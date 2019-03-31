@@ -6,24 +6,24 @@
 #include "GameFramework/Character.h"
 #include "SaucewichCharacter.generated.h"
 
-UCLASS(Abstract, Config = Input)
+UCLASS(Abstract)
 class ASaucewichCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
 	class UCameraComponent* FollowCamera;
 
 public:
 	ASaucewichCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Config)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	float BaseTurnRate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, Config)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	float BaseLookUpRate;
 
 protected:
@@ -31,8 +31,6 @@ protected:
 	void MoveRight(float Value);
 	void TurnAtRate(float Rate);
 	void LookUpAtRate(float Rate);
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

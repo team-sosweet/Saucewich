@@ -13,6 +13,8 @@
 // ASaucewichCharacter
 
 ASaucewichCharacter::ASaucewichCharacter()
+	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom")) },
+	FollowCamera{ CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera")) }
 {
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -28,12 +30,10 @@ ASaucewichCharacter::ASaucewichCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 }
@@ -43,9 +43,6 @@ ASaucewichCharacter::ASaucewichCharacter()
 
 void ASaucewichCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASaucewichCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASaucewichCharacter::MoveRight);
 
@@ -53,19 +50,6 @@ void ASaucewichCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASaucewichCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASaucewichCharacter::LookUpAtRate);
-
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ASaucewichCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ASaucewichCharacter::TouchStopped);
-}
-
-void ASaucewichCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	Jump();
-}
-
-void ASaucewichCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	StopJumping();
 }
 
 void ASaucewichCharacter::TurnAtRate(float Rate)
