@@ -5,37 +5,33 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapon.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ASaucewichCharacter
 
 ASaucewichCharacter::ASaucewichCharacter()
-	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom")) },
-	FollowCamera{ CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera")) }
+	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>("CameraBoom") },
+	FollowCamera{ CreateDefaultSubobject<UCameraComponent>("FollowCamera") }
 {
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
-
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
-
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f;
-	CameraBoom->bUsePawnControlRotation = true;
-
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Weapon
+
+void ASaucewichCharacter::GiveWeapon(AWeapon * Weapon)
+{
+	if (Weapon)
+	{
+		this->Weapon = Weapon;
+		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

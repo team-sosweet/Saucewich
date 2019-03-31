@@ -11,28 +11,36 @@ class ASaucewichCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	class USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	class UCameraComponent* FollowCamera;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void GiveWeapon(class AWeapon* Weapon);
+
+private:
+	UPROPERTY(VisibleInstanceOnly, Transient)
+	class AWeapon* Weapon;
 
 public:
 	ASaucewichCharacter();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseTurnRate;
+	float BaseTurnRate = 45.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseLookUpRate;
+	float BaseLookUpRate = 45.f;
 
-protected:
+private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void TurnAtRate(float Rate);
 	void LookUpAtRate(float Rate);
 
-protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
