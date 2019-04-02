@@ -14,7 +14,7 @@ enum class EDirection : uint8
 	Left, Right
 };
 
-UCLASS(Abstract)
+UCLASS(Abstract, Config = Input)
 class ASaucewichCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -24,9 +24,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GiveWeapon(class AWeapon* Weapon);
-
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
@@ -41,10 +38,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	float TurnAnimRate = 90.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Camera", Config)
 	float BaseTurnRate = 45.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category = "Camera", Config)
 	float BaseLookUpRate = 45.f;
 
 	UPROPERTY(VisibleInstanceOnly, Transient)
