@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2019, 이석진, 강찬. All rights reserved.
+﻿// Copyright (c) 2019, Team Sosweet. All rights reserved.
 
 #include "SaucewichCharacter.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UnrealNetwork.h"
 #include "Weapon.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -22,6 +22,16 @@ ASaucewichCharacter::ASaucewichCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
 
+void ASaucewichCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	TurnWhenNotMoving();
+	ReplicateCameraYaw();
+
+	PostTick.Broadcast(DeltaTime);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Weapon
 
@@ -32,6 +42,127 @@ void ASaucewichCharacter::GiveWeapon(AWeapon * Weapon)
 		this->Weapon = Weapon;
 		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Turn when not moving
+
+void ASaucewichCharacter::TurnWhenNotMoving()
+{
+	if (Role == ROLE_SimulatedProxy) return;
+
+	bool bMoving = GetVelocity().Size() > 0.f;
+	GetCharacterMovement()->bUseControllerDesiredRotation = bMoving;
+
+	if (!IsLocallyControlled()) return;
+
+	if (!bMoving)
+	{
+		EDirection TurnDirection;
+		bool bShouldTurn = CheckShouldTurn(TurnDirection);
+		if (bShouldTurn)
+		{
+			StartTurn(TurnDirection);
+		}
+	}
+}
+
+bool ASaucewichCharacter::CheckShouldTurn(EDirection& OutDirection)
+{
+	if (DoTurn.IsValid()) return false;
+
+	float Diff = FRotator::NormalizeAxis(GetActorRotation().Yaw - GetBaseAimRotation().Yaw);
+	bool bShouldTurn = FMath::Abs(Diff) > TurnAnimRate;
+	if (bShouldTurn)
+	{
+		OutDirection = Diff < 0.f ? EDirection::Right : EDirection::Left;
+		return true;
+	}
+
+	return false;
+}
+
+void ASaucewichCharacter::StartTurn(EDirection Direction)
+{
+	ServerStartTurn(Direction);
+
+	if (Role != ROLE_Authority)
+	{
+		StartTurn_Internal(Direction);
+	}
+}
+
+void ASaucewichCharacter::StartTurn_Internal(EDirection Direction)
+{
+	float TurnTime = TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f;
+	TurnAlpha = 0.f;
+
+	FRotator OldRotation = GetActorRotation();
+	FRotator NewRotation = OldRotation;
+	NewRotation.Yaw += Direction == EDirection::Right ? 90.f : -90.f;
+	
+	DoTurn = PostTick.AddLambda([=](float DeltaTime)
+	{
+		TurnAlpha += DeltaTime / TurnTime;
+		if (TurnAlpha >= 1.f)
+		{
+			PostTick.Remove(DoTurn);
+			DoTurn.Reset();
+		}
+		else
+		{
+			SetActorRotation(FMath::Lerp(OldRotation, NewRotation, TurnAlpha));
+		}
+	});
+
+	SimulateTurn(Direction);
+}
+
+void ASaucewichCharacter::SimulateTurn(EDirection Direction)
+{
+	PlayAnimMontage(TurnAnim, 1.f, Direction == EDirection::Left ? "Left" : "Right");
+}
+
+void ASaucewichCharacter::ServerStartTurn_Implementation(EDirection Direction)
+{
+	MulticastSimulateTurn(Direction);
+	StartTurn_Internal(Direction);
+}
+bool ASaucewichCharacter::ServerStartTurn_Validate(EDirection) { return true; }
+
+void ASaucewichCharacter::MulticastSimulateTurn_Implementation(EDirection Direction)
+{
+	if (Role != ROLE_AutonomousProxy)
+	{
+		SimulateTurn(Direction);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Replication
+
+void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
+}
+
+FRotator ASaucewichCharacter::GetBaseAimRotation() const
+{
+	FRotator BaseRotation = Super::GetBaseAimRotation();
+	if (Role == ROLE_SimulatedProxy)
+	{
+		BaseRotation.Yaw = FRotator::DecompressAxisFromByte(RemoteViewYaw);
+	}
+	return BaseRotation;
+}
+
+void ASaucewichCharacter::ReplicateCameraYaw()
+{
+	if (Role != ROLE_Authority) return;
+
+	RemoteViewYaw = FRotator::CompressAxisToByte(FollowCamera->GetComponentRotation().Yaw);
 }
 
 //////////////////////////////////////////////////////////////////////////
