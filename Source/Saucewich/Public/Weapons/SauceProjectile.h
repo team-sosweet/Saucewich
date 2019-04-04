@@ -13,14 +13,18 @@ class SAUCEWICH_API ASauceProjectile : public AActor
 	
 public:	
 	ASauceProjectile();
+	
+	void SetUsing(bool bUse);
+	bool IsUsing() const { return bUsing; }
 
 private:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* Movement;
+
+	uint8 bUsing : 1;
+
+	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 };
