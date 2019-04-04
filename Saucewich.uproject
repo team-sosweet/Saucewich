@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.21",
+	"EngineAssociation": "4.22",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -12,5 +12,14 @@
 				"Engine"
 			]
 		}
+	],
+	"TargetPlatforms": [
+		"AllDesktop",
+		"Android",
+		"HTML5",
+		"IOS",
+		"LinuxNoEditor",
+		"MacNoEditor",
+		"WindowsNoEditor"
 	]
 }

@@ -22,7 +22,7 @@ ASaucewichCharacter::ASaucewichCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
 
-void ASaucewichCharacter::Tick(float DeltaTime)
+void ASaucewichCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -35,12 +35,28 @@ void ASaucewichCharacter::Tick(float DeltaTime)
 //////////////////////////////////////////////////////////////////////////
 // Weapon
 
-void ASaucewichCharacter::GiveWeapon(AWeapon * Weapon)
+void ASaucewichCharacter::GiveWeapon(AWeapon* const NewWeapon)
+{
+	if (NewWeapon)
+	{
+		Weapon = NewWeapon;
+		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+	}
+}
+
+void ASaucewichCharacter::WeaponAttack()
 {
 	if (Weapon)
 	{
-		this->Weapon = Weapon;
-		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+		Weapon->Attack();
+	}
+}
+
+void ASaucewichCharacter::WeaponStopAttack()
+{
+	if (Weapon)
+	{
+		Weapon->StopAttack();
 	}
 }
 
@@ -51,7 +67,7 @@ void ASaucewichCharacter::TurnWhenNotMoving()
 {
 	if (Role == ROLE_SimulatedProxy) return;
 
-	bool bMoving = GetVelocity().Size() > 0.f;
+	const bool bMoving = GetVelocity().Size() > 0.f;
 	GetCharacterMovement()->bUseControllerDesiredRotation = bMoving;
 
 	if (!IsLocallyControlled()) return;
@@ -59,7 +75,7 @@ void ASaucewichCharacter::TurnWhenNotMoving()
 	if (!bMoving)
 	{
 		EDirection TurnDirection;
-		bool bShouldTurn = CheckShouldTurn(TurnDirection);
+		const bool bShouldTurn = CheckShouldTurn(TurnDirection);
 		if (bShouldTurn)
 		{
 			StartTurn(TurnDirection);
@@ -71,18 +87,18 @@ bool ASaucewichCharacter::CheckShouldTurn(EDirection& OutDirection)
 {
 	if (DoTurn.IsValid()) return false;
 
-	float Diff = FRotator::NormalizeAxis(GetActorRotation().Yaw - GetBaseAimRotation().Yaw);
-	bool bShouldTurn = FMath::Abs(Diff) > TurnAnimRate;
+	const float Diff = FRotator::NormalizeAxis(GetActorRotation().Yaw - GetBaseAimRotation().Yaw);
+	const bool bShouldTurn = FMath::Abs(Diff) > TurnAnimRate;
 	if (bShouldTurn)
 	{
-		OutDirection = Diff < 0.f ? EDirection::Right : EDirection::Left;
+		OutDirection = (Diff < 0.f) ? EDirection::Right : EDirection::Left;
 		return true;
 	}
 
 	return false;
 }
 
-void ASaucewichCharacter::StartTurn(EDirection Direction)
+void ASaucewichCharacter::StartTurn(const EDirection Direction)
 {
 	ServerStartTurn(Direction);
 
@@ -92,16 +108,15 @@ void ASaucewichCharacter::StartTurn(EDirection Direction)
 	}
 }
 
-void ASaucewichCharacter::StartTurn_Internal(EDirection Direction)
+void ASaucewichCharacter::StartTurn_Internal(const EDirection Direction)
 {
-	float TurnTime = TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f;
-	TurnAlpha = 0.f;
+	const float TurnTime = TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f;
+	const float YawDelta = 90.f * ((Direction == EDirection::Right) ? 1.f : -1.f);
+	const FRotator OldRotation = GetActorRotation();
+	const FRotator NewRotation = OldRotation + FRotator{ 0.f, YawDelta, 0.f };
 
-	FRotator OldRotation = GetActorRotation();
-	FRotator NewRotation = OldRotation;
-	NewRotation.Yaw += Direction == EDirection::Right ? 90.f : -90.f;
-	
-	DoTurn = PostTick.AddLambda([=](float DeltaTime)
+	TurnAlpha = 0.f;
+	DoTurn = PostTick.AddLambda([=](const float DeltaTime)
 	{
 		TurnAlpha += DeltaTime / TurnTime;
 		if (TurnAlpha >= 1.f)
@@ -115,26 +130,27 @@ void ASaucewichCharacter::StartTurn_Internal(EDirection Direction)
 		}
 	});
 
-	SimulateTurn(Direction);
+	PlayTurnAnim(Direction);
 }
 
-void ASaucewichCharacter::SimulateTurn(EDirection Direction)
+void ASaucewichCharacter::PlayTurnAnim(const EDirection Direction)
 {
-	PlayAnimMontage(TurnAnim, 1.f, Direction == EDirection::Left ? "Left" : "Right");
+	const FName Section = (Direction == EDirection::Left) ? "Left" : "Right";
+	PlayAnimMontage(TurnAnim, 1.f, Section);
 }
 
-void ASaucewichCharacter::ServerStartTurn_Implementation(EDirection Direction)
+void ASaucewichCharacter::ServerStartTurn_Implementation(const EDirection Direction)
 {
 	MulticastSimulateTurn(Direction);
 	StartTurn_Internal(Direction);
 }
 bool ASaucewichCharacter::ServerStartTurn_Validate(EDirection) { return true; }
 
-void ASaucewichCharacter::MulticastSimulateTurn_Implementation(EDirection Direction)
+void ASaucewichCharacter::MulticastSimulateTurn_Implementation(const EDirection Direction)
 {
 	if (Role != ROLE_AutonomousProxy)
 	{
-		SimulateTurn(Direction);
+		PlayTurnAnim(Direction);
 	}
 }
 
@@ -145,6 +161,7 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ASaucewichCharacter, Weapon);
 	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
 }
 
@@ -168,7 +185,7 @@ void ASaucewichCharacter::ReplicateCameraYaw()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void ASaucewichCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ASaucewichCharacter::SetupPlayerInputComponent(UInputComponent* const PlayerInputComponent)
 {
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASaucewichCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASaucewichCharacter::MoveRight);
@@ -177,38 +194,41 @@ void ASaucewichCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASaucewichCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASaucewichCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &ASaucewichCharacter::WeaponAttack);
+	PlayerInputComponent->BindAction("Attack", IE_Released, this, &ASaucewichCharacter::WeaponStopAttack);
 }
 
-void ASaucewichCharacter::TurnAtRate(float Rate)
+void ASaucewichCharacter::TurnAtRate(const float Rate)
 {
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ASaucewichCharacter::LookUpAtRate(float Rate)
+void ASaucewichCharacter::LookUpAtRate(const float Rate)
 {
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ASaucewichCharacter::MoveForward(float Value)
+void ASaucewichCharacter::MoveForward(const float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if (Controller && Value != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation{ 0.f, Rotation.Yaw, 0.f };
 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector Direction = FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
 	}
 }
 
-void ASaucewichCharacter::MoveRight(float Value)
+void ASaucewichCharacter::MoveRight(const float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if (Controller && Value != 0.0f)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation{ 0.f, Rotation.Yaw, 0.f };
 	
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector Direction = FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 	}
 }

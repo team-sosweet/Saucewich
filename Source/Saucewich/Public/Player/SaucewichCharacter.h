@@ -14,6 +14,8 @@ enum class EDirection : uint8
 	Left, Right
 };
 
+class AWeapon;
+
 UCLASS(Abstract, Config = Input)
 class ASaucewichCharacter : public ACharacter
 {
@@ -23,7 +25,7 @@ public:
 	ASaucewichCharacter();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GiveWeapon(class AWeapon* Weapon);
+	void GiveWeapon(AWeapon* Weapon);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
@@ -44,12 +46,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera", Config)
 	float BaseLookUpRate = 45.f;
 
-	UPROPERTY(VisibleInstanceOnly, Transient)
-	class AWeapon* Weapon;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
 	FTickDelegate PostTick;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Weapon
+
+	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	AWeapon* Weapon;
+
+	void WeaponAttack();
+	void WeaponStopAttack();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Turn when not moving
@@ -58,7 +65,7 @@ private:
 	bool CheckShouldTurn(EDirection& OutDirection);
 	void StartTurn(EDirection Direction);
 	void StartTurn_Internal(EDirection Direction);
-	void SimulateTurn(EDirection Direction);
+	void PlayTurnAnim(EDirection Direction);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerStartTurn(EDirection Direction);
@@ -75,7 +82,6 @@ private:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual FRotator GetBaseAimRotation() const override;
-
 	void ReplicateCameraYaw();
 
 	UPROPERTY(Replicated, Transient)
@@ -83,6 +89,8 @@ private:
 
 	//////////////////////////////////////////////////////////////////////////
 	// Input
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
