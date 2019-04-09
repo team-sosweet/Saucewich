@@ -28,7 +28,7 @@ void ASaucewichCharacter::Tick(const float DeltaTime)
 
 	TurnWhenNotMoving();
 	ReplicateCameraYaw();
-
+	GetPawnViewLocation();
 	PostTick.Broadcast(DeltaTime);
 }
 
@@ -163,6 +163,14 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 	DOREPLIFETIME(ASaucewichCharacter, Weapon);
 	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Camera
+
+FVector ASaucewichCharacter::GetPawnViewLocation() const
+{
+	return FollowCamera->GetComponentLocation();
 }
 
 FRotator ASaucewichCharacter::GetBaseAimRotation() const

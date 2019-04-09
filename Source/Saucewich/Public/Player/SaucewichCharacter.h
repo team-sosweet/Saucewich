@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GiveWeapon(AWeapon* Weapon);
 
+	virtual FVector GetPawnViewLocation() const override;
+	virtual FRotator GetBaseAimRotation() const override;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
 	class USpringArmComponent* CameraBoom;
@@ -81,7 +84,6 @@ private:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual FRotator GetBaseAimRotation() const override;
 	void ReplicateCameraYaw();
 
 	UPROPERTY(Replicated, Transient)
