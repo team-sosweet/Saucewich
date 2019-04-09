@@ -27,7 +27,7 @@ void ASaucewichCharacter::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	TurnWhenNotMoving();
-	ReplicateCameraYaw();
+	ReplicateView();
 	GetPawnViewLocation();
 	PostTick.Broadcast(DeltaTime);
 }
@@ -163,6 +163,7 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 	DOREPLIFETIME(ASaucewichCharacter, Weapon);
 	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
+	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewLocation, COND_SimulatedOnly);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,7 +171,7 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 FVector ASaucewichCharacter::GetPawnViewLocation() const
 {
-	return FollowCamera->GetComponentLocation();
+	return Role == ROLE_SimulatedProxy ? RemoteViewLocation : FollowCamera->GetComponentLocation();
 }
 
 FRotator ASaucewichCharacter::GetBaseAimRotation() const
@@ -183,11 +184,12 @@ FRotator ASaucewichCharacter::GetBaseAimRotation() const
 	return BaseRotation;
 }
 
-void ASaucewichCharacter::ReplicateCameraYaw()
+void ASaucewichCharacter::ReplicateView()
 {
 	if (Role != ROLE_Authority) return;
 
 	RemoteViewYaw = FRotator::CompressAxisToByte(FollowCamera->GetComponentRotation().Yaw);
+	RemoteViewLocation = FollowCamera->GetComponentLocation();
 }
 
 //////////////////////////////////////////////////////////////////////////

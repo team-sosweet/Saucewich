@@ -84,10 +84,13 @@ private:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void ReplicateCameraYaw();
+	void ReplicateView();
 
 	UPROPERTY(Replicated, Transient)
 	uint8 RemoteViewYaw;
+
+	UPROPERTY(Replicated, Transient)
+	FVector_NetQuantize RemoteViewLocation;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Input
