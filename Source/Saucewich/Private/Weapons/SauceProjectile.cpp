@@ -11,6 +11,11 @@ ASauceProjectile::ASauceProjectile()
 	RootComponent = Mesh;
 }
 
+void ASauceProjectile::Init(float Damage)
+{
+	this->Damage = Damage;
+}
+
 void ASauceProjectile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -21,6 +26,15 @@ void ASauceProjectile::BeginPlay()
 void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	if (Other)
+	{
+		APawn* const Instigtor = GetInstigator();
+		if (Instigator)
+		{
+			static const FDamageEvent DamageEvent;
+			Other->TakeDamage(Damage, DamageEvent, Instigator->GetController(), this);
+		}
+	}
 	ReturnToPool();
 }
 

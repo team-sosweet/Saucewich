@@ -12,7 +12,6 @@
 #include "Weapon.h"
 
 //////////////////////////////////////////////////////////////////////////
-// ASaucewichCharacter
 
 ASaucewichCharacter::ASaucewichCharacter()
 	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>("CameraBoom") },
@@ -32,8 +31,45 @@ void ASaucewichCharacter::Tick(const float DeltaTime)
 	PostTick.Broadcast(DeltaTime);
 }
 
+void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASaucewichCharacter, Weapon);
+	DOREPLIFETIME(ASaucewichCharacter, HP);
+	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
+	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewLocation, COND_SimulatedOnly);
+}
+
 //////////////////////////////////////////////////////////////////////////
-// Weapon
+
+float ASaucewichCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (Role != ROLE_Authority) return 0.f;
+
+	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	HP = FMath::Clamp(HP - ActualDamage, 0.f, GetClass()->GetDefaultObject<ASaucewichCharacter>()->HP);
+	OnHPChanged();
+	return ActualDamage;
+}
+
+void ASaucewichCharacter::OnHPChanged()
+{
+	if (HP <= 0.f)
+	{
+		Kill();
+	}
+}
+
+void ASaucewichCharacter::Kill()
+{
+	SetActorTickEnabled(false);
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(true);
+	OnDeath.Broadcast();
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 void ASaucewichCharacter::GiveWeapon(AWeapon* const NewWeapon)
 {
@@ -42,6 +78,11 @@ void ASaucewichCharacter::GiveWeapon(AWeapon* const NewWeapon)
 		Weapon = NewWeapon;
 		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
 	}
+}
+
+bool ASaucewichCharacter::CanAttack() const
+{
+	return HP > 0.f;
 }
 
 void ASaucewichCharacter::WeaponAttack()
@@ -61,7 +102,6 @@ void ASaucewichCharacter::WeaponStopAttack()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Turn when not moving
 
 void ASaucewichCharacter::TurnWhenNotMoving()
 {
@@ -155,19 +195,6 @@ void ASaucewichCharacter::MulticastSimulateTurn_Implementation(const EDirection 
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Replication
-
-void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ASaucewichCharacter, Weapon);
-	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
-	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewLocation, COND_SimulatedOnly);
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Camera
 
 FVector ASaucewichCharacter::GetPawnViewLocation() const
 {
@@ -193,7 +220,6 @@ void ASaucewichCharacter::ReplicateView()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Input
 
 void ASaucewichCharacter::SetupPlayerInputComponent(UInputComponent* const PlayerInputComponent)
 {

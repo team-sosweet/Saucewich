@@ -13,9 +13,8 @@ class SAUCEWICH_API ASauceProjectile : public APoolActor
 	
 public:	
 	ASauceProjectile();
+	void Init(float Damage);
 
-	class UStaticMeshComponent* GetMesh() const { return Mesh; }
-	
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
@@ -30,4 +29,6 @@ private:
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	virtual void BeginReuse() override;
+
+	float Damage;
 };
