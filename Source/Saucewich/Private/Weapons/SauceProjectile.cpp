@@ -11,9 +11,9 @@ ASauceProjectile::ASauceProjectile()
 	RootComponent = Mesh;
 }
 
-void ASauceProjectile::Init(float Damage)
+void ASauceProjectile::Init(float NewDamage)
 {
-	this->Damage = Damage;
+	this->Damage = NewDamage;
 }
 
 void ASauceProjectile::BeginPlay()
