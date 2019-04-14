@@ -32,6 +32,12 @@ void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 	ReturnToPool();
 }
 
+void ASauceProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	Mesh->IgnoreActorWhenMoving(GetInstigator(), true);
+}
+
 void ASauceProjectile::BeginReuse()
 {
 	Movement->SetUpdatedComponent(RootComponent);

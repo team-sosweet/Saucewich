@@ -26,6 +26,7 @@ private:
 	float CharacterVelocityApplyRate = .5f;
 
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	virtual void BeginPlay() override;
 	virtual void BeginReuse() override;
 
 	float Damage;
