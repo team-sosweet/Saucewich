@@ -84,7 +84,7 @@ void ASaucewichCharacter::GiveWeapon(AWeapon* const NewWeapon)
 		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
 
 		const float DefaultSpeed = GetClass()->GetDefaultObject<ASaucewichCharacter>()->GetCharacterMovement()->MaxWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Weapon->Weight, 0.f, DefaultSpeed);
+		GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Weapon->GetData().Weight, 0.f, DefaultSpeed);
 	}
 }
 

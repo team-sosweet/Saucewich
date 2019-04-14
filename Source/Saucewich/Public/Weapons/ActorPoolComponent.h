@@ -1,4 +1,4 @@
-// Copyright (c) 2019, Team Sosweet. All rights reserved.
+// Copyright (c) 2019, Seokjin Lee. All rights reserved.
 
 #pragma once
 
