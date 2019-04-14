@@ -1,4 +1,4 @@
-// Copyright (c) 2019, Team Sosweet. All rights reserved.
+// Copyright (c) 2019, Seokjin Lee. All rights reserved.
 
 #include "ActorPoolComponent.h"
 #include "Engine/World.h"
@@ -33,14 +33,15 @@ APoolActor* UActorPoolComponent::SpawnActor(const FTransform& Transform, const F
 	{
 		NewActor = AvailableActors.Last();
 		NewActor->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
-		USceneComponent* TemplateRoot = Template->GetRootComponent();
+		const USceneComponent* const TemplateRoot = Template->GetRootComponent();
 		if (TemplateRoot)
 		{
-			TemplateRoot->SetRelativeScale3D(TemplateRoot->RelativeScale3D * Transform.GetScale3D());
+			NewActor->SetActorScale3D(TemplateRoot->RelativeScale3D * Transform.GetScale3D());
 		}
 
 		NewActor->SpawnCollisionHandlingMethod = CollisionHandlingMethod;
-		if (!NewActor->HandleCollision()) return nullptr;
+		const bool bCanSpawn = NewActor->HandleCollision();
+		if (!bCanSpawn) return nullptr;
 
 		AvailableActors.RemoveAt(AvailableActors.Num() - 1, 1, false);
 	}

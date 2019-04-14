@@ -11,16 +11,10 @@ ASauceProjectile::ASauceProjectile()
 	RootComponent = Mesh;
 }
 
-void ASauceProjectile::Init(float NewDamage)
+void ASauceProjectile::Init(float NewDamage, float NewSpeed)
 {
-	this->Damage = NewDamage;
-}
-
-void ASauceProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-
-	Movement->Velocity += GetInstigator()->GetVelocity() * CharacterVelocityApplyRate;
+	Damage = NewDamage;
+	Movement->Velocity = GetActorForwardVector() * NewSpeed + GetInstigator()->GetVelocity() * CharacterVelocityApplyRate;
 }
 
 void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
@@ -41,5 +35,4 @@ void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 void ASauceProjectile::BeginReuse()
 {
 	Movement->SetUpdatedComponent(RootComponent);
-	Movement->Velocity = GetActorForwardVector() * Movement->InitialSpeed + GetInstigator()->GetVelocity() * CharacterVelocityApplyRate;
 }

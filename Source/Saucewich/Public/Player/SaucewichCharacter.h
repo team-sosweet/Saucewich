@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GiveWeapon(AWeapon* Weapon);
 
+	UFUNCTION(BlueprintCallable)
+	AWeapon* GetWeapon() const { return Weapon; }
+
 	bool CanAttack() const;
 
 	virtual FVector GetPawnViewLocation() const override;
