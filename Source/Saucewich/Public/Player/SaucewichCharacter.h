@@ -7,6 +7,7 @@
 #include "SaucewichCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FTickDelegate, float)
+DECLARE_EVENT(ASaucewichCharacter, FOnCharacterDeath)
 
 UENUM()
 enum class EDirection : uint8
@@ -24,8 +25,18 @@ class ASaucewichCharacter : public ACharacter
 public:
 	ASaucewichCharacter();
 
+	FOnCharacterDeath OnDeath;
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GiveWeapon(AWeapon* Weapon);
+
+	UFUNCTION(BlueprintCallable)
+	AWeapon* GetWeapon() const { return Weapon; }
+
+	bool CanAttack() const;
+
+	virtual FVector GetPawnViewLocation() const override;
+	virtual FRotator GetBaseAimRotation() const override;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
@@ -50,7 +61,18 @@ private:
 	FTickDelegate PostTick;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Weapon
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnHPChanged, meta = (AllowPrivateAccess = true))
+	float HP = 100.f;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION()
+	void OnHPChanged();
+
+	void Kill();
+
+	//////////////////////////////////////////////////////////////////////////
 
 	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	AWeapon* Weapon;
@@ -59,7 +81,6 @@ private:
 	void WeaponStopAttack();
 
 	//////////////////////////////////////////////////////////////////////////
-	// Turn when not moving
 
 	void TurnWhenNotMoving();
 	bool CheckShouldTurn(EDirection& OutDirection);
@@ -77,18 +98,18 @@ private:
 	float TurnAlpha;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Replication
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual FRotator GetBaseAimRotation() const override;
-	void ReplicateCameraYaw();
+	void ReplicateView();
 
 	UPROPERTY(Replicated, Transient)
 	uint8 RemoteViewYaw;
 
+	UPROPERTY(Replicated, Transient)
+	FVector_NetQuantize RemoteViewLocation;
+
 	//////////////////////////////////////////////////////////////////////////
-	// Input
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
