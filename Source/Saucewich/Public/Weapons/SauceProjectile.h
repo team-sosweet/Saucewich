@@ -13,9 +13,8 @@ class SAUCEWICH_API ASauceProjectile : public APoolActor
 	
 public:	
 	ASauceProjectile();
+	void Init(float Damage, float Speed);
 
-	class UStaticMeshComponent* GetMesh() const { return Mesh; }
-	
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
@@ -23,11 +22,12 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* Movement;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	float CharacterVelocityApplyRate = .5f;
 
-	virtual void BeginPlay() override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-
+	virtual void BeginPlay() override;
 	virtual void BeginReuse() override;
+
+	float Damage;
 };
