@@ -25,7 +25,7 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ASaucewichCharacter* const Character = GetInstigator<ASaucewichCharacter>();
+	const auto Character{ GetInstigator<ASaucewichCharacter>() };
 	if (Character)
 	{
 		Role = Character->Role;
@@ -112,7 +112,7 @@ void AWeapon::StopAttack()
 
 bool AWeapon::CanAttack() const
 {
-	ASaucewichCharacter* const Character = GetInstigator<ASaucewichCharacter>();
+	const auto Character{ GetInstigator<ASaucewichCharacter>() };
 	return Character && Character->Alive() && SauceAmount > 0 && NextAttackTime <= GetWorld()->GetTimeSeconds() && !bDried;
 }
 
@@ -127,7 +127,7 @@ void AWeapon::OnRep_Attacking()
 
 void AWeapon::HandleAttack()
 {
-	AActor* const Sauce = ShootSauce();
+	const auto Sauce{ ShootSauce() };
 	if (Sauce)
 	{
 		NextAttackTime = GetWorld()->GetTimeSeconds() + GetData().AttackDelay;
@@ -144,15 +144,15 @@ void AWeapon::HandleAttack()
 
 AActor* AWeapon::ShootSauce()
 {
-	APawn* const Pawn = GetInstigator();
+	const auto Pawn{ GetInstigator() };
 	if (!Pawn) return nullptr;
 
 	auto& Data = GetData();
 
-	FTransform SpawnTransform = Muzzle->GetComponentTransform();
+	auto SpawnTransform{ Muzzle->GetComponentTransform() };
 
-	const FVector Start = Pawn->GetPawnViewLocation();
-	const FVector End = Start + Pawn->GetBaseAimRotation().Vector() * Data.ProjectileSpeed;
+	const auto Start{ Pawn->GetPawnViewLocation() };
+	const auto End{ Start + Pawn->GetBaseAimRotation().Vector() * Data.ProjectileSpeed };
 	FHitResult Hit;
 	if (GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile"))
 	{
@@ -163,7 +163,7 @@ AActor* AWeapon::ShootSauce()
 	Param.Instigator = Pawn;
 	Param.Owner = this;
 	bool bReused;
-	ASauceProjectile* const Sauce = ProjectilePool->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused);
+	const auto Sauce{ ProjectilePool->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused) };
 	if (Sauce)
 	{
 		Sauce->Init(Data.Damage, Data.ProjectileSpeed);

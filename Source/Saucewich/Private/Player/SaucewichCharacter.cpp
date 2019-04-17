@@ -43,11 +43,11 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 //////////////////////////////////////////////////////////////////////////
 
-float ASaucewichCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ASaucewichCharacter::TakeDamage(const float Damage, FDamageEvent const& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
 	if (Role != ROLE_Authority) return 0.f;
 
-	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	const auto ActualDamage{ Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser) };
 	HP = FMath::Clamp(HP - ActualDamage, 0.f, GetClass()->GetDefaultObject<ASaucewichCharacter>()->HP);
 	OnHPChanged();
 	return ActualDamage;
@@ -117,7 +117,7 @@ void ASaucewichCharacter::TurnWhenNotMoving()
 {
 	if (Role == ROLE_SimulatedProxy) return;
 
-	const bool bMoving = GetVelocity().Size() > 0.f;
+	const auto bMoving{ GetVelocity().Size() > 0.f };
 	GetCharacterMovement()->bUseControllerDesiredRotation = bMoving;
 
 	if (!IsLocallyControlled()) return;
@@ -125,7 +125,7 @@ void ASaucewichCharacter::TurnWhenNotMoving()
 	if (!bMoving)
 	{
 		EDirection TurnDirection;
-		const bool bShouldTurn = CheckShouldTurn(TurnDirection);
+		const auto bShouldTurn{ CheckShouldTurn(TurnDirection) };
 		if (bShouldTurn)
 		{
 			StartTurn(TurnDirection);
@@ -137,8 +137,8 @@ bool ASaucewichCharacter::CheckShouldTurn(EDirection& OutDirection)
 {
 	if (DoTurn.IsValid()) return false;
 
-	const float Diff = FRotator::NormalizeAxis(GetActorRotation().Yaw - GetBaseAimRotation().Yaw);
-	const bool bShouldTurn = FMath::Abs(Diff) > TurnAnimRate;
+	const auto Diff{ FRotator::NormalizeAxis(GetActorRotation().Yaw - GetBaseAimRotation().Yaw) };
+	const auto bShouldTurn{ FMath::Abs(Diff) > TurnAnimRate };
 	if (bShouldTurn)
 	{
 		OutDirection = (Diff < 0.f) ? EDirection::Right : EDirection::Left;
@@ -160,13 +160,13 @@ void ASaucewichCharacter::StartTurn(const EDirection Direction)
 
 void ASaucewichCharacter::StartTurn_Internal(const EDirection Direction)
 {
-	const float TurnTime = TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f;
-	const float YawDelta = 90.f * ((Direction == EDirection::Right) ? 1.f : -1.f);
-	const FRotator OldRotation = GetActorRotation();
-	const FRotator NewRotation = OldRotation + FRotator{ 0.f, YawDelta, 0.f };
+	const auto TurnTime{ TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f };
+	const auto YawDelta{ 90.f * ((Direction == EDirection::Right) ? 1.f : -1.f) };
+	const auto OldRotation{ GetActorRotation() };
+	const auto NewRotation{ OldRotation + FRotator{ 0.f, YawDelta, 0.f } };
 
 	TurnAlpha = 0.f;
-	DoTurn = PostTick.AddLambda([=](const float DeltaTime)
+	DoTurn = PostTick.AddLambda([this, TurnTime, OldRotation, NewRotation](const float DeltaTime)
 	{
 		TurnAlpha += DeltaTime / TurnTime;
 		if (TurnAlpha >= 1.f)
@@ -185,8 +185,7 @@ void ASaucewichCharacter::StartTurn_Internal(const EDirection Direction)
 
 void ASaucewichCharacter::PlayTurnAnim(const EDirection Direction)
 {
-	const FName Section = (Direction == EDirection::Left) ? "Left" : "Right";
-	PlayAnimMontage(TurnAnim, 1.f, Section);
+	PlayAnimMontage(TurnAnim, 1.f, (Direction == EDirection::Left) ? "Left" : "Right");
 }
 
 void ASaucewichCharacter::ServerStartTurn_Implementation(const EDirection Direction)
@@ -213,7 +212,7 @@ FVector ASaucewichCharacter::GetPawnViewLocation() const
 
 FRotator ASaucewichCharacter::GetBaseAimRotation() const
 {
-	FRotator BaseRotation = Super::GetBaseAimRotation();
+	auto BaseRotation = Super::GetBaseAimRotation();
 	if (Role == ROLE_SimulatedProxy)
 	{
 		BaseRotation.Yaw = FRotator::DecompressAxisFromByte(RemoteViewYaw);
@@ -259,10 +258,10 @@ void ASaucewichCharacter::MoveForward(const float Value)
 {
 	if (Controller && Value != 0.0f)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
+		const auto Rotation{ Controller->GetControlRotation() };
 		const FRotator YawRotation{ 0.f, Rotation.Yaw, 0.f };
 
-		const FVector Direction = FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::X);
+		const auto Direction{ FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::X) };
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -271,10 +270,10 @@ void ASaucewichCharacter::MoveRight(const float Value)
 {
 	if (Controller && Value != 0.0f)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
+		const auto Rotation{ Controller->GetControlRotation() };
 		const FRotator YawRotation{ 0.f, Rotation.Yaw, 0.f };
 	
-		const FVector Direction = FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::Y);
+		const auto Direction{ FRotationMatrix{ YawRotation }.GetUnitAxis(EAxis::Y) };
 		AddMovementInput(Direction, Value);
 	}
 }
