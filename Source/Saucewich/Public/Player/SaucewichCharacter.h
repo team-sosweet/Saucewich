@@ -33,7 +33,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AWeapon* GetWeapon() const { return Weapon; }
 
-	bool CanAttack() const;
+	bool Alive() const { return HP > 0.f; }
 
 	virtual FVector GetPawnViewLocation() const override;
 	virtual FRotator GetBaseAimRotation() const override;

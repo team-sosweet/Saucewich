@@ -113,7 +113,7 @@ void AWeapon::StopAttack()
 bool AWeapon::CanAttack() const
 {
 	ASaucewichCharacter* const Character = GetInstigator<ASaucewichCharacter>();
-	return Character && Character->CanAttack() && SauceAmount > 0 && NextAttackTime <= GetWorld()->GetTimeSeconds() && !bDried;
+	return Character && Character->Alive() && SauceAmount > 0 && NextAttackTime <= GetWorld()->GetTimeSeconds() && !bDried;
 }
 
 void AWeapon::OnRep_Attacking()

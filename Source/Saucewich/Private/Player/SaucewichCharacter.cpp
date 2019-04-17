@@ -95,11 +95,6 @@ void ASaucewichCharacter::GiveWeapon(TSubclassOf<AWeapon> WeaponClass)
 	}
 }
 
-bool ASaucewichCharacter::CanAttack() const
-{
-	return HP > 0.f;
-}
-
 void ASaucewichCharacter::WeaponAttack()
 {
 	if (Weapon)
