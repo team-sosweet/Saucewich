@@ -28,7 +28,7 @@ public:
 	FOnCharacterDeath OnDeath;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GiveWeapon(AWeapon* Weapon);
+	void GiveWeapon(TSubclassOf<AWeapon> WeaponClass);
 
 	UFUNCTION(BlueprintCallable)
 	AWeapon* GetWeapon() const { return Weapon; }

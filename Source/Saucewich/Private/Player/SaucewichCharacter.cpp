@@ -71,20 +71,27 @@ void ASaucewichCharacter::Kill()
 
 //////////////////////////////////////////////////////////////////////////
 
-void ASaucewichCharacter::GiveWeapon(AWeapon* const NewWeapon)
+void ASaucewichCharacter::GiveWeapon(TSubclassOf<AWeapon> WeaponClass)
 {
-	if (NewWeapon)
+	if (WeaponClass)
 	{
-		if (Weapon)
+		FActorSpawnParameters Param;
+		Param.Owner = this;
+		Param.Instigator = this;
+		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(WeaponClass, Param) })
 		{
-			Weapon->Destroy();
+			if (Weapon)
+			{
+				Weapon->Destroy();
+			}
+			Weapon = NewWeapon;
+
+			Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+
+			const auto DefaultSpeed{ GetClass()->GetDefaultObject<ASaucewichCharacter>()->GetCharacterMovement()->MaxWalkSpeed };
+			GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Weapon->GetData().Weight, 0.f, DefaultSpeed);
 		}
-
-		Weapon = NewWeapon;
-		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
-
-		const float DefaultSpeed = GetClass()->GetDefaultObject<ASaucewichCharacter>()->GetCharacterMovement()->MaxWalkSpeed;
-		GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Weapon->GetData().Weight, 0.f, DefaultSpeed);
 	}
 }
 
