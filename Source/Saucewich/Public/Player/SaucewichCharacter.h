@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Weapon.h"
 #include "SaucewichCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FTickDelegate, float)
@@ -14,8 +15,6 @@ enum class EDirection : uint8
 {
 	Left, Right
 };
-
-class AWeapon;
 
 UCLASS(Abstract, Config = Input)
 class ASaucewichCharacter : public ACharacter
@@ -28,10 +27,10 @@ public:
 	FOnCharacterDeath OnDeath;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GiveWeapon(TSubclassOf<AWeapon> WeaponClass);
+	void GiveWeapon(const FDataTableRowHandle& WeaponData);
 
 	UFUNCTION(BlueprintCallable)
-	AWeapon* GetWeapon() const { return Weapon; }
+	AWeapon* GetActiveWeapon() const { return Weapon[ActiveWeaponIdx]; }
 
 	bool Alive() const { return HP > 0.f; }
 
@@ -74,8 +73,11 @@ private:
 
 	//////////////////////////////////////////////////////////////////////////
 
-	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	AWeapon* Weapon;
+	UPROPERTY(Replicated, Transient)
+	AWeapon* Weapon[static_cast<uint8>(EWeaponPosition::_MAX)];
+
+	UPROPERTY(Replicated, Transient)
+	uint8 ActiveWeaponIdx;
 
 	void WeaponAttack();
 	void WeaponStopAttack();

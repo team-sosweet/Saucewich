@@ -9,7 +9,6 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "UnrealNetwork.h"
-#include "Weapon.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +44,7 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 float ASaucewichCharacter::TakeDamage(const float Damage, FDamageEvent const& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
-	if (Role != ROLE_Authority) return 0.f;
+	if (Role != ROLE_Authority || !Alive()) return 0.f;
 
 	const auto ActualDamage{ Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser) };
 	HP = FMath::Clamp(HP - ActualDamage, 0.f, GetClass()->GetDefaultObject<ASaucewichCharacter>()->HP);
@@ -71,43 +70,47 @@ void ASaucewichCharacter::Kill()
 
 //////////////////////////////////////////////////////////////////////////
 
-void ASaucewichCharacter::GiveWeapon(TSubclassOf<AWeapon> WeaponClass)
+void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 {
-	if (WeaponClass)
+	if (const auto Data{ WeaponData.GetRow<FWeaponData>(TEXT("ASaucewichCharacter::GiveWeapon")) })
 	{
 		FActorSpawnParameters Param;
 		Param.Owner = this;
 		Param.Instigator = this;
 		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(WeaponClass, Param) })
+		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->GetBaseClass(), Param) })
 		{
-			if (Weapon)
+			NewWeapon->Equip(Data);
+			auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
+			if (OldWeapon)
 			{
-				Weapon->Destroy();
+				OldWeapon->Destroy();
 			}
-			Weapon = NewWeapon;
+			OldWeapon = NewWeapon;
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
 
-			Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
-
-			const auto DefaultSpeed{ GetClass()->GetDefaultObject<ASaucewichCharacter>()->GetCharacterMovement()->MaxWalkSpeed };
-			GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Weapon->GetData().Weight, 0.f, DefaultSpeed);
+			if (Data->Position == EWeaponPosition::Primary)
+			{
+				const auto DefaultSpeed{ GetClass()->GetDefaultObject<ACharacter>()->GetCharacterMovement()->MaxWalkSpeed };
+				GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Data->Weight, 0.f, DefaultSpeed);
+			}
 		}
 	}
 }
 
 void ASaucewichCharacter::WeaponAttack()
 {
-	if (Weapon)
+	if (Weapon[ActiveWeaponIdx])
 	{
-		Weapon->Attack();
+		Weapon[ActiveWeaponIdx]->StartAttack();
 	}
 }
 
 void ASaucewichCharacter::WeaponStopAttack()
 {
-	if (Weapon)
+	if (Weapon[ActiveWeaponIdx])
 	{
-		Weapon->StopAttack();
+		Weapon[ActiveWeaponIdx]->StopAttack();
 	}
 }
 
