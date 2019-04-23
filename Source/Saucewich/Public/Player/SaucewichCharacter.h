@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Weapon.h"
 #include "SaucewichCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FTickDelegate, float)
@@ -14,8 +15,6 @@ enum class EDirection : uint8
 {
 	Left, Right
 };
-
-class AWeapon;
 
 UCLASS(Abstract, Config = Input)
 class ASaucewichCharacter : public ACharacter
@@ -28,12 +27,12 @@ public:
 	FOnCharacterDeath OnDeath;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GiveWeapon(AWeapon* Weapon);
+	void GiveWeapon(const FDataTableRowHandle& WeaponData);
 
 	UFUNCTION(BlueprintCallable)
-	AWeapon* GetWeapon() const { return Weapon; }
+	AWeapon* GetActiveWeapon() const { return Weapon[ActiveWeaponIdx]; }
 
-	bool CanAttack() const;
+	bool Alive() const { return HP > 0.f; }
 
 	virtual FVector GetPawnViewLocation() const override;
 	virtual FRotator GetBaseAimRotation() const override;
@@ -49,13 +48,13 @@ private:
 	class UAnimMontage* TurnAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	float TurnAnimRate = 90.f;
+	float TurnAnimRate{ 90.f };
 
 	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseTurnRate = 45.f;
+	float BaseTurnRate{ 45.f };
 
 	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseLookUpRate = 45.f;
+	float BaseLookUpRate{ 45.f };
 
 	virtual void Tick(float DeltaTime) override;
 	FTickDelegate PostTick;
@@ -63,7 +62,7 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnHPChanged, meta = (AllowPrivateAccess = true))
-	float HP = 100.f;
+	float HP{ 100.f };
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -74,8 +73,11 @@ private:
 
 	//////////////////////////////////////////////////////////////////////////
 
-	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	AWeapon* Weapon;
+	UPROPERTY(Replicated, Transient)
+	AWeapon* Weapon[static_cast<uint8>(EWeaponPosition::_MAX)];
+
+	UPROPERTY(Replicated, Transient)
+	uint8 ActiveWeaponIdx;
 
 	void WeaponAttack();
 	void WeaponStopAttack();
