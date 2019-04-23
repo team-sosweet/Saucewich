@@ -9,7 +9,8 @@
 #include "Engine/World.h"
 
 AGun::AGun()
-	:Muzzle{ CreateDefaultSubobject<USceneComponent>("Muzzle") }
+	:Muzzle{ CreateDefaultSubobject<USceneComponent>("Muzzle") },
+	ProjectilePool{ CreateDefaultSubobject<UActorPoolComponent>("ProjectilePool") }
 {
 	Muzzle->SetupAttachment(RootComponent, "Muzzle");
 }
@@ -82,7 +83,7 @@ void AGun::Equip(const FWeaponData* NewWeaponData)
 
 	auto& Data{ GetData() };
 	SauceAmount = Data.SauceAmount;
-	GetProjPool()->SetDefaultActorClass(Data.ProjectileClass);
+	ProjectilePool->SetDefaultActorClass(Data.ProjectileClass);
 }
 
 void AGun::OnRep_Attacking()
@@ -126,12 +127,13 @@ AActor* AGun::ShootSauce()
 	{
 		SpawnTransform.SetRotation((Hit.Location - SpawnTransform.GetLocation()).ToOrientationQuat());
 	}
+	SpawnTransform.SetScale3D(FVector{ Data.ProjectileScale });
 
 	FActorSpawnParameters Param;
 	Param.Instigator = Pawn;
 	Param.Owner = this;
 	bool bReused;
-	const auto Sauce{ GetProjPool()->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused) };
+	const auto Sauce{ ProjectilePool->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused) };
 	if (Sauce)
 	{
 		Sauce->Init(Data.Damage, Data.ProjectileSpeed);

@@ -48,13 +48,13 @@ private:
 	class UAnimMontage* TurnAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	float TurnAnimRate = 90.f;
+	float TurnAnimRate{ 90.f };
 
 	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseTurnRate = 45.f;
+	float BaseTurnRate{ 45.f };
 
 	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseLookUpRate = 45.f;
+	float BaseLookUpRate{ 45.f };
 
 	virtual void Tick(float DeltaTime) override;
 	FTickDelegate PostTick;
@@ -62,7 +62,7 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnHPChanged, meta = (AllowPrivateAccess = true))
-	float HP = 100.f;
+	float HP{ 100.f };
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

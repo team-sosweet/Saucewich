@@ -6,8 +6,7 @@
 #include "SaucewichCharacter.h"
 
 AWeapon::AWeapon()
-	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") },
-	ProjectilePool{ CreateDefaultSubobject<UActorPoolComponent>("ProjectilePool") }
+	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
@@ -41,6 +40,7 @@ bool AWeapon::CanAttack() const
 
 void AWeapon::Equip(const FWeaponData* NewWeaponData)
 {
+	check(NewWeaponData);
 	DataTable = NewWeaponData;
 	Mesh->SetStaticMesh(DataTable->Mesh.LoadSynchronous());
 }

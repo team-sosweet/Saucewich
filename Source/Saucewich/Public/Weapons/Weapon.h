@@ -62,14 +62,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	class UStaticMeshComponent* GetMesh() const { return Mesh; }
-	class UActorPoolComponent* GetProjPool() const { return ProjectilePool; }
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
-
-	UPROPERTY(VisibleAnywhere)
-	class UActorPoolComponent* ProjectilePool;
 
 	const FWeaponData* DataTable;
 

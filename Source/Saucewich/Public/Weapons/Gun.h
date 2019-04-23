@@ -17,7 +17,7 @@ struct FGunData : public FWeaponData
 	float Damage;
 
 	UPROPERTY(EditAnywhere)
-	int32 NumberOfProjectilesFiredAtOnce;
+	int32 NumberOfProjectilesFiredAtOnce{ 1 };
 
 	UPROPERTY(EditAnywhere)
 	uint8 bFullAuto : 1;
@@ -41,6 +41,9 @@ struct FGunData : public FWeaponData
 	float ProjectileSpeed;
 
 	UPROPERTY(EditAnywhere)
+	float ProjectileScale{ 1.f };
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APoolActor> ProjectileClass;
 };
 
@@ -56,6 +59,9 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* Muzzle;
+
+	UPROPERTY(VisibleAnywhere)
+	class UActorPoolComponent* ProjectilePool;
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

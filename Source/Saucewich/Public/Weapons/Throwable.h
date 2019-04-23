@@ -6,9 +6,6 @@
 #include "Weapons/Weapon.h"
 #include "Throwable.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class SAUCEWICH_API AThrowable : public AWeapon
 {
