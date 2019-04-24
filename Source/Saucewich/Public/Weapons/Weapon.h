@@ -57,11 +57,11 @@ public:
 	virtual void Holster() {};
 	virtual void Equip(const FWeaponData* NewWeaponData);
 
-	const FWeaponData& GetData() const { return *DataTable; }
+	auto GetData() const { return DataTable; }
 
 protected:
 	virtual void BeginPlay() override;
-	class UStaticMeshComponent* GetMesh() const { return Mesh; }
+	auto GetMesh() const { return Mesh; }
 
 private:
 	UPROPERTY(VisibleAnywhere)

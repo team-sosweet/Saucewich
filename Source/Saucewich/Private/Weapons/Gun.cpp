@@ -40,7 +40,7 @@ void AGun::StartAttack()
 {
 	if (ENSURE_NOT_SIMULATED_PROXY() && !bAttacking)
 	{
-		if (GetData().bFullAuto)
+		if (GetData()->bFullAuto)
 		{
 			bAttacking = true;
 			bOldAttacking = true;
@@ -81,9 +81,9 @@ void AGun::Equip(const FWeaponData* NewWeaponData)
 {
 	Super::Equip(NewWeaponData);
 
-	auto& Data{ GetData() };
-	SauceAmount = Data.SauceAmount;
-	ProjectilePool->SetDefaultActorClass(Data.ProjectileClass);
+	const auto Data{ GetData() };
+	SauceAmount = Data->SauceAmount;
+	ProjectilePool->SetDefaultActorClass(Data->ProjectileClass);
 }
 
 void AGun::OnRep_Attacking()
@@ -99,7 +99,7 @@ void AGun::HandleAttack()
 {
 	if (ShootSauce())
 	{
-		NextAttackTime = GetWorld()->GetTimeSeconds() + GetData().AttackDelay;
+		NextAttackTime = GetWorld()->GetTimeSeconds() + GetData()->AttackDelay;
 
 		if (Role != ROLE_SimulatedProxy)
 		{
@@ -116,18 +116,18 @@ AActor* AGun::ShootSauce()
 	const auto Pawn{ GetInstigator() };
 	if (!Pawn) return nullptr;
 
-	auto& Data = GetData();
+	const auto Data{ GetData() };
 
 	auto SpawnTransform{ Muzzle->GetComponentTransform() };
 
 	const auto Start{ Pawn->GetPawnViewLocation() };
-	const auto End{ Start + Pawn->GetBaseAimRotation().Vector() * Data.ProjectileSpeed };
+	const auto End{ Start + Pawn->GetBaseAimRotation().Vector() * Data->ProjectileSpeed };
 	FHitResult Hit;
 	if (GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile"))
 	{
 		SpawnTransform.SetRotation((Hit.Location - SpawnTransform.GetLocation()).ToOrientationQuat());
 	}
-	SpawnTransform.SetScale3D(FVector{ Data.ProjectileScale });
+	SpawnTransform.SetScale3D(FVector{ Data->ProjectileScale });
 
 	FActorSpawnParameters Param;
 	Param.Instigator = Pawn;
@@ -136,7 +136,7 @@ AActor* AGun::ShootSauce()
 	const auto Sauce{ ProjectilePool->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused) };
 	if (Sauce)
 	{
-		Sauce->Init(Data.Damage, Data.ProjectileSpeed);
+		Sauce->Init(Data->Damage, Data->ProjectileSpeed);
 		if (!bReused)
 		{
 			Pawn->MoveIgnoreActorAdd(Sauce);
@@ -145,7 +145,7 @@ AActor* AGun::ShootSauce()
 	return Sauce;
 }
 
-void AGun::ServerAttack_Implementation() { StartAttack(); if (!GetData().bFullAuto) MulticastSingleAttack(); }
+void AGun::ServerAttack_Implementation() { StartAttack(); if (!GetData()->bFullAuto) MulticastSingleAttack(); }
 bool AGun::ServerAttack_Validate() { return true; }
 void AGun::ServerStopAttack_Implementation() { StopAttack(); }
 bool AGun::ServerStopAttack_Validate() { return true; }
@@ -154,14 +154,14 @@ void AGun::MulticastSingleAttack_Implementation() { if (Role == ROLE_SimulatedPr
 void AGun::Reload(const float DeltaTime)
 {
 	if (Role != ROLE_Authority) return;
-	auto & Data = GetData();
-	if (SauceAmount < Data.SauceAmount)
+	const auto Data{ GetData() };
+	if (SauceAmount < Data->SauceAmount)
 	{
-		if (ReloadWaitTime >= Data.ReloadWaitTime)
+		if (ReloadWaitTime >= Data->ReloadWaitTime)
 		{
-			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaTime / Data.ReloadTime, 0.f, 1.f);
-			SauceAmount = FMath::CubicInterp<float>(LastSauceAmount, 0.f, Data.SauceAmount, 0.f, ReloadAlpha);
-			if (bDried && SauceAmount >= Data.MinSauceAmountToShootWhenFullReload)
+			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaTime / Data->ReloadTime, 0.f, 1.f);
+			SauceAmount = FMath::CubicInterp<float>(LastSauceAmount, 0.f, Data->SauceAmount, 0.f, ReloadAlpha);
+			if (bDried && SauceAmount >= Data->MinSauceAmountToShootWhenFullReload)
 			{
 				bDried = false;
 			}

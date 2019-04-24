@@ -54,7 +54,7 @@ class SAUCEWICH_API AGun : public AWeapon
 
 public:
 	AGun();
-	const FGunData& GetData() const { return static_cast<const FGunData&>(Super::GetData()); }
+	auto GetData() const { return static_cast<const FGunData*>(Super::GetData()); }
 
 private:
 	UPROPERTY(VisibleAnywhere)
