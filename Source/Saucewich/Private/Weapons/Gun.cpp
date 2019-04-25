@@ -136,9 +136,12 @@ AActor* AGun::ShootSauce()
 	const auto Sauce{ ProjectilePool->SpawnActor<ASauceProjectile>(SpawnTransform, Param, &bReused) };
 	if (Sauce)
 	{
-		Sauce->Init(Data->Damage, Data->ProjectileSpeed);
+		Sauce->SetSpeed(Data->ProjectileSpeed);
 		if (!bReused)
 		{
+			// 현재 기획상 게임 플레이 도중 대미지나 색상이 바뀔 일이 없어서 최초 스폰시에만 설정함
+			Sauce->Damage = Data->Damage;
+			Sauce->SetColor(GetColor());
 			Pawn->MoveIgnoreActorAdd(Sauce);
 		}
 	}

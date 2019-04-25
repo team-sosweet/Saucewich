@@ -3,6 +3,7 @@
 #include "SauceProjectile.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 ASauceProjectile::ASauceProjectile()
 	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") },
@@ -11,10 +12,14 @@ ASauceProjectile::ASauceProjectile()
 	RootComponent = Mesh;
 }
 
-void ASauceProjectile::Init(float NewDamage, float NewSpeed)
+void ASauceProjectile::SetColor(const FLinearColor& Color)
 {
-	Damage = NewDamage;
-	Movement->Velocity = GetActorForwardVector() * NewSpeed + GetInstigator()->GetVelocity() * CharacterVelocityApplyRate;
+	ColorDynamicMaterial->SetVectorParameterValue("Base Color", Color);
+}
+
+void ASauceProjectile::SetSpeed(float Speed)
+{
+	Movement->Velocity = GetActorForwardVector() * Speed + GetInstigator()->GetVelocity() * CharacterVelocityApplyRate;
 }
 
 void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
@@ -22,7 +27,7 @@ void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 	if (Other)
 	{
-		APawn* const Instigtor = GetInstigator();
+		const auto Instigtor{ GetInstigator() };
 		if (Instigator)
 		{
 			static const FDamageEvent DamageEvent;
@@ -35,7 +40,12 @@ void ASauceProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPr
 void ASauceProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+
 	Mesh->IgnoreActorWhenMoving(GetInstigator(), true);
+
+	static const FName SlotName{ "Color" };
+	ColorDynamicMaterial = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(Mesh->GetMaterialIndex(SlotName)), this);
+	Mesh->SetMaterialByName(SlotName, ColorDynamicMaterial);
 }
 
 void ASauceProjectile::BeginReuse()

@@ -45,8 +45,8 @@ public:
 	virtual void Holster() {};
 	virtual void Equip(const FWeaponData* NewWeaponData);
 
-	UFUNCTION(BlueprintCallable)
 	void SetColor(const FLinearColor& Color);
+	FLinearColor GetColor() const;
 
 	auto GetData() const { return DataTable; }
 

@@ -20,12 +20,13 @@ ASaucewichCharacter::ASaucewichCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
 
-void ASaucewichCharacter::BeginPlay()
+void ASaucewichCharacter::PostInitializeComponents()
 {
-	ClothColorDynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("Color")), this);
-	GetMesh()->SetMaterialByName("Color", ClothColorDynamicMaterial);
+	Super::PostInitializeComponents();
 
-	Super::BeginPlay();
+	static const FName SlotName{ "Color" };
+	ClothColorDynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex(SlotName)), this);
+	GetMesh()->SetMaterialByName(SlotName, ClothColorDynamicMaterial);
 }
 
 void ASaucewichCharacter::Tick(const float DeltaTime)
@@ -83,7 +84,6 @@ void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->GetBaseClass(), Param) })
 		{
-			NewWeapon->Equip(Data);
 			auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
 			if (OldWeapon)
 			{
@@ -91,6 +91,8 @@ void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 			}
 			OldWeapon = NewWeapon;
 			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+			NewWeapon->Equip(Data);
+			NewWeapon->SetColor(GetColor());
 
 			if (Data->Position == EWeaponPosition::Primary)
 			{
@@ -117,9 +119,18 @@ void ASaucewichCharacter::WeaponStopAttack()
 	}
 }
 
+const FName ParameterName{ "TeamColor" };
+
 void ASaucewichCharacter::SetColor(const FLinearColor& Color)
 {
-	ClothColorDynamicMaterial->SetVectorParameterValue("TeamColor", Color);
+	ClothColorDynamicMaterial->SetVectorParameterValue(ParameterName, Color);
+}
+
+FLinearColor ASaucewichCharacter::GetColor() const
+{
+	FLinearColor Color;
+	ClothColorDynamicMaterial->GetVectorParameterValue(ParameterName, Color);
+	return Color;
 }
 
 void ASaucewichCharacter::TurnWhenNotMoving()

@@ -11,9 +11,15 @@ class SAUCEWICH_API ASauceProjectile : public APoolActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	ASauceProjectile();
-	void Init(float Damage, float Speed);
+
+	UFUNCTION(BlueprintCallable)
+	void SetColor(const FLinearColor& Color);
+
+	void SetSpeed(float Speed);
+
+	float Damage;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -23,11 +29,11 @@ private:
 	class UProjectileMovementComponent* Movement;
 
 	UPROPERTY(EditDefaultsOnly)
-	float CharacterVelocityApplyRate = .5f;
+	float CharacterVelocityApplyRate{ .5f };
+
+	class UMaterialInstanceDynamic* ColorDynamicMaterial;
 
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	virtual void BeginPlay() override;
 	virtual void BeginReuse() override;
-
-	float Damage;
 };

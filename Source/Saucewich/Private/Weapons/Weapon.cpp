@@ -16,9 +16,18 @@ AWeapon::AWeapon()
 	SetActorEnableCollision(false);
 }
 
+static const FName ColorMaterialParameterName{ "Base Color" };
+
 void AWeapon::SetColor(const FLinearColor& Color)
 {
-	ColorDynamicMaterial->SetVectorParameterValue("Base Color", Color);
+	ColorDynamicMaterial->SetVectorParameterValue(ColorMaterialParameterName, Color);
+}
+
+FLinearColor AWeapon::GetColor() const
+{
+	FLinearColor Color;
+	ColorDynamicMaterial->GetVectorParameterValue(ColorMaterialParameterName, Color);
+	return Color;
 }
 
 void AWeapon::BeginPlay()
@@ -49,9 +58,13 @@ void AWeapon::Equip(const FWeaponData* NewWeaponData)
 	if (NewWeaponData && !DataTable)
 	{
 		DataTable = NewWeaponData;
+
+		// TODO: 캐릭터/무기 선택이 구현되면 비동기 로드로 변경
 		Mesh->SetStaticMesh(DataTable->Mesh.LoadSynchronous());
-		ColorDynamicMaterial = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(Mesh->GetMaterialIndex("Color")), this);
-		Mesh->SetMaterialByName("Color", ColorDynamicMaterial);
+
+		static const FName SlotName{ "Color" };
+		ColorDynamicMaterial = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(Mesh->GetMaterialIndex(SlotName)), this);
+		Mesh->SetMaterialByName(SlotName, ColorDynamicMaterial);
 	}
 }
 

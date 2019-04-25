@@ -34,6 +34,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetColor(const FLinearColor& Color);
+	FLinearColor GetColor() const;
 
 	virtual FVector GetPawnViewLocation() const override;
 	virtual FRotator GetBaseAimRotation() const override;
@@ -49,7 +50,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UAnimMontage* TurnAnim;
 
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 	FTickDelegate PostTick;
 
