@@ -22,8 +22,8 @@ ASaucewichCharacter::ASaucewichCharacter()
 
 void ASaucewichCharacter::BeginPlay()
 {
-	ClothColorDynamicMaterial = UMaterialInstanceDynamic::Create(ClothColorMaterial, this);
-	GetMesh()->SetMaterial(ClothColorMaterialIndex, ClothColorDynamicMaterial);
+	ClothColorDynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("Color")), this);
+	GetMesh()->SetMaterialByName("Color", ClothColorDynamicMaterial);
 
 	Super::BeginPlay();
 }
@@ -119,7 +119,7 @@ void ASaucewichCharacter::WeaponStopAttack()
 
 void ASaucewichCharacter::SetColor(const FLinearColor& Color)
 {
-	ClothColorDynamicMaterial->SetVectorParameterValue(ClothColorMaterialParameterName, Color);
+	ClothColorDynamicMaterial->SetVectorParameterValue("TeamColor", Color);
 }
 
 void ASaucewichCharacter::TurnWhenNotMoving()

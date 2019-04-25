@@ -70,15 +70,7 @@ private:
 	void WeaponAttack();
 	void WeaponStopAttack();
 
-	UPROPERTY(EditAnywhere, Category = "Cloth Color")
-	class UMaterialInterface* ClothColorMaterial;
 	class UMaterialInstanceDynamic* ClothColorDynamicMaterial;
-
-	UPROPERTY(EditAnywhere, Category = "Cloth Color")
-	int32 ClothColorMaterialIndex;
-
-	UPROPERTY(EditAnywhere, Category = "Cloth Color")
-	FName ClothColorMaterialParameterName;
 
 	void TurnWhenNotMoving();
 	bool CheckShouldTurn(EDirection& OutDirection);
