@@ -5,20 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
+#include "WeaponEnum.h"
 #include "Weapon.generated.h"
-
-UENUM(BlueprintType)
-enum class EWeaponGripType : uint8
-{
-	Rifle, Pistol
-};
-
-UENUM(BlueprintType)
-enum class EWeaponPosition : uint8
-{
-	Primary, Secondary,
-	_MAX UMETA(Hidden)
-};
 
 USTRUCT(BlueprintInternalUseOnly)
 struct FWeaponData : public FTableRowBase
@@ -57,6 +45,9 @@ public:
 	virtual void Holster() {};
 	virtual void Equip(const FWeaponData* NewWeaponData);
 
+	UFUNCTION(BlueprintCallable)
+	void SetColor(const FLinearColor& Color);
+
 	auto GetData() const { return DataTable; }
 
 protected:
@@ -66,6 +57,8 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
+
+	class UMaterialInstanceDynamic* ColorDynamicMaterial;
 
 	const FWeaponData* DataTable;
 

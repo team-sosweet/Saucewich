@@ -3,6 +3,7 @@
 #include "SaucewichAnimInstance.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SaucewichCharacter.h"
+#include "Weapon.h"
 
 void USaucewichAnimInstance::NativeUpdateAnimation(const float DeltaTime)
 {

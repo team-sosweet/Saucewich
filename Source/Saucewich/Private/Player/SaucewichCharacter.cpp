@@ -8,9 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "UnrealNetwork.h"
-
-//////////////////////////////////////////////////////////////////////////
+#include "Weapon.h"
 
 ASaucewichCharacter::ASaucewichCharacter()
 	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>("CameraBoom") },
@@ -18,6 +18,14 @@ ASaucewichCharacter::ASaucewichCharacter()
 {
 	CameraBoom->SetupAttachment(RootComponent);
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+}
+
+void ASaucewichCharacter::BeginPlay()
+{
+	ClothColorDynamicMaterial = UMaterialInstanceDynamic::Create(ClothColorMaterial, this);
+	GetMesh()->SetMaterial(ClothColorMaterialIndex, ClothColorDynamicMaterial);
+
+	Super::BeginPlay();
 }
 
 void ASaucewichCharacter::Tick(const float DeltaTime)
@@ -39,8 +47,6 @@ void ASaucewichCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewYaw, COND_SimulatedOnly);
 	DOREPLIFETIME_CONDITION(ASaucewichCharacter, RemoteViewLocation, COND_SimulatedOnly);
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 float ASaucewichCharacter::TakeDamage(const float Damage, FDamageEvent const& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
@@ -65,14 +71,11 @@ void ASaucewichCharacter::Kill()
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
-	OnDeath.Broadcast();
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 {
-	if (const auto Data{ WeaponData.GetRow<FWeaponData>(TEXT("ASaucewichCharacter::GiveWeapon")) })
+	if (const auto Data{ WeaponData.GetRow<FWeaponData>(TEXT(__FUNCTION__)) })
 	{
 		FActorSpawnParameters Param;
 		Param.Owner = this;
@@ -114,7 +117,10 @@ void ASaucewichCharacter::WeaponStopAttack()
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////
+void ASaucewichCharacter::SetColor(const FLinearColor& Color)
+{
+	ClothColorDynamicMaterial->SetVectorParameterValue(ClothColorMaterialParameterName, Color);
+}
 
 void ASaucewichCharacter::TurnWhenNotMoving()
 {
@@ -206,8 +212,6 @@ void ASaucewichCharacter::MulticastSimulateTurn_Implementation(const EDirection 
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////
-
 FVector ASaucewichCharacter::GetPawnViewLocation() const
 {
 	return Role == ROLE_SimulatedProxy ? RemoteViewLocation : FollowCamera->GetComponentLocation();
@@ -230,8 +234,6 @@ void ASaucewichCharacter::ReplicateView()
 	RemoteViewYaw = FRotator::CompressAxisToByte(FollowCamera->GetComponentRotation().Yaw);
 	RemoteViewLocation = FollowCamera->GetComponentLocation();
 }
-
-//////////////////////////////////////////////////////////////////////////
 
 void ASaucewichCharacter::SetupPlayerInputComponent(UInputComponent* const PlayerInputComponent)
 {

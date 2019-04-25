@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Weapon.h"
+#include "Engine/DataTable.h"
+#include "WeaponEnum.h"
 #include "SaucewichCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FTickDelegate, float)
-DECLARE_EVENT(ASaucewichCharacter, FOnCharacterDeath)
 
 UENUM()
 enum class EDirection : uint8
@@ -24,7 +24,7 @@ class ASaucewichCharacter : public ACharacter
 public:
 	ASaucewichCharacter();
 
-	FOnCharacterDeath OnDeath;
+	auto Alive() const { return HP > 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GiveWeapon(const FDataTableRowHandle& WeaponData);
@@ -32,10 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AWeapon* GetActiveWeapon() const { return Weapon[ActiveWeaponIdx]; }
 
-	bool Alive() const { return HP > 0.f; }
+	UFUNCTION(BlueprintCallable)
+	void SetColor(const FLinearColor& Color);
 
 	virtual FVector GetPawnViewLocation() const override;
 	virtual FRotator GetBaseAimRotation() const override;
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = true))
@@ -47,31 +49,17 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UAnimMontage* TurnAnim;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	float TurnAnimRate{ 90.f };
-
-	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseTurnRate{ 45.f };
-
-	UPROPERTY(EditAnywhere, Category = "Camera", Config)
-	float BaseLookUpRate{ 45.f };
-
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	FTickDelegate PostTick;
 
-	//////////////////////////////////////////////////////////////////////////
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnHPChanged, meta = (AllowPrivateAccess = true))
 	float HP{ 100.f };
-
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UFUNCTION()
 	void OnHPChanged();
 
 	void Kill();
-
-	//////////////////////////////////////////////////////////////////////////
 
 	UPROPERTY(Replicated, Transient)
 	AWeapon* Weapon[static_cast<uint8>(EWeaponPosition::_MAX)];
@@ -82,7 +70,15 @@ private:
 	void WeaponAttack();
 	void WeaponStopAttack();
 
-	//////////////////////////////////////////////////////////////////////////
+	UPROPERTY(EditAnywhere, Category = "Cloth Color")
+	class UMaterialInterface* ClothColorMaterial;
+	class UMaterialInstanceDynamic* ClothColorDynamicMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Cloth Color")
+	int32 ClothColorMaterialIndex;
+
+	UPROPERTY(EditAnywhere, Category = "Cloth Color")
+	FName ClothColorMaterialParameterName;
 
 	void TurnWhenNotMoving();
 	bool CheckShouldTurn(EDirection& OutDirection);
@@ -99,8 +95,6 @@ private:
 	FDelegateHandle DoTurn;
 	float TurnAlpha;
 
-	//////////////////////////////////////////////////////////////////////////
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void ReplicateView();
@@ -111,7 +105,14 @@ private:
 	UPROPERTY(Replicated, Transient)
 	FVector_NetQuantize RemoteViewLocation;
 
-	//////////////////////////////////////////////////////////////////////////
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	float TurnAnimRate{ 90.f };
+
+	UPROPERTY(EditAnywhere, Category = "Camera", Config)
+	float BaseTurnRate{ 45.f };
+
+	UPROPERTY(EditAnywhere, Category = "Camera", Config)
+	float BaseLookUpRate{ 45.f };
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

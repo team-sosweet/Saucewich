@@ -2,6 +2,7 @@
 
 #include "Weapon.h"
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "ActorPoolComponent.h"
 #include "SaucewichCharacter.h"
 
@@ -13,6 +14,11 @@ AWeapon::AWeapon()
 
 	RootComponent = Mesh;
 	SetActorEnableCollision(false);
+}
+
+void AWeapon::SetColor(const FLinearColor& Color)
+{
+	ColorDynamicMaterial->SetVectorParameterValue("Base Color", Color);
 }
 
 void AWeapon::BeginPlay()
@@ -40,9 +46,13 @@ bool AWeapon::CanAttack() const
 
 void AWeapon::Equip(const FWeaponData* NewWeaponData)
 {
-	check(NewWeaponData);
-	DataTable = NewWeaponData;
-	Mesh->SetStaticMesh(DataTable->Mesh.LoadSynchronous());
+	if (NewWeaponData && !DataTable)
+	{
+		DataTable = NewWeaponData;
+		Mesh->SetStaticMesh(DataTable->Mesh.LoadSynchronous());
+		ColorDynamicMaterial = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(Mesh->GetMaterialIndex("Color")), this);
+		Mesh->SetMaterialByName("Color", ColorDynamicMaterial);
+	}
 }
 
 UClass* FWeaponData::GetBaseClass() const

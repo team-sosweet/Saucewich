@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/Weapon.h"
+#include "Weapon.h"
 #include "Gun.generated.h"
 
 USTRUCT(BlueprintType)
