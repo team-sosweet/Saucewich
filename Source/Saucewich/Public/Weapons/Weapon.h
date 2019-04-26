@@ -13,7 +13,8 @@ struct FWeaponData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	virtual UClass* GetBaseClass() const;
+public:
+	FWeaponData();
 
 	UPROPERTY(EditAnywhere)
 	FText DisplayName;
@@ -29,6 +30,12 @@ struct FWeaponData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere)
 	EWeaponGripType GripType;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWeapon> BaseClass;
+
+protected:
+	FWeaponData(const TSubclassOf<AWeapon>& Base);
 };
 
 UCLASS(Abstract)

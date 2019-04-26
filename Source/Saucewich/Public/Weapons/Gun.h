@@ -11,7 +11,8 @@ struct FGunData : public FWeaponData
 {
 	GENERATED_BODY()
 
-	virtual UClass* GetBaseClass() const override;
+public:
+	FGunData();
 
 	UPROPERTY(EditAnywhere)
 	float Damage;

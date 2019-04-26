@@ -76,13 +76,13 @@ void ASaucewichCharacter::Kill()
 
 void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 {
-	if (const auto Data{ WeaponData.GetRow<FWeaponData>(TEXT(__FUNCTION__)) })
+	if (const auto* const Data{ WeaponData.GetRow<FWeaponData>(TEXT(__FUNCTION__)) })
 	{
 		FActorSpawnParameters Param;
 		Param.Owner = this;
 		Param.Instigator = this;
 		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->GetBaseClass(), Param) })
+		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->BaseClass, Param) })
 		{
 			auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
 			if (OldWeapon)

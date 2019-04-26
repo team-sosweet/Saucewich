@@ -55,11 +55,12 @@ bool AWeapon::CanAttack() const
 
 void AWeapon::Equip(const FWeaponData* NewWeaponData)
 {
-	if (NewWeaponData && !DataTable)
+	if (!DataTable)
 	{
+		check(NewWeaponData);
 		DataTable = NewWeaponData;
 
-		// TODO: Ä³¸¯ÅÍ/¹«±â ¼±ÅÃÀÌ ±¸ÇöµÇ¸é ºñµ¿±â ·Îµå·Î º¯°æ
+		// TODO: ìºë¦­í„°/ë¬´ê¸° ì„ íƒì´ êµ¬í˜„ë˜ë©´ ë¹„ë™ê¸° ë¡œë“œë¡œ ë³€ê²½
 		Mesh->SetStaticMesh(DataTable->Mesh.LoadSynchronous());
 
 		static const FName SlotName{ "Color" };
@@ -68,7 +69,12 @@ void AWeapon::Equip(const FWeaponData* NewWeaponData)
 	}
 }
 
-UClass* FWeaponData::GetBaseClass() const
+FWeaponData::FWeaponData()
+	:BaseClass{ AWeapon::StaticClass() }
 {
-	return AWeapon::StaticClass();
+}
+
+FWeaponData::FWeaponData(const TSubclassOf<AWeapon>& Base)
+	:BaseClass{ Base }
+{
 }

@@ -176,7 +176,7 @@ void AGun::Reload(const float DeltaTime)
 	}
 }
 
-UClass* FGunData::GetBaseClass() const
+FGunData::FGunData()
+	:Super{ AGun::StaticClass() }
 {
-	return AGun::StaticClass();
 }
