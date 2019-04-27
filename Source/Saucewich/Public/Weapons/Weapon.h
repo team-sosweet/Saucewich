@@ -14,8 +14,6 @@ struct FWeaponData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	FWeaponData();
-
 	UPROPERTY(EditAnywhere)
 	FText DisplayName;
 
@@ -33,9 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> BaseClass;
-
-protected:
-	FWeaponData(const TSubclassOf<AWeapon>& Base);
 };
 
 UCLASS(Abstract)
@@ -50,24 +45,33 @@ public:
 	virtual bool CanAttack() const;
 	virtual void Deploy() {};
 	virtual void Holster() {};
-	virtual void Equip(const FWeaponData* NewWeaponData);
+	virtual void Equip(const FWeaponData* NewWeaponData, const FName& NewDataTableRowName);
 
 	void SetColor(const FLinearColor& Color);
 	FLinearColor GetColor() const;
 
-	auto GetData() const { return DataTable; }
+	auto GetData() const { return WeaponData; }
 
 protected:
 	virtual void BeginPlay() override;
-	auto GetMesh() const { return Mesh; }
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* Mesh;
 
-	class UMaterialInstanceDynamic* ColorDynamicMaterial;
+	UPROPERTY(EditDefaultsOnly)
+	const UDataTable* DataTable;
 
-	const FWeaponData* DataTable;
+	const FWeaponData* WeaponData;
+
+	UPROPERTY(ReplicatedUsing = OnRep_DataTableRowName, Transient)
+	FName DataTableRowName;
+
+	UFUNCTION()
+	void OnRep_DataTableRowName();
 
 	void SetActivated(bool bActive);
+
+	class UMaterialInstanceDynamic* ColorDynamicMaterial;
 };

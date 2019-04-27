@@ -12,8 +12,6 @@ struct FGunData : public FWeaponData
 	GENERATED_BODY()
 
 public:
-	FGunData();
-
 	UPROPERTY(EditAnywhere)
 	float Damage;
 
@@ -70,13 +68,14 @@ private:
 	virtual void StartAttack() override;
 	virtual void StopAttack() override;
 	virtual bool CanAttack() const override;
-	virtual void Equip(const FWeaponData* NewWeaponData) override;
+	virtual void Equip(const FWeaponData* NewWeaponData, const FName& NewDataTableRowName) override;
 
 	UPROPERTY(EditInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	int32 SauceAmount;
 	int32 LastSauceAmount;
 	float ReloadAlpha;
 	float ReloadWaitTime;
+	UPROPERTY(VisibleInstanceOnly, Replicated, Transient)
 	uint8 bDried : 1;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, ReplicatedUsing = OnRep_Attacking, Transient, meta = (AllowPrivateAccess = true))

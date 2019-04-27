@@ -32,6 +32,7 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 
 	DOREPLIFETIME(AGun, SauceAmount);
 	DOREPLIFETIME(AGun, bAttacking);
+	DOREPLIFETIME(AGun, bDried);
 }
 
 #define ENSURE_NOT_SIMULATED_PROXY() ensureMsgf(Role != ROLE_SimulatedProxy, TEXT(__FUNCTION__)TEXT(" called on simulated proxy. It won't have any effect!"))
@@ -77,9 +78,9 @@ bool AGun::CanAttack() const
 	return Super::CanAttack() && SauceAmount > 0 && NextAttackTime <= GetWorld()->GetTimeSeconds() && !bDried;
 }
 
-void AGun::Equip(const FWeaponData* NewWeaponData)
+void AGun::Equip(const FWeaponData* NewWeaponData, const FName& NewDataTableRowName)
 {
-	Super::Equip(NewWeaponData);
+	Super::Equip(NewWeaponData, NewDataTableRowName);
 
 	const auto Data{ GetData() };
 	SauceAmount = Data->SauceAmount;
@@ -117,6 +118,7 @@ AActor* AGun::ShootSauce()
 	if (!Pawn) return nullptr;
 
 	const auto Data{ GetData() };
+	if (!Data) return nullptr;
 
 	auto SpawnTransform{ Muzzle->GetComponentTransform() };
 
@@ -157,6 +159,7 @@ void AGun::MulticastSingleAttack_Implementation() { if (Role == ROLE_SimulatedPr
 void AGun::Reload(const float DeltaTime)
 {
 	if (Role != ROLE_Authority) return;
+
 	const auto Data{ GetData() };
 	if (SauceAmount < Data->SauceAmount)
 	{
@@ -174,9 +177,4 @@ void AGun::Reload(const float DeltaTime)
 			ReloadWaitTime += DeltaTime;
 		}
 	}
-}
-
-FGunData::FGunData()
-	:Super{ AGun::StaticClass() }
-{
 }

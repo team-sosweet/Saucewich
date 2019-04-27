@@ -12,6 +12,8 @@
 #include "UnrealNetwork.h"
 #include "Weapon.h"
 
+DECLARE_LOG_CATEGORY_CLASS(LogSaucewichCharacter, Log, All)
+
 ASaucewichCharacter::ASaucewichCharacter()
 	:CameraBoom{ CreateDefaultSubobject<USpringArmComponent>("CameraBoom") },
 	FollowCamera{ CreateDefaultSubobject<UCameraComponent>("FollowCamera") }
@@ -78,27 +80,34 @@ void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
 {
 	if (const auto* const Data{ WeaponData.GetRow<FWeaponData>(TEXT(__FUNCTION__)) })
 	{
-		FActorSpawnParameters Param;
-		Param.Owner = this;
-		Param.Instigator = this;
-		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->BaseClass, Param) })
+		if (Data->BaseClass)
 		{
-			auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
-			if (OldWeapon)
+			FActorSpawnParameters Param;
+			Param.Owner = this;
+			Param.Instigator = this;
+			Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->BaseClass, Param) })
 			{
-				OldWeapon->Destroy();
-			}
-			OldWeapon = NewWeapon;
-			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
-			NewWeapon->Equip(Data);
-			NewWeapon->SetColor(GetColor());
+				auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
+				if (OldWeapon)
+				{
+					OldWeapon->Destroy();
+				}
+				OldWeapon = NewWeapon;
+				NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+				NewWeapon->Equip(Data, WeaponData.RowName);
+				NewWeapon->SetColor(GetColor());
 
-			if (Data->Position == EWeaponPosition::Primary)
-			{
-				const auto DefaultSpeed{ GetClass()->GetDefaultObject<ACharacter>()->GetCharacterMovement()->MaxWalkSpeed };
-				GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Data->Weight, 0.f, DefaultSpeed);
+				if (Data->Position == EWeaponPosition::Primary)
+				{
+					const auto DefaultSpeed{ GetClass()->GetDefaultObject<ACharacter>()->GetCharacterMovement()->MaxWalkSpeed };
+					GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Data->Weight, 0.f, DefaultSpeed);
+				}
 			}
+		}
+		else
+		{
+			UE_LOG(LogSaucewichCharacter, Error, TEXT(__FUNCTION__" : Failed to give weapon. Weapon's BaseClass hasn't been set in data table."));
 		}
 	}
 }
