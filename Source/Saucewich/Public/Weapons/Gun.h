@@ -6,17 +6,37 @@
 #include "Weapon.h"
 #include "Gun.generated.h"
 
-USTRUCT(BlueprintType)
-struct FGunData : public FWeaponData
+UCLASS()
+class SAUCEWICH_API AGun : public AWeapon
 {
 	GENERATED_BODY()
 
 public:
+	AGun();
+
+protected:
+	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void StartAttack() override;
+	virtual void StopAttack() override;
+	virtual bool CanAttack() const override;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* Muzzle;
+
+	UPROPERTY(VisibleAnywhere)
+	class UActorPoolComponent* ProjPool;
+
 	UPROPERTY(EditAnywhere)
 	float Damage;
 
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	int32 Clip;
+
 	UPROPERTY(EditAnywhere)
-	int32 NumberOfProjectilesFiredAtOnce{ 1 };
+	int32 NumProjFiredAtOnce{ 1 };
 
 	UPROPERTY(EditAnywhere)
 	uint8 bFullAuto : 1;
@@ -25,10 +45,7 @@ public:
 	float AttackDelay;
 
 	UPROPERTY(EditAnywhere)
-	int32 SauceAmount;
-
-	UPROPERTY(EditAnywhere)
-	int32 MinSauceAmountToShootWhenFullReload;
+	int32 MinClipToShootAfterDried;
 
 	UPROPERTY(EditAnywhere)
 	float ReloadTime;
@@ -37,44 +54,11 @@ public:
 	float ReloadWaitTime;
 
 	UPROPERTY(EditAnywhere)
-	float ProjectileSpeed;
+	float ProjSpeed;
 
-	UPROPERTY(EditAnywhere)
-	float ProjectileScale{ 1.f };
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class APoolActor> ProjectileClass;
-};
-
-UCLASS()
-class SAUCEWICH_API AGun : public AWeapon
-{
-	GENERATED_BODY()
-
-public:
-	AGun();
-	auto GetData() const { return static_cast<const FGunData*>(Super::GetData()); }
-
-private:
-	UPROPERTY(VisibleAnywhere)
-	class USceneComponent* Muzzle;
-
-	UPROPERTY(VisibleAnywhere)
-	class UActorPoolComponent* ProjectilePool;
-
-	virtual void Tick(float DeltaTime) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	virtual void StartAttack() override;
-	virtual void StopAttack() override;
-	virtual bool CanAttack() const override;
-	virtual void Equip(const FWeaponData* NewWeaponData, const FName& NewDataTableRowName) override;
-
-	UPROPERTY(EditInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	int32 SauceAmount;
-	int32 LastSauceAmount;
+	int32 LastClip;
 	float ReloadAlpha;
-	float ReloadWaitTime;
+	float ReloadWaitingTime;
 	UPROPERTY(VisibleInstanceOnly, Replicated, Transient)
 	uint8 bDried : 1;
 
@@ -100,4 +84,6 @@ private:
 	void MulticastSingleAttack();
 
 	void Reload(float DeltaTime);
+
+	const auto* GetCDO() const { return GetClass()->GetDefaultObject<AGun>(); }
 };

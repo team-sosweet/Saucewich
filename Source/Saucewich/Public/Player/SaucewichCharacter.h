@@ -27,7 +27,7 @@ public:
 	auto Alive() const { return HP > 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GiveWeapon(const FDataTableRowHandle& WeaponData);
+	void GiveWeapon(TSubclassOf<AWeapon> WeaponClass);
 
 	UFUNCTION(BlueprintCallable)
 	AWeapon* GetActiveWeapon() const { return Weapon[ActiveWeaponIdx]; }

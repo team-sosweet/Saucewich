@@ -31,10 +31,7 @@ void USaucewichAnimInstance::NativeUpdateAnimation(const float DeltaTime)
 		{
 			if (const auto Weapon{ Character->GetActiveWeapon() })
 			{
-				if (const auto Data{ Weapon->GetData() })
-				{
-					WeaponGripType = Data->GripType;
-				}
+				WeaponGripType = Weapon->GetGripType();
 			}
 		}
 	}

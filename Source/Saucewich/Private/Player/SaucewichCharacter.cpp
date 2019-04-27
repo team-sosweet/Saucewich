@@ -76,38 +76,31 @@ void ASaucewichCharacter::Kill()
 	SetActorHiddenInGame(true);
 }
 
-void ASaucewichCharacter::GiveWeapon(const FDataTableRowHandle& WeaponData)
+void ASaucewichCharacter::GiveWeapon(TSubclassOf<AWeapon> WeaponClass)
 {
-	if (const auto* const Data{ WeaponData.GetRow<FWeaponData>(TEXT(__FUNCTION__)) })
+	if (WeaponClass)
 	{
-		if (Data->BaseClass)
+		FActorSpawnParameters Param;
+		Param.Owner = this;
+		Param.Instigator = this;
+		Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(WeaponClass, Param) })
 		{
-			FActorSpawnParameters Param;
-			Param.Owner = this;
-			Param.Instigator = this;
-			Param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			if (const auto NewWeapon{ GetWorld()->SpawnActor<AWeapon>(Data->BaseClass, Param) })
+			const auto Position{ NewWeapon->GetPosition() };
+			auto& OldWeapon{ Weapon[static_cast<uint8>(Position)] };
+			if (OldWeapon)
 			{
-				auto& OldWeapon{ Weapon[static_cast<uint8>(Data->Position)] };
-				if (OldWeapon)
-				{
-					OldWeapon->Destroy();
-				}
-				OldWeapon = NewWeapon;
-				NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
-				NewWeapon->Equip(Data, WeaponData.RowName);
-				NewWeapon->SetColor(GetColor());
-
-				if (Data->Position == EWeaponPosition::Primary)
-				{
-					const auto DefaultSpeed{ GetClass()->GetDefaultObject<ACharacter>()->GetCharacterMovement()->MaxWalkSpeed };
-					GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(Data->Weight, 0.f, DefaultSpeed);
-				}
+				OldWeapon->Destroy();
 			}
-		}
-		else
-		{
-			UE_LOG(LogSaucewichCharacter, Error, TEXT(__FUNCTION__" : Failed to give weapon. Weapon's BaseClass hasn't been set in data table."));
+			OldWeapon = NewWeapon;
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "Weapon");
+			NewWeapon->SetColor(GetColor());
+
+			if (Position == EWeaponPosition::Primary)
+			{
+				const auto DefaultSpeed{ GetClass()->GetDefaultObject<ACharacter>()->GetCharacterMovement()->MaxWalkSpeed };
+				GetCharacterMovement()->MaxWalkSpeed = DefaultSpeed - FMath::Clamp(NewWeapon->GetWeight(), 0.f, DefaultSpeed);
+			}
 		}
 	}
 }
