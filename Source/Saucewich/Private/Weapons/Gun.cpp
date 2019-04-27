@@ -147,13 +147,13 @@ void AGun::Reload(const float DeltaTime)
 {
 	if (Role != ROLE_Authority) return;
 
-	const auto DefaultClip{ GetCDO()->Clip };
-	if (Clip < DefaultClip)
+	const auto CDO{ GetCDO() };
+	if (Clip < CDO->Clip)
 	{
-		if (ReloadWaitingTime >= ReloadWaitTime)
+		if (ReloadWaitTime >= CDO->ReloadWaitTime)
 		{
 			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaTime / ReloadTime, 0.f, 1.f);
-			Clip = FMath::CubicInterp<float>(LastClip, 0.f, DefaultClip, 0.f, ReloadAlpha);
+			Clip = FMath::CubicInterp<float>(LastClip, 0.f, CDO->Clip, 0.f, ReloadAlpha);
 			if (bDried && Clip >= MinClipToShootAfterDried)
 			{
 				bDried = false;

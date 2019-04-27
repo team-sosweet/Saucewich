@@ -58,7 +58,6 @@ private:
 
 	int32 LastClip;
 	float ReloadAlpha;
-	float ReloadWaitingTime;
 	UPROPERTY(VisibleInstanceOnly, Replicated, Transient)
 	uint8 bDried : 1;
 
