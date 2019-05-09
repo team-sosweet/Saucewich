@@ -183,7 +183,7 @@ void ASaucewichCharacter::StartTurn(const EDirection Direction)
 void ASaucewichCharacter::StartTurn_Internal(const EDirection Direction)
 {
 	const auto TurnTime{ TurnAnim->SequenceLength / TurnAnim->RateScale / 2.f };
-	const auto YawDelta{ 90.f * ((Direction == EDirection::Right) ? 1.f : -1.f) };
+	const auto YawDelta{ Direction == EDirection::Right ? 90.f : -90.f };
 	const auto OldRotation{ GetActorRotation() };
 	const auto NewRotation{ OldRotation + FRotator{ 0.f, YawDelta, 0.f } };
 

@@ -5,7 +5,6 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ActorPoolComponent.h"
 #include "SaucewichCharacter.h"
-#include "UnrealNetwork.h"
 
 DECLARE_LOG_CATEGORY_CLASS(LogWeapon, Log, All)
 
