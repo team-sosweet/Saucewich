@@ -7,18 +7,7 @@
 		{
 			"Name": "Saucewich",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine"
-			]
+			"LoadingPhase": "Default"
 		}
-	],
-	"TargetPlatforms": [
-		"AllDesktop",
-		"Android",
-		"IOS",
-		"LinuxNoEditor",
-		"MacNoEditor",
-		"WindowsNoEditor"
 	]
 }
