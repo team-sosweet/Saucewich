@@ -3,6 +3,7 @@
 #include "TpsCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "WeaponComponent.h"
 
@@ -13,6 +14,7 @@ ATpsCharacter::ATpsCharacter()
 {
 	SpringArm->SetupAttachment(RootComponent);
 	Camera->SetupAttachment(SpringArm);
+	WeaponComponent->SetupAttachment(GetMesh(), "Weapon");
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
