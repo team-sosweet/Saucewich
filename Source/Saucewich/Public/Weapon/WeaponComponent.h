@@ -46,9 +46,6 @@ protected:
 	virtual void OnRep_Weapons();
 
 private:
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSetActiveWeapon(uint8 Slot);
-
 	void FireP(); void FireR();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireP();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireR();

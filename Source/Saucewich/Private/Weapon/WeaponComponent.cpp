@@ -72,22 +72,6 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 	return true;
 }
 
-void UWeaponComponent::ServerSetActiveWeapon_Implementation(const uint8 Slot)
-{
-	const auto W = GetActiveWeapon();
-	if (Slot < Weapons.Num() && Slot != Active
-		&& (!W || W->CanHolster())
-		&& Weapons[Slot] && Weapons[Slot]->CanDeploy())
-	{
-		// if (W) W->MulticastHolster(Weapons[Slot]);
-		// else SelectWeapon(Slot);
-	}
-}
-bool UWeaponComponent::ServerSetActiveWeapon_Validate(const uint8 Slot)
-{
-	return Slot < Weapons.Max();
-}
-
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
 	if (!WeaponClass)
@@ -117,7 +101,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 
 	if (Weapons[Slot]) Weapons[Slot]->Destroy();
 	Weapons[Slot] = Weapon;
-	//if (Slot == Active) Weapon->MulticastDeploy();
+	if (Slot == Active) Weapon->Deploy();
 
 	return Weapon;
 }
