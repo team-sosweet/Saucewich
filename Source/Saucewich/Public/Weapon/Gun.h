@@ -15,11 +15,21 @@ public:
 	void FireP() override;
 	void FireR() override;
 	void SlotP() override;
-
+	
 protected:
+	void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void Shoot();
+
 private:
+	UPROPERTY(EditAnywhere)
+	float Rpm;
+
+	float FireLag;
+	float LastFire;
+
 	UPROPERTY(EditAnywhere)
 	uint8 ClipSize;
 

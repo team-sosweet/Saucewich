@@ -8,6 +8,12 @@
 void AGun::FireP()
 {
 	bFiring = true;
+	FireLag = 0.f;
+	if (LastFire + 60.f / Rpm <= GetGameTimeSinceCreation())
+	{
+		Shoot();
+		LastFire = GetGameTimeSinceCreation();
+	}
 }
 
 void AGun::FireR()
@@ -18,6 +24,23 @@ void AGun::FireR()
 void AGun::SlotP()
 {
 	GetCharacter()->GetWeaponComponent()->TrySelectWeapon(GetSlot());
+}
+
+void AGun::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bFiring)
+	{
+		const auto CurTime = GetGameTimeSinceCreation();
+		const auto Delay = 60.f / Rpm;
+		for (; FireLag >= Delay; FireLag -= Delay)
+		{
+			Shoot();
+			LastFire = CurTime;
+		}
+		FireLag += DeltaSeconds;
+	}
 }
 
 void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
