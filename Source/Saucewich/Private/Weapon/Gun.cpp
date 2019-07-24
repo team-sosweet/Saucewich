@@ -1,9 +1,48 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Gun.h"
+#include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "ProjectilePoolComponent.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
+
+AGun::AGun()
+	:ProjectilePool{CreateDefaultSubobject<UProjectilePoolComponent>("ProjectilePool")}
+{
+	ProjectilePool->SetupAttachment(RootComponent, "Muzzle");
+}
+
+FHitResult AGun::GunTrace() const
+{
+	const auto Character = GetCharacter();
+	const auto AimRotation = Character->GetBaseAimRotation();
+
+	const auto Start = Character->GetPawnViewLocation();
+	const auto End = Start + AimRotation.Vector() * MaxDistance;
+
+	TArray<FHitResult> BoxHits;
+	GetWorld()->SweepMultiByProfile(
+		BoxHits, Start, End, AimRotation.Quaternion(), PawnOnly.Name,
+		FCollisionShape::MakeBox({0.f, TraceBoxSize.X, TraceBoxSize.Y})
+	);
+
+	auto HitPawn = -1;
+	for (auto i = 0; i < BoxHits.Num(); ++i)
+	{
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name))
+		{
+			HitPawn = i;
+			break;
+		}
+	}
+
+	if (HitPawn != -1) return BoxHits[HitPawn];
+
+	FHitResult Hit;
+	//if (GetWorld()->LineTraceSingleByProfile(Hit, Start, End, ))
+	return Hit;
+}
 
 void AGun::FireP()
 {

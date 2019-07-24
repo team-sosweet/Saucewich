@@ -32,6 +32,8 @@ public:
 	class UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 	class UStaticMeshComponent* GetShadow() const { return Shadow; }
 
+	FVector GetPawnViewLocation() const override;
+
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
@@ -41,7 +43,7 @@ private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 
-	void UpdateShadow();
+	void UpdateShadow() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UWeaponComponent* WeaponComponent;

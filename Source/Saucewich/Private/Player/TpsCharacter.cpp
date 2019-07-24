@@ -23,6 +23,11 @@ ATpsCharacter::ATpsCharacter()
 	Shadow->SetupAttachment(RootComponent);
 }
 
+FVector ATpsCharacter::GetPawnViewLocation() const
+{
+	return Camera->GetComponentLocation();
+}
+
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -57,7 +62,7 @@ void ATpsCharacter::MoveRight(const float AxisValue)
 	AddMovementInput(GetActorRightVector(), FMath::Sign(AxisValue));
 }
 
-void ATpsCharacter::UpdateShadow()
+void ATpsCharacter::UpdateShadow() const
 {
 	auto Start = GetActorLocation();
 	Start.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
