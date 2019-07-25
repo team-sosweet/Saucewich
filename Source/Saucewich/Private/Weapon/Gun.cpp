@@ -58,7 +58,7 @@ void AGun::Shoot()
 {
 	const auto& Transform = ProjectilePool->GetComponentTransform();
 	FHitResult Hit;
-	const auto Dir = GunTrace(Hit) ? Hit.ImpactPoint - Transform.GetLocation() : Transform.GetRotation().Vector();
+	const auto Dir = GunTrace(Hit) ? Hit.ImpactPoint - Transform.GetLocation() : Transform.GetRotation().Vector().RotateAngleAxis(PitchOffsetWhileNoTarget, GetActorForwardVector());
 	const auto Rotation = FireRand.VRandCone(Dir, HorizontalSpread, VerticalSpread).ToOrientationQuat();
 	ProjectilePool->Spawn(Rotation)->SetSpeed(ProjectileSpeed);
 }
@@ -114,7 +114,8 @@ bool AGun::GunTrace(FHitResult& OutHit)
 	}
 
 	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
-	bGunTraceResultCache = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
+	// bGunTraceResultCache = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
+	bGunTraceResultCache = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, EDrawDebugTrace::ForOneFrame, GunTraceCache, false);
 	OutHit = GunTraceCache;
 	return bGunTraceResultCache;
 }
