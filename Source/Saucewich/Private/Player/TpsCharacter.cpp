@@ -23,6 +23,11 @@ ATpsCharacter::ATpsCharacter()
 	Shadow->SetupAttachment(RootComponent);
 }
 
+float ATpsCharacter::GetSpringArmLength() const
+{
+	return (SpringArm->GetComponentLocation() - Camera->GetComponentLocation()).Size();
+}
+
 FVector ATpsCharacter::GetPawnViewLocation() const
 {
 	return Camera->GetComponentLocation();

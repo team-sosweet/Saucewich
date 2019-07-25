@@ -32,6 +32,7 @@ public:
 	class UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 	class UStaticMeshComponent* GetShadow() const { return Shadow; }
 
+	float GetSpringArmLength() const;
 	FVector GetPawnViewLocation() const override;
 
 protected:

@@ -6,15 +6,15 @@
 #include "Components/SceneComponent.h"
 #include "ProjectilePoolComponent.generated.h"
 
-
 UCLASS()
 class UProjectilePoolComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
-	class AProjectile* Spawn();
+	class AProjectile* Spawn(const FRotator& Rotation);
+	class AProjectile* Spawn(const FQuat& Rotation);
+	AProjectile* Spawn(const FTransform& Transform);
 	void Release(AProjectile* Projectile);
 	TSubclassOf<AProjectile> GetProjectileClass() const { return Class; }
 
