@@ -29,6 +29,11 @@ float ATpsCharacter::GetSpringArmLength() const
 	return (SpringArm->GetComponentLocation() - Camera->GetComponentLocation()).Size();
 }
 
+AWeapon* ATpsCharacter::GetActiveWeapon() const
+{
+	return WeaponComponent->GetActiveWeapon();
+}
+
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
 	return WeaponComponent->GunTrace(OutHit);
@@ -79,7 +84,7 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 		Hp = FMath::Clamp(Hp - Damage, 0.f, MaxHp);
 		if (Hp == 0.f)
 		{
-			Destroy();
+			Kill();
 		}
 	}
 	return Damage;
