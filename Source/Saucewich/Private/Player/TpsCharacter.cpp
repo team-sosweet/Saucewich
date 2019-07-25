@@ -28,6 +28,11 @@ float ATpsCharacter::GetSpringArmLength() const
 	return (SpringArm->GetComponentLocation() - Camera->GetComponentLocation()).Size();
 }
 
+EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
+{
+	return WeaponComponent->GunTrace(OutHit);
+}
+
 FVector ATpsCharacter::GetPawnViewLocation() const
 {
 	return Camera->GetComponentLocation();

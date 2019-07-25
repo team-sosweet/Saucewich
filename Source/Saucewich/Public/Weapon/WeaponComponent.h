@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Saucewich.h"
 #include "Components/SceneComponent.h"
 #include "WeaponComponent.generated.h"
 
@@ -32,6 +32,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	AWeapon* GetActiveWeapon() const { return Active < Weapons.Num() ? Weapons[Active] : nullptr; }
+
+	UFUNCTION(BlueprintCallable)
+	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	virtual bool TrySelectWeapon(uint8 Slot);
 	

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Saucewich.h"
 #include "GameFramework/Character.h"
 #include "TpsCharacter.generated.h"
 
@@ -33,6 +34,10 @@ public:
 	class UStaticMeshComponent* GetShadow() const { return Shadow; }
 
 	float GetSpringArmLength() const;
+
+	UFUNCTION(BlueprintCallable)
+	EGunTraceHit GunTrace(FHitResult& OutHit) const;
+
 	FVector GetPawnViewLocation() const override;
 
 protected:

@@ -58,17 +58,34 @@ void AGun::Shoot()
 {
 	const auto& Transform = ProjectilePool->GetComponentTransform();
 	FHitResult Hit;
-	const auto Dir = GunTrace(Hit) ? Hit.ImpactPoint - Transform.GetLocation() : Transform.GetRotation().Vector().RotateAngleAxis(PitchOffsetWhileNoTarget, GetActorForwardVector());
+	const auto HitType = GunTrace(Hit);
+
+	if (HitType == EGunTraceHit::Pawn)
+	{
+		const auto ShotDir = (Hit.ImpactPoint - ProjectilePool->GetComponentLocation()).GetSafeNormal();
+		Hit.GetActor()->TakeDamage(
+			Damage,
+			FPointDamageEvent{Damage, Hit, ShotDir, DamageType},
+			GetInstigator()->GetController(),
+			this
+		);
+	}
+
+	const auto Dir =
+		HitType != EGunTraceHit::None ? Hit.ImpactPoint - Transform.GetLocation()
+		: Transform.GetRotation().Vector().RotateAngleAxis(PitchOffsetWhileNoTarget, GetActorForwardVector());
+
 	const auto Rotation = FireRand.VRandCone(Dir, HorizontalSpread, VerticalSpread).ToOrientationQuat();
-	ProjectilePool->Spawn(Rotation)->SetSpeed(ProjectileSpeed);
+
+	ProjectilePool->Spawn(Rotation, HitType == EGunTraceHit::Pawn);
 }
 
-bool AGun::GunTrace(FHitResult& OutHit)
+EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
 	if (bIsGunTraceCacheValid)
 	{
 		OutHit = GunTraceCache;
-		return bGunTraceResultCache;
+		return GunTraceHitCache;
 	}
 	bIsGunTraceCacheValid = true;
 
@@ -110,14 +127,14 @@ bool AGun::GunTrace(FHitResult& OutHit)
 	if (HitPawn != -1)
 	{
 		OutHit = GunTraceCache = BoxHits[HitPawn];
-		return bGunTraceResultCache = true;
+		return GunTraceHitCache = EGunTraceHit::Pawn;
 	}
 
 	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
-	// bGunTraceResultCache = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
-	bGunTraceResultCache = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, EDrawDebugTrace::ForOneFrame, GunTraceCache, false);
+	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
+	const auto bHit = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, EDrawDebugTrace::ForOneFrame, GunTraceCache, false);
 	OutHit = GunTraceCache;
-	return bGunTraceResultCache;
+	return GunTraceHitCache = bHit ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
 void AGun::FireP()

@@ -4,25 +4,20 @@
 #include "Engine/World.h"
 #include "Projectile.h"
 
-AProjectile* UProjectilePoolComponent::Spawn(const FRotator& Rotation)
-{
-	return Spawn(Rotation.Quaternion());
-}
-
-AProjectile* UProjectilePoolComponent::Spawn(const FQuat& Rotation)
+AProjectile* UProjectilePoolComponent::Spawn(const FQuat& Rotation, const bool bCosmetic)
 {
 	auto Transform = GetComponentTransform();
 	Transform.SetRotation(Rotation);
-	return Spawn(Transform);
+	return Spawn(Transform, bCosmetic);
 }
 
-AProjectile* UProjectilePoolComponent::Spawn(const FTransform& Transform)
+AProjectile* UProjectilePoolComponent::Spawn(const FTransform& Transform, const bool bCosmetic)
 {
 	if (Pool.Num() > 0)
 	{
 		const auto Projectile = Pool.Pop();
 		Projectile->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
-		Projectile->SetActivated(true);
+		Projectile->Activate(bCosmetic);
 		return Projectile;
 	}
 
@@ -30,9 +25,7 @@ AProjectile* UProjectilePoolComponent::Spawn(const FTransform& Transform)
 	Parameters.Owner = GetOwner();
 	Parameters.Instigator = Parameters.Owner->GetInstigator();
 
-	const auto Projectile = GetWorld()->SpawnActor<AProjectile>(Class, Transform, Parameters);
-	Projectile->SetPool(this);
-	return Projectile;
+	return GetWorld()->SpawnActor<AProjectile>(Class, Transform, Parameters);
 }
 
 void UProjectilePoolComponent::Release(AProjectile* Projectile)

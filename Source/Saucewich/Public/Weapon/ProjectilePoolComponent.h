@@ -12,9 +12,8 @@ class UProjectilePoolComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:
-	class AProjectile* Spawn(const FRotator& Rotation);
-	class AProjectile* Spawn(const FQuat& Rotation);
-	AProjectile* Spawn(const FTransform& Transform);
+	class AProjectile* Spawn(const FQuat& Rotation, bool bCosmetic = false);
+	AProjectile* Spawn(const FTransform& Transform, bool bCosmetic = false);
 	void Release(AProjectile* Projectile);
 	TSubclassOf<AProjectile> GetProjectileClass() const { return Class; }
 

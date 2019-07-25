@@ -4,21 +4,17 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "ProjectilePoolComponent.h"
+#include "Gun.h"
 
 AProjectile::AProjectile()
 	:Movement{CreateDefaultSubobject<UProjectileMovementComponent>("Movement")}
 {
 }
 
-void AProjectile::SetSpeed(const float Speed) const
-{
-	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
-}
-
 void AProjectile::Release()
 {
-	SetActivated(false);
-	Pool->Release(this);
+	Deactivate();
+	Gun->GetProjectilePool()->Release(this);
 }
 
 FName AProjectile::GetCollisionProfile() const
@@ -26,20 +22,44 @@ FName AProjectile::GetCollisionProfile() const
 	return GetStaticMeshComponent()->GetCollisionProfileName();
 }
 
-void AProjectile::SetActivated(const bool bActive)
+void AProjectile::Activate(const bool bIsCosmetic)
 {
-	SetActorTickEnabled(bActive);
-	SetActorEnableCollision(bActive);
-	SetActorHiddenInGame(!bActive);
-	if (bActive)
-	{
-		Movement->SetUpdatedComponent(RootComponent);
-	}
+	SetActorTickEnabled(true);
+	SetActorEnableCollision(true);
+	SetActorHiddenInGame(false);
+	Movement->SetUpdatedComponent(RootComponent);
+	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
+	bCosmetic = bIsCosmetic;
+}
+
+void AProjectile::Deactivate()
+{
+	SetActorTickEnabled(false);
+	SetActorEnableCollision(false);
+	SetActorHiddenInGame(true);
+}
+
+void AProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	Gun = CastChecked<AGun>(GetOwner());
 }
 
 void AProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const bool bSelfMoved,
 	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	if (!bCosmetic)
+	{
+		const auto Damage = Gun->GetDamage();
+		Other->TakeDamage(
+			Damage,
+			FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Gun->GetDamageType()},
+			GetInstigator()->GetController(),
+			GetOwner()
+		);
+	}
+
 	Release();
 }

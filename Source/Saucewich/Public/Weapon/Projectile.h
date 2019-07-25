@@ -18,17 +18,19 @@ public:
 	AProjectile();
 
 	UFUNCTION(BlueprintCallable)
-	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
 	void Release();
-	virtual void SetActivated(bool bActive);
-	void SetPool(class UProjectilePoolComponent* NewPool) { Pool = NewPool; }
+	void Activate(bool bIsCosmetic = false);
+	void Deactivate();
+
+	uint8 bCosmetic : 1;
 
 protected:
+	void BeginPlay() override;
 	void LifeSpanExpired() override { Release(); }
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:
-	UProjectilePoolComponent* Pool;
+	class AGun* Gun;
 };

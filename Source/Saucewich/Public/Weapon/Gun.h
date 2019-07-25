@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Saucewich.h"
 #include "Weapon/Weapon.h"
 #include "Engine/CollisionProfile.h"
 #include "Gun.generated.h"
@@ -18,6 +18,12 @@ class AGun : public AWeapon
 public:
 	AGun();
 
+	UProjectilePoolComponent* GetProjectilePool() const { return ProjectilePool; }
+
+	float GetDamage() const { return Damage; }
+	float GetProjectileSpeed() const { return ProjectileSpeed; }
+	TSubclassOf<UDamageType> GetDamageType() const { return DamageType; }
+
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
@@ -27,7 +33,7 @@ public:
 	virtual void Shoot();
 
 	UFUNCTION(BlueprintCallable)
-	bool GunTrace(FHitResult& OutHit);
+	EGunTraceHit GunTrace(FHitResult& OutHit);
 
 	void FireP() override;
 	void FireR() override;
@@ -50,7 +56,13 @@ private:
 	FRandomStream FireRand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TSubclassOf<UDamageType> DamageType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float TraceStartOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Rpm;
@@ -75,6 +87,8 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_FireRandSeed, Transient)
 	int32 FireRandSeed;
 
+	EGunTraceHit GunTraceHitCache;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 ClipSize;
 
@@ -83,6 +97,5 @@ private:
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bFiring : 1;
-	uint8 bGunTraceResultCache : 1;
 	uint8 bIsGunTraceCacheValid : 1;
 };
