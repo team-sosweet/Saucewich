@@ -23,13 +23,12 @@ void AGun::BeginPlay()
 	{
 		FireRandSeed = FMath::Rand();
 		OnRep_FireRandSeed();
+		Clip = ClipSize;
 	}
 }
 
 void AGun::Tick(const float DeltaSeconds)
 {
-	bIsGunTraceCacheValid = false;
-
 	Super::Tick(DeltaSeconds);
 
 	if (bFiring)
@@ -43,6 +42,8 @@ void AGun::Tick(const float DeltaSeconds)
 		}
 		FireLag += DeltaSeconds;
 	}
+
+	Reload(DeltaSeconds);
 }
 
 void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -50,12 +51,15 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGun, Clip);
+	DOREPLIFETIME(AGun, bDried);
 	DOREPLIFETIME(AGun, bFiring);
 	DOREPLIFETIME_CONDITION(AGun, FireRandSeed, COND_InitialOnly);
 }
 
 void AGun::Shoot()
 {
+	if (!CanFire()) return;
+
 	const auto& Transform = ProjectilePool->GetComponentTransform();
 	FHitResult Hit;
 	const auto HitType = GunTrace(Hit);
@@ -78,17 +82,15 @@ void AGun::Shoot()
 	const auto Rotation = FireRand.VRandCone(Dir, HorizontalSpread, VerticalSpread).ToOrientationQuat();
 
 	ProjectilePool->Spawn(Rotation, HitType == EGunTraceHit::Pawn);
+
+	LastClip = --Clip;
+	bDried = Clip == 0;
+	ReloadAlpha = 0.f;
+	ReloadWaitingTime = 0.f;
 }
 
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
-	if (bIsGunTraceCacheValid)
-	{
-		OutHit = GunTraceCache;
-		return GunTraceHitCache;
-	}
-	bIsGunTraceCacheValid = true;
-
 	const auto Character = GetCharacter();
 	const auto AimRotation = Character->GetBaseAimRotation();
 
@@ -129,15 +131,13 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 
 	if (HitPawn != -1)
 	{
-		OutHit = GunTraceCache = BoxHits[HitPawn];
-		return GunTraceHitCache = EGunTraceHit::Pawn;
+		OutHit = BoxHits[HitPawn];
+		return EGunTraceHit::Pawn;
 	}
 
 	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
 	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
-	const auto bHit = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, GunTraceCache, false);
-	OutHit = GunTraceCache;
-	return GunTraceHitCache = bHit ? EGunTraceHit::Other : EGunTraceHit::None;
+	return UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, OutHit, false) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
 void AGun::FireP()
@@ -159,6 +159,34 @@ void AGun::FireR()
 void AGun::SlotP()
 {
 	GetCharacter()->GetWeaponComponent()->TrySelectWeapon(GetSlot());
+}
+
+bool AGun::CanFire() const
+{
+	return Clip > 0 && !bDried;
+}
+
+void AGun::Reload(const float DeltaSeconds)
+{
+	if (!HasAuthority()) return;
+
+	if (Clip < ClipSize)
+	{
+		if (ReloadWaitingTime >= (bDried ? ReloadWaitTimeAfterDried : ReloadWaitTime))
+		{
+			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaSeconds / ReloadTime, 0.f, 1.f);
+			Clip = FMath::CubicInterp<float>(LastClip, 0.f, ClipSize, 0.f, ReloadAlpha);
+
+			if (bDried && Clip >= MinClipToFireAfterDried)
+			{
+				bDried = false;
+			}
+		}
+		else
+		{
+			ReloadWaitingTime += DeltaSeconds;
+		}
+	}
 }
 
 void AGun::OnRep_FireRandSeed()
