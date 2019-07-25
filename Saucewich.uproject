@@ -12,13 +12,5 @@
 				"Engine"
 			]
 		}
-	],
-	"TargetPlatforms": [
-		"AllDesktop",
-		"Android",
-		"IOS",
-		"LinuxNoEditor",
-		"MacNoEditor",
-		"WindowsNoEditor"
 	]
 }

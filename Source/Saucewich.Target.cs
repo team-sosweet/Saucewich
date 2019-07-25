@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, Team Sosweet. All rights reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 using UnrealBuildTool;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ public class SaucewichTarget : TargetRules
 	public SaucewichTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		ExtraModuleNames.Add("Saucewich");
+
+		ExtraModuleNames.AddRange( new string[] { "Saucewich" } );
 	}
 }
