@@ -21,7 +21,7 @@ public:
 	FName GetCollisionProfile() const;
 
 	void Release();
-	void Activate(bool bIsCosmetic = false);
+	void Activate(bool bIsCosmetic);
 	void Deactivate();
 
 	uint8 bCosmetic : 1;

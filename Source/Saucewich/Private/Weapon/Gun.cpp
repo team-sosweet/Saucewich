@@ -73,7 +73,7 @@ void AGun::Shoot()
 
 	const auto Dir =
 		HitType != EGunTraceHit::None ? Hit.ImpactPoint - Transform.GetLocation()
-		: Transform.GetRotation().Vector().RotateAngleAxis(PitchOffsetWhileNoTarget, GetActorForwardVector());
+		: Transform.GetRotation().Vector();
 
 	const auto Rotation = FireRand.VRandCone(Dir, HorizontalSpread, VerticalSpread).ToOrientationQuat();
 

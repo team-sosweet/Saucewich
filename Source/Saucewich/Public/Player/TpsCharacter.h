@@ -39,11 +39,14 @@ public:
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	FVector GetPawnViewLocation() const override;
+	FRotator GetBaseAimRotation() const override { return Super::GetBaseAimRotation().GetNormalized(); }
 
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
 	void MoveForward(float AxisValue);
@@ -65,4 +68,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float MaxHp;
+
+	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float Hp;
 };

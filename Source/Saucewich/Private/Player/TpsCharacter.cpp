@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UnrealNetwork.h"
 #include "WeaponComponent.h"
 
 ATpsCharacter::ATpsCharacter()
@@ -41,6 +42,7 @@ FVector ATpsCharacter::GetPawnViewLocation() const
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	Hp = MaxHp;
 	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 }
 
@@ -60,6 +62,27 @@ void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 	Input->BindAxis("LookUp", this, &ATpsCharacter::AddControllerPitchInput);
 
 	WeaponComponent->SetupPlayerInputComponent(Input);
+}
+
+void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ATpsCharacter, Hp);
+}
+
+float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (Damage != 0.f)
+	{
+		Hp = FMath::Clamp(Hp - Damage, 0.f, MaxHp);
+		if (Hp == 0.f)
+		{
+			Destroy();
+		}
+	}
+	return Damage;
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

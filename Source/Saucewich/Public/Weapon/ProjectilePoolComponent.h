@@ -12,9 +12,9 @@ class UProjectilePoolComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:
-	class AProjectile* Spawn(const FQuat& Rotation, bool bCosmetic = false);
-	AProjectile* Spawn(const FTransform& Transform, bool bCosmetic = false);
-	void Release(AProjectile* Projectile);
+	void Release(class AProjectile* Projectile);
+	AProjectile* Spawn(const FQuat& Rotation, bool bCosmetic);
+	AProjectile* Spawn(const FTransform& Transform, bool bCosmetic);
 	TSubclassOf<AProjectile> GetProjectileClass() const { return Class; }
 
 protected:
@@ -23,7 +23,5 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<AProjectile> Class;
-
-	UPROPERTY(Transient, VisibleInstanceOnly)
 	TArray<AProjectile*> Pool;
 };
