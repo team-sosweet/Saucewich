@@ -1,6 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Projectile.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "ProjectilePoolComponent.h"
 
@@ -9,10 +10,20 @@ AProjectile::AProjectile()
 {
 }
 
+void AProjectile::SetSpeed(const float Speed) const
+{
+	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
+}
+
 void AProjectile::Release()
 {
 	SetActivated(false);
 	Pool->Release(this);
+}
+
+FName AProjectile::GetCollisionProfile() const
+{
+	return GetStaticMeshComponent()->GetCollisionProfileName();
 }
 
 void AProjectile::SetActivated(const bool bActive)
@@ -23,7 +34,6 @@ void AProjectile::SetActivated(const bool bActive)
 	if (bActive)
 	{
 		Movement->SetUpdatedComponent(RootComponent);
-		Movement->SetVelocityInLocalSpace(Movement->Velocity * Movement->InitialSpeed);
 	}
 }
 

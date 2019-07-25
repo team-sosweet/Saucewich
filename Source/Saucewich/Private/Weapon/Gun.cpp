@@ -3,6 +3,7 @@
 #include "Gun.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Projectile.h"
 #include "ProjectilePoolComponent.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
@@ -13,7 +14,7 @@ AGun::AGun()
 	ProjectilePool->SetupAttachment(RootComponent, "Muzzle");
 }
 
-FHitResult AGun::GunTrace() const
+bool AGun::GunTrace(FHitResult& OutHit) const
 {
 	const auto Character = GetCharacter();
 	const auto AimRotation = Character->GetBaseAimRotation();
@@ -21,27 +22,34 @@ FHitResult AGun::GunTrace() const
 	const auto Start = Character->GetPawnViewLocation();
 	const auto End = Start + AimRotation.Vector() * MaxDistance;
 
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(GetOwner());
+
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
 		BoxHits, Start, End, AimRotation.Quaternion(), PawnOnly.Name,
-		FCollisionShape::MakeBox({0.f, TraceBoxSize.X, TraceBoxSize.Y})
+		FCollisionShape::MakeBox({0.f, TraceBoxSize.X, TraceBoxSize.Y}), Params
 	);
 
 	auto HitPawn = -1;
 	for (auto i = 0; i < BoxHits.Num(); ++i)
 	{
-		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name, Params))
 		{
 			HitPawn = i;
 			break;
 		}
 	}
 
-	if (HitPawn != -1) return BoxHits[HitPawn];
+	if (HitPawn != -1)
+	{
+		OutHit = BoxHits[HitPawn];
+		return true;
+	}
 
-	FHitResult Hit;
-	//if (GetWorld()->LineTraceSingleByProfile(Hit, Start, End, ))
-	return Hit;
+	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
+	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, Profile, Params);
 }
 
 void AGun::FireP()

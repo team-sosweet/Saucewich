@@ -17,8 +17,11 @@ class AProjectile : public AStaticMeshActor
 public:
 	AProjectile();
 
-	void Release();
+	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float Speed) const;
+	FName GetCollisionProfile() const;
 
+	void Release();
 	virtual void SetActivated(bool bActive);
 	void SetPool(class UProjectilePoolComponent* NewPool) { Pool = NewPool; }
 

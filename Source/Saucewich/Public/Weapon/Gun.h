@@ -18,7 +18,7 @@ class AGun : public AWeapon
 public:
 	AGun();
 
-	FHitResult GunTrace() const;
+	bool GunTrace(FHitResult& OutHit) const;
 
 	void FireP() override;
 	void FireR() override;
