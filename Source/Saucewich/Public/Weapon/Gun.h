@@ -42,51 +42,60 @@ protected:
 	virtual void Reload(float DeltaSeconds);
 
 private:
-
 	UFUNCTION()
 	void OnRep_FireRandSeed();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	FCollisionProfileName PawnOnly;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	FCollisionProfileName NoPawn;
 
+	// 자동조준 상자 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FVector2D TraceBoxSize;
 	FRandomStream FireRand;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	TSubclassOf<UDamageType> DamageType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	float TraceStartOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Damage;
 
+	// 분당 발사 수 (연사력)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Rpm;
 	float FireLag;
 	float LastFire;
 
+	// 소스 발사 수직 퍼짐
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1, AllowPrivateAccess=true))
 	float VerticalSpread;
 
+	// 소스 발사 수평 퍼짐
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1, AllowPrivateAccess=true))
 	float HorizontalSpread;
 
+	// 자동 조준 최대 거리
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxDistance;
 
+	// 발사되는 소스 발사체의 속력
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ProjectileSpeed;
 
+	// 재장전에 걸리는 시간
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadTime;
 
+	// 재장전 시작까지 걸리는 시간
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTime;
+
+	// 소스를 완전히 소모하고 재장전 시작까지 걸리는 시간
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTimeAfterDried;
 	float ReloadWaitingTime;
@@ -95,6 +104,7 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_FireRandSeed, Transient)
 	int32 FireRandSeed;
 
+	// 탄창 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 ClipSize;
 
@@ -102,6 +112,7 @@ private:
 	uint8 Clip;
 	uint8 LastClip;
 
+	// 소스를 완전히 소모하고 재장전중에 소스가 이만큼 차면 다시 발사가 가능해집니다.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 MinClipToFireAfterDried;
 
