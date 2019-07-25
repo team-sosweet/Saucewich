@@ -79,23 +79,23 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1, AllowPrivateAccess=true))
 	float HorizontalSpread;
 
-	// 자동 조준 최대 거리
+	// 자동 조준 최대 거리 (cm)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxDistance;
 
-	// 발사되는 소스 발사체의 속력
+	// 발사되는 소스 발사체의 속력 (cm/s)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ProjectileSpeed;
 
-	// 재장전에 걸리는 시간
+	// 재장전에 걸리는 시간 (초)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadTime;
 
-	// 재장전 시작까지 걸리는 시간
+	// 재장전 시작까지 걸리는 시간 (초)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTime;
 
-	// 소스를 완전히 소모하고 재장전 시작까지 걸리는 시간
+	// 소스를 완전히 소모하고 재장전 시작까지 걸리는 시간 (초)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTimeAfterDried;
 	float ReloadWaitingTime;
