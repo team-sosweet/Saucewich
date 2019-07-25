@@ -96,14 +96,17 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	const auto Start = Character->GetPawnViewLocation() + AimDir * (Character->GetSpringArmLength() + TraceStartOffset);
 	const auto End = Start + AimDir * MaxDistance;
 
+	/*
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.AddIgnoredActor(GetOwner());
+	*/
 
-	const TArray<AActor*> Ignored{ this, GetOwner() };
+	const TArray<AActor*> Ignored{ GetOwner() };
+	const auto Debug = Character->IsLocallyControlled() ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 
 	TArray<FHitResult> BoxHits;
-	UKismetSystemLibrary::BoxTraceMultiByProfile(this, Start, End, {0.f, TraceBoxSize.X, TraceBoxSize.Y}, AimRotation, PawnOnly.Name, false, Ignored, EDrawDebugTrace::ForOneFrame, BoxHits, false);
+	UKismetSystemLibrary::BoxTraceMultiByProfile(this, Start, End, {0.f, TraceBoxSize.X, TraceBoxSize.Y}, AimRotation, PawnOnly.Name, false, Ignored, Debug, BoxHits, false);
 	
 	/*
 	GetWorld()->SweepMultiByProfile(
@@ -117,7 +120,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	{
 		//if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name, Params))
 		FHitResult a;
-		if (!UKismetSystemLibrary::LineTraceSingleByProfile(this, BoxHits[i].ImpactPoint, Start, NoPawn.Name, false, Ignored, EDrawDebugTrace::ForOneFrame, a, false))
+		if (!UKismetSystemLibrary::LineTraceSingleByProfile(this, BoxHits[i].ImpactPoint, Start, NoPawn.Name, false, Ignored, Debug, a, false))
 		{
 			HitPawn = i;
 			break;
@@ -132,7 +135,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 
 	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
 	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
-	const auto bHit = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, EDrawDebugTrace::ForOneFrame, GunTraceCache, false);
+	const auto bHit = UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, GunTraceCache, false);
 	OutHit = GunTraceCache;
 	return GunTraceHitCache = bHit ? EGunTraceHit::Other : EGunTraceHit::None;
 }
