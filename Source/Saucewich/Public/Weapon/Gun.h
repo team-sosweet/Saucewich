@@ -51,7 +51,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	FCollisionProfileName NoPawn;
 
-	// ÀÚµ¿Á¶ÁØ »óÀÚ Å©±â
+	// ìë™ì¡°ì¤€ ìƒì í¬ê¸°
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FVector2D TraceBoxSize;
 	FRandomStream FireRand;
@@ -65,37 +65,37 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Damage;
 
-	// ºĞ´ç ¹ß»ç ¼ö (¿¬»ç·Â)
+	// ë¶„ë‹¹ ë°œì‚¬ ìˆ˜ (ì—°ì‚¬ë ¥)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Rpm;
 	float FireLag;
 	float LastFire;
 
-	// ¼Ò½º ¹ß»ç ¼öÁ÷ ÆÛÁü
+	// ì†ŒìŠ¤ ë°œì‚¬ ìˆ˜ì§ í¼ì§
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1, AllowPrivateAccess=true))
 	float VerticalSpread;
 
-	// ¼Ò½º ¹ß»ç ¼öÆò ÆÛÁü
+	// ì†ŒìŠ¤ ë°œì‚¬ ìˆ˜í‰ í¼ì§
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1, AllowPrivateAccess=true))
 	float HorizontalSpread;
 
-	// ÀÚµ¿ Á¶ÁØ ÃÖ´ë °Å¸®
+	// ìë™ ì¡°ì¤€ ìµœëŒ€ ê±°ë¦¬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxDistance;
 
-	// ¹ß»çµÇ´Â ¼Ò½º ¹ß»çÃ¼ÀÇ ¼Ó·Â
+	// ë°œì‚¬ë˜ëŠ” ì†ŒìŠ¤ ë°œì‚¬ì²´ì˜ ì†ë ¥
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ProjectileSpeed;
 
-	// ÀçÀåÀü¿¡ °É¸®´Â ½Ã°£
+	// ì¬ì¥ì „ì— ê±¸ë¦¬ëŠ” ì‹œê°„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadTime;
 
-	// ÀçÀåÀü ½ÃÀÛ±îÁö °É¸®´Â ½Ã°£
+	// ì¬ì¥ì „ ì‹œì‘ê¹Œì§€ ê±¸ë¦¬ëŠ” ì‹œê°„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTime;
 
-	// ¼Ò½º¸¦ ¿ÏÀüÈ÷ ¼Ò¸ğÇÏ°í ÀçÀåÀü ½ÃÀÛ±îÁö °É¸®´Â ½Ã°£
+	// ì†ŒìŠ¤ë¥¼ ì™„ì „íˆ ì†Œëª¨í•˜ê³  ì¬ì¥ì „ ì‹œì‘ê¹Œì§€ ê±¸ë¦¬ëŠ” ì‹œê°„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ReloadWaitTimeAfterDried;
 	float ReloadWaitingTime;
@@ -104,7 +104,7 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_FireRandSeed, Transient)
 	int32 FireRandSeed;
 
-	// ÅºÃ¢ Å©±â
+	// íƒ„ì°½ í¬ê¸°
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 ClipSize;
 
@@ -112,7 +112,7 @@ private:
 	uint8 Clip;
 	uint8 LastClip;
 
-	// ¼Ò½º¸¦ ¿ÏÀüÈ÷ ¼Ò¸ğÇÏ°í ÀçÀåÀüÁß¿¡ ¼Ò½º°¡ ÀÌ¸¸Å­ Â÷¸é ´Ù½Ã ¹ß»ç°¡ °¡´ÉÇØÁı´Ï´Ù.
+	// ì†ŒìŠ¤ë¥¼ ì™„ì „íˆ ì†Œëª¨í•˜ê³  ì¬ì¥ì „ì¤‘ì— ì†ŒìŠ¤ê°€ ì´ë§Œí¼ ì°¨ë©´ ë‹¤ì‹œ ë°œì‚¬ê°€ ê°€ëŠ¥í•´ì§‘ë‹ˆë‹¤.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 MinClipToFireAfterDried;
 
