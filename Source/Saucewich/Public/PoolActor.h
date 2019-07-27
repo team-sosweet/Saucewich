@@ -10,9 +10,9 @@ class SAUCEWICH_API APoolActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	void Release();
-	void Activate();
+public:
+	void Release(bool bForce = false);
+	void Activate(bool bForce = false);
 	void LifeSpanExpired() override { Release(); }
 	void SetPool(class AActorPool* NewPool) { Pool = NewPool; }
 

@@ -3,9 +3,9 @@
 #include "PoolActor.h"
 #include "ActorPool.h"
 
-void APoolActor::Release()
+void APoolActor::Release(const bool bForce)
 {
-	if (!bActivated) return;
+	if (!bActivated && !bForce) return;
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
@@ -14,9 +14,9 @@ void APoolActor::Release()
 	OnReleased();
 }
 
-void APoolActor::Activate()
+void APoolActor::Activate(const bool bForce)
 {
-	if (bActivated) return;
+	if (bActivated && !bForce) return;
 	SetActorTickEnabled(true);
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
