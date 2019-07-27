@@ -12,14 +12,7 @@ class AGun : public AWeapon
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UProjectilePoolComponent* ProjectilePool;
-
 public:
-	AGun();
-
-	UProjectilePoolComponent* GetProjectilePool() const { return ProjectilePool; }
-
 	float GetDamage() const { return Damage; }
 	float GetProjectileSpeed() const { return ProjectileSpeed; }
 	TSubclassOf<UDamageType> GetDamageType() const { return DamageType; }
@@ -60,6 +53,11 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	class AActorPool* ProjectilePool;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	float TraceStartOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -86,6 +84,14 @@ private:
 	// 발사되는 소스 발사체의 속력 (cm/s)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ProjectileSpeed;
+
+	// 최소 발사체 크기
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float MinProjectileSize = 1.f;
+
+	// 최대 발사체 크기
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float MaxProjectileSize = 1.f;
 
 	// 재장전에 걸리는 시간 (초)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))

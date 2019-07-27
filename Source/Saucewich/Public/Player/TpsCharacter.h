@@ -20,7 +20,7 @@ struct FShadowData
 	class UMaterialInstanceDynamic* Material;
 };
 
-UCLASS()
+UCLASS(Abstract)
 class ATpsCharacter : public ACharacter
 {
 	GENERATED_BODY()

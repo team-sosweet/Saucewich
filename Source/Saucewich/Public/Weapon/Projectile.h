@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/StaticMeshActor.h"
+#include "PoolActor.h"
 #include "Projectile.generated.h"
 
 UCLASS()
-class AProjectile : public AStaticMeshActor
+class AProjectile : public APoolActor
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UProjectileMovementComponent* Movement;
@@ -17,18 +20,14 @@ class AProjectile : public AStaticMeshActor
 public:
 	AProjectile();
 
+	void OnActivated() override;
+
 	UFUNCTION(BlueprintCallable)
 	FName GetCollisionProfile() const;
-
-	void Release();
-	void Activate(bool bIsCosmetic);
-	void Deactivate();
 
 	uint8 bCosmetic : 1;
 
 protected:
-	void BeginPlay() override;
-	void LifeSpanExpired() override { Release(); }
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:

@@ -3,46 +3,25 @@
 #include "Projectile.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "ProjectilePoolComponent.h"
 #include "Gun.h"
 
 AProjectile::AProjectile()
-	:Movement{CreateDefaultSubobject<UProjectileMovementComponent>("Movement")}
+	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
+	Movement{CreateDefaultSubobject<UProjectileMovementComponent>("Movement")}
 {
+	RootComponent = Mesh;
 }
 
-void AProjectile::Release()
+void AProjectile::OnActivated()
 {
-	Deactivate();
-	Gun->GetProjectilePool()->Release(this);
+	Gun = CastChecked<AGun>(GetOwner());
+	Movement->SetUpdatedComponent(Mesh);
+	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
 }
 
 FName AProjectile::GetCollisionProfile() const
 {
-	return GetStaticMeshComponent()->GetCollisionProfileName();
-}
-
-void AProjectile::Activate(const bool bIsCosmetic)
-{
-	SetActorTickEnabled(true);
-	SetActorEnableCollision(true);
-	SetActorHiddenInGame(false);
-	Movement->SetUpdatedComponent(RootComponent);
-	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
-	bCosmetic = bIsCosmetic;
-}
-
-void AProjectile::Deactivate()
-{
-	SetActorTickEnabled(false);
-	SetActorEnableCollision(false);
-	SetActorHiddenInGame(true);
-}
-
-void AProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	Gun = CastChecked<AGun>(GetOwner());
+	return Mesh->GetCollisionProfileName();
 }
 
 void AProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const bool bSelfMoved,
@@ -50,7 +29,7 @@ void AProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimiti
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	if (!bCosmetic)
+	if (!bCosmetic && Gun)
 	{
 		const auto Damage = Gun->GetDamage();
 		Other->TakeDamage(

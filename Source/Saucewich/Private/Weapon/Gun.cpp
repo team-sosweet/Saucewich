@@ -1,19 +1,14 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Gun.h"
-#include "Engine/World.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UnrealNetwork.h"
+#include "ActorPool.h"
 #include "Projectile.h"
-#include "ProjectilePoolComponent.h"
+#include "SaucewichGameInstance.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
-
-AGun::AGun()
-	:ProjectilePool{CreateDefaultSubobject<UProjectilePoolComponent>("ProjectilePool")}
-{
-	ProjectilePool->SetupAttachment(RootComponent, "Muzzle");
-}
 
 void AGun::BeginPlay()
 {
@@ -25,6 +20,8 @@ void AGun::BeginPlay()
 		OnRep_FireRandSeed();
 		Clip = ClipSize;
 	}
+
+	ProjectilePool = CastChecked<USaucewichGameInstance>(GetGameInstance())->GetActorPool();
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -60,13 +57,15 @@ void AGun::Shoot()
 {
 	if (!CanFire()) return;
 
-	const auto& Transform = ProjectilePool->GetComponentTransform();
+	const auto& MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
+	const auto MuzzleLocation = MuzzleTransform.GetLocation();
+
 	FHitResult Hit;
 	const auto HitType = GunTrace(Hit);
 
 	if (HitType == EGunTraceHit::Pawn)
 	{
-		const auto ShotDir = (Hit.ImpactPoint - ProjectilePool->GetComponentLocation()).GetSafeNormal();
+		const auto ShotDir = (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal();
 		Hit.GetActor()->TakeDamage(
 			Damage,
 			FPointDamageEvent{Damage, Hit, ShotDir, DamageType},
@@ -76,12 +75,23 @@ void AGun::Shoot()
 	}
 
 	const auto Dir =
-		HitType != EGunTraceHit::None ? Hit.ImpactPoint - Transform.GetLocation()
-		: Transform.GetRotation().Vector();
+		HitType != EGunTraceHit::None ? Hit.ImpactPoint - MuzzleLocation
+		: MuzzleTransform.GetRotation().Vector();
 
 	const auto Rotation = FireRand.VRandCone(Dir, HorizontalSpread, VerticalSpread).ToOrientationQuat();
 
-	ProjectilePool->Spawn(Rotation, HitType == EGunTraceHit::Pawn);
+	FTransform SpawnTransform{
+		Rotation, MuzzleLocation, FVector{FireRand.FRandRange(MinProjectileSize, MaxProjectileSize)}
+	};
+
+	FActorSpawnParameters Parameters;
+	Parameters.Owner = this;
+	Parameters.Instigator = GetInstigator();
+
+	if (const auto Projectile = ProjectilePool->Spawn<AProjectile>(*ProjectileClass, SpawnTransform, Parameters))
+	{
+		Projectile->bCosmetic = HitType == EGunTraceHit::Pawn;
+	}
 
 	LastClip = --Clip;
 	bDried = Clip == 0;
@@ -135,7 +145,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 		return EGunTraceHit::Pawn;
 	}
 
-	const auto Profile = GetDefault<AProjectile>(ProjectilePool->GetProjectileClass())->GetCollisionProfile();
+	const auto Profile = GetDefault<AProjectile>(ProjectileClass)->GetCollisionProfile();
 	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
 	return UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, OutHit, false) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
