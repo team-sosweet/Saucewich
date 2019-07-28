@@ -22,10 +22,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit);
 
-	void FireP() override;
-	void FireR() override;
-	void SlotP() override;
-
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
@@ -33,6 +29,9 @@ protected:
 
 	virtual bool CanFire() const;
 	virtual void Reload(float DeltaSeconds);
+	void FireP() override;
+	void FireR() override;
+	void SlotP() override;
 
 private:
 	UFUNCTION()

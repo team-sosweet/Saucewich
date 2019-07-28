@@ -12,6 +12,8 @@
 #include "UnrealNetwork.h"
 #include "WeaponComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
+
 ATpsCharacter::ATpsCharacter()
 	:WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
 	SpringArm{ CreateDefaultSubobject<USpringArmComponent>("SpringArm") },
@@ -22,11 +24,6 @@ ATpsCharacter::ATpsCharacter()
 	SpringArm->SetupAttachment(RootComponent);
 	Camera->SetupAttachment(SpringArm);
 	Shadow->SetupAttachment(RootComponent);
-}
-
-float ATpsCharacter::GetSpringArmLength() const
-{
-	return (SpringArm->GetComponentLocation() - Camera->GetComponentLocation()).Size();
 }
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
@@ -41,7 +38,17 @@ EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 
 FVector ATpsCharacter::GetPawnViewLocation() const
 {
+	if (Role == ROLE_SimulatedProxy)
+	{
+		const auto ArmLocation = GetSpringArmLocation();
+		return ArmLocation - GetBaseAimRotation().Vector() * (ArmLocation - Camera->GetComponentLocation()).Size();
+	}
 	return Camera->GetComponentLocation();
+}
+
+FVector ATpsCharacter::GetSpringArmLocation() const
+{
+	return SpringArm->GetComponentLocation();
 }
 
 void ATpsCharacter::BeginPlay()

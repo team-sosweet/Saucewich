@@ -105,7 +105,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	const auto AimRotation = Character->GetBaseAimRotation();
 
 	const auto AimDir = AimRotation.Vector();
-	const auto Start = Character->GetPawnViewLocation() + AimDir * (Character->GetSpringArmLength() + TraceStartOffset);
+	const auto Start = Character->GetSpringArmLocation() + AimDir * TraceStartOffset;
 	const auto End = Start + AimDir * MaxDistance;
 
 	/*

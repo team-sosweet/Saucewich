@@ -33,14 +33,15 @@ public:
 	class UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 	class UStaticMeshComponent* GetShadow() const { return Shadow; }
 
-	float GetSpringArmLength() const;
 	class AWeapon* GetActiveWeapon() const;
 
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
+	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
 	FVector GetPawnViewLocation() const override;
 	FRotator GetBaseAimRotation() const override { return Super::GetBaseAimRotation().GetNormalized(); }
+	FVector GetSpringArmLocation() const;
 
 protected:
 	void BeginPlay() override;
