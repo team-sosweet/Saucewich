@@ -30,7 +30,7 @@ private:
 	// 여기에 클래스와 개수를 등록해두면 게임 시작시 미리 생성됩니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TMap<TSubclassOf<APoolActor>, uint8> Reserve;
-	TMap<TSubclassOf<APoolActor>, TArray<APoolActor*>> Pool;
+	TMap<TSubclassOf<APoolActor>, TArray<TWeakObjectPtr<APoolActor>>> Pool;
 
 #if !UE_BUILD_SHIPPING
 	// 액터 풀에 등록된 액터가 가장 많았을 때의 개수를 기억했다가 게임이 끝날 때 로그를 출력합니다.

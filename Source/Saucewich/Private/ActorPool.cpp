@@ -20,7 +20,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 		{
 			while (PoolPtr->Num() > 0)
 			{
-				if (const auto Actor = PoolPtr->Pop())
+				if (const auto Actor = PoolPtr->Pop().Get())
 				{
 					Actor->SetOwner(SpawnParameters.Owner);
 					Actor->Instigator = SpawnParameters.Instigator;
