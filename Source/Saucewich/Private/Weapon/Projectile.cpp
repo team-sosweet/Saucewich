@@ -14,7 +14,7 @@ AProjectile::AProjectile()
 
 void AProjectile::OnActivated()
 {
-	Gun = Cast<AGun>(GetOwner());
+	Gun = CastChecked<AGun>(GetOwner());
 	Movement->SetUpdatedComponent(Mesh);
 	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
 }
