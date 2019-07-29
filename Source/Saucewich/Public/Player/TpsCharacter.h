@@ -20,7 +20,7 @@ struct FShadowData
 	class UMaterialInstanceDynamic* Material;
 };
 
-UCLASS()
+UCLASS(Abstract)
 class ATpsCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -33,13 +33,15 @@ public:
 	class UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 	class UStaticMeshComponent* GetShadow() const { return Shadow; }
 
-	float GetSpringArmLength() const;
+	class AWeapon* GetActiveWeapon() const;
 
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
+	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
 	FVector GetPawnViewLocation() const override;
 	FRotator GetBaseAimRotation() const override { return Super::GetBaseAimRotation().GetNormalized(); }
+	FVector GetSpringArmLocation() const;
 
 protected:
 	void BeginPlay() override;
@@ -47,6 +49,11 @@ protected:
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	// 캐릭터가 사망하여 소멸되기 직전에 호출됩니다.
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnKill();
+	virtual void Kill() { OnKill(); Destroy(); }
 
 private:
 	void MoveForward(float AxisValue);

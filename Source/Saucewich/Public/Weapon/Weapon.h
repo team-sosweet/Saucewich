@@ -20,7 +20,6 @@ public:
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
-	void PostInitializeComponents() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:

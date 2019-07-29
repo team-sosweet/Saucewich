@@ -12,6 +12,8 @@
 #include "UnrealNetwork.h"
 #include "WeaponComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
+
 ATpsCharacter::ATpsCharacter()
 	:WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
 	SpringArm{ CreateDefaultSubobject<USpringArmComponent>("SpringArm") },
@@ -24,9 +26,9 @@ ATpsCharacter::ATpsCharacter()
 	Shadow->SetupAttachment(RootComponent);
 }
 
-float ATpsCharacter::GetSpringArmLength() const
+AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	return (SpringArm->GetComponentLocation() - Camera->GetComponentLocation()).Size();
+	return WeaponComponent->GetActiveWeapon();
 }
 
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
@@ -36,7 +38,17 @@ EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 
 FVector ATpsCharacter::GetPawnViewLocation() const
 {
+	if (Role == ROLE_SimulatedProxy)
+	{
+		const auto ArmLocation = GetSpringArmLocation();
+		return ArmLocation - GetBaseAimRotation().Vector() * (ArmLocation - Camera->GetComponentLocation()).Size();
+	}
 	return Camera->GetComponentLocation();
+}
+
+FVector ATpsCharacter::GetSpringArmLocation() const
+{
+	return SpringArm->GetComponentLocation();
 }
 
 void ATpsCharacter::BeginPlay()
@@ -79,7 +91,7 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 		Hp = FMath::Clamp(Hp - Damage, 0.f, MaxHp);
 		if (Hp == 0.f)
 		{
-			Destroy();
+			Kill();
 		}
 	}
 	return Damage;
