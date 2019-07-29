@@ -23,6 +23,7 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+	Mesh->SetVisibility(false);
 	Init();
 }
 
@@ -32,7 +33,7 @@ void AWeapon::Init()
 	{
 		Owner = Character;
 		Role = Owner->Role;
-		if (!bEquipped && Owner->GetWeaponComponent()->GetActiveWeapon() == this)
+		if (Owner->GetWeaponComponent()->GetActiveWeapon() == this)
 		{
 			Deploy();
 		}
@@ -57,12 +58,6 @@ void AWeapon::Tick(const float DeltaSeconds)
 	{
 		Role = Character->Role;
 	}
-}
-
-void AWeapon::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	Mesh->SetVisibility(false);
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
