@@ -2,7 +2,7 @@
 
 #include "Weapon.h"
 
-#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
@@ -10,7 +10,7 @@
 #include "WeaponComponent.h"
 
 AWeapon::AWeapon()
-	:Mesh{ CreateDefaultSubobject<USkeletalMeshComponent>("Mesh") }
+	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -18,7 +18,6 @@ AWeapon::AWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = Mesh;
-	Mesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
 void AWeapon::BeginPlay()

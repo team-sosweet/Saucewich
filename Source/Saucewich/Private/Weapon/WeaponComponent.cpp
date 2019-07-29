@@ -4,8 +4,8 @@
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "Gun.h"
 #include "TpsCharacter.h"
-#include "Weapon.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, Log, All)
 
@@ -54,6 +54,15 @@ void UWeaponComponent::SetupPlayerInputComponent(UInputComponent* Input)
 		Input->BindAction<F>(*Slot, IE_Pressed, this, &UWeaponComponent::SlotP, i);
 		Input->BindAction<F>(*Slot, IE_Released, this, &UWeaponComponent::SlotR, i);
 	}
+}
+
+EGunTraceHit UWeaponComponent::GunTrace(FHitResult& OutHit) const
+{
+	if (const auto Gun = Cast<AGun>(GetActiveWeapon()))
+	{
+		return Gun->GunTrace(OutHit);
+	}
+	return EGunTraceHit::None;
 }
 
 bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)

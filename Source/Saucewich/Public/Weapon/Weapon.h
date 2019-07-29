@@ -12,7 +12,7 @@ class AWeapon : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	class USkeletalMeshComponent* Mesh;
+	class UStaticMeshComponent* Mesh;
 	
 public:	
 	AWeapon();
@@ -36,7 +36,7 @@ public:
 
 	bool IsEquipped() const { return bEquipped; }
 	uint8 GetSlot() const { return Slot; }
-	USkeletalMeshComponent* GetMesh() const { return Mesh; }
+	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 	class ATpsCharacter* GetCharacter() const;
