@@ -7,6 +7,7 @@
 #include "ActorPool.h"
 #include "GunProjectile.h"
 #include "SaucewichGameInstance.h"
+#include "SaucewichGameState.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
 
@@ -114,7 +115,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	Params.AddIgnoredActor(GetOwner());
 	*/
 
-	const TArray<AActor*> Ignored{ GetOwner() };
+	const auto Ignored = GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam());
 	const auto Debug = Character->IsLocallyControlled() ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 
 	TArray<FHitResult> BoxHits;

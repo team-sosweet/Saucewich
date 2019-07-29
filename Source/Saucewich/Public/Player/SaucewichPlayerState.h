@@ -13,10 +13,10 @@ class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
 public:
 	uint8 GetTeam() const { return Team; }
 
-	UFUNCTION(NetMulticast, Reliable)
-	void SetTeam(uint8 NewTeam);
+protected:
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Replicated, Transient, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };

@@ -8,8 +8,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "UnrealNetwork.h"
+#include "SaucewichPlayerState.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
@@ -34,6 +36,12 @@ AWeapon* ATpsCharacter::GetActiveWeapon() const
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
 	return WeaponComponent->GunTrace(OutHit);
+}
+
+uint8 ATpsCharacter::GetTeam() const
+{
+	const auto Player = GetPlayerState<ASaucewichPlayerState>();
+	return Player ? Player->GetTeam() : 0;
 }
 
 FVector ATpsCharacter::GetPawnViewLocation() const
@@ -83,7 +91,7 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATpsCharacter, Hp);
 }
 
-float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
 	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (Damage != 0.f)
@@ -95,6 +103,20 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 		}
 	}
 	return Damage;
+}
+
+bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
+{
+	if (!Super::ShouldTakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser))
+		return false;
+
+	if (!EventInstigator)
+		return true;
+
+	if (const auto State = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
+		return GetTeam() != State->GetTeam();
+
+	return true;
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

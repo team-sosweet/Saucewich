@@ -3,7 +3,8 @@
 #include "SaucewichPlayerState.h"
 #include "UnrealNetwork.h"
 
-void ASaucewichPlayerState::SetTeam_Implementation(const uint8 NewTeam)
+void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Team = NewTeam;
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASaucewichPlayerState, Team);
 }
