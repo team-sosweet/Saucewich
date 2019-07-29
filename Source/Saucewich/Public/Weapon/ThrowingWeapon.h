@@ -15,6 +15,9 @@ class AThrowingWeapon final : public AWeapon
 	void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FTransform ThrowOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class AProjectile> ProjectileClass;
 	class AActorPool* ProjectilePool;
 

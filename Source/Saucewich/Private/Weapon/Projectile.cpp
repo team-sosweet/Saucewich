@@ -12,6 +12,11 @@ AProjectile::AProjectile()
 	RootComponent = Mesh;
 }
 
+void AProjectile::ResetSpeed() const
+{
+	SetSpeed(Movement->InitialSpeed);
+}
+
 void AProjectile::SetSpeed(const float Speed) const
 {
 	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);

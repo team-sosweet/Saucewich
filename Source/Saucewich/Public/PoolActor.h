@@ -11,6 +11,7 @@ class SAUCEWICH_API APoolActor : public AActor
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(BlueprintCallable)
 	void Release(bool bForce = false);
 	void Activate(bool bForce = false);
 	void LifeSpanExpired() override { Release(); }

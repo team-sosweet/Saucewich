@@ -3,6 +3,7 @@
 #include "ThrowingWeapon.h"
 #include "Engine/World.h"
 #include "ActorPool.h"
+#include "Projectile.h"
 #include "SaucewichGameInstance.h"
 
 void AThrowingWeapon::SlotP()
@@ -12,9 +13,11 @@ void AThrowingWeapon::SlotP()
 	FActorSpawnParameters Parameters;
 	Parameters.Owner = this;
 	Parameters.Instigator = GetInstigator();
-	//if (const auto Thrown = ProjectilePool->Spawn<AProjectile>(ProjectileClass, GetActorTransform(), Parameters))
+
+	if (const auto Thrown = ProjectilePool->Spawn<AProjectile>(ProjectileClass, ThrowOffset * GetActorTransform(), Parameters))
 	{
-		
+		Thrown->ResetSpeed();
+		bReloading = true;
 	}
 }
 
@@ -33,8 +36,8 @@ void AThrowingWeapon::Tick(const float DeltaSeconds)
 		ReloadingTime += DeltaSeconds;
 		if (ReloadingTime >= ReloadTime)
 		{
-			bReloading = false;
 			ReloadingTime = 0.f;
+			bReloading = false;
 		}
 	}
 }

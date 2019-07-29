@@ -31,7 +31,10 @@ public:
 	 * @return: The weapon currently equipped
 	 */
 	UFUNCTION(BlueprintCallable)
-	AWeapon* GetActiveWeapon() const { return Active < Weapons.Num() ? Weapons[Active] : nullptr; }
+	AWeapon* GetActiveWeapon() const { return GetWeapon(Active); }
+
+	UFUNCTION(BlueprintCallable)
+	AWeapon* GetWeapon(const uint8 Slot) const { return Slot < Weapons.Num() ? Weapons[Slot] : nullptr; }
 
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;

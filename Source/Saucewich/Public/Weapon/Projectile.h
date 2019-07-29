@@ -17,9 +17,9 @@ class AProjectile : public APoolActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UProjectileMovementComponent* Movement;
 
-
 public:
 	AProjectile();
+	void ResetSpeed() const;
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
