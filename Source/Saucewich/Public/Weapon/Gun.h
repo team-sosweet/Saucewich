@@ -52,7 +52,7 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
-	TSubclassOf<class AProjectile> ProjectileClass;
+	TSubclassOf<class AGunProjectile> ProjectileClass;
 
 	class AActorPool* ProjectilePool;
 

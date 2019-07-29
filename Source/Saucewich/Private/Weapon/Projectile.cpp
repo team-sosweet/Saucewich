@@ -12,11 +12,14 @@ AProjectile::AProjectile()
 	RootComponent = Mesh;
 }
 
+void AProjectile::SetSpeed(const float Speed) const
+{
+	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
+}
+
 void AProjectile::OnActivated()
 {
-	Gun = CastChecked<AGun>(GetOwner());
 	Movement->SetUpdatedComponent(Mesh);
-	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
 }
 
 void AProjectile::OnReleased()
@@ -27,23 +30,4 @@ void AProjectile::OnReleased()
 FName AProjectile::GetCollisionProfile() const
 {
 	return Mesh->GetCollisionProfileName();
-}
-
-void AProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const bool bSelfMoved,
-	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	if (!bCosmetic && Gun)
-	{
-		const auto Damage = Gun->GetDamage();
-		Other->TakeDamage(
-			Damage,
-			FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Gun->GetDamageType()},
-			GetInstigator()->GetController(),
-			GetOwner()
-		);
-	}
-
-	Release();
 }

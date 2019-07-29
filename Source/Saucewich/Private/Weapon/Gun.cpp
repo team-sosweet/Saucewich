@@ -5,7 +5,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "UnrealNetwork.h"
 #include "ActorPool.h"
-#include "Projectile.h"
+#include "GunProjectile.h"
 #include "SaucewichGameInstance.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
@@ -88,7 +88,7 @@ void AGun::Shoot()
 	Parameters.Owner = this;
 	Parameters.Instigator = GetInstigator();
 
-	if (const auto Projectile = ProjectilePool->Spawn<AProjectile>(*ProjectileClass, SpawnTransform, Parameters))
+	if (const auto Projectile = ProjectilePool->Spawn<AGunProjectile>(*ProjectileClass, SpawnTransform, Parameters))
 	{
 		Projectile->bCosmetic = HitType == EGunTraceHit::Pawn;
 	}
@@ -145,7 +145,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 		return EGunTraceHit::Pawn;
 	}
 
-	const auto Profile = GetDefault<AProjectile>(ProjectileClass)->GetCollisionProfile();
+	const auto Profile = GetDefault<AGunProjectile>(ProjectileClass)->GetCollisionProfile();
 	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
 	return UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, OutHit, false) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
