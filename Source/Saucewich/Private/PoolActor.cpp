@@ -20,6 +20,7 @@ void APoolActor::Activate(const bool bForce)
 	SetActorTickEnabled(true);
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
+	SetLifeSpan(InitialLifeSpan);
 	bActivated = true;
 	OnActivated();
 }

@@ -19,6 +19,11 @@ void AProjectile::OnActivated()
 	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Gun->GetProjectileSpeed());
 }
 
+void AProjectile::OnReleased()
+{
+	Movement->SetUpdatedComponent(nullptr);
+}
+
 FName AProjectile::GetCollisionProfile() const
 {
 	return Mesh->GetCollisionProfileName();

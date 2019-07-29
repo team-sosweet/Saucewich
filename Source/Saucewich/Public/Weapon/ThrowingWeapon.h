@@ -2,19 +2,28 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Weapon/Weapon.h"
 #include "ThrowingWeapon.generated.h"
 
 UCLASS(Abstract)
-class AThrowingWeapon : public AWeapon
+class AThrowingWeapon final : public AWeapon
 {
 	GENERATED_BODY()
 
-public:
 	void SlotP() override;
+	void BeginPlay() override;
+	void Tick(float DeltaSeconds) override;
 
-private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class AProjectile> ProjectileClass;
+	class AActorPool* ProjectilePool;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float ReloadTime;
+
+	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float ReloadingTime;
+
+	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bReloading : 1;
 };

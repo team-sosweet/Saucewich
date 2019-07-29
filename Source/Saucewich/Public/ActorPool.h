@@ -15,17 +15,16 @@ public:
 	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters);
 
 	template <class T>
-	T* Spawn(const TSubclassOf<APoolActor> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters)
+	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters)
 	{
 		static_assert(TIsDerivedFrom<T, APoolActor>::IsDerived, "");
-		return Cast<T>(Spawn(Class, Transform, SpawnParameters));
+		return Cast<T>(Spawn(*Class, Transform, SpawnParameters));
 	}
 
 	void Release(APoolActor* Actor);
 
 private:
 	void BeginPlay() override;
-	void UpdateMaxUse(TSubclassOf<APoolActor> Class, uint8 Cur);
 
 	// 여기에 클래스와 개수를 등록해두면 게임 시작시 미리 생성됩니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -39,5 +38,6 @@ private:
 	TMap<TSubclassOf<APoolActor>, uint8> MaxUse;
 	TMap<TSubclassOf<APoolActor>, uint8> CurUse;
 	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+	void UpdateMaxUse(TSubclassOf<APoolActor> Class, uint8 Cur);
 #endif
 };

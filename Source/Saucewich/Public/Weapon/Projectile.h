@@ -7,7 +7,7 @@
 #include "Projectile.generated.h"
 
 UCLASS()
-class AProjectile : public APoolActor
+class AProjectile final : public APoolActor
 {
 	GENERATED_BODY()
 
@@ -20,16 +20,15 @@ class AProjectile : public APoolActor
 public:
 	AProjectile();
 
-	void OnActivated() override;
-
 	UFUNCTION(BlueprintCallable)
 	FName GetCollisionProfile() const;
 
 	uint8 bCosmetic : 1;
 
-protected:
+private:
+	void OnActivated() override;
+	void OnReleased() override;
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
-private:
 	class AGun* Gun;
 };
