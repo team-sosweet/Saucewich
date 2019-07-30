@@ -38,6 +38,7 @@ void AWeapon::Init()
 		{
 			Deploy();
 		}
+		Material->SetVectorParameterValue("Color", Owner->GetTeamColor());
 	}
 	else
 	{
@@ -93,8 +94,7 @@ FLinearColor AWeapon::GetColor() const
 
 void AWeapon::SetColor(const FLinearColor& NewColor)
 {
-	if (Material) Material->SetVectorParameterValue("Color", NewColor);
-	else GetWorldTimerManager().SetTimerForNextTick([this, &NewColor] { SetColor(NewColor); });
+	Material->SetVectorParameterValue("Color", NewColor);
 }
 
 ATpsCharacter* AWeapon::GetCharacter() const

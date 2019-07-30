@@ -60,6 +60,15 @@ FLinearColor ATpsCharacter::GetColor() const
 	return Color;
 }
 
+FLinearColor ATpsCharacter::GetTeamColor() const
+{
+	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		return GameState->GetTeamData(GetTeam()).Color;
+	}
+	return {};
+}
+
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
 	Material->SetVectorParameterValue("Color", NewColor);
@@ -161,10 +170,7 @@ void ATpsCharacter::MoveRight(const float AxisValue)
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 {
-	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-	{
-		SetColor(GameState->GetTeamData(NewTeam).Color);
-	}
+	SetColor(GetTeamColor());
 }
 
 void ATpsCharacter::BindOnTeamChanged()

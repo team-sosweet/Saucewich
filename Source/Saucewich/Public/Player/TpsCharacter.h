@@ -55,6 +55,7 @@ public:
 	uint8 GetTeam() const;
 
 	FLinearColor GetColor() const;
+	FLinearColor GetTeamColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
 	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.

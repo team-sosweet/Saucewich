@@ -119,7 +119,6 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	}
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	Weapon->SetColor(Owner->GetColor());
 
 	if (Weapons[Slot]) Weapons[Slot]->Destroy();
 	Weapons[Slot] = Weapon;
