@@ -14,16 +14,25 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-	if (const auto Controller = Cast<ASaucewichPlayerController>(GetOwner()))
-	{
-		Controller->OnPlayerStateSpawned.Broadcast(this);
-	}
-	OnRep_Team();
+	Init();
 }
 
 void ASaucewichPlayerState::OnRep_Team()
 {
 	OnTeamChanged.Broadcast(Team);
+}
+
+void ASaucewichPlayerState::Init()
+{
+	if (const auto Controller = Cast<ASaucewichPlayerController>(GetOwner()))
+	{
+		Controller->OnPlayerStateSpawned.Broadcast(this);
+		OnRep_Team();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimerForNextTick(this, &ASaucewichPlayerState::Init);
+	}
 }
 
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

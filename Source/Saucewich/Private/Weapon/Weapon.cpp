@@ -15,7 +15,7 @@ AWeapon::AWeapon()
 {
 	bReplicates = true;
 	bAlwaysRelevant = true;
-
+	
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = Mesh;
@@ -24,10 +24,7 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-
 	Mesh->SetVisibility(false);
-	Material = Mesh->CreateDynamicMaterialInstance(TeamColorMaterialElementIndex);
-
 	Init();
 }
 
@@ -64,6 +61,12 @@ void AWeapon::Tick(const float DeltaSeconds)
 	}
 }
 
+void AWeapon::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	Material = Mesh->CreateDynamicMaterialInstance(FMath::Max(Mesh->GetMaterialIndex("TeamColor"), 0));
+}
+
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -91,6 +94,7 @@ FLinearColor AWeapon::GetColor() const
 void AWeapon::SetColor(const FLinearColor& NewColor)
 {
 	if (Material) Material->SetVectorParameterValue("Color", NewColor);
+	else GetWorldTimerManager().SetTimerForNextTick([this, &NewColor] { SetColor(NewColor); });
 }
 
 ATpsCharacter* AWeapon::GetCharacter() const

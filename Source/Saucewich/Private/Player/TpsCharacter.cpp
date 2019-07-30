@@ -47,6 +47,18 @@ uint8 ATpsCharacter::GetTeam() const
 	return Player ? Player->GetTeam() : 0;
 }
 
+FLinearColor ATpsCharacter::GetColor() const
+{
+	if (!Material) 
+	{
+		UE_LOG(LogTpsCharacter, Error, TEXT("Tried to get color before material created!"));
+		return {};
+	}
+	FLinearColor Color;
+	Material->GetVectorParameterValue({"Color"}, Color);
+	return Color;
+}
+
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
 	Material->SetVectorParameterValue("Color", NewColor);
@@ -73,12 +85,11 @@ void ATpsCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	Hp = MaxHp;
-	Material = GetMesh()->CreateDynamicMaterialInstance(TeamColorMaterialElementIndex);
 	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 
-	if (const auto PlayerState = GetPlayerState<ASaucewichPlayerState>())
+	if (const auto Player = GetPlayerState<ASaucewichPlayerState>())
 	{
-		BindOnTeamChanged(PlayerState);
+		BindOnTeamChanged(Player);
 	}
 	else if (const auto MyController = GetController<ASaucewichPlayerController>())
 	{
@@ -90,6 +101,12 @@ void ATpsCharacter::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	UpdateShadow();
+}
+
+void ATpsCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	Material = GetMesh()->CreateDynamicMaterialInstance(FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0));
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
@@ -177,6 +194,7 @@ void ATpsCharacter::UpdateShadow() const
 void ATpsCharacter::BindOnTeamChanged(ASaucewichPlayerState* const Player)
 {
 	Player->OnTeamChanged.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+	OnTeamChanged(Player->GetTeam());
 }
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)

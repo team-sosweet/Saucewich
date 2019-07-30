@@ -26,7 +26,7 @@ public:
 	void SetColor(const FLinearColor& NewColor) override;
 
 protected:
-	void BeginPlay() override;
+	void PostInitializeComponents() override;
 	void OnActivated() override;
 	void OnReleased() override;
 

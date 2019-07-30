@@ -43,6 +43,7 @@ public:
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
+	void PostInitializeComponents() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
@@ -59,9 +60,6 @@ private:
 
 	ATpsCharacter* Owner;
 	UMaterialInstanceDynamic* Material;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 TeamColorMaterialElementIndex;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Slot;

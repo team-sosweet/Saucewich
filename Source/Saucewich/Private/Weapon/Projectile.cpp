@@ -40,11 +40,11 @@ FName AProjectile::GetCollisionProfile() const
 
 void AProjectile::SetColor(const FLinearColor& NewColor)
 {
-	Material->SetVectorParameterValue("Color", NewColor);
+	if (Material) Material->SetVectorParameterValue("Color", NewColor);
 }
 
-void AProjectile::BeginPlay()
+void AProjectile::PostInitializeComponents()
 {
-	Super::BeginPlay();
-	Material = Mesh->CreateDynamicMaterialInstance(0);
+	Super::PostInitializeComponents();
+	Material = Mesh->CreateDynamicMaterialInstance(FMath::Max(Mesh->GetMaterialIndex("TeamColor"), 0));
 }

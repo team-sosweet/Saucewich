@@ -29,6 +29,8 @@ protected:
 	virtual void OnRep_Team();
 
 private:
+	void Init();
+
 	UPROPERTY(ReplicatedUsing=OnRep_Team, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };

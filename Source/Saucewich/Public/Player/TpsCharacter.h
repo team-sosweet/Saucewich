@@ -54,6 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
 
+	FLinearColor GetColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
 	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
@@ -64,6 +65,7 @@ public:
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
+	void PostInitializeComponents() override;
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -96,7 +98,4 @@ private:
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Hp;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 TeamColorMaterialElementIndex;
 };

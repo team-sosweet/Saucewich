@@ -84,7 +84,13 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 {
 	for (const auto Weapon : Weapons)
-		if (Weapon) Weapon->SetColor(NewColor);
+	{
+		if (Weapon)
+		{
+			UE_LOG(LogWeaponComponent, Log, TEXT("Set color of %s from %s to %s"), *Weapon->GetName(), *Weapon->GetColor().ToString(), *NewColor.ToString());
+			Weapon->SetColor(NewColor);
+		}
+	}
 }
 
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
@@ -113,10 +119,13 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	}
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Weapon->SetColor(Owner->GetColor());
 
 	if (Weapons[Slot]) Weapons[Slot]->Destroy();
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
+
+	UE_LOG(LogWeaponComponent, Log, TEXT("%s successfully given."), *WeaponClass->GetName());
 
 	return Weapon;
 }
