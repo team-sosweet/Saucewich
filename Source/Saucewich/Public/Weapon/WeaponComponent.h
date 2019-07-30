@@ -9,6 +9,9 @@
 
 class AWeapon;
 
+/*
+ * 캐릭터와 무기가 상호작용하는 중간다리입니다.
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UWeaponComponent : public USceneComponent, public IColorable
 {

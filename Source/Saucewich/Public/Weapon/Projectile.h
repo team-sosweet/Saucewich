@@ -6,6 +6,9 @@
 #include "Colorable.h"
 #include "Projectile.generated.h"
 
+/*
+ * 발사체는 pooling 가능하여 대량으로 생산할 수 있으며, ProjectileMovementComponent를 가진 클래스입니다.
+ */
 UCLASS()
 class AProjectile : public APoolActor, public IColorable
 {

@@ -185,10 +185,13 @@ void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 
 void ATpsCharacter::BindOnTeamChanged()
 {
-	if (const auto State = GetPlayerState<ASaucewichPlayerState>())
+	if (const auto PlayerState = GetPlayerState())
 	{
-		State->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-		OnTeamChanged(State->GetTeam());
+		if (const auto MyState = Cast<ASaucewichPlayerState>(PlayerState))
+		{
+			MyState->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+			OnTeamChanged(MyState->GetTeam());
+		}
 	}
 	else
 	{
