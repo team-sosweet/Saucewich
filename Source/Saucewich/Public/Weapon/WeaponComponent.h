@@ -4,12 +4,13 @@
 
 #include "Saucewich.h"
 #include "Components/SceneComponent.h"
+#include "Colorable.h"
 #include "WeaponComponent.generated.h"
 
 class AWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UWeaponComponent : public USceneComponent
+class UWeaponComponent : public USceneComponent, public IColorable
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,8 @@ public:
 
 	virtual bool TrySelectWeapon(uint8 Slot);
 	
+	void SetColor(const FLinearColor& NewColor) override;
+
 	class ATpsCharacter* const Owner = nullptr;
 
 protected:

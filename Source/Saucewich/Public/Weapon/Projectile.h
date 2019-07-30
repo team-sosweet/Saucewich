@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "PoolActor.h"
+#include "Colorable.h"
 #include "Projectile.generated.h"
 
 UCLASS()
-class AProjectile : public APoolActor
+class AProjectile : public APoolActor, public IColorable
 {
 	GENERATED_BODY()
 
@@ -23,7 +23,13 @@ public:
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
+	void SetColor(const FLinearColor& NewColor) override;
+
 protected:
+	void BeginPlay() override;
 	void OnActivated() override;
 	void OnReleased() override;
+
+private:
+	UMaterialInstanceDynamic* Material;
 };

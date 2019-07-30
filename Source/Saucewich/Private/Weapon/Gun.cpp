@@ -92,6 +92,7 @@ void AGun::Shoot()
 	if (const auto Projectile = ProjectilePool->Spawn<AGunProjectile>(*ProjectileClass, SpawnTransform, Parameters))
 	{
 		Projectile->bCosmetic = HitType == EGunTraceHit::Pawn;
+		Projectile->SetColor(GetColor());
 	}
 
 	LastClip = --Clip;

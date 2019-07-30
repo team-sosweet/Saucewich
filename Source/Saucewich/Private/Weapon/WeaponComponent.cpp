@@ -81,6 +81,12 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 	return true;
 }
 
+void UWeaponComponent::SetColor(const FLinearColor& NewColor)
+{
+	for (const auto Weapon : Weapons)
+		if (Weapon) Weapon->SetColor(NewColor);
+}
+
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
 	if (!WeaponClass)

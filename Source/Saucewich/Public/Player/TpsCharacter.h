@@ -4,6 +4,7 @@
 
 #include "Saucewich.h"
 #include "GameFramework/Character.h"
+#include "Colorable.h"
 #include "TpsCharacter.generated.h"
 
 USTRUCT(BlueprintType)
@@ -21,17 +22,29 @@ struct FShadowData
 };
 
 UCLASS(Abstract)
-class ATpsCharacter : public ACharacter
+class ATpsCharacter : public ACharacter, public IColorable
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UWeaponComponent* WeaponComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UStaticMeshComponent* Shadow;
 
 public:
 	ATpsCharacter();
 
-	class USpringArmComponent* GetSpringArm() const { return SpringArm; }
-	class UCameraComponent* GetCamera() const { return Camera; }
-	class UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
-	class UStaticMeshComponent* GetShadow() const { return Shadow; }
+	USpringArmComponent* GetSpringArm() const { return SpringArm; }
+	UCameraComponent* GetCamera() const { return Camera; }
+	UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
+	UStaticMeshComponent* GetShadow() const { return Shadow; }
 
 	class AWeapon* GetActiveWeapon() const;
 
@@ -40,6 +53,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
+
+	void SetColor(const FLinearColor& NewColor) override;
 
 	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
 	FVector GetPawnViewLocation() const override;
@@ -65,24 +80,23 @@ private:
 
 	void UpdateShadow() const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	UWeaponComponent* WeaponComponent;
+	UFUNCTION()
+	void BindOnTeamChanged(class ASaucewichPlayerState* Player);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	UCameraComponent* Camera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* Shadow;
+	UFUNCTION()
+	void OnTeamChanged(uint8 NewTeam);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UMaterialInstanceDynamic* Material;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxHp;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Hp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 TeamColorMaterialElementIndex;
 };

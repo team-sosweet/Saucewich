@@ -17,6 +17,7 @@ void AThrowingWeapon::SlotP()
 	if (const auto Thrown = ProjectilePool->Spawn<AProjectile>(ProjectileClass, ThrowOffset * GetActorTransform(), Parameters))
 	{
 		Thrown->ResetSpeed();
+		Thrown->SetColor(GetColor());
 		bReloading = true;
 	}
 }

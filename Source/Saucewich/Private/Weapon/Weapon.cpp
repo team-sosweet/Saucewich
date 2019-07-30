@@ -3,6 +3,7 @@
 #include "Weapon.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
@@ -23,7 +24,10 @@ AWeapon::AWeapon()
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
 	Mesh->SetVisibility(false);
+	Material = Mesh->CreateDynamicMaterialInstance(TeamColorMaterialElementIndex);
+
 	Init();
 }
 
@@ -75,6 +79,18 @@ bool AWeapon::IsVisible() const
 void AWeapon::SetVisibility(const bool bNewVisibility) const
 {
 	Mesh->SetVisibility(bNewVisibility);
+}
+
+FLinearColor AWeapon::GetColor() const
+{
+	FLinearColor Color;
+	Material->GetVectorParameterValue({"Color"}, Color);
+	return Color;
+}
+
+void AWeapon::SetColor(const FLinearColor& NewColor)
+{
+	if (Material) Material->SetVectorParameterValue("Color", NewColor);
 }
 
 ATpsCharacter* AWeapon::GetCharacter() const

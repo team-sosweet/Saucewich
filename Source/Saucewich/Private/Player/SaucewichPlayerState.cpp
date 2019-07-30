@@ -18,11 +18,12 @@ void ASaucewichPlayerState::BeginPlay()
 	{
 		Controller->OnPlayerStateSpawned.Broadcast(this);
 	}
+	OnRep_Team();
 }
 
 void ASaucewichPlayerState::OnRep_Team()
 {
-	OnTeamChanged.Broadcast();
+	OnTeamChanged.Broadcast(Team);
 }
 
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -5,7 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "SaucewichPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTeamChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
 
 UCLASS()
 class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
@@ -18,6 +18,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTeam(uint8 NewTeam);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnTeamChanged OnTeamChanged;
+
 protected:
 	void BeginPlay() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -28,7 +31,4 @@ protected:
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_Team, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnTeamChanged OnTeamChanged;
 };
