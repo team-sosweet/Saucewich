@@ -41,7 +41,9 @@ public:
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	virtual bool TrySelectWeapon(uint8 Slot);
-	
+
+	float GetSpeedRatio() const;
+
 	void SetColor(const FLinearColor& NewColor) override;
 
 	class ATpsCharacter* const Owner = nullptr;

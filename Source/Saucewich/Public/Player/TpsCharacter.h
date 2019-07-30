@@ -39,7 +39,7 @@ class ATpsCharacter : public ACharacter, public IColorable
 	class UStaticMeshComponent* Shadow;
 
 public:
-	ATpsCharacter();
+	explicit ATpsCharacter(const FObjectInitializer& ObjectInitializer);
 
 	USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	UCameraComponent* GetCamera() const { return Camera; }
@@ -57,6 +57,9 @@ public:
 	FLinearColor GetColor() const;
 	FLinearColor GetTeamColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
+
+	void SetMaxHP(float Ratio);
+	virtual float GetSpeedRatio() const;
 
 	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
 	FVector GetPawnViewLocation() const override;
@@ -92,9 +95,12 @@ private:
 
 	UMaterialInstanceDynamic* Material;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float MaxHp;
+	UPROPERTY(EditDefaultsOnly)
+	float DefaultMaxHP;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float Hp;
+	float MaxHP;
+
+	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float HP;
 };

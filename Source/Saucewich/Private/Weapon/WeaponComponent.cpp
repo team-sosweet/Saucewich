@@ -81,6 +81,13 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 	return true;
 }
 
+float UWeaponComponent::GetSpeedRatio() const
+{
+	if (const auto Weapon = GetActiveWeapon())
+		return Weapon->GetSpeedRatio();
+	return 1.f;
+}
+
 void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 {
 	for (const auto Weapon : Weapons)
@@ -121,6 +128,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	if (Weapons[Slot]) Weapons[Slot]->Destroy();
+	else if (Slot == 0) Owner->SetMaxHP(Weapon->GetHPRatio());
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 

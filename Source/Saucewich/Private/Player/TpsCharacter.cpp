@@ -16,12 +16,14 @@
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
+#include "TpsCharacterMovementComponent.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
-ATpsCharacter::ATpsCharacter()
-	:WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
+ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
+	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
+	WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
 	SpringArm{ CreateDefaultSubobject<USpringArmComponent>("SpringArm") },
 	Camera{ CreateDefaultSubobject<UCameraComponent>("Camera") },
 	Shadow{ CreateDefaultSubobject<UStaticMeshComponent>("Shadow") }
@@ -50,11 +52,6 @@ uint8 ATpsCharacter::GetTeam() const
 
 FLinearColor ATpsCharacter::GetColor() const
 {
-	if (!Material) 
-	{
-		UE_LOG(LogTpsCharacter, Error, TEXT("Tried to get color before material created!"));
-		return {};
-	}
 	FLinearColor Color;
 	Material->GetVectorParameterValue({"Color"}, Color);
 	return Color;
@@ -73,6 +70,18 @@ void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
 	Material->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
+}
+
+void ATpsCharacter::SetMaxHP(const float Ratio)
+{
+	const auto OldMaxHP = MaxHP;
+	MaxHP = DefaultMaxHP * Ratio;
+	if (HP == OldMaxHP) HP = MaxHP;
+}
+
+float ATpsCharacter::GetSpeedRatio() const
+{
+	return WeaponComponent->GetSpeedRatio();
 }
 
 FVector ATpsCharacter::GetPawnViewLocation() const
@@ -94,7 +103,7 @@ void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Hp = MaxHp;
+	HP = MaxHP;
 	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 	BindOnTeamChanged();
 }
@@ -127,7 +136,8 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATpsCharacter, Hp);
+	DOREPLIFETIME(ATpsCharacter, HP);
+	DOREPLIFETIME(ATpsCharacter, MaxHP);
 }
 
 float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
@@ -135,8 +145,8 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (Damage != 0.f)
 	{
-		Hp = FMath::Clamp(Hp - Damage, 0.f, MaxHp);
-		if (Hp == 0.f)
+		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
+		if (HP == 0.f)
 		{
 			Kill();
 		}
@@ -153,7 +163,7 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 		return true;
 
 	if (const auto State = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
-		return GetTeam() != State->GetTeam();
+		return DamageAmount > 0.f ? GetTeam() != State->GetTeam() : GetTeam() == State->GetTeam();
 
 	return true;
 }

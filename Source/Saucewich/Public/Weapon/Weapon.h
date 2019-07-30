@@ -22,6 +22,9 @@ public:
 	bool IsEquipped() const { return bEquipped; }
 	uint8 GetSlot() const { return Slot; }
 
+	float GetSpeedRatio() const { return WalkSpeedRatio; }
+	float GetHPRatio() const { return HPRatio; }
+
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 
@@ -60,6 +63,12 @@ private:
 
 	ATpsCharacter* Owner;
 	UMaterialInstanceDynamic* Material;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float WalkSpeedRatio = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float HPRatio = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Slot;
