@@ -80,13 +80,11 @@ private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 
-	void UpdateShadow() const;
-
-	UFUNCTION()
-	void BindOnTeamChanged(class ASaucewichPlayerState* Player);
-
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
+	void BindOnTeamChanged();
+
+	void UpdateShadow() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;

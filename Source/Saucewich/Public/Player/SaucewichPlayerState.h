@@ -19,18 +19,13 @@ public:
 	void SetTeam(uint8 NewTeam);
 
 	UPROPERTY(BlueprintAssignable)
-	FOnTeamChanged OnTeamChanged;
+	FOnTeamChanged OnTeamChangedDelegate;
 
 protected:
-	void BeginPlay() override;
+	UFUNCTION() void OnTeamChanged() const;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION()
-	virtual void OnRep_Team();
-
 private:
-	void Init();
-
-	UPROPERTY(ReplicatedUsing=OnRep_Team, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };

@@ -10,6 +10,7 @@
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "TimerManager.h"
 #include "UnrealNetwork.h"
 
 #include "SaucewichGameState.h"
@@ -86,15 +87,7 @@ void ATpsCharacter::BeginPlay()
 
 	Hp = MaxHp;
 	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
-
-	if (const auto Player = GetPlayerState<ASaucewichPlayerState>())
-	{
-		BindOnTeamChanged(Player);
-	}
-	else if (const auto MyController = GetController<ASaucewichPlayerController>())
-	{
-		MyController->OnPlayerStateSpawned.AddDynamic(this, &ATpsCharacter::BindOnTeamChanged);
-	}
+	BindOnTeamChanged();
 }
 
 void ATpsCharacter::Tick(const float DeltaSeconds)
@@ -166,6 +159,27 @@ void ATpsCharacter::MoveRight(const float AxisValue)
 	AddMovementInput(GetActorRightVector(), FMath::Sign(AxisValue));
 }
 
+void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
+{
+	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		SetColor(GameState->GetTeamData(NewTeam).Color);
+	}
+}
+
+void ATpsCharacter::BindOnTeamChanged()
+{
+	if (const auto State = GetPlayerState<ASaucewichPlayerState>())
+	{
+		State->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+		OnTeamChanged(State->GetTeam());
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimerForNextTick(this, &ATpsCharacter::BindOnTeamChanged);
+	}
+}
+
 void ATpsCharacter::UpdateShadow() const
 {
 	auto Start = GetActorLocation();
@@ -188,19 +202,5 @@ void ATpsCharacter::UpdateShadow() const
 			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
 		);
 		ShadowData.Material->SetScalarParameterValue("Darkness", (1.f - (Start.Z - Hit.Location.Z) / ShadowData.MaxDistance) * ShadowData.Darkness);
-	}
-}
-
-void ATpsCharacter::BindOnTeamChanged(ASaucewichPlayerState* const Player)
-{
-	Player->OnTeamChanged.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-	OnTeamChanged(Player->GetTeam());
-}
-
-void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
-{
-	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-	{
-		SetColor(GameState->GetTeamData(NewTeam).Color);
 	}
 }
