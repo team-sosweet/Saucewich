@@ -17,7 +17,6 @@ void ASaucewichPlayerState::BeginPlay()
 	if (const auto Controller = Cast<ASaucewichPlayerController>(GetOwner()))
 	{
 		Controller->OnPlayerStateSpawned.Broadcast(this);
-		OnTeamChanged.Broadcast();
 	}
 }
 
