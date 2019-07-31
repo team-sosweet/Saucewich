@@ -60,13 +60,15 @@ protected:
 	virtual void OnRep_Weapons();
 
 private:
-	void FireP(); void FireR();
+	UFUNCTION(BlueprintCallable) void FireP();
+	UFUNCTION(BlueprintCallable) void FireR();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireP();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireR();
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireP();
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireR();
 
-	void SlotP(uint8 Slot); void SlotR(uint8 Slot);
+	UFUNCTION(BlueprintCallable) void SlotP(uint8 Slot);
+	UFUNCTION(BlueprintCallable) void SlotR(uint8 Slot);
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotP(uint8 Slot);
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotR(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotP(uint8 Slot);
