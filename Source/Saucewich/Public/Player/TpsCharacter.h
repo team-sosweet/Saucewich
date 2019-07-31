@@ -93,10 +93,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
+	class ASaucewichPlayerState* State;
 	UMaterialInstanceDynamic* Material;
 
 	UPROPERTY(EditDefaultsOnly)
-	float DefaultMaxHP;
+	float DefaultMaxHP = 100.f;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxHP;
