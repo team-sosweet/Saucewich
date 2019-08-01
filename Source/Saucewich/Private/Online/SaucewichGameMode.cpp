@@ -18,7 +18,6 @@ void ASaucewichGameMode::PostInitializeComponents()
 	if (!State)
 	{
 		UE_LOG(LogSaucewichGameMode, Error, TEXT("GameState가 유효하지 않습니다. GameMode가 비활성화 됩니다. Class가 SaucewichGameState가 맞는지 확인해주세요."));
-		return;
 	}
 }
 
