@@ -159,6 +159,14 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (Damage != 0.f)
 	{
+		if (Damage > 0.f)
+		{
+			if (const auto Attacker = Cast<ASaucewichPlayerController>(EventInstigator))
+			{
+				Attacker->OnHitEnemy.Broadcast();
+			}
+		}
+
 		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
 		if (HP == 0.f)
 		{
@@ -173,6 +181,9 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (!Super::ShouldTakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser))
 		return false;
 
+	if (!IsAlive())
+		return false;
+
 	if (!EventInstigator)
 		return true;
 
@@ -180,6 +191,12 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 		return DamageAmount > 0.f ? GetTeam() != InstigatorState->GetTeam() : GetTeam() == InstigatorState->GetTeam();
 
 	return true;
+}
+
+void ATpsCharacter::Kill()
+{
+
+	OnKill();
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

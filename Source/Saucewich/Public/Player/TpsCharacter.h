@@ -58,6 +58,7 @@ public:
 	FLinearColor GetTeamColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
+	bool IsAlive() const { return HP > 0.f; }
 	void SetMaxHP(float Ratio);
 	virtual float GetSpeedRatio() const;
 
@@ -75,10 +76,10 @@ protected:
 	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	bool ShouldTakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 
-	// 캐릭터가 사망하여 소멸되기 직전에 호출됩니다.
+	// 캐릭터 사망시 호출됩니다.
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnKill();
-	virtual void Kill() { OnKill(); Destroy(); }
+	virtual void Kill();
 
 private:
 	void MoveForward(float AxisValue);
