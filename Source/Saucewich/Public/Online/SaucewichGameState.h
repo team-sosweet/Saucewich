@@ -46,5 +46,5 @@ private:
 	 * 실제 팀 index는 1부터 시작합니다.
 	 */
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FTeam> Teams{{},{}};
+	TArray<FTeam> Teams;
 };

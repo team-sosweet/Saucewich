@@ -1,7 +1,9 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "SaucewichGameMode.h"
-#include "GameFramework/OnlineSession.h"
+#include "Engine/PlayerStartPIE.h"
+#include "EngineUtils.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerState.h"
@@ -9,9 +11,9 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameMode, Log, All)
 
-void ASaucewichGameMode::BeginPlay()
+void ASaucewichGameMode::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 	State = GetGameState<ASaucewichGameState>();
 	if (!State)
 	{
@@ -30,14 +32,61 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 	}
 }
 
-FString ASaucewichGameMode::InitNewPlayer(APlayerController* PC, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal)
+AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
 {
-	const auto ErrorMessage = Super::InitNewPlayer(PC, UniqueId, Options, Portal);
-	if (!State) return ErrorMessage;
+	const auto PawnClass = GetDefaultPawnClassForController(Player);
+	const auto PawnToFit = PawnClass ? PawnClass->GetDefaultObject<APawn>() : nullptr;
+	const auto World = GetWorld();
 
-	auto Team = UGameplayStatics::GetIntOption(Options, "Team", 0);
-	if (Team == 0) Team = State->GetMinPlayerTeam();
-	PC->GetPlayerState<ASaucewichPlayerState>()->SetTeam(Team);
+	TCHAR Tag[] = TEXT("0");
+	Tag[0] = TEXT('0') + Player->GetPlayerState<ASaucewichPlayerState>()->GetTeam();
 
-	return ErrorMessage;
+	// 4개의 TArray는 우선순위를 나타내며 0번이 가장 높다.
+	TArray<APlayerStart*> StartPoints[4];
+
+	for (TActorIterator<APlayerStart> It{World}; It; ++It)
+	{
+		const auto PlayerStart = *It;
+
+#if WITH_EDITOR
+		if (PlayerStart->IsA<APlayerStartPIE>())
+		{
+			return PlayerStart;
+		}
+#endif
+
+		const auto bMyTeam = PlayerStart->PlayerStartTag == Tag;
+		auto ActorLocation = PlayerStart->GetActorLocation();
+		const auto ActorRotation = PlayerStart->GetActorRotation();
+		if (!World->EncroachingBlockingGeometry(PawnToFit, ActorLocation, ActorRotation))
+		{
+			(bMyTeam ? StartPoints[0] : StartPoints[2]).Add(PlayerStart);
+		}
+		else if (World->FindTeleportSpot(PawnToFit, ActorLocation, ActorRotation))
+		{
+			(bMyTeam ? StartPoints[1] : StartPoints[3]).Add(PlayerStart);
+		}
+	}
+
+	for (const auto& Starts : StartPoints)
+	{
+		if (Starts.Num() > 0)
+		{
+			return Starts[FMath::RandHelper(Starts.Num())];
+		}
+	}
+
+	return nullptr;
+}
+
+APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
+{
+	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
+	if (State && PC)
+	{
+		auto Team = UGameplayStatics::GetIntOption(Options, "Team", 0);
+		if (Team == 0) Team = State->GetMinPlayerTeam();
+		PC->GetPlayerState<ASaucewichPlayerState>()->SetTeam(Team);
+	}
+	return PC;
 }
