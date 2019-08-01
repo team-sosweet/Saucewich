@@ -7,7 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerState.h"
-#include "TpsCharacter.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameMode, Log, All)
 
@@ -25,9 +24,33 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 {
 	Super::SetPlayerDefaults(PlayerPawn);
 
-	if (const auto Character = Cast<ATpsCharacter>(PlayerPawn))
+	if (const auto PS = PlayerPawn->GetPlayerState<ASaucewichPlayerState>())
 	{
-		GiveWeapons(Character);
+		PS->GiveWeapons();
+	}
+}
+
+void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)
+{
+	if (!IsValid(NewPlayer)) return;
+	if (!StartSpot) return;
+	if (MustSpectate(Cast<APlayerController>(NewPlayer))) return;
+
+	if (!NewPlayer->GetPawn() && GetDefaultPawnClassForController(NewPlayer))
+	{
+		NewPlayer->SetPawn(SpawnDefaultPawnFor(NewPlayer, StartSpot));
+	}
+
+	if (!NewPlayer->GetPawn())
+	{
+		NewPlayer->FailedToSpawnPawn();
+	}
+	else
+	{
+		InitStartSpot(StartSpot, NewPlayer);
+		auto& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
+		NewPlayer->GetPawn()->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
+		FinishRestartPlayer(NewPlayer, StartSpot->GetActorRotation());
 	}
 }
 
@@ -85,7 +108,15 @@ APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRe
 	{
 		auto Team = UGameplayStatics::GetIntOption(Options, "Team", 0);
 		if (Team == 0) Team = State->GetMinPlayerTeam();
-		PC->GetPlayerState<ASaucewichPlayerState>()->SetTeam(Team);
+		if (State->IsValidTeam(Team))
+		{
+			PC->GetPlayerState<ASaucewichPlayerState>()->SetTeam(Team);
+		}
 	}
 	return PC;
+}
+
+void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
+{
+	PC->SetRespawnTimer(RespawnTime);
 }

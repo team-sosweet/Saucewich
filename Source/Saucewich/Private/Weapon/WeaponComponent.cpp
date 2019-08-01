@@ -88,6 +88,18 @@ float UWeaponComponent::GetSpeedRatio() const
 	return 1.f;
 }
 
+void UWeaponComponent::OnCharacterDeath()
+{
+	for (auto& Weapon : Weapons)
+	{
+		if (Weapon)
+		{
+			Weapon->Destroy();
+			Weapon = nullptr;
+		}
+	}
+}
+
 void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 {
 	for (const auto Weapon : Weapons)
@@ -102,11 +114,7 @@ void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
-	if (!WeaponClass)
-	{
-		UE_LOG(LogWeaponComponent, Error, TEXT("Failed to give weapon: Invalid class"));
-		return nullptr;
-	}
+	if (!WeaponClass) return nullptr;
 
 	const auto Slot = GetDefault<AWeapon>(WeaponClass)->GetSlot();
 	if (Slot >= Weapons.Num())
@@ -148,6 +156,7 @@ void UWeaponComponent::OnRep_Weapons()
 
 void UWeaponComponent::FireP()
 {
+	if (!Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireP();
@@ -161,6 +170,7 @@ void UWeaponComponent::MulticastFireP_Implementation() { if (Owner->Role != ROLE
 
 void UWeaponComponent::FireR()
 {
+	if (!Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireR();
@@ -174,6 +184,7 @@ void UWeaponComponent::MulticastFireR_Implementation() { if (Owner->Role != ROLE
 
 void UWeaponComponent::SlotP(const uint8 Slot)
 {
+	if (!Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotP();
@@ -187,6 +198,7 @@ void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot) { if (Own
 
 void UWeaponComponent::SlotR(const uint8 Slot)
 {
+	if (!Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotR();

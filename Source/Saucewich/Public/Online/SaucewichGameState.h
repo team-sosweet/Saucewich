@@ -5,6 +5,8 @@
 #include "GameFramework/GameState.h"
 #include "SaucewichGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, class ASaucewichPlayerState*, Player);
+
 USTRUCT(BlueprintType)
 struct FTeam
 {
@@ -37,6 +39,9 @@ public:
 
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
 	uint8 GetMinPlayerTeam() const;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponChanged OnWeaponChanged;
 
 private:
 	/*
