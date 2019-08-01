@@ -19,6 +19,10 @@ public:
 
 	virtual void Shoot();
 
+	/*
+	 * 이 총으로 target을 찾는 trace를 수행합니다.
+	 * 결과는 캐시되어 1 tick 동안 유지되기 때문에 몇번이고 호출해도 성능에 지장은 없습니다.
+	 */
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit);
 

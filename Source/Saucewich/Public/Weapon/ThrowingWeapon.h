@@ -5,6 +5,10 @@
 #include "Weapon/Weapon.h"
 #include "ThrowingWeapon.generated.h"
 
+/*
+ * 던지는 무기입니다.
+ * 이것은 가상의 무기를 나타내고, 실제 던져지는 것은 projectile 입니다.
+ */
 UCLASS(Abstract)
 class AThrowingWeapon final : public AWeapon
 {

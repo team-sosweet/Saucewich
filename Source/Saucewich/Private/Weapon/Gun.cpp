@@ -116,7 +116,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	Params.AddIgnoredActor(GetOwner());
 	*/
 
-	const auto Ignored = GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam());
+	const TArray<AActor*> Ignored{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam())};
 	const auto Debug = Character->IsLocallyControlled() ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
 
 	TArray<FHitResult> BoxHits;

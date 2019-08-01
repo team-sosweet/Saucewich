@@ -30,9 +30,21 @@ public:
 	TArray<class ASaucewichPlayerState*> GetPlayers(uint8 Team) const;
 
 	UFUNCTION(BlueprintCallable)
-	TArray<AActor*> GetCharacters(uint8 Team) const;
+	TArray<class ATpsCharacter*> GetCharacters(uint8 Team) const;
+
+	bool IsValidTeam(const uint8 Team) const { return Team > 0 && Team < Teams.Num(); }
+	uint8 GetPlayerNum(uint8 Team) const;
+
+	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
+	uint8 GetMinPlayerTeam() const;
 
 private:
+	/*
+	 * 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
+	 * 0번 요소는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
+	 * 팀 개수는 사용되지 않는 0번 팀 포함 최소 2개여야 합니다.
+	 * 실제 팀 index는 1부터 시작합니다.
+	 */
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FTeam> Teams;
+	TArray<FTeam> Teams{{},{}};
 };

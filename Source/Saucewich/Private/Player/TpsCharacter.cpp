@@ -46,8 +46,7 @@ EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 
 uint8 ATpsCharacter::GetTeam() const
 {
-	const auto Player = GetPlayerState<ASaucewichPlayerState>();
-	return Player ? Player->GetTeam() : 0;
+	return State ? State->GetTeam() : 0;
 }
 
 FLinearColor ATpsCharacter::GetColor() const
@@ -103,9 +102,24 @@ void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HP = MaxHP;
 	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 	BindOnTeamChanged();
+
+	if (HasAuthority())
+	{
+		HP = MaxHP = DefaultMaxHP;
+
+		if (State)
+		{
+			if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+			{
+				if (!GS->IsValidTeam(GetTeam()))
+				{
+					State->SetTeam(GS->GetMinPlayerTeam());
+				}
+			}
+		}
+	}
 }
 
 void ATpsCharacter::Tick(const float DeltaSeconds)
@@ -162,8 +176,8 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (!EventInstigator)
 		return true;
 
-	if (const auto State = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
-		return DamageAmount > 0.f ? GetTeam() != State->GetTeam() : GetTeam() == State->GetTeam();
+	if (const auto InstigatorState = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
+		return DamageAmount > 0.f ? GetTeam() != InstigatorState->GetTeam() : GetTeam() == InstigatorState->GetTeam();
 
 	return true;
 }
@@ -185,10 +199,18 @@ void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 
 void ATpsCharacter::BindOnTeamChanged()
 {
-	if (const auto State = GetPlayerState<ASaucewichPlayerState>())
+	if (const auto PState = GetPlayerState())
 	{
-		State->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-		OnTeamChanged(State->GetTeam());
+		State = Cast<ASaucewichPlayerState>(PState);
+		if (State)
+		{
+			State->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+			OnTeamChanged(State->GetTeam());
+		}
+		else
+		{
+			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerStateClass -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
+		}
 	}
 	else
 	{

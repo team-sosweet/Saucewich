@@ -93,14 +93,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
+	class ASaucewichPlayerState* State;
 	UMaterialInstanceDynamic* Material;
 
-	UPROPERTY(EditDefaultsOnly)
-	float DefaultMaxHP;
+	// 기본 최대 체력입니다.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float DefaultMaxHP = 100.f;
 
+	// 현재 최대 체력입니다. 장착중인 주무기 등 여러 요인에 의해 달라집니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxHP;
 
+	// 현재 체력입니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
 };
