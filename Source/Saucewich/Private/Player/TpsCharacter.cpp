@@ -13,6 +13,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "SaucewichGameMode.h"
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
@@ -107,6 +108,7 @@ void ATpsCharacter::BeginPlay()
 
 	if (HasAuthority())
 	{
+		bAlive = true;
 		HP = MaxHP = DefaultMaxHP;
 
 		if (State)
@@ -142,6 +144,7 @@ void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 	Input->BindAxis("MoveRight", this, &ATpsCharacter::MoveRight);
 	Input->BindAxis("Turn", this, &ATpsCharacter::AddControllerYawInput);
 	Input->BindAxis("LookUp", this, &ATpsCharacter::AddControllerPitchInput);
+	Input->BindAction("Respawn", IE_Pressed, this, &ATpsCharacter::Respawn);
 
 	WeaponComponent->SetupPlayerInputComponent(Input);
 }
@@ -152,6 +155,7 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(ATpsCharacter, HP);
 	DOREPLIFETIME(ATpsCharacter, MaxHP);
+	DOREPLIFETIME(ATpsCharacter, bAlive);
 }
 
 float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
@@ -159,11 +163,16 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (Damage != 0.f)
 	{
-		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
-		if (HP == 0.f)
+		if (Damage > 0.f)
 		{
-			Kill();
+			if (const auto Attacker = Cast<ASaucewichPlayerController>(EventInstigator))
+			{
+				Attacker->OnHitEnemy.Broadcast();
+			}
 		}
+
+		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
+		if (HP == 0.f) Kill();
 	}
 	return Damage;
 }
@@ -171,6 +180,9 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
 {
 	if (!Super::ShouldTakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser))
+		return false;
+
+	if (!IsAlive())
 		return false;
 
 	if (!EventInstigator)
@@ -182,6 +194,34 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	return true;
 }
 
+void ATpsCharacter::SetPlayerDefaults()
+{
+	HP = MaxHP;
+	bAlive = true;
+	SetActorTickEnabled(true);
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+	OnCharacterSpawn.Broadcast();
+}
+
+void ATpsCharacter::Kill()
+{
+	HP = 0.f;
+	bAlive = false;
+	SetActorTickEnabled(false);
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+	if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+	{
+		if (const auto PC = GetController<ASaucewichPlayerController>())
+		{
+			Gm->SetPlayerRespawnTimer(PC);
+		}
+	}
+	WeaponComponent->OnCharacterDeath();
+	OnCharacterDeath.Broadcast();
+}
+
 void ATpsCharacter::MoveForward(const float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector(), FMath::Sign(AxisValue));
@@ -190,6 +230,15 @@ void ATpsCharacter::MoveForward(const float AxisValue)
 void ATpsCharacter::MoveRight(const float AxisValue)
 {
 	AddMovementInput(GetActorRightVector(), FMath::Sign(AxisValue));
+}
+
+void ATpsCharacter::Respawn()
+{
+	if (IsAlive()) return;
+	if (const auto PC = GetController<ASaucewichPlayerController>())
+	{
+		PC->Respawn();
+	}
 }
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
@@ -216,6 +265,12 @@ void ATpsCharacter::BindOnTeamChanged()
 	{
 		GetWorldTimerManager().SetTimerForNextTick(this, &ATpsCharacter::BindOnTeamChanged);
 	}
+}
+
+void ATpsCharacter::OnRep_Alive()
+{
+	if (bAlive) SetPlayerDefaults();
+	else Kill();
 }
 
 void ATpsCharacter::UpdateShadow() const

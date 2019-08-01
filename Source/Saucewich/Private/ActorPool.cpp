@@ -12,6 +12,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 	{
 		if (!Class)
 		{
+			UE_LOG(LogActorPool, Error, TEXT("Failed to spawn actor. Class was nullptr."));
 			return nullptr;
 		}
 

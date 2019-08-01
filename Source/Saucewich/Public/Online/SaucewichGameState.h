@@ -5,6 +5,8 @@
 #include "GameFramework/GameState.h"
 #include "SaucewichGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, class ASaucewichPlayerState*, Player);
+
 USTRUCT(BlueprintType)
 struct FTeam
 {
@@ -38,6 +40,9 @@ public:
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
 	uint8 GetMinPlayerTeam() const;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponChanged OnWeaponChanged;
+
 private:
 	/*
 	 * 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
@@ -46,5 +51,5 @@ private:
 	 * 실제 팀 index는 1부터 시작합니다.
 	 */
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FTeam> Teams{{},{}};
+	TArray<FTeam> Teams;
 };

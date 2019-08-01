@@ -7,8 +7,6 @@
 #include "Colorable.h"
 #include "WeaponComponent.generated.h"
 
-class AWeapon;
-
 /*
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
  */
@@ -28,7 +26,7 @@ public:
 	 * @return: The weapon given
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
+	virtual class AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
 
 	/*
 	 * [Shared] Returns active weapon.
@@ -43,18 +41,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
-	virtual bool TrySelectWeapon(uint8 Slot);
-
+	void OnCharacterDeath();
 	float GetSpeedRatio() const;
-
+	virtual bool TrySelectWeapon(uint8 Slot);
+	uint8 GetSlots() const { return WeaponSlots; }
 	void SetColor(const FLinearColor& NewColor) override;
 
 	class ATpsCharacter* const Owner = nullptr;
 
 protected:
 	void InitializeComponent() override;
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
 	virtual void OnRep_Weapons();

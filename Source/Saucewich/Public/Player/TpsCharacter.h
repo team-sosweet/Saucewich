@@ -7,6 +7,9 @@
 #include "Colorable.h"
 #include "TpsCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
+
 USTRUCT(BlueprintType)
 struct FShadowData
 {
@@ -22,7 +25,7 @@ struct FShadowData
 };
 
 UCLASS(Abstract)
-class ATpsCharacter : public ACharacter, public IColorable
+class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable
 {
 	GENERATED_BODY()
 
@@ -58,6 +61,7 @@ public:
 	FLinearColor GetTeamColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
+	bool IsAlive() const { return bAlive; }
 	void SetMaxHP(float Ratio);
 	virtual float GetSpeedRatio() const;
 
@@ -75,23 +79,34 @@ protected:
 	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	bool ShouldTakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 
-	// 캐릭터가 사망하여 소멸되기 직전에 호출됩니다.
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnKill();
-	virtual void Kill() { OnKill(); Destroy(); }
+	// 캐릭터를 죽입니다.
+	virtual void Kill();
+
+	// 캐릭터를 살립니다.
+	void SetPlayerDefaults() override;
 
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
+	void Respawn();
 
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();
 
+	UFUNCTION()
+	void OnRep_Alive();
+
 	void UpdateShadow() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterSpawn OnCharacterSpawn;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterDeath OnCharacterDeath;
 
 	class ASaucewichPlayerState* State;
 	UMaterialInstanceDynamic* Material;
@@ -107,4 +122,7 @@ private:
 	// 현재 체력입니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bAlive : 1;
 };
