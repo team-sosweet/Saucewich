@@ -73,6 +73,12 @@ private:
 	ATpsCharacter* Owner;
 	UMaterialInstanceDynamic* Material;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UTexture* Icon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UTexture* IconMask;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float WalkSpeedRatio = 1.f;
 
