@@ -7,7 +7,7 @@
 
 /*
  * 던지는 무기입니다.
- * 이것은 가상의 무기를 나타내고, 실제 던져지는 것은 projectile 입니다.
+ * 주의: 이것은 무기 그 자체를 나타내고, 실제 던져지는 것은 projectile 입니다.
  */
 UCLASS(Abstract)
 class AThrowingWeapon final : public AWeapon
@@ -18,7 +18,7 @@ class AThrowingWeapon final : public AWeapon
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere)
 	FTransform ThrowOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

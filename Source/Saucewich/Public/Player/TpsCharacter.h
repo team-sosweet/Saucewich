@@ -51,14 +51,19 @@ public:
 
 	class AWeapon* GetActiveWeapon() const;
 
+	// 플레이어가 현재 들고있는 무기로 Trace를 실시합니다.
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
 
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
+
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetTeamColor() const;
+
 	void SetColor(const FLinearColor& NewColor) override;
 
 	bool IsAlive() const { return bAlive; }

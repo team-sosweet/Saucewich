@@ -35,10 +35,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<class ATpsCharacter*> GetCharacters(uint8 Team) const;
 
+	UFUNCTION(BlueprintCallable)
 	bool IsValidTeam(const uint8 Team) const { return Team > 0 && Team < Teams.Num(); }
-	uint8 GetPlayerNum(uint8 Team) const;
 
+	UFUNCTION(BlueprintCallable)
+	uint8 GetPlayerNum(uint8 Team) const;
+	   
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
+	UFUNCTION(BlueprintCallable)
 	uint8 GetMinPlayerTeam() const;
 
 	/*
@@ -67,7 +71,7 @@ private:
 	/*
 	 * 게임에서 사용할 무기 목록입니다.
 	 * 플레이어는 무기 선택창에서 이 무기들중 하나를 선택하여 사용할 수 있습니다.
-	 * 무기 슬롯은 자동으로 고려됩니다만, 특정 슬롯의 무기만을 구하고 싶으면 GetWeapons 함수를 사용하세요.
+	 * 특정 슬롯의 무기만을 구하고 싶으면 GetWeapons 함수를 사용하세요.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> Weapons;

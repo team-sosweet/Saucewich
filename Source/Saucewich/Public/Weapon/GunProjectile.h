@@ -6,7 +6,7 @@
 #include "Weapon/Projectile.h"
 #include "GunProjectile.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class SAUCEWICH_API AGunProjectile final : public AProjectile
 {
 	GENERATED_BODY()

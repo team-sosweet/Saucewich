@@ -71,13 +71,16 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotR(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotP(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotR(uint8 Slot);
-	
-	UPROPERTY(VisibleInstanceOnly, ReplicatedUsing=OnRep_Weapons, Transient)
+
+	// 현재 캐릭터가 가지고 있는 무기 목록입니다.
+	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleInstanceOnly, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<AWeapon*> Weapons;
 
-	UPROPERTY(EditDefaultsOnly, meta = (UIMax = 9, ClampMax = 9))
+	// 무기 슬롯 개수입니다. 각 슬롯은 키보드 숫자 1 ~ 9 키에 대응됩니다.
+	UPROPERTY(EditDefaultsOnly, meta=(UIMax=9, ClampMax=9), BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 WeaponSlots;
 
-	UPROPERTY(VisibleInstanceOnly, Replicated, Transient)
+	// 현재 활성화된 무기 슬롯 index 입니다.
+	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Active;
 };

@@ -21,14 +21,8 @@ public:
 
 	void Respawn();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnRespawn();
-
 	UFUNCTION(Server, Unreliable, WithValidation)
 	void ServerRespawn();
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnServerRespawn();
 
 	// 적에게 피해를 입혔을 때 발동됩니다. 주 목적은 히트마커 입니다.
 	UPROPERTY(BlueprintAssignable)

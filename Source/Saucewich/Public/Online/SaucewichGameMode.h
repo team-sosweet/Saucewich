@@ -21,7 +21,6 @@ protected:
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
 
-	UFUNCTION(BlueprintImplementableEvent)
 	void GiveWeapons(class ATpsCharacter* Character);
 
 private:
