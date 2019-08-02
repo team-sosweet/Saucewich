@@ -41,6 +41,13 @@ public:
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
 	uint8 GetMinPlayerTeam() const;
 
+	/*
+	 * 무기 목록에서 특정 슬롯의 무기들만 반환합니다.
+	 * 시간복잡도가 O(n)이고 새 배열을 할당하므로 자주 호출하지는 마세요.
+	 */
+	UFUNCTION(BlueprintCallable)
+	TArray<TSubclassOf<AWeapon>> GetWeapons(uint8 Slot) const;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerChangedWeapon OnPlayerChangedWeapon;
 
@@ -56,4 +63,12 @@ private:
 	 */
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FTeam> Teams;
+
+	/*
+	 * 게임에서 사용할 무기 목록입니다.
+	 * 플레이어는 무기 선택창에서 이 무기들중 하나를 선택하여 사용할 수 있습니다.
+	 * 무기 슬롯은 자동으로 고려됩니다만, 특정 슬롯의 무기만을 구하고 싶으면 GetWeapons 함수를 사용하세요.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TArray<TSubclassOf<AWeapon>> Weapons;
 };
