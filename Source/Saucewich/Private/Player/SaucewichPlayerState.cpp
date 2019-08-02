@@ -9,10 +9,23 @@
 #include "Weapon.h"
 #include "WeaponComponent.h"
 
-void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
+void ASaucewichPlayerState::SetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
-	Team = NewTeam;
-	OnTeamChanged();
+	MulticastSetWeapon(Slot, Weapon);
+}
+
+bool ASaucewichPlayerState::SetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+{
+	return Weapon && Slot < Weapons.Num();
+}
+
+void ASaucewichPlayerState::MulticastSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+{
+	Weapons[Slot] = Weapon;
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		GS->OnPlayerChangedWeapon.Broadcast(this, Slot, Weapon);
+	}
 }
 
 void ASaucewichPlayerState::GiveWeapons()
@@ -29,20 +42,20 @@ void ASaucewichPlayerState::GiveWeapons()
 	}
 }
 
-void ASaucewichPlayerState::SetWeapon_Implementation(const uint8 Slot, UClass* const Weapon)
+void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 {
-	Weapons[Slot] = Weapon;
-	OnRep_Weapons();
+	const auto OldTeam = Team;
+	Team = NewTeam;
+	OnTeamChanged(OldTeam);
 }
 
-bool ASaucewichPlayerState::SetWeapon_Validate(const uint8 Slot, UClass* const Weapon)
-{
-	return Weapon && Slot < Weapons.Num();
-}
-
-void ASaucewichPlayerState::OnTeamChanged() const
+void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		GS->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
+	}
 }
 
 void ASaucewichPlayerState::PostInitializeComponents()
@@ -60,17 +73,8 @@ void ASaucewichPlayerState::PostInitializeComponents()
 	}
 }
 
-void ASaucewichPlayerState::OnRep_Weapons()
-{
-	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-	{
-		GS->OnWeaponChanged.Broadcast(this);
-	}
-}
-
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichPlayerState, Team);
-	DOREPLIFETIME(ASaucewichPlayerState, Weapons);
 }
