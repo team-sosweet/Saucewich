@@ -5,7 +5,8 @@
 #include "GameFramework/GameState.h"
 #include "SaucewichGameState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, class ASaucewichPlayerState*, Player);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedWeapon, class ASaucewichPlayerState*, Player, uint8, Slot, TSubclassOf<class AWeapon>, NewWeapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 
 USTRUCT(BlueprintType)
 struct FTeam
@@ -41,7 +42,10 @@ public:
 	uint8 GetMinPlayerTeam() const;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnWeaponChanged OnWeaponChanged;
+	FOnPlayerChangedWeapon OnPlayerChangedWeapon;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerChangedTeam OnPlayerChangedTeam;
 
 private:
 	/*
