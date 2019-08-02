@@ -160,13 +160,13 @@ void UWeaponComponent::FireP()
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireP();
-		if (!Owner->HasAuthority() && Owner->IsLocallyControlled()) ServerFireP();
+		if (Owner->IsLocallyControlled()) ServerFireP();
 	}
 }
 
 void UWeaponComponent::ServerFireP_Implementation() { MulticastFireP(); }
 bool UWeaponComponent::ServerFireP_Validate() { return true; }
-void UWeaponComponent::MulticastFireP_Implementation() { if (Owner->Role != ROLE_AutonomousProxy) FireP(); }
+void UWeaponComponent::MulticastFireP_Implementation() { if (!Owner->IsLocallyControlled()) FireP(); }
 
 void UWeaponComponent::FireR()
 {
@@ -174,13 +174,13 @@ void UWeaponComponent::FireR()
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireR();
-		if (!Owner->HasAuthority() && Owner->IsLocallyControlled()) ServerFireR();
+		if (Owner->IsLocallyControlled()) ServerFireR();
 	}
 }
 
 void UWeaponComponent::ServerFireR_Implementation() { MulticastFireR(); }
 bool UWeaponComponent::ServerFireR_Validate() { return true; }
-void UWeaponComponent::MulticastFireR_Implementation() { if (Owner->Role != ROLE_AutonomousProxy) FireR(); }
+void UWeaponComponent::MulticastFireR_Implementation() { if (!Owner->IsLocallyControlled()) FireR(); }
 
 void UWeaponComponent::SlotP(const uint8 Slot)
 {
@@ -188,13 +188,13 @@ void UWeaponComponent::SlotP(const uint8 Slot)
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotP();
-		if (!Owner->HasAuthority() && Owner->IsLocallyControlled()) ServerSlotP(Slot);
+		if (Owner->IsLocallyControlled()) ServerSlotP(Slot);
 	}
 }
 
 void UWeaponComponent::ServerSlotP_Implementation(const uint8 Slot) { MulticastSlotP(Slot); }
 bool UWeaponComponent::ServerSlotP_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
-void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot) { if (Owner->Role != ROLE_AutonomousProxy) SlotP(Slot); }
+void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot) { if (!Owner->IsLocallyControlled()) SlotP(Slot); }
 
 void UWeaponComponent::SlotR(const uint8 Slot)
 {
@@ -202,10 +202,10 @@ void UWeaponComponent::SlotR(const uint8 Slot)
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotR();
-		if (!Owner->HasAuthority() && Owner->IsLocallyControlled()) ServerSlotR(Slot);
+		if (Owner->IsLocallyControlled()) ServerSlotR(Slot);
 	}
 }
 
 void UWeaponComponent::ServerSlotR_Implementation(const uint8 Slot) { MulticastSlotR(Slot); }
 bool UWeaponComponent::ServerSlotR_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
-void UWeaponComponent::MulticastSlotR_Implementation(const uint8 Slot) { if (Owner->Role != ROLE_AutonomousProxy) SlotR(Slot); }
+void UWeaponComponent::MulticastSlotR_Implementation(const uint8 Slot) { if (!Owner->IsLocallyControlled()) SlotR(Slot); }

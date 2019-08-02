@@ -88,8 +88,10 @@ protected:
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
-	void Respawn();
 	void SetActorActivated(bool bActive);
+
+	UFUNCTION(BlueprintCallable)
+	void Respawn();
 
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);

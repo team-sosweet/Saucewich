@@ -19,7 +19,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRespawnTime() const;
 
-	UFUNCTION(BlueprintCallable)
 	void Respawn();
 
 	UFUNCTION(BlueprintImplementableEvent)
