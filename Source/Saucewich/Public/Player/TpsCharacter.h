@@ -89,6 +89,7 @@ private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void Respawn();
+	void SetActorActivated(bool bActive);
 
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);

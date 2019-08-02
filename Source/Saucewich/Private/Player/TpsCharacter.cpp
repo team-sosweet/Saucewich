@@ -198,9 +198,7 @@ void ATpsCharacter::SetPlayerDefaults()
 {
 	HP = MaxHP;
 	bAlive = true;
-	SetActorTickEnabled(true);
-	SetActorHiddenInGame(false);
-	SetActorEnableCollision(true);
+	SetActorActivated(true);
 	OnCharacterSpawn.Broadcast();
 }
 
@@ -208,9 +206,7 @@ void ATpsCharacter::Kill()
 {
 	HP = 0.f;
 	bAlive = false;
-	SetActorTickEnabled(false);
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
+	SetActorActivated(false);
 	if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
 	{
 		if (const auto PC = GetController<ASaucewichPlayerController>())
@@ -239,6 +235,14 @@ void ATpsCharacter::Respawn()
 	{
 		PC->Respawn();
 	}
+}
+
+void ATpsCharacter::SetActorActivated(const bool bActive)
+{
+	SetActorTickEnabled(bActive);
+	SetActorHiddenInGame(!bActive);
+	SetActorEnableCollision(bActive);
+	GetCharacterMovement()->SetComponentTickEnabled(bActive);
 }
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
