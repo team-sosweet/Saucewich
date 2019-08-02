@@ -61,7 +61,7 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 {
 	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
 	{
-		return GameState->GetTeamData(GetTeam()).Color;
+		return GetTeamColor(GameState);
 	}
 	return {};
 }
@@ -247,7 +247,7 @@ void ATpsCharacter::SetActorActivated(const bool bActive)
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 {
-	SetColor(GetTeamColor());
+	SetColorToTeamColor();
 }
 
 void ATpsCharacter::BindOnTeamChanged()
@@ -269,6 +269,30 @@ void ATpsCharacter::BindOnTeamChanged()
 	{
 		GetWorldTimerManager().SetTimerForNextTick(this, &ATpsCharacter::BindOnTeamChanged);
 	}
+}
+
+void ATpsCharacter::SetColorToTeamColor()
+{
+	if (const auto GameState = GetWorld()->GetGameState())
+	{
+		if (const auto GS = Cast<ASaucewichGameState>(GameState))
+		{
+			SetColor(GetTeamColor(GS));
+		}
+		else
+		{
+			UE_LOG(LogTpsCharacter, Error, TEXT("GameState가 있긴 한데 ASaucewichGameState가 아닙니다!"));
+		}
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimerForNextTick(this, &ATpsCharacter::SetColorToTeamColor);
+	}
+}
+
+FLinearColor ATpsCharacter::GetTeamColor(ASaucewichGameState* const GameState) const
+{
+	return GameState->GetTeamData(GetTeam()).Color;
 }
 
 void ATpsCharacter::OnRep_Alive()

@@ -96,6 +96,8 @@ private:
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();
+	void SetColorToTeamColor();
+	FLinearColor GetTeamColor(class ASaucewichGameState* GameState) const;
 
 	UFUNCTION()
 	void OnRep_Alive();
