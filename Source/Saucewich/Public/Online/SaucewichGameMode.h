@@ -26,7 +26,4 @@ protected:
 
 private:
 	class ASaucewichGameState* State;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float RespawnTime = 5.f;
 };

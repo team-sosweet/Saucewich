@@ -118,5 +118,5 @@ APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRe
 
 void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
 {
-	PC->SetRespawnTimer(RespawnTime);
+	PC->SetRespawnTimer(MinRespawnDelay);
 }
