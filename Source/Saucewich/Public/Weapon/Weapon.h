@@ -7,6 +7,18 @@
 #include "Colorable.h"
 #include "Weapon.generated.h"
 
+USTRUCT(BlueprintType)
+struct FWeaponIcon
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UTexture* Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture* IconMask;
+};
+
 /*
  * 모든 무기의 기본이 되는 클래스입니다.
  * 이름과는 달리 '캐릭터가 지니고 있을 수 있으며 슬롯을 누르면 특정 행동을 할 수 있는 그 어떤 것도 될 수 있습니다.
@@ -70,14 +82,11 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	FText Description;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FWeaponIcon Icon;
+
 	ATpsCharacter* Owner;
 	UMaterialInstanceDynamic* Material;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UTexture* Icon;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	UTexture* IconMask;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float WalkSpeedRatio = 1.f;
