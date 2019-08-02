@@ -70,6 +70,12 @@ public:
 	FRotator GetBaseAimRotation() const override { return Super::GetBaseAimRotation().GetNormalized(); }
 	FVector GetSpringArmLocation() const;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterSpawn OnCharacterSpawn;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterDeath OnCharacterDeath;
+
 protected:
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
@@ -96,6 +102,8 @@ private:
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();
+	void SetColorToTeamColor();
+	FLinearColor GetTeamColor(class ASaucewichGameState* GameState) const;
 
 	UFUNCTION()
 	void OnRep_Alive();
@@ -104,12 +112,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnCharacterSpawn OnCharacterSpawn;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnCharacterDeath OnCharacterDeath;
 
 	class ASaucewichPlayerState* State;
 	UMaterialInstanceDynamic* Material;

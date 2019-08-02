@@ -3,6 +3,7 @@
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerState.h"
 #include "TpsCharacter.h"
+#include "Weapon.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -59,6 +60,19 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 		}
 	}
 	return Min[FMath::RandHelper(Min.Num())] + 1;
+}
+
+TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetWeapons(const uint8 Slot) const
+{
+	TArray<TSubclassOf<AWeapon>> SlotWep;
+	for (const auto Class : Weapons)
+	{
+		if (GetDefault<AWeapon>(Class)->GetSlot() == Slot)
+		{
+			SlotWep.Add(Class);
+		}
+	}
+	return SlotWep;
 }
 
 uint8 ASaucewichGameState::GetPlayerNum(const uint8 Team) const
