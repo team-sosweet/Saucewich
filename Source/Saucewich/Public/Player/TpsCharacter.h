@@ -116,13 +116,21 @@ private:
 	void RegisterGameMode();
 	void UpdateShadow() const;
 
+	void BeTransl();
+	void BeOpaque();
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
+	UPROPERTY(EditAnywhere)
+	class UTranslucentMaterialData* TranslMatData;
+
 	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
-	UMaterialInstanceDynamic* Material;
 	FTimerHandle RespawnInvincibleTimerHandle;
+
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* DynamicMaterial;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -142,4 +150,5 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
+	uint8 bTransl : 1;
 };

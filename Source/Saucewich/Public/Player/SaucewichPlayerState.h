@@ -43,7 +43,7 @@ private:
 	void SafeGameState(Fn&& Func)
 	{
 		if (GameState) Func();
-		else OnGameStateReady.AddLambda(std::move(Func));
+		else OnGameStateReady.AddLambda(MoveTemp(Func));
 	}
 
 	FOnGameStateReady OnGameStateReady;
