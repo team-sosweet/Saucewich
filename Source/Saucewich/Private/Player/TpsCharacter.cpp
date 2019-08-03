@@ -172,7 +172,7 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 		}
 
 		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
-		if (HP == 0.f) Kill();
+		if (HP == 0.f) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
 	return Damage;
 }
@@ -202,20 +202,21 @@ void ATpsCharacter::SetPlayerDefaults()
 	OnCharacterSpawn.Broadcast();
 }
 
-void ATpsCharacter::Kill()
+void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
 	HP = 0.f;
 	bAlive = false;
 	SetActorActivated(false);
+
 	if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-	{
 		if (const auto PC = GetController<ASaucewichPlayerController>())
-		{
 			Gm->SetPlayerRespawnTimer(PC);
-		}
-	}
+
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
+
+	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+		GameState->MulticastPlayerDeath(State, Attacker, Inflictor);
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

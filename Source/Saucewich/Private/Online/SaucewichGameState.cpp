@@ -75,6 +75,12 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetWeapons(const uint8 Slot) c
 	return SlotWep;
 }
 
+void ASaucewichGameState::MulticastPlayerDeath_Implementation(
+	ASaucewichPlayerState* const Victim, ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
+{
+	OnPlayerDeath.Broadcast(Victim, Attacker, Inflictor);
+}
+
 uint8 ASaucewichGameState::GetPlayerNum(const uint8 Team) const
 {
 	uint8 Num = 0;
