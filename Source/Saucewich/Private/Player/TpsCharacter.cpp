@@ -99,6 +99,13 @@ FVector ATpsCharacter::GetSpringArmLocation() const
 	return SpringArm->GetComponentLocation();
 }
 
+void ATpsCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	Material = GetMesh()->CreateDynamicMaterialInstance(FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0));
+	RegisterGameMode();
+}
+
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -128,12 +135,6 @@ void ATpsCharacter::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	UpdateShadow();
-}
-
-void ATpsCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	Material = GetMesh()->CreateDynamicMaterialInstance(FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0));
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
@@ -185,6 +186,9 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (!IsAlive())
 		return false;
 
+	if (GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f)
+		return false;
+
 	if (!EventInstigator)
 		return true;
 
@@ -199,6 +203,7 @@ void ATpsCharacter::SetPlayerDefaults()
 	HP = MaxHP;
 	bAlive = true;
 	SetActorActivated(true);
+	GetWorldTimerManager().SetTimer(RespawnInvincibleTimerHandle, RespawnInvincibleTime, false);
 	OnCharacterSpawn.Broadcast();
 }
 
@@ -208,9 +213,9 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 	bAlive = false;
 	SetActorActivated(false);
 
-	if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+	if (GameMode)
 		if (const auto PC = GetController<ASaucewichPlayerController>())
-			Gm->SetPlayerRespawnTimer(PC);
+			GameMode->SetPlayerRespawnTimer(PC);
 
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
@@ -263,7 +268,7 @@ void ATpsCharacter::BindOnTeamChanged()
 		}
 		else
 		{
-			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerStateClass -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
+			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerState -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
 		}
 	}
 	else
@@ -300,6 +305,13 @@ void ATpsCharacter::OnRep_Alive()
 {
 	if (bAlive) SetPlayerDefaults();
 	else Kill();
+}
+
+void ATpsCharacter::RegisterGameMode()
+{
+	if (!HasAuthority()) return;
+	GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>();
+	if (!GameMode) UE_LOG(LogTpsCharacter, Error, TEXT("ASaucewichGameMode 등록 실패. 일부 기능이 작동하지 않을 수 있습니다."));
 }
 
 void ATpsCharacter::UpdateShadow() const

@@ -113,13 +113,16 @@ private:
 	UFUNCTION()
 	void OnRep_Alive();
 
+	void RegisterGameMode();
 	void UpdateShadow() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
+	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
 	UMaterialInstanceDynamic* Material;
+	FTimerHandle RespawnInvincibleTimerHandle;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -132,6 +135,10 @@ private:
 	// 현재 체력입니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
+
+	// 스폰 무적 시간
+	UPROPERTY(EditAnywhere)
+	float RespawnInvincibleTime;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
