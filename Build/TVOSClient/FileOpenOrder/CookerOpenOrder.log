@@ -1590,271 +1590,281 @@
 "../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Compressed.uasset" 1589
 "../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Uncompressed.uasset" 1590
 "D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Joystick.uasset" 1591
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColorTwoSided.uasset" 1592
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_yellow.uasset" 1593
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Skeleton.uasset" 1594
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Left.uasset" 1595
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Ref.uasset" 1596
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Right.uasset" 1597
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimH.uasset" 1598
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Shoot.uasset" 1599
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Down45.uasset" 1600
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Up60.uasset" 1601
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimV.uasset" 1602
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AO.uasset" 1603
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/MI_Weapon_Base.uasset" 1604
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColor.uasset" 1605
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/M_Weapon.uasset" 1606
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameState.uasset" 1607
-"../../../Engine/Content/BasicShapes/Sphere.uasset" 1608
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_GunProjectile.uasset" 1609
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_JAr.uasset" 1610
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_JarProjectile.uasset" 1611
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_ActorPool.uasset" 1612
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_SFX.uasset" 1613
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Master.uasset" 1614
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Ambient.uasset" 1615
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/SM_Mixer.uasset" 1616
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_GameInstance.uasset" 1617
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_WidgetIcon.uasset" 1618
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_WidgetIcon.uasset" 1619
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_HUD.uasset" 1620
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_HUD.uasset" 1621
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PCM.uasset" 1622
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PC.uasset" 1623
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PlayerState.uasset" 1624
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Idle.uasset" 1625
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Walk.uasset" 1626
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/AnimBP_TpsCharacter.uasset" 1627
-"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.uasset" 1628
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_MobileShadow.uasset" 1629
-"../../../Engine/Content/BasicShapes/Plane.uasset" 1630
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_red.uasset" 1631
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseTexture.uasset" 1632
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_Soldier.uasset" 1633
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier.uasset" 1634
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_PhysicsAsset.uasset" 1635
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier.uasset" 1636
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_TpsCharacter.uasset" 1637
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Gadget/BP_Jar.uasset" 1638
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_GunBase.uasset" 1639
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_Plain.uasset" 1640
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_Plain.uasset" 1641
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameMode.uasset" 1642
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_Projectile.uasset" 1643
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_ProfileMask.uasset" 1644
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_ProfileImage.uasset" 1645
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_ProfileImage.uasset" 1646
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Party.uasset" 1647
-"../../../Engine/Content/MobileResources/HUD/AnalogHat.uasset" 1648
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_FloatOption.uasset" 1649
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Bad.uasset" 1650
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Option.uasset" 1651
-"../../../Engine/Content/EditorResources/S_FluidSurf.uasset" 1652
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Mode.uasset" 1653
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_SelectMode.uasset" 1654
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Lobby.uasset" 1655
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyPC.uasset" 1656
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyPC.uasset" 1657
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_SelectWeapon.uasset" 1658
-"../../Plugins/2D/Paper2D/Content/PlaceholderTextures/DummySpriteTexture.uasset" 1659
-"../../Plugins/2D/Paper2D/Content/DummySprite.uasset" 1660
-"../../Plugins/2D/Paper2D/Content/DefaultPaperTerrainMaterial.uasset" 1661
-"../../Plugins/2D/Paper2D/Content/PlaceholderTextures/FlatNormalMap.uasset" 1662
-"../../Plugins/2D/Paper2D/Content/DefaultLitSpriteMaterial.uasset" 1663
-"../../Plugins/2D/Paper2D/Content/MaskedLitSpriteMaterial.uasset" 1664
-"../../Plugins/2D/Paper2D/Content/DummySpriteTexture.uasset" 1665
-"../../Plugins/2D/Paper2D/Content/DefaultSpriteMaterial.uasset" 1666
-"../../Plugins/2D/Paper2D/Content/MaskedUnlitSpriteMaterial.uasset" 1667
-"../../Plugins/2D/Paper2D/Content/OpaqueLitSpriteMaterial.uasset" 1668
-"../../Plugins/2D/Paper2D/Content/OpaqueUnlitSpriteMaterial.uasset" 1669
-"../../Plugins/2D/Paper2D/Content/TranslucentLitSpriteMaterial.uasset" 1670
-"../../Plugins/2D/Paper2D/Content/TranslucentUnlitSpriteMaterial.uasset" 1671
-"../../Plugins/Developer/AnimationSharing/Content/AnimSharingBase.uasset" 1672
-"../../Plugins/Developer/AnimationSharing/Content/AnimSharingBlue.uasset" 1673
-"../../Plugins/Developer/AnimationSharing/Content/AnimSharingGreen.uasset" 1674
-"../../Plugins/Developer/AnimationSharing/Content/AnimSharingRed.uasset" 1675
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ActiveActor.uasset" 1676
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ArrayOfActor.uasset" 1677
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ArrayOfSwitch.uasset" 1678
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_Switch.uasset" 1679
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SceneRoot.uasset" 1680
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SceneNode.uasset" 1681
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SharedNode.uasset" 1682
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenAnimationTrackType.uasset" 1683
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenAnimationTrack.uasset" 1684
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenTimelineAnimation.uasset" 1685
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenTimeline.uasset" 1686
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_AnimatedNode.uasset" 1687
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_Animation.uasset" 1688
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/FBXImporterUtils.uasset" 1689
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/BP_AnimationPlayer.uasset" 1690
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrackComponent.uasset" 1691
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrackType.uasset" 1692
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrack.uasset" 1693
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDTimelineAnimation.uasset" 1694
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDTimeline.uasset" 1695
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/GeometryVariant.uasset" 1696
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/PackageVariant.uasset" 1697
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/CameraVariant.uasset" 1698
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchCamera.uasset" 1699
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchGeometry.uasset" 1700
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchPackage.uasset" 1701
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/SwitchObjectVariant.uasset" 1702
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchSwitchObject.uasset" 1703
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchType.uasset" 1704
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitch.uasset" 1705
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/BP_VariantSelector.uasset" 1706
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/State.uasset" 1707
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDState.uasset" 1708
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDCameraVariant.uasset" 1709
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchCamera.uasset" 1710
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDGeometryVariant.uasset" 1711
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchGeometry.uasset" 1712
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDLightVariant.uasset" 1713
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchLight.uasset" 1714
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDMaterialVariant.uasset" 1715
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchMaterial.uasset" 1716
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDPackageVariant.uasset" 1717
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchPackage.uasset" 1718
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDTransformVariant.uasset" 1719
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchTransform.uasset" 1720
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchType.uasset" 1721
-"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitch.uasset" 1722
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithLayer.uasset" 1723
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithActor.uasset" 1724
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/AreaLightsStruct.uasset" 1725
-"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/cylinder.uasset" 1726
-"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/disc.uasset" 1727
-"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/sphere.uasset" 1728
-"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/square.uasset" 1729
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/AreaLightsTable.uasset" 1730
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Arealight.uasset" 1731
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithAreaLight.uasset" 1732
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithArealightMesh.uasset" 1733
-"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithSelector.uasset" 1734
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/TileMirrorAxis.uasset" 1735
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/UVEdit.uasset" 1736
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/C4DMasterUV.uasset" 1737
-"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Texturing/FlattenNormal.uasset" 1738
-"../../../Engine/Content/EngineMaterials/T_Default_Normal.uasset" 1739
-"../../../Engine/Content/EngineMaterials/T_DefaultTexture2_D.uasset" 1740
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/C4DMaster.uasset" 1741
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_BaseMaster.uasset" 1742
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpacityMaster.uasset" 1743
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpacitySimpleMaster.uasset" 1744
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpaqueMaster.uasset" 1745
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CropUV.uasset" 1746
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CroppedUVMapping.uasset" 1747
-"../../../Engine/Content/Functions/Engine_MaterialFunctions02/Math/RGBtoHSV.uasset" 1748
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Datasmith_Color.uasset" 1749
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/ExtractColor.uasset" 1750
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Datasmith_Material.uasset" 1751
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/HSVtoRGB.uasset" 1752
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MirrorUVTiling.uasset" 1753
-"../../../Engine/Content/Functions/Engine_MaterialFunctions03/Procedurals/NormalFromHeightmap.uasset" 1754
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/RevitMaster.uasset" 1755
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/RGBtoHSV.uasset" 1756
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/SketchUpMaster.uasset" 1757
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenUVEdit.uasset" 1758
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenBase.uasset" 1759
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMaster.uasset" 1760
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterAbsorb.uasset" 1761
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterClearCoat.uasset" 1762
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterTransparent.uasset" 1763
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDUVEdit.uasset" 1764
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDBase.uasset" 1765
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMaster.uasset" 1766
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterAbsorb.uasset" 1767
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterClearCoat.uasset" 1768
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterTransparent.uasset" 1769
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/VREDRepeatMode.uasset" 1770
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/PlanarMapping.uasset" 1771
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/ProcessNormal.uasset" 1772
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/TriplanarMapping.uasset" 1773
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/UVMapping.uasset" 1774
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/VREDTextureRead.uasset" 1775
-"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Texturing/BakedDisplacement.uasset" 1776
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Glass.uasset" 1777
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Phong.uasset" 1778
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Plastic.uasset" 1779
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/CarColorTable.uasset" 1780
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/CarFlakes.uasset" 1781
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/AdjustNormal.uasset" 1782
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/AngularDirection.uasset" 1783
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/WhiteSquareTexture.uasset" 1784
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Carpaint.uasset" 1785
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Base.uasset" 1786
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/ClearCoat.uasset" 1787
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/ColorMap.uasset" 1788
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Emissive.uasset" 1789
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/GrayscaleMap.uasset" 1790
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Masked.uasset" 1791
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/NormalMap.uasset" 1792
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Opaque.uasset" 1793
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Subsurface.uasset" 1794
-"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Transparent.uasset" 1795
-"../../Plugins/Enterprise/DatasmithContent/Content/Textures/S_LightArea.uasset" 1796
-"../../Plugins/Media/MediaCompositing/Content/DefaultMediaPlaneTexture.uasset" 1797
-"../../Plugins/Media/MediaCompositing/Content/DefaultMediaPlaneMaterial.uasset" 1798
-"../../Plugins/Runtime/Oculus/OculusVR/Content/OculusMR_GreenKey.uasset" 1799
-"../../Plugins/Runtime/Oculus/OculusVR/Content/OculusMR_RenderTarget.uasset" 1800
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_ChromaKey.uasset" 1801
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_ChromaKey_Lit.uasset" 1802
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_OpaqueColoredMaterial.uasset" 1803
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_WhiteMaterial.uasset" 1804
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/PokeAHoleMaterial.uasset" 1805
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_AO.uasset" 1806
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_Color.uasset" 1807
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_Normal.uasset" 1808
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/GearVRControllerMaterial.uasset" 1809
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/GearVrController.uasset" 1810
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/touchController_albedo.uasset" 1811
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/touchController_controlmap.uasset" 1812
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/touchController_mat.uasset" 1813
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/LeftTouchController.uasset" 1814
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/OculusGoController_albedo.uasset" 1815
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusGoControllerMaterial.uasset" 1816
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/OculusGoController.uasset" 1817
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftHMD.uasset" 1818
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftSensorHead.uasset" 1819
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftSensorStem.uasset" 1820
-"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RightTouchController.uasset" 1821
-"../../Plugins/Runtime/Steam/SteamVR/Content/Materials/M_DefaultDevice.uasset" 1822
-"../../../Engine/Content/Maps/Entry_BuiltData.uasset" 1823
-"../../../Engine/Content/Maps/Entry.umap" 1824
-"../../../Engine/Content/Maps/Templates/Template_Default_BuiltData.uasset" 1825
-"../../../Engine/Content/MapTemplates/SM_Template_Map_Floor.uasset" 1826
-"../../../Engine/Content/Maps/Templates/Template_Default.umap" 1827
-"../../../Engine/Content/Maps/Templates/VR-Basic_BuiltData.uasset" 1828
-"../../../Engine/Content/VREditor/BasicMeshes/T_CleanFloorGrunge_01_D.uasset" 1829
-"../../../Engine/Content/VREditor/BasicMeshes/M_Floor_01.uasset" 1830
-"../../../Engine/Content/VREditor/BasicMeshes/MI_Ball_01.uasset" 1831
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Ball_01.uasset" 1832
-"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_01.uasset" 1833
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_01.uasset" 1834
-"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_02.uasset" 1835
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_02.uasset" 1836
-"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_03.uasset" 1837
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_03.uasset" 1838
-"../../../Engine/Content/VREditor/BasicMeshes/MI_Pyramid_01.uasset" 1839
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Pyramid_01.uasset" 1840
-"../../../Engine/Content/VREditor/BasicMeshes/SM_Room_01.uasset" 1841
-"../../../Engine/Content/Maps/Templates/VR-Basic.umap" 1842
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Develop_BuiltData.uasset" 1843
-"../../../Engine/Content/BasicShapes/BasicShapeMaterial.uasset" 1844
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Develop.umap" 1845
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyGM.uasset" 1846
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyGM.uasset" 1847
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Lobby_BuiltData.uasset" 1848
-"../../../Engine/Content/EngineDebugMaterials/BlackUnlitMaterial.uasset" 1849
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/eyes.uasset" 1850
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/helmetStrap.uasset" 1851
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert1.uasset" 1852
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert2.uasset" 1853
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert3.uasset" 1854
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert6.uasset" 1855
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone_PhysicsAsset.uasset" 1856
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone_Skeleton.uasset" 1857
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone.uasset" 1858
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Lobby.umap" 1859
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColor.uasset" 1592
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColorTwoSided.uasset" 1593
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_yellow.uasset" 1594
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_red.uasset" 1595
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslTexture.uasset" 1596
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier_Transl.uasset" 1597
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Skeleton.uasset" 1598
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Left.uasset" 1599
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Ref.uasset" 1600
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Right.uasset" 1601
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimH.uasset" 1602
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Shoot.uasset" 1603
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Down45.uasset" 1604
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Up60.uasset" 1605
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimV.uasset" 1606
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AO.uasset" 1607
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/MI_Weapon_Base.uasset" 1608
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColor.uasset" 1609
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/M_Weapon.uasset" 1610
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_JAr.uasset" 1611
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_JarProjectile.uasset" 1612
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Gadget/BP_Jar.uasset" 1613
+"../../../Engine/Content/BasicShapes/Sphere.uasset" 1614
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_GunProjectile.uasset" 1615
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_GunBase.uasset" 1616
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_Plain.uasset" 1617
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_Plain.uasset" 1618
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameState.uasset" 1619
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_ActorPool.uasset" 1620
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_SFX.uasset" 1621
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Master.uasset" 1622
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Ambient.uasset" 1623
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/SM_Mixer.uasset" 1624
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_GameInstance.uasset" 1625
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_WidgetIcon.uasset" 1626
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_WidgetIcon.uasset" 1627
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_BaseHUD.uasset" 1628
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_FunctionLibrary.uasset" 1629
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_PartyWeapon.uasset" 1630
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_WeaponSelector.uasset" 1631
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_RespawnHUD.uasset" 1632
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_HUD.uasset" 1633
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PCM.uasset" 1634
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PC.uasset" 1635
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PlayerState.uasset" 1636
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Idle.uasset" 1637
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Walk.uasset" 1638
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/AnimBP_TpsCharacter.uasset" 1639
+"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.uasset" 1640
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_MobileShadow.uasset" 1641
+"../../../Engine/Content/BasicShapes/Plane.uasset" 1642
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColorTwoSided.uasset" 1643
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseTexture.uasset" 1644
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_Soldier.uasset" 1645
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier.uasset" 1646
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_PhysicsAsset.uasset" 1647
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier.uasset" 1648
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/TranslMatData.uasset" 1649
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_TpsCharacter.uasset" 1650
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameMode.uasset" 1651
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_Projectile.uasset" 1652
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_ProfileMask.uasset" 1653
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_ProfileImage.uasset" 1654
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_ProfileImage.uasset" 1655
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Party.uasset" 1656
+"../../../Engine/Content/MobileResources/HUD/AnalogHat.uasset" 1657
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_FloatOption.uasset" 1658
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Bad.uasset" 1659
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Option.uasset" 1660
+"../../../Engine/Content/EditorResources/S_FluidSurf.uasset" 1661
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Mode.uasset" 1662
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_SelectMode.uasset" 1663
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Lobby.uasset" 1664
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyPC.uasset" 1665
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyPC.uasset" 1666
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_MakeSandwichHUD.uasset" 1667
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Ring.uasset" 1668
+"../../Plugins/2D/Paper2D/Content/PlaceholderTextures/DummySpriteTexture.uasset" 1669
+"../../Plugins/2D/Paper2D/Content/DummySprite.uasset" 1670
+"../../Plugins/2D/Paper2D/Content/DefaultPaperTerrainMaterial.uasset" 1671
+"../../Plugins/2D/Paper2D/Content/PlaceholderTextures/FlatNormalMap.uasset" 1672
+"../../Plugins/2D/Paper2D/Content/DefaultLitSpriteMaterial.uasset" 1673
+"../../Plugins/2D/Paper2D/Content/MaskedLitSpriteMaterial.uasset" 1674
+"../../Plugins/2D/Paper2D/Content/DummySpriteTexture.uasset" 1675
+"../../Plugins/2D/Paper2D/Content/DefaultSpriteMaterial.uasset" 1676
+"../../Plugins/2D/Paper2D/Content/MaskedUnlitSpriteMaterial.uasset" 1677
+"../../Plugins/2D/Paper2D/Content/OpaqueLitSpriteMaterial.uasset" 1678
+"../../Plugins/2D/Paper2D/Content/OpaqueUnlitSpriteMaterial.uasset" 1679
+"../../Plugins/2D/Paper2D/Content/TranslucentLitSpriteMaterial.uasset" 1680
+"../../Plugins/2D/Paper2D/Content/TranslucentUnlitSpriteMaterial.uasset" 1681
+"../../Plugins/Developer/AnimationSharing/Content/AnimSharingBase.uasset" 1682
+"../../Plugins/Developer/AnimationSharing/Content/AnimSharingBlue.uasset" 1683
+"../../Plugins/Developer/AnimationSharing/Content/AnimSharingGreen.uasset" 1684
+"../../Plugins/Developer/AnimationSharing/Content/AnimSharingRed.uasset" 1685
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ActiveActor.uasset" 1686
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ArrayOfActor.uasset" 1687
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/ArrayOfSwitch.uasset" 1688
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_Switch.uasset" 1689
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SceneRoot.uasset" 1690
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SceneNode.uasset" 1691
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_SharedNode.uasset" 1692
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenAnimationTrackType.uasset" 1693
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenAnimationTrack.uasset" 1694
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenTimelineAnimation.uasset" 1695
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/DeltaGenTimeline.uasset" 1696
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_AnimatedNode.uasset" 1697
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/BP_Animation.uasset" 1698
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/FBXImporterUtils.uasset" 1699
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/BP_AnimationPlayer.uasset" 1700
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrackComponent.uasset" 1701
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrackType.uasset" 1702
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDAnimationTrack.uasset" 1703
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDTimelineAnimation.uasset" 1704
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Animation/VREDTimeline.uasset" 1705
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/GeometryVariant.uasset" 1706
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/PackageVariant.uasset" 1707
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/CameraVariant.uasset" 1708
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchCamera.uasset" 1709
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchGeometry.uasset" 1710
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchPackage.uasset" 1711
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/SwitchObjectVariant.uasset" 1712
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchSwitchObject.uasset" 1713
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitchType.uasset" 1714
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VariantSwitch.uasset" 1715
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/BP_VariantSelector.uasset" 1716
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/State.uasset" 1717
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDState.uasset" 1718
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDCameraVariant.uasset" 1719
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchCamera.uasset" 1720
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDGeometryVariant.uasset" 1721
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchGeometry.uasset" 1722
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDLightVariant.uasset" 1723
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchLight.uasset" 1724
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDMaterialVariant.uasset" 1725
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchMaterial.uasset" 1726
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDPackageVariant.uasset" 1727
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchPackage.uasset" 1728
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDTransformVariant.uasset" 1729
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchTransform.uasset" 1730
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitchType.uasset" 1731
+"../../Plugins/Enterprise/DatasmithContent/Content/Blueprints/FBXImporter/Variants/VREDVariantSwitch.uasset" 1732
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithLayer.uasset" 1733
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithActor.uasset" 1734
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/AreaLightsStruct.uasset" 1735
+"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/cylinder.uasset" 1736
+"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/disc.uasset" 1737
+"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/sphere.uasset" 1738
+"../../Plugins/Enterprise/DatasmithContent/Content/Meshes/square.uasset" 1739
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/AreaLightsTable.uasset" 1740
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Arealight.uasset" 1741
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithAreaLight.uasset" 1742
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithArealightMesh.uasset" 1743
+"../../Plugins/Enterprise/DatasmithContent/Content/Datasmith/DatasmithSelector.uasset" 1744
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/TileMirrorAxis.uasset" 1745
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/UVEdit.uasset" 1746
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/C4DMasterUV.uasset" 1747
+"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Texturing/FlattenNormal.uasset" 1748
+"../../../Engine/Content/EngineMaterials/T_Default_Normal.uasset" 1749
+"../../../Engine/Content/EngineMaterials/T_DefaultTexture2_D.uasset" 1750
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/C4DMaster.uasset" 1751
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_BaseMaster.uasset" 1752
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpacityMaster.uasset" 1753
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpacitySimpleMaster.uasset" 1754
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpaqueMaster.uasset" 1755
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CropUV.uasset" 1756
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/CroppedUVMapping.uasset" 1757
+"../../../Engine/Content/Functions/Engine_MaterialFunctions02/Math/RGBtoHSV.uasset" 1758
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Datasmith_Color.uasset" 1759
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/ExtractColor.uasset" 1760
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/Datasmith_Material.uasset" 1761
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/HSVtoRGB.uasset" 1762
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MirrorUVTiling.uasset" 1763
+"../../../Engine/Content/Functions/Engine_MaterialFunctions03/Procedurals/NormalFromHeightmap.uasset" 1764
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/RevitMaster.uasset" 1765
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/RGBtoHSV.uasset" 1766
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/SketchUpMaster.uasset" 1767
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenUVEdit.uasset" 1768
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenBase.uasset" 1769
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMaster.uasset" 1770
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterAbsorb.uasset" 1771
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterClearCoat.uasset" 1772
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/DeltaGenMasterTransparent.uasset" 1773
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDUVEdit.uasset" 1774
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDBase.uasset" 1775
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMaster.uasset" 1776
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterAbsorb.uasset" 1777
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterClearCoat.uasset" 1778
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDMasterTransparent.uasset" 1779
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/VREDRepeatMode.uasset" 1780
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/PlanarMapping.uasset" 1781
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/ProcessNormal.uasset" 1782
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/TriplanarMapping.uasset" 1783
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/UVMapping.uasset" 1784
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/VREDTextureRead.uasset" 1785
+"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Texturing/BakedDisplacement.uasset" 1786
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Glass.uasset" 1787
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Phong.uasset" 1788
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VRED/Plastic.uasset" 1789
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/CarColorTable.uasset" 1790
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/CarFlakes.uasset" 1791
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/AdjustNormal.uasset" 1792
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/AngularDirection.uasset" 1793
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/WhiteSquareTexture.uasset" 1794
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Carpaint.uasset" 1795
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Base.uasset" 1796
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/ClearCoat.uasset" 1797
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/ColorMap.uasset" 1798
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Emissive.uasset" 1799
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/GrayscaleMap.uasset" 1800
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Masked.uasset" 1801
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/NormalMap.uasset" 1802
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Opaque.uasset" 1803
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Subsurface.uasset" 1804
+"../../Plugins/Enterprise/DatasmithContent/Content/Materials/MDL/Transparent.uasset" 1805
+"../../Plugins/Enterprise/DatasmithContent/Content/Textures/S_LightArea.uasset" 1806
+"../../Plugins/Media/MediaCompositing/Content/DefaultMediaPlaneTexture.uasset" 1807
+"../../Plugins/Media/MediaCompositing/Content/DefaultMediaPlaneMaterial.uasset" 1808
+"../../Plugins/Runtime/Oculus/OculusVR/Content/OculusMR_GreenKey.uasset" 1809
+"../../Plugins/Runtime/Oculus/OculusVR/Content/OculusMR_RenderTarget.uasset" 1810
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_ChromaKey.uasset" 1811
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_ChromaKey_Lit.uasset" 1812
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_OpaqueColoredMaterial.uasset" 1813
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusMR_WhiteMaterial.uasset" 1814
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/PokeAHoleMaterial.uasset" 1815
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_AO.uasset" 1816
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_Color.uasset" 1817
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/GearVRController_Normal.uasset" 1818
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/GearVRControllerMaterial.uasset" 1819
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/GearVrController.uasset" 1820
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/touchController_albedo.uasset" 1821
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/touchController_controlmap.uasset" 1822
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/touchController_mat.uasset" 1823
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/LeftTouchController.uasset" 1824
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Textures/OculusGoController_albedo.uasset" 1825
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Materials/OculusGoControllerMaterial.uasset" 1826
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/OculusGoController.uasset" 1827
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftHMD.uasset" 1828
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftSensorHead.uasset" 1829
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RiftSensorStem.uasset" 1830
+"../../Plugins/Runtime/Oculus/OculusVR/Content/Meshes/RightTouchController.uasset" 1831
+"../../Plugins/Runtime/Steam/SteamVR/Content/Materials/M_DefaultDevice.uasset" 1832
+"../../../Engine/Content/Maps/Entry_BuiltData.uasset" 1833
+"../../../Engine/Content/Maps/Entry.umap" 1834
+"../../../Engine/Content/Maps/Templates/Template_Default_BuiltData.uasset" 1835
+"../../../Engine/Content/MapTemplates/SM_Template_Map_Floor.uasset" 1836
+"../../../Engine/Content/Maps/Templates/Template_Default.umap" 1837
+"../../../Engine/Content/Maps/Templates/VR-Basic_BuiltData.uasset" 1838
+"../../../Engine/Content/VREditor/BasicMeshes/T_CleanFloorGrunge_01_D.uasset" 1839
+"../../../Engine/Content/VREditor/BasicMeshes/M_Floor_01.uasset" 1840
+"../../../Engine/Content/VREditor/BasicMeshes/MI_Ball_01.uasset" 1841
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Ball_01.uasset" 1842
+"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_01.uasset" 1843
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_01.uasset" 1844
+"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_02.uasset" 1845
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_02.uasset" 1846
+"../../../Engine/Content/VREditor/BasicMeshes/MI_Cube_03.uasset" 1847
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Cube_03.uasset" 1848
+"../../../Engine/Content/VREditor/BasicMeshes/MI_Pyramid_01.uasset" 1849
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Pyramid_01.uasset" 1850
+"../../../Engine/Content/VREditor/BasicMeshes/SM_Room_01.uasset" 1851
+"../../../Engine/Content/Maps/Templates/VR-Basic.umap" 1852
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Develop_BuiltData.uasset" 1853
+"../../../Engine/Content/BasicShapes/BasicShapeMaterial.uasset" 1854
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Develop.umap" 1855
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyGM.uasset" 1856
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyGM.uasset" 1857
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Lobby_BuiltData.uasset" 1858
+"../../../Engine/Content/EngineDebugMaterials/BlackUnlitMaterial.uasset" 1859
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/eyes.uasset" 1860
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/helmetStrap.uasset" 1861
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert1.uasset" 1862
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert2.uasset" 1863
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert3.uasset" 1864
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/lambert6.uasset" 1865
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone_PhysicsAsset.uasset" 1866
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone_Skeleton.uasset" 1867
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Model/sujungbone.uasset" 1868
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Lobby.umap" 1869

@@ -41,10 +41,10 @@ private:
 	UFUNCTION()
 	void OnRep_FireRandSeed();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FCollisionProfileName PawnOnly;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FCollisionProfileName NoPawn;
 
 	// 자동조준 상자 크기
@@ -60,7 +60,7 @@ private:
 
 	class AActorPool* ProjectilePool;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	float TraceStartOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -97,15 +97,15 @@ private:
 	float MaxProjectileSize = 1.f;
 
 	// 재장전에 걸리는 시간 (초)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ReloadTime;
 
 	// 재장전 시작까지 걸리는 시간 (초)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ReloadWaitTime;
 
 	// 소스를 완전히 소모하고 재장전 시작까지 걸리는 시간 (초)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ReloadWaitTimeAfterDried;
 	float ReloadWaitingTime;
 	float ReloadAlpha;
@@ -125,7 +125,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 MinClipToFireAfterDried;
 
-	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bDried : 1;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

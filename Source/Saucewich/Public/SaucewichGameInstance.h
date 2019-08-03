@@ -21,4 +21,7 @@ private:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	AActorPool* ActorPool;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool bIsAutoShot;
 };

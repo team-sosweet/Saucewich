@@ -18,6 +18,7 @@
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
 #include "TpsCharacterMovementComponent.h"
+#include "TranslucentMaterialData.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
@@ -53,7 +54,7 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	Material->GetVectorParameterValue({"Color"}, Color);
+	DynamicMaterial->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
@@ -68,7 +69,7 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	Material->SetVectorParameterValue("Color", NewColor);
+	DynamicMaterial->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -97,6 +98,16 @@ FVector ATpsCharacter::GetPawnViewLocation() const
 FVector ATpsCharacter::GetSpringArmLocation() const
 {
 	return SpringArm->GetComponentLocation();
+}
+
+void ATpsCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	const auto Idx = FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0);
+	DynamicMaterial = GetMesh()->CreateDynamicMaterialInstance(Idx);
+
+	RegisterGameMode();
 }
 
 void ATpsCharacter::BeginPlay()
@@ -128,12 +139,6 @@ void ATpsCharacter::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	UpdateShadow();
-}
-
-void ATpsCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	Material = GetMesh()->CreateDynamicMaterialInstance(FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0));
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
@@ -172,7 +177,7 @@ float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& Da
 		}
 
 		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
-		if (HP == 0.f) Kill();
+		if (HP == 0.f) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
 	return Damage;
 }
@@ -183,6 +188,9 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 		return false;
 
 	if (!IsAlive())
+		return false;
+
+	if (GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f)
 		return false;
 
 	if (!EventInstigator)
@@ -199,23 +207,32 @@ void ATpsCharacter::SetPlayerDefaults()
 	HP = MaxHP;
 	bAlive = true;
 	SetActorActivated(true);
+
+	BeTransl();
+	GetWorldTimerManager().SetTimer(
+		RespawnInvincibleTimerHandle, 
+		this, &ATpsCharacter::BeOpaque,
+		RespawnInvincibleTime, false
+	);
+	
 	OnCharacterSpawn.Broadcast();
 }
 
-void ATpsCharacter::Kill()
+void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
 	HP = 0.f;
 	bAlive = false;
 	SetActorActivated(false);
-	if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-	{
+
+	if (GameMode)
 		if (const auto PC = GetController<ASaucewichPlayerController>())
-		{
-			Gm->SetPlayerRespawnTimer(PC);
-		}
-	}
+			GameMode->SetPlayerRespawnTimer(PC);
+
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
+
+	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+		GameState->MulticastPlayerDeath(State, Attacker, Inflictor);
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)
@@ -262,7 +279,7 @@ void ATpsCharacter::BindOnTeamChanged()
 		}
 		else
 		{
-			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerStateClass -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
+			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerState -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
 		}
 	}
 	else
@@ -301,6 +318,12 @@ void ATpsCharacter::OnRep_Alive()
 	else Kill();
 }
 
+void ATpsCharacter::RegisterGameMode()
+{
+	if (!HasAuthority()) return;
+	GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>();
+}
+
 void ATpsCharacter::UpdateShadow() const
 {
 	auto Start = GetActorLocation();
@@ -324,4 +347,50 @@ void ATpsCharacter::UpdateShadow() const
 		);
 		ShadowData.Material->SetScalarParameterValue("Darkness", (1.f - (Start.Z - Hit.Location.Z) / ShadowData.MaxDistance) * ShadowData.Darkness);
 	}
+}
+
+void ATpsCharacter::BeTransl()
+{
+	if (!TranslMatData || bTransl) return;
+
+	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
+	{
+		if (i == DefMesh->GetMaterialIndex("TeamColor"))
+			continue;
+
+		const auto DefMat = DefMesh->GetMaterial(i);
+		if (!DefMat) continue;
+
+		const auto Ptr = TranslMatData->Get(DefMat);
+		if (!Ptr) continue;
+
+		if (const auto Material = Ptr->LoadSynchronous())
+		{
+			GetMesh()->SetMaterial(i, Material);
+		}
+	}
+
+	bTransl = true;
+}
+
+void ATpsCharacter::BeOpaque()
+{
+	if (!TranslMatData || !bTransl) return;
+
+	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
+	{
+		if (i == DefMesh->GetMaterialIndex("TeamColor"))
+			continue;
+		
+		if (const auto Material = DefMesh->GetMaterial(i))
+		{
+			GetMesh()->SetMaterial(i, Material);
+		}
+	}
+
+	bTransl = false;
 }

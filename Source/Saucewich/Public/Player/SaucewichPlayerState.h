@@ -16,7 +16,6 @@ class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
 public:
 	uint8 GetTeam() const { return Team; }
 
-	UFUNCTION(BlueprintCallable)
 	void SetTeam(uint8 NewTeam);
 
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -44,21 +43,25 @@ private:
 	void SafeGameState(Fn&& Func)
 	{
 		if (GameState) Func();
-		else OnGameStateReady.AddLambda(std::move(Func));
+		else OnGameStateReady.AddLambda(MoveTemp(Func));
 	}
 
 	FOnGameStateReady OnGameStateReady;
 
 	// 플레이어가 무기를 선택하지 않았을 때 기본적으로 지급될 무기입니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<AWeapon>> DefaultWeapons;
 
+	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
+	// 배열 인덱스는 무기 슬롯을 의미합니다.
 	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> Weapons;
 
 	class ASaucewichGameState* GameState;
 
+	// 플레이어의 팀을 나타냅니다. 팀 번호는 1부터 시작합니다.
+	// 팀 관련 함수들은 SaucewichGameState를 확인하세요.
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };

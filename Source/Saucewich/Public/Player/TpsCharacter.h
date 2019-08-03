@@ -51,14 +51,19 @@ public:
 
 	class AWeapon* GetActiveWeapon() const;
 
+	// 플레이어가 현재 들고있는 무기로 Trace를 실시합니다.
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
 
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
+
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetTeamColor() const;
+
 	void SetColor(const FLinearColor& NewColor) override;
 
 	bool IsAlive() const { return bAlive; }
@@ -86,7 +91,7 @@ protected:
 	bool ShouldTakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 
 	// 캐릭터를 죽입니다.
-	virtual void Kill();
+	void Kill(class ASaucewichPlayerState* Attacker = nullptr, AActor* Inflictor = nullptr);
 
 	// 캐릭터를 살립니다.
 	void SetPlayerDefaults() override;
@@ -108,13 +113,24 @@ private:
 	UFUNCTION()
 	void OnRep_Alive();
 
+	void RegisterGameMode();
 	void UpdateShadow() const;
+
+	void BeTransl();
+	void BeOpaque();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
+	UPROPERTY(EditAnywhere)
+	class UTranslucentMaterialData* TranslMatData;
+
+	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
-	UMaterialInstanceDynamic* Material;
+	FTimerHandle RespawnInvincibleTimerHandle;
+
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* DynamicMaterial;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -128,6 +144,11 @@ private:
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
 
+	// 스폰 무적 시간
+	UPROPERTY(EditAnywhere)
+	float RespawnInvincibleTime;
+
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
+	uint8 bTransl : 1;
 };
