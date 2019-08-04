@@ -42,10 +42,11 @@ public:
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	void OnCharacterDeath();
-	float GetSpeedRatio() const;
 	virtual bool TrySelectWeapon(uint8 Slot);
-	uint8 GetSlots() const { return WeaponSlots; }
 	void SetColor(const FLinearColor& NewColor) override;
+
+	float GetSpeedRatio() const;
+	uint8 GetSlots() const { return WeaponSlots; }
 
 	class ATpsCharacter* const Owner = nullptr;
 
