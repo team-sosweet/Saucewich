@@ -132,6 +132,9 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	auto HitPawn = -1;
 	for (auto i = 0; i < BoxHits.Num(); ++i)
 	{
+		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
+		if (!Chr || Chr->IsInvincible()) continue;
+
 		//if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name, Params))
 		FHitResult a;
 		if (!UKismetSystemLibrary::LineTraceSingleByProfile(this, BoxHits[i].ImpactPoint, Start, NoPawn.Name, false, Ignored, Debug, a, false))

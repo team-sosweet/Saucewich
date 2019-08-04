@@ -73,6 +73,11 @@ void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 	WeaponComponent->SetColor(NewColor);
 }
 
+bool ATpsCharacter::IsInvincible() const
+{
+	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f;
+}
+
 void ATpsCharacter::SetMaxHP(const float Ratio)
 {
 	const auto OldMaxHP = MaxHP;
@@ -190,7 +195,7 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (!IsAlive())
 		return false;
 
-	if (GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f)
+	if (IsInvincible())
 		return false;
 
 	if (!EventInstigator)

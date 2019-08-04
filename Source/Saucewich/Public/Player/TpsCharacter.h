@@ -67,6 +67,7 @@ public:
 	void SetColor(const FLinearColor& NewColor) override;
 
 	bool IsAlive() const { return bAlive; }
+	bool IsInvincible() const;
 	void SetMaxHP(float Ratio);
 	virtual float GetSpeedRatio() const;
 
