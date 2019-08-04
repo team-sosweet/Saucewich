@@ -17,6 +17,7 @@ void UAliveHUD::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	RootWidget = Cast<UPanelWidget>(GetWidgetFromName(TEXT("Root")));
 	HealthProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_HP")));
 	ClipProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_Clip")));
 	SubWeaponProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_SubWeapon")));
@@ -40,6 +41,9 @@ void UAliveHUD::NativeOnInitialized()
 
 	AWeapon* SubWeapon = WeaponComponent->GetWeapon(1);
 	AddProgressBarMaterial(SubWeaponProgressBar, SubWeapon->GetIcon(), SubWeapon->GetMask());
+
+	UUserWidget* ChildWidget = CreateWidget(GetOwningPlayer(), *ChildWidgetClass);
+	RootWidget->AddChild(ChildWidget);
 
 	BindOnTeamChanged();
 }

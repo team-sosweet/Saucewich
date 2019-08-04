@@ -30,6 +30,9 @@ private:
 
 private:
 	UPROPERTY()
+	UPanelWidget* RootWidget;
+
+	UPROPERTY()
 	UProgressBar* HealthProgressBar;
 
 	UPROPERTY()
@@ -43,6 +46,9 @@ private:
 
 	UPROPERTY()
 	class UButton* AttackButton;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> ChildWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* IconMaterial;
