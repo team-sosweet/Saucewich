@@ -1,6 +1,6 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "BaseHUD.h"
+#include "AliveHUD.h"
 #include "TpsCharacter.h"
 #include "Weapon.h"
 #include "WeaponComponent.h"
@@ -13,7 +13,7 @@
 #include "Classes/Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetMaterialLibrary.h"
 
-void UBaseHUD::NativeOnInitialized()
+void UAliveHUD::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
@@ -44,7 +44,7 @@ void UBaseHUD::NativeOnInitialized()
 	BindOnTeamChanged();
 }
 
-void UBaseHUD::SetTeamColor(uint8 NewTeam)
+void UAliveHUD::SetTeamColor(uint8 NewTeam)
 {
 	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
 
@@ -57,22 +57,22 @@ void UBaseHUD::SetTeamColor(uint8 NewTeam)
 	}
 }
 
-void UBaseHUD::BindOnTeamChanged()
+void UAliveHUD::BindOnTeamChanged()
 {
 	ASaucewichPlayerState* PlayerState = GetOwningPlayerState<ASaucewichPlayerState>();
 
 	if (PlayerState)
 	{
-		PlayerState->OnTeamChangedDelegate.AddDynamic(this, &UBaseHUD::SetTeamColor);
+		PlayerState->OnTeamChangedDelegate.AddDynamic(this, &UAliveHUD::SetTeamColor);
 		SetTeamColor(PlayerState->GetTeam());
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBaseHUD::BindOnTeamChanged);
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAliveHUD::BindOnTeamChanged);
 	}
 }
 
-void UBaseHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask)
+void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask)
 {
 	UMaterialInstanceDynamic* Material =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), IconMaterial);

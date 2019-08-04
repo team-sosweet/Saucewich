@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "BaseHUD.generated.h"
+#include "AliveHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SAUCEWICH_API UBaseHUD : public UUserWidget
+class SAUCEWICH_API UAliveHUD : public UUserWidget
 {
 	GENERATED_BODY()
 	

@@ -1,7 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "SaucewichHUD.h"
-#include "BaseHUD.h"
+#include "AliveHUD.h"
 #include "DeathHUD.h"
 #include "TpsCharacter.h"
 #include "TimerManager.h"
@@ -10,8 +10,11 @@ void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetHUD(AliveWidget, DeathWidget);
-	AliveWidget->AddToViewport();
+	AliveWidget = CreateWidget<UAliveHUD>(GetOwningPlayerController(), *AliveWidgetClass);
+	DeathWidget = CreateWidget<UDeathHUD>(GetOwningPlayerController(), *DeathWidgetClass);
+
+	DeathWidget->AddToViewport();
+	OnSpawn();
 
 	ATpsCharacter* Player = Cast<ATpsCharacter>(GetOwningPawn());
 	Player->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
