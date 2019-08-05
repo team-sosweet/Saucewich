@@ -21,24 +21,17 @@ AWeapon::AWeapon()
 	RootComponent = Mesh;
 }
 
-void AWeapon::BeginPlay()
-{
-	Super::BeginPlay();
-	Mesh->SetVisibility(false);
-	Init();
-}
-
 void AWeapon::Init()
 {
-	if (const auto Character = Cast<ATpsCharacter>(GetOwner()))
+	if (const auto MyOwner = GetOwner())
 	{
-		Owner = Character;
-		Role = Owner->Role;
-		if (Owner->GetWeaponComponent()->GetActiveWeapon() == this)
+		if (const auto Character = Cast<ATpsCharacter>(MyOwner))
 		{
-			Deploy();
+			Owner = Character;
+			Role = Owner->Role;
+			Owner->GetWeaponComponent()->GetActiveWeapon() == this ? Deploy() : Holster();
+			Material->SetVectorParameterValue("Color", Owner->GetTeamColor());
 		}
-		Material->SetVectorParameterValue("Color", Owner->GetTeamColor());
 	}
 	else
 	{
@@ -52,16 +45,6 @@ void AWeapon::OnRep_Equipped()
 	else Holster();
 }
 
-void AWeapon::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (const auto Character = GetCharacter())
-	{
-		Role = Character->Role;
-	}
-}
-
 void AWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -73,6 +56,16 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, bEquipped);
+}
+
+void AWeapon::OnActivated()
+{
+	Init();
+}
+
+void AWeapon::OnReleased()
+{
+	Holster();
 }
 
 bool AWeapon::IsVisible() const

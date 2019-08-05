@@ -7,7 +7,7 @@
 #include "Colorable.h"
 #include "WeaponComponent.generated.h"
 
-/*
+/**
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -20,7 +20,7 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* Input);
 
-	/*
+	/**
 	 * [Server] Gives a weapon. Replaces if already in the same slot.
 	 * @param WeaponClass: Class of weapon to give
 	 * @return: The weapon given
@@ -28,7 +28,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual class AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
 
-	/*
+	/**
 	 * [Shared] Returns active weapon.
 	 * @return: The weapon currently equipped
 	 */

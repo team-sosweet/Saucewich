@@ -25,6 +25,7 @@ public:
 
 private:
 	void BeginPlay() override;
+	void SpawnReserved();
 
 	// 여기에 클래스와 개수를 등록해두면 게임 시작시 미리 생성됩니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

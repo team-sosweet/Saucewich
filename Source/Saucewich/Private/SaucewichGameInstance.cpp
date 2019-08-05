@@ -11,6 +11,7 @@ USaucewichGameInstance::USaucewichGameInstance()
 
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
-	if (!ActorPool) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
+	if (!ActorPool)
+		ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
 	return ActorPool;
 }

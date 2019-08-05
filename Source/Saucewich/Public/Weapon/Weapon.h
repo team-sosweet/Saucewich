@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "PoolActor.h"
 #include "Colorable.h"
 #include "Weapon.generated.h"
 
@@ -24,7 +24,7 @@ struct FWeaponIcon
  * 이름과는 달리 '캐릭터가 지니고 있을 수 있으며 슬롯을 누르면 특정 행동을 할 수 있는' 그 어떤 것도 될 수 있습니다.
  */
 UCLASS(Abstract)
-class AWeapon : public AActor, public IColorable
+class AWeapon : public APoolActor, public IColorable
 {
 	GENERATED_BODY()
 
@@ -59,16 +59,17 @@ public:
 	// [Shared] 무기를 집어넣으면 호출됩니다.
 	virtual void Holster();
 
-	virtual bool CanDeploy() const { return true; }
+	virtual bool CanDeploy() const { return IsActive(); }
 	virtual bool CanHolster() const { return true; }
 
 	class ATpsCharacter* GetCharacter() const;
 
 protected:
-	void BeginPlay() override;
-	void Tick(float DeltaSeconds) override;
 	void PostInitializeComponents() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void OnActivated() override;
+	void OnReleased() override;
 
 private:
 	void Init();

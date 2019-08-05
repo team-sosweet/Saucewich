@@ -37,6 +37,9 @@ protected:
 	void FireR() override;
 	void SlotP() override;
 
+	void OnActivated() override;
+	void OnReleased() override;
+
 private:
 	UFUNCTION()
 	void OnRep_FireRandSeed();
@@ -57,8 +60,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class AGunProjectile> ProjectileClass;
-
-	class AActorPool* ProjectilePool;
 
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	float TraceStartOffset;

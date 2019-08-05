@@ -4,7 +4,9 @@
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
+#include "ActorPool.h"
 #include "Gun.h"
+#include "SaucewichGameInstance.h"
 #include "TpsCharacter.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, Log, All)
@@ -37,7 +39,7 @@ void UWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	for (auto Wep : Weapons)
 	{
-		if (Wep) Wep->Destroy();
+		if (Wep) Wep->Release();
 	}
 }
 
@@ -94,8 +96,7 @@ void UWeaponComponent::OnCharacterDeath()
 	{
 		if (Weapon)
 		{
-			Weapon->Destroy();
-			Weapon = nullptr;
+			Weapon->Release();
 		}
 	}
 }
@@ -123,10 +124,35 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 		return nullptr;
 	}
 
+	const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
+	if (!GI)
+	{
+		UE_LOG(LogWeaponComponent, Error, TEXT("Give: USaucewichGameInstance를 얻는 데 실패했습니다."));
+		return nullptr;
+	}
+
+	const auto Pool = GI->GetActorPool();
+	if (!Pool)
+	{
+		UE_LOG(LogWeaponComponent, Error, TEXT("Give: ActorPool을 얻는 데 실패했습니다."));
+		return nullptr;
+	}
+
+	if (Weapons[Slot])
+	{
+		Weapons[Slot]->Release();
+		if (Weapons[Slot]->GetClass() == WeaponClass)
+		{
+			Weapons[Slot]->Activate();
+			return Weapons[Slot];
+		}
+	}
+
 	FActorSpawnParameters Parameters;
 	Parameters.Owner = Owner;
 	Parameters.Instigator = Owner;
-	const auto Weapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass, Parameters);
+
+	const auto Weapon = Pool->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
 	if (!Weapon)
 	{
 		UE_LOG(LogWeaponComponent, Error, TEXT("Failed to give weapon: Can't spawn the weapon"));
@@ -135,8 +161,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	if (Weapons[Slot]) Weapons[Slot]->Destroy();
-	else if (Slot == 0) Owner->SetMaxHP(Weapon->GetHPRatio());
+	if (Slot == 0 && !Weapons[Slot]) Owner->SetMaxHP(Weapon->GetHPRatio());
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 

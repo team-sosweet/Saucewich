@@ -4,7 +4,6 @@
 #include "Engine/World.h"
 #include "ActorPool.h"
 #include "Projectile.h"
-#include "SaucewichGameInstance.h"
 
 void AThrowingWeapon::SlotP()
 {
@@ -14,18 +13,12 @@ void AThrowingWeapon::SlotP()
 	Parameters.Owner = this;
 	Parameters.Instigator = GetInstigator();
 
-	if (const auto Thrown = ProjectilePool->Spawn<AProjectile>(ProjectileClass, ThrowOffset * GetActorTransform(), Parameters))
+	if (const auto Thrown = GetPool()->Spawn<AProjectile>(ProjectileClass, ThrowOffset * GetActorTransform(), Parameters))
 	{
 		Thrown->ResetSpeed();
 		Thrown->SetColor(GetColor());
 		bReloading = true;
 	}
-}
-
-void AThrowingWeapon::BeginPlay()
-{
-	Super::BeginPlay();
-	ProjectilePool = CastChecked<USaucewichGameInstance>(GetGameInstance())->GetActorPool();
 }
 
 void AThrowingWeapon::Tick(const float DeltaSeconds)
