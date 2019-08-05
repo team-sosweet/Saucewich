@@ -49,7 +49,7 @@ void UAliveHUD::SetTeamColor(uint8 NewTeam)
 	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
 
 	uint8 EnemyTeam = (NewTeam == 1) ? 2 : 1;
-	EnemyTeamColor = GameState->GetTeamData(NewTeam).Color;
+	EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
 	for (UMaterialInstanceDynamic* Material : Materials)
 	{
