@@ -13,8 +13,7 @@ void ASaucewichHUD::BeginPlay()
 	AliveWidget = CreateWidget<UAliveHUD>(GetOwningPlayerController(), *AliveWidgetClass);
 	DeathWidget = CreateWidget<UDeathHUD>(GetOwningPlayerController(), *DeathWidgetClass);
 
-	DeathWidget->AddToViewport();
-	OnSpawn();
+	AliveWidget->AddToViewport();
 
 	ATpsCharacter* Player = Cast<ATpsCharacter>(GetOwningPawn());
 	Player->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);

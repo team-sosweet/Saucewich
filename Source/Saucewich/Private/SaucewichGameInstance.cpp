@@ -7,10 +7,17 @@
 USaucewichGameInstance::USaucewichGameInstance()
 	:ActorPoolClass{AActorPool::StaticClass()}
 {
+	Sensitivity = 0.5f;
+	Revision = 1.0f;
 }
 
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
 	if (!ActorPool) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
 	return ActorPool;
+}
+
+float USaucewichGameInstance::GetSensitivity() const
+{
+	return Revision * Sensitivity * -1.0f;
 }
