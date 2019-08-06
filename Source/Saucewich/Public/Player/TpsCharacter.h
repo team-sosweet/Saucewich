@@ -123,8 +123,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
 
-	UPROPERTY(EditAnywhere)
-	class UTranslucentMaterialData* TranslMatData;
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
+	TMap<uint8, UMaterialInterface*> TranslMatByIdx;
+
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
+	UMaterialInterface* DefTranslMat;
 
 	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;

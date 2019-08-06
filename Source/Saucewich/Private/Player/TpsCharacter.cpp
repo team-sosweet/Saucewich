@@ -18,7 +18,6 @@
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
 #include "TpsCharacterMovementComponent.h"
-#include "TranslucentMaterialData.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
@@ -54,7 +53,8 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	DynamicMaterial->GetVectorParameterValue({"Color"}, Color);
+	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
+		Mat->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
@@ -69,7 +69,8 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	DynamicMaterial->SetVectorParameterValue("Color", NewColor);
+	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
+		Mat->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -213,12 +214,15 @@ void ATpsCharacter::SetPlayerDefaults()
 	bAlive = true;
 	SetActorActivated(true);
 
-	BeTransl();
-	GetWorldTimerManager().SetTimer(
-		RespawnInvincibleTimerHandle, 
-		this, &ATpsCharacter::BeOpaque,
-		RespawnInvincibleTime, false
-	);
+	if (RespawnInvincibleTime > 0.f)
+	{
+		BeTransl();
+		GetWorldTimerManager().SetTimer(
+			RespawnInvincibleTimerHandle, 
+			this, &ATpsCharacter::BeOpaque,
+			RespawnInvincibleTime, false
+		);
+	}
 	
 	OnCharacterSpawn.Broadcast();
 }
@@ -356,24 +360,23 @@ void ATpsCharacter::UpdateShadow() const
 
 void ATpsCharacter::BeTransl()
 {
-	if (!TranslMatData || bTransl) return;
+	if (bTransl) return;
 
-	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
 	for (auto i = 0; i < NumMat; ++i)
 	{
-		if (i == DefMesh->GetMaterialIndex("TeamColor"))
-			continue;
+		const auto Ptr = TranslMatByIdx.Find(i);
+		const auto Mat = Ptr ? *Ptr : DefTranslMat;
 
-		const auto DefMat = DefMesh->GetMaterial(i);
-		if (!DefMat) continue;
-
-		const auto Ptr = TranslMatData->Get(DefMat);
-		if (!Ptr) continue;
-
-		if (const auto Material = Ptr->LoadSynchronous())
+		if (i == Colored)
 		{
-			GetMesh()->SetMaterial(i, Material);
+			const auto Color = GetColor();
+			GetMesh()->CreateDynamicMaterialInstance(i, Mat)->SetVectorParameterValue("Color", Color);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, Mat);
 		}
 	}
 
@@ -382,18 +385,23 @@ void ATpsCharacter::BeTransl()
 
 void ATpsCharacter::BeOpaque()
 {
-	if (!TranslMatData || !bTransl) return;
+	if (!bTransl) return;
 
 	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
 	for (auto i = 0; i < NumMat; ++i)
 	{
-		if (i == DefMesh->GetMaterialIndex("TeamColor"))
-			continue;
-		
-		if (const auto Material = DefMesh->GetMaterial(i))
+		if (i == Colored)
 		{
-			GetMesh()->SetMaterial(i, Material);
+			FLinearColor Color;
+			GetMesh()->GetMaterial(i)->GetVectorParameterValue({"Color"}, Color);
+			DynamicMaterial->SetVectorParameterValue("Color", Color);
+			GetMesh()->SetMaterial(i, DynamicMaterial);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, DefMesh->GetMaterial(i));
 		}
 	}
 
