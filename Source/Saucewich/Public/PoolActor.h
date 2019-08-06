@@ -22,6 +22,12 @@ protected:
 	virtual void OnReleased() {}
 	virtual void OnActivated() {}
 
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnReleased"))
+	void BP_OnReleased();
+
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnActivated"))
+	void BP_OnActivated();
+
 	void BeginPlay() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

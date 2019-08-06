@@ -15,6 +15,7 @@ void APoolActor::Release(const bool bForce)
 	bActivated = false;
 	Pool->Release(this);
 	OnReleased();
+	BP_OnReleased();
 }
 
 void APoolActor::Activate(const bool bForce)
@@ -26,6 +27,7 @@ void APoolActor::Activate(const bool bForce)
 	SetLifeSpan(InitialLifeSpan);
 	bActivated = true;
 	OnActivated();
+	BP_OnActivated();
 }
 
 void APoolActor::BeginPlay()
