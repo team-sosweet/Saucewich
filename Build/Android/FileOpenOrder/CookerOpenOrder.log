@@ -1575,102 +1575,102 @@
 "../../../Engine/Content/VREditor/TransformGizmo/RotationHandle.uasset" 1574
 "../../../Engine/Content/VREditor/TransformGizmo/SM_Dialog_Main.uasset" 1575
 "../../../Engine/Content/VREditor/TransformGizmo/SM_Sequencer_Key.uasset" 1576
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColor.uasset" 1577
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_JAr.uasset" 1578
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_JarProjectile.uasset" 1579
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Gadget/BP_Jar.uasset" 1580
-"../../../Engine/Content/BasicShapes/Sphere.uasset" 1581
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_GunProjectile.uasset" 1582
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_GunBase.uasset" 1583
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_Plain.uasset" 1584
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_Plain.uasset" 1585
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameState.uasset" 1586
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_ActorPool.uasset" 1587
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_SFX.uasset" 1588
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Master.uasset" 1589
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Ambient.uasset" 1590
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/SM_Mixer.uasset" 1591
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_GameInstance.uasset" 1592
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_WidgetIcon.uasset" 1593
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_WidgetIcon.uasset" 1594
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Base/UMG_Component.uasset" 1595
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Base/UMG_AliveHUD.uasset" 1596
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/MakeSandwich/UMG_MakeSandwichComponent.uasset" 1597
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/MakeSandwich/UMG_MakeSandwichHUD.uasset" 1598
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_FunctionLibrary.uasset" 1599
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Weapon.uasset" 1600
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/EWeaponSelectMode.uasset" 1601
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_PartyWeapon.uasset" 1602
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_WeaponSelector.uasset" 1603
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_RespawnHUD.uasset" 1604
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_HUD.uasset" 1605
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PCM.uasset" 1606
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PC.uasset" 1607
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PlayerState.uasset" 1608
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Skeleton.uasset" 1609
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Down45.uasset" 1610
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Ref.uasset" 1611
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Up60.uasset" 1612
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimV.uasset" 1613
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Idle.uasset" 1614
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Walk.uasset" 1615
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/AnimBP_TpsCharacter.uasset" 1616
-"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.uasset" 1617
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_MobileShadow.uasset" 1618
-"../../../Engine/Content/BasicShapes/Plane.uasset" 1619
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColorTwoSided.uasset" 1620
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_red.uasset" 1621
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseTexture.uasset" 1622
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_Soldier.uasset" 1623
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier.uasset" 1624
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_PhysicsAsset.uasset" 1625
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier.uasset" 1626
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/TranslMatData.uasset" 1627
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_TpsCharacter.uasset" 1628
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameMode.uasset" 1629
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_Projectile.uasset" 1630
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_ProfileMask.uasset" 1631
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_ProfileImage.uasset" 1632
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_ProfileImage.uasset" 1633
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Party.uasset" 1634
-"../../../Engine/Content/MobileResources/HUD/AnalogHat.uasset" 1635
-"../../../Engine/Content/EditorResources/S_FluidSurf.uasset" 1636
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Mode.uasset" 1637
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_SelectMode.uasset" 1638
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Option/UMG_FloatOption.uasset" 1639
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Bad.uasset" 1640
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Option/UMG_Option.uasset" 1641
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Lobby.uasset" 1642
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyPC.uasset" 1643
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyPC.uasset" 1644
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColorTwoSided.uasset" 1645
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_yellow.uasset" 1646
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslTexture.uasset" 1647
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier_Transl.uasset" 1648
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Left.uasset" 1649
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Right.uasset" 1650
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimH.uasset" 1651
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Shoot.uasset" 1652
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AO.uasset" 1653
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/MI_Weapon_Base.uasset" 1654
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/M_Weapon.uasset" 1655
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Joystick.uasset" 1656
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColor.uasset" 1657
-"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Ring.uasset" 1658
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_0_Compressed.uasset" 1659
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_0_Uncompressed.uasset" 1660
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_1_Compressed.uasset" 1661
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_1_Uncompressed.uasset" 1662
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_2_Compressed.uasset" 1663
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_2_Uncompressed.uasset" 1664
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Compressed.uasset" 1665
-"../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Uncompressed.uasset" 1666
-"../../../Engine/Content/VREditor/TransformGizmo/SM_Sequencer_Node.uasset" 1667
-"../../../Engine/Content/VREditor/TransformGizmo/StretchingHandle.uasset" 1668
-"../../../Engine/Content/VREditor/TransformGizmo/TranslateHandleLong.uasset" 1669
-"../../../Engine/Content/VREditor/TransformGizmo/TranslationHandle.uasset" 1670
-"../../../Engine/Content/VREditor/UI/KeyMaterial.uasset" 1671
-"../../../Engine/Content/VREditor/UI/FrameMaterial.uasset" 1672
+"../../../Engine/Content/VREditor/TransformGizmo/SM_Sequencer_Node.uasset" 1577
+"../../../Engine/Content/VREditor/TransformGizmo/StretchingHandle.uasset" 1578
+"../../../Engine/Content/VREditor/TransformGizmo/TranslateHandleLong.uasset" 1579
+"../../../Engine/Content/VREditor/TransformGizmo/TranslationHandle.uasset" 1580
+"../../../Engine/Content/VREditor/UI/KeyMaterial.uasset" 1581
+"../../../Engine/Content/VREditor/UI/FrameMaterial.uasset" 1582
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_0_Compressed.uasset" 1583
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_0_Uncompressed.uasset" 1584
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_1_Compressed.uasset" 1585
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_1_Uncompressed.uasset" 1586
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_2_Compressed.uasset" 1587
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_2_Uncompressed.uasset" 1588
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Compressed.uasset" 1589
+"../../../Engine/Content/VT/LightmapVirtualTextureSpace_3_Uncompressed.uasset" 1590
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Joystick.uasset" 1591
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColor.uasset" 1592
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslColorTwoSided.uasset" 1593
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_yellow.uasset" 1594
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Albeido_no_AO_red.uasset" 1595
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_TranslTexture.uasset" 1596
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier_Transl.uasset" 1597
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Skeleton.uasset" 1598
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Left.uasset" 1599
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Ref.uasset" 1600
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Right.uasset" 1601
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimH.uasset" 1602
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Shoot.uasset" 1603
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Down45.uasset" 1604
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Up60.uasset" 1605
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AimV.uasset" 1606
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_AO.uasset" 1607
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/MI_Weapon_Base.uasset" 1608
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColor.uasset" 1609
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/M_Weapon.uasset" 1610
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_JAr.uasset" 1611
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_JarProjectile.uasset" 1612
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Gadget/BP_Jar.uasset" 1613
+"../../../Engine/Content/BasicShapes/Sphere.uasset" 1614
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_GunProjectile.uasset" 1615
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_GunBase.uasset" 1616
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Weapon/SM_Plain.uasset" 1617
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/Primary/BP_Plain.uasset" 1618
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameState.uasset" 1619
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_ActorPool.uasset" 1620
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_SFX.uasset" 1621
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Master.uasset" 1622
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/Class/SC_Ambient.uasset" 1623
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Sound/SM_Mixer.uasset" 1624
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_GameInstance.uasset" 1625
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_WidgetIcon.uasset" 1626
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_WidgetIcon.uasset" 1627
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Base/UMG_Component.uasset" 1628
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Base/UMG_AliveHUD.uasset" 1629
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/MakeSandwich/UMG_MakeSandwichComponent.uasset" 1630
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/MakeSandwich/UMG_MakeSandwichHUD.uasset" 1631
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/BP_FunctionLibrary.uasset" 1632
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_Weapon.uasset" 1633
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/EWeaponSelectMode.uasset" 1634
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_PartyWeapon.uasset" 1635
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_WeaponSelector.uasset" 1636
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/UMG_RespawnHUD.uasset" 1637
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_HUD.uasset" 1638
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PCM.uasset" 1639
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PC.uasset" 1640
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_PlayerState.uasset" 1641
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Idle.uasset" 1642
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_Anim_Walk.uasset" 1643
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/AnimBP_TpsCharacter.uasset" 1644
+"../../../Engine/Content/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.uasset" 1645
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_MobileShadow.uasset" 1646
+"../../../Engine/Content/BasicShapes/Plane.uasset" 1647
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseColorTwoSided.uasset" 1648
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/M_BaseTexture.uasset" 1649
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/M_Soldier.uasset" 1650
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/MI_Soldier.uasset" 1651
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier_PhysicsAsset.uasset" 1652
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/Soldier/Soldier.uasset" 1653
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Assets/TranslMatData.uasset" 1654
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Player/BP_TpsCharacter.uasset" 1655
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Online/BP_GameMode.uasset" 1656
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Weapon/BP_Projectile.uasset" 1657
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_ProfileMask.uasset" 1658
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/M_ProfileImage.uasset" 1659
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Material/MI_ProfileImage.uasset" 1660
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Party.uasset" 1661
+"../../../Engine/Content/MobileResources/HUD/AnalogHat.uasset" 1662
+"../../../Engine/Content/EditorResources/S_FluidSurf.uasset" 1663
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Mode.uasset" 1664
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_SelectMode.uasset" 1665
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Option/UMG_FloatOption.uasset" 1666
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Bad.uasset" 1667
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Option/UMG_Option.uasset" 1668
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/Lobby/UMG_Lobby.uasset" 1669
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Lobby/BP_LobbyPC.uasset" 1670
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Widget/BP_LobbyPC.uasset" 1671
+"D:/Programming/Game Engine/Unreal/Saucewich/Content/Texture/T_Ring.uasset" 1672
 "../../Plugins/2D/Paper2D/Content/PlaceholderTextures/DummySpriteTexture.uasset" 1673
 "../../Plugins/2D/Paper2D/Content/DummySprite.uasset" 1674
 "../../Plugins/2D/Paper2D/Content/DefaultPaperTerrainMaterial.uasset" 1675

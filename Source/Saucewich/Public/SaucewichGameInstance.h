@@ -18,6 +18,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
 
+	UFUNCTION(Exec)
+	void SetRevision(float NewA, float NewB);
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess=true))
 	TSubclassOf<AActorPool> ActorPoolClass;
@@ -31,5 +34,6 @@ private:
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	float Sensitivity;
 
-	float Revision;
+	float A;
+	float B;
 };

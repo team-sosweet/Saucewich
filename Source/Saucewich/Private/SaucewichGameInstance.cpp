@@ -8,7 +8,7 @@ USaucewichGameInstance::USaucewichGameInstance()
 	:ActorPoolClass{AActorPool::StaticClass()}
 {
 	Sensitivity = 0.5f;
-	Revision = 1.0f;
+	A = B = 1.0f;
 }
 
 AActorPool* USaucewichGameInstance::GetActorPool()
@@ -19,5 +19,10 @@ AActorPool* USaucewichGameInstance::GetActorPool()
 
 float USaucewichGameInstance::GetSensitivity() const
 {
-	return Revision * Sensitivity * -1.0f;
+	return (A * Sensitivity) + (A * B);
+}
+
+void USaucewichGameInstance::SetRevision(float NewA, float NewB)
+{
+	A = NewA; B = NewB;
 }
