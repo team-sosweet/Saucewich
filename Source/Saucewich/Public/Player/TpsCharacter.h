@@ -5,6 +5,7 @@
 #include "Saucewich.h"
 #include "GameFramework/Character.h"
 #include "Colorable.h"
+#include "Translucentable.h"
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
@@ -25,7 +26,7 @@ struct FShadowData
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable
+class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
 
@@ -117,17 +118,11 @@ private:
 	void RegisterGameMode();
 	void UpdateShadow() const;
 
-	void BeTransl();
-	void BeOpaque();
+	void BeTranslucent() override;
+	void BeOpaque() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FShadowData ShadowData;
-
-	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	TMap<uint8, UMaterialInterface*> TranslMatByIdx;
-
-	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	UMaterialInterface* DefTranslMat;
 
 	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
@@ -135,6 +130,9 @@ private:
 
 	UPROPERTY(Transient)
 	UMaterialInstanceDynamic* DynamicMaterial;
+
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
+	class UTranslucentMatData* TranslMatData;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

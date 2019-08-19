@@ -39,7 +39,11 @@ void UWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	for (auto Wep : Weapons)
 	{
-		if (Wep) Wep->Release();
+		if (Wep) 
+		{
+			Wep->Release();
+			Wep = nullptr;
+		}
 	}
 }
 
@@ -61,9 +65,7 @@ void UWeaponComponent::SetupPlayerInputComponent(UInputComponent* Input)
 EGunTraceHit UWeaponComponent::GunTrace(FHitResult& OutHit) const
 {
 	if (const auto Gun = Cast<AGun>(GetActiveWeapon()))
-	{
 		return Gun->GunTrace(OutHit);
-	}
 	return EGunTraceHit::None;
 }
 
@@ -81,6 +83,18 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 	DesiredWep->Deploy();
 	Active = Slot;
 	return true;
+}
+
+void UWeaponComponent::BeOpaque()
+{
+	for (const auto Wep : Weapons)
+		if (Wep) Wep->BeOpaque();
+}
+
+void UWeaponComponent::BeTranslucent()
+{
+	for (const auto Wep : Weapons)
+		if (Wep) Wep->BeTranslucent();
 }
 
 float UWeaponComponent::GetSpeedRatio() const

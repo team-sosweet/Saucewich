@@ -18,16 +18,17 @@
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
 #include "TpsCharacterMovementComponent.h"
+#include "TranslucentMatData.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
-	WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
-	SpringArm{ CreateDefaultSubobject<USpringArmComponent>("SpringArm") },
-	Camera{ CreateDefaultSubobject<UCameraComponent>("Camera") },
-	Shadow{ CreateDefaultSubobject<UStaticMeshComponent>("Shadow") }
+	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
+	SpringArm{CreateDefaultSubobject<USpringArmComponent>("SpringArm")},
+	Camera{CreateDefaultSubobject<UCameraComponent>("Camera")},
+	Shadow{CreateDefaultSubobject<UStaticMeshComponent>("Shadow")}
 {
 	WeaponComponent->SetupAttachment(GetMesh(), "Weapon");
 	SpringArm->SetupAttachment(RootComponent);
@@ -216,7 +217,7 @@ void ATpsCharacter::SetPlayerDefaults()
 
 	if (RespawnInvincibleTime > 0.f)
 	{
-		BeTransl();
+		BeTranslucent();
 		GetWorldTimerManager().SetTimer(
 			RespawnInvincibleTimerHandle, 
 			this, &ATpsCharacter::BeOpaque,
@@ -358,16 +359,16 @@ void ATpsCharacter::UpdateShadow() const
 	}
 }
 
-void ATpsCharacter::BeTransl()
+void ATpsCharacter::BeTranslucent()
 {
-	if (bTransl) return;
+	if (bTransl || !TranslMatData) return;
 
 	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
 	for (auto i = 0; i < NumMat; ++i)
 	{
-		const auto Ptr = TranslMatByIdx.Find(i);
-		const auto Mat = Ptr ? *Ptr : DefTranslMat;
+		const auto Ptr = TranslMatData->TranslMatByIdx.Find(i);
+		const auto Mat = Ptr ? *Ptr : TranslMatData->DefTranslMat;
 
 		if (i == Colored)
 		{
@@ -380,6 +381,7 @@ void ATpsCharacter::BeTransl()
 		}
 	}
 
+	WeaponComponent->BeTranslucent();
 	bTransl = true;
 }
 
@@ -405,5 +407,6 @@ void ATpsCharacter::BeOpaque()
 		}
 	}
 
+	WeaponComponent->BeOpaque();
 	bTransl = false;
 }
