@@ -5,6 +5,9 @@
 #include "GameFramework/Actor.h"
 #include "PoolActor.generated.h"
 
+/**
+ * 재활용 가능한 액터입니다. 자주 생성/소멸되는 액터에 좋습니다.
+ */
 UCLASS()
 class SAUCEWICH_API APoolActor : public AActor
 {

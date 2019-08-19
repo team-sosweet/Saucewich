@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "ActorPool.generated.h"
 
+/**
+ * 자주 생성/소멸되는 액터를 재활용하기 위한 풀입니다.
+ */
 UCLASS()
 class SAUCEWICH_API AActorPool final : public AActor
 {
