@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerState.h"
+#include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
 #include "Components/CanvasPanelSlot.h"
@@ -21,7 +22,7 @@ void UAliveHUD::NativeOnInitialized()
 	ClipProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_Clip")));
 	SubWeaponProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_SubWeapon")));
 	SubWeaponButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_SubWeapon")));
-	AttackButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_Attack")));
+	AttackButton = Cast<UBorder>(GetWidgetFromName(TEXT("Button_Attack")));
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 

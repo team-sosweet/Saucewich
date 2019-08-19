@@ -42,7 +42,7 @@ private:
 	class UButton* SubWeaponButton;
 
 	UPROPERTY()
-	class UButton* AttackButton;
+	class UBorder* AttackButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* IconMaterial;
