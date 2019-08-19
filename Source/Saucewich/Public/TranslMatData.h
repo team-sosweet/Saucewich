@@ -3,13 +3,13 @@
 #pragma once
 
 #include "Engine/DataAsset.h"
-#include "TranslucentMatData.generated.h"
+#include "TranslMatData.generated.h"
 
 /**
  * 어떤 머티리얼에 대한 반투명 머티리얼을 저장합니다.
  */
 UCLASS()
-class SAUCEWICH_API UTranslucentMatData : public UDataAsset
+class SAUCEWICH_API UTranslMatData : public UDataAsset
 {
 	GENERATED_BODY()
 

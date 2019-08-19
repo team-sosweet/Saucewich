@@ -96,7 +96,7 @@ private:
 	UMaterialInstanceDynamic* Material;
 
 	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	class UTranslucentMatData* TranslMatData;
+	class UTranslMatData* TranslMatData;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float WalkSpeedRatio = 1.f;

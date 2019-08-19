@@ -132,7 +132,7 @@ private:
 	UMaterialInstanceDynamic* DynamicMaterial;
 
 	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	class UTranslucentMatData* TranslMatData;
+	class UTranslMatData* TranslMatData;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

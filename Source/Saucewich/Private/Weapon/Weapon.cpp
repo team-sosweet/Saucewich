@@ -8,7 +8,7 @@
 #include "UnrealNetwork.h"
 
 #include "TpsCharacter.h"
-#include "TranslucentMatData.h"
+#include "TranslMatData.h"
 #include "WeaponComponent.h"
 
 AWeapon::AWeapon()

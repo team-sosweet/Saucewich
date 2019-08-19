@@ -18,7 +18,7 @@
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
 #include "TpsCharacterMovementComponent.h"
-#include "TranslucentMatData.h"
+#include "TranslMatData.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
