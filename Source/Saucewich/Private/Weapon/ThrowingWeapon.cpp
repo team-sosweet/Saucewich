@@ -21,6 +21,13 @@ void AThrowingWeapon::SlotP()
 	}
 }
 
+void AThrowingWeapon::OnActivated()
+{
+	Super::OnActivated();
+	ReloadingTime = 0;
+	bReloading = false;
+}
+
 void AThrowingWeapon::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -30,7 +37,7 @@ void AThrowingWeapon::Tick(const float DeltaSeconds)
 		ReloadingTime += DeltaSeconds;
 		if (ReloadingTime >= ReloadTime)
 		{
-			ReloadingTime = 0.f;
+			ReloadingTime = 0;
 			bReloading = false;
 		}
 	}

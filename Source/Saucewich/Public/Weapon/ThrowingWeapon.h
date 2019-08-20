@@ -15,6 +15,7 @@ class AThrowingWeapon final : public AWeapon
 	GENERATED_BODY()
 
 	void SlotP() override;
+	void OnActivated() override;
 	void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere)
