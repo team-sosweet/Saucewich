@@ -1,15 +1,18 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Pickup.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
+#include "ShadowComponent.h"
 
 APickup::APickup()
-	:SceneRoot{CreateDefaultSubobject<USceneComponent>("SceneRoot")},
-	Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")}
+	:Collision{CreateDefaultSubobject<USphereComponent>("Collision")},
+	Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
+	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
-	RootComponent = SceneRoot;
-	Mesh->SetupAttachment(SceneRoot);
 	PrimaryActorTick.bCanEverTick = true;
+	RootComponent = Collision;
+	Mesh->SetupAttachment(Collision);
+	Shadow->SetupAttachment(Mesh);
 }
 
 void APickup::Tick(const float DeltaSeconds)

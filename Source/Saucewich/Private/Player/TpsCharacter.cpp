@@ -3,10 +3,8 @@
 #include "TpsCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -17,6 +15,7 @@
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
+#include "ShadowComponent.h"
 #include "TpsCharacterMovementComponent.h"
 #include "TranslMatData.h"
 #include "WeaponComponent.h"
@@ -28,7 +27,7 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
 	SpringArm{CreateDefaultSubobject<USpringArmComponent>("SpringArm")},
 	Camera{CreateDefaultSubobject<UCameraComponent>("Camera")},
-	Shadow{CreateDefaultSubobject<UStaticMeshComponent>("Shadow")}
+	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
 	WeaponComponent->SetupAttachment(GetMesh(), "Weapon");
 	SpringArm->SetupAttachment(RootComponent);
@@ -121,7 +120,6 @@ void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 	BindOnTeamChanged();
 
 	if (HasAuthority())
@@ -140,12 +138,6 @@ void ATpsCharacter::BeginPlay()
 			}
 		}
 	}
-}
-
-void ATpsCharacter::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	UpdateShadow();
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
@@ -334,34 +326,9 @@ void ATpsCharacter::RegisterGameMode()
 	GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>();
 }
 
-void ATpsCharacter::UpdateShadow() const
-{
-	auto Start = GetActorLocation();
-	Start.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-
-	auto End = Start;
-	End.Z -= ShadowData.MaxDistance;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FHitResult Hit;
-	const auto bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
-	Shadow->SetVisibility(bHit);
-	if (bHit)
-	{
-		Hit.Location.Z += .01f;
-		Shadow->SetWorldLocationAndRotation(
-			Hit.Location,
-			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
-		);
-		ShadowData.Material->SetScalarParameterValue("Darkness", (1.f - (Start.Z - Hit.Location.Z) / ShadowData.MaxDistance) * ShadowData.Darkness);
-	}
-}
-
 void ATpsCharacter::BeTranslucent()
 {
-	if (bTransl || !TranslMatData) return;
+	if (bTranslucent || !TranslMatData) return;
 
 	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
@@ -382,12 +349,13 @@ void ATpsCharacter::BeTranslucent()
 	}
 
 	WeaponComponent->BeTranslucent();
-	bTransl = true;
+	Shadow->BeTranslucent();
+	bTranslucent = true;
 }
 
 void ATpsCharacter::BeOpaque()
 {
-	if (!bTransl) return;
+	if (!bTranslucent) return;
 
 	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
 	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
@@ -408,5 +376,6 @@ void ATpsCharacter::BeOpaque()
 	}
 
 	WeaponComponent->BeOpaque();
-	bTransl = false;
+	Shadow->BeOpaque();
+	bTranslucent = false;
 }

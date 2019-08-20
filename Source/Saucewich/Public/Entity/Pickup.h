@@ -13,11 +13,14 @@ class SAUCEWICH_API APickup : public APoolActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent* SceneRoot;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class USphereComponent* Collision;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UShadowComponent* Shadow;
 
 public:
 	APickup();

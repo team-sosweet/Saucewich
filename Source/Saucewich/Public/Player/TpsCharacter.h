@@ -11,20 +11,6 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
 
-USTRUCT(BlueprintType)
-struct FShadowData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxDistance = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Darkness = .9f;
-
-	class UMaterialInstanceDynamic* Material;
-};
-
 UCLASS(Abstract)
 class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
 {
@@ -40,7 +26,7 @@ class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UStaticMeshComponent* Shadow;
+	class UShadowComponent* Shadow;
 
 public:
 	explicit ATpsCharacter(const FObjectInitializer& ObjectInitializer);
@@ -48,7 +34,6 @@ public:
 	USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	UCameraComponent* GetCamera() const { return Camera; }
 	UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
-	UStaticMeshComponent* GetShadow() const { return Shadow; }
 
 	class AWeapon* GetActiveWeapon() const;
 
@@ -85,7 +70,6 @@ public:
 
 protected:
 	void BeginPlay() override;
-	void Tick(float DeltaSeconds) override;
 	void PostInitializeComponents() override;
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -116,13 +100,9 @@ private:
 	void OnRep_Alive();
 
 	void RegisterGameMode();
-	void UpdateShadow() const;
 
 	void BeTranslucent() override;
 	void BeOpaque() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FShadowData ShadowData;
 
 	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
@@ -152,5 +132,5 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
-	uint8 bTransl : 1;
+	uint8 bTranslucent : 1;
 };
