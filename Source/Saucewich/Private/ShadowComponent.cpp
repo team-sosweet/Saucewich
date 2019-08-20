@@ -10,6 +10,7 @@ UShadowComponent::UShadowComponent()
 	BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Plane{TEXT("/Engine/BasicShapes/Plane")};
 	Super::SetStaticMesh(Plane.Object);
+	bVisible = false;
 }
 
 void UShadowComponent::BeginPlay()

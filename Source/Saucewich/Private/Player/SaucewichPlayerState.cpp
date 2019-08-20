@@ -4,6 +4,7 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+#include "SaucewichGameInstance.h"
 #include "SaucewichGameMode.h"
 #include "SaucewichGameState.h"
 #include "TpsCharacter.h"
@@ -12,6 +13,14 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichPlayerState, Log, All)
 
+template <class Fn>
+void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
+{
+	if (const auto GI = PlayerState->GetWorld()->GetGameInstance<USaucewichGameInstance>())
+		GI->SafeGameState(Func);
+	else UE_LOG(LogSaucewichPlayerState, Error, TEXT("Failed to cast game instance to SaucewichGameInstance"));
+}
+
 void ASaucewichPlayerState::SetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
 	MulticastSetWeapon(Slot, Weapon);
@@ -19,13 +28,14 @@ void ASaucewichPlayerState::SetWeapon_Implementation(const uint8 Slot, const TSu
 
 bool ASaucewichPlayerState::SetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
-	return Weapon && Slot < Weapons.Num();
+	return true;
 }
 
 void ASaucewichPlayerState::MulticastSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
+	if (Weapons.Num() <= Slot) Weapons.AddZeroed(Slot - Weapons.Num() + 1);
 	Weapons[Slot] = Weapon;
-	SafeGameState([this, Slot, Weapon]
+	SafeGameState(this, [this, Slot, Weapon](ASaucewichGameState* const GameState)
 	{
 		GameState->OnPlayerChangedWeapon.Broadcast(this, Slot, Weapon);
 	});
@@ -34,15 +44,8 @@ void ASaucewichPlayerState::MulticastSetWeapon_Implementation(const uint8 Slot, 
 void ASaucewichPlayerState::GiveWeapons()
 {
 	if (const auto Character = GetPawn<ATpsCharacter>())
-	{
-		for (auto i = 0; i < Weapons.Num(); ++i)
-		{
-			if (const auto Weapon = Weapons[i] ? Weapons[i] : i < DefaultWeapons.Num() ? DefaultWeapons[i] : nullptr)
-			{
-				Character->GetWeaponComponent()->Give(Weapon);
-			}
-		}
-	}
+		for (const auto Weapon : Weapons)
+			Character->GetWeaponComponent()->Give(Weapon);
 }
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
@@ -55,43 +58,14 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
-	SafeGameState([this, OldTeam]
+	SafeGameState(this, [this, OldTeam](ASaucewichGameState* const GameState)
 	{
 		GameState->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
 	});
-}
-
-void ASaucewichPlayerState::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	Init();
-	Weapons = DefaultWeapons;
 }
 
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichPlayerState, Team);
-}
-
-void ASaucewichPlayerState::Init()
-{
-	if (const auto GS = GetWorld()->GetGameState())
-	{
-		if (const auto SaucewichGS = Cast<ASaucewichGameState>(GS))
-		{
-			GameState = SaucewichGS;
-			OnGameStateReady.Broadcast();
-			OnGameStateReady.Clear();
-		}
-		else
-		{
-			UE_LOG(LogSaucewichPlayerState, Error, TEXT("이런! 게임 스테이트가 있긴 한데 ASaucewichGameState가 아니네요!"));
-		}
-	}
-	else
-	{
-		GetWorldTimerManager().SetTimerForNextTick(this, &ASaucewichPlayerState::Init);
-	}
 }
