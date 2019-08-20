@@ -16,6 +16,7 @@ APickup::APickup()
 	
 	Mesh->SetupAttachment(Collision);
 	Shadow->SetupAttachment(Mesh);
+	Shadow->RelativeScale3D = FVector{Collision->GetScaledSphereRadius() / 50};
 }
 
 void APickup::Tick(const float DeltaSeconds)
