@@ -10,7 +10,10 @@ APickup::APickup()
 	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	RootComponent = Collision;
+	Collision->BodyInstance.SetCollisionProfileNameDeferred("Pickup");
+	
 	Mesh->SetupAttachment(Collision);
 	Shadow->SetupAttachment(Mesh);
 }

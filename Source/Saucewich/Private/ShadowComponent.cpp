@@ -1,12 +1,15 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "ShadowComponent.h"
+#include "ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 UShadowComponent::UShadowComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Plane{TEXT("/Engine/BasicShapes/Plane")};
+	Super::SetStaticMesh(Plane.Object);
 }
 
 void UShadowComponent::BeginPlay()
@@ -21,7 +24,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	const auto* const Owner = GetOwner();
-	const auto StartTransform = Offset * Owner->GetRootComponent()->GetComponentTransform();
+	const auto StartTransform = Offset * GetAttachParent()->GetComponentTransform();
 	const auto Start = StartTransform.GetLocation();
 	auto End = Start;
 	End.Z -= MaxDistance;
