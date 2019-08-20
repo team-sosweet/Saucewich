@@ -230,6 +230,7 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 		if (const auto PC = GetController<ASaucewichPlayerController>())
 			GameMode->SetPlayerRespawnTimer(PC);
 
+	State->OnDeath();
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 

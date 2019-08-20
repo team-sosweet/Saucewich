@@ -50,6 +50,7 @@ void ASaucewichPlayerState::GiveWeapons()
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 {
+	if (Team == NewTeam) return;
 	const auto OldTeam = Team;
 	Team = NewTeam;
 	OnTeamChanged(OldTeam);

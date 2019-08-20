@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ActorPool.generated.h"
 
@@ -15,18 +14,20 @@ class SAUCEWICH_API AActorPool final : public AActor
 	GENERATED_BODY()
 	
 public:
-	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters);
+	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
 
 	template <class T>
-	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters)
+	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters = DefaultParameters)
 	{
-		static_assert(TIsDerivedFrom<T, APoolActor>::IsDerived, "");
+		static_assert(TIsDerivedFrom<T, APoolActor>::IsDerived, "T must be derived from APoolActor");
 		return Cast<T>(Spawn(*Class, Transform, SpawnParameters));
 	}
 
 	void Release(APoolActor* Actor);
 
 private:
+	static const FActorSpawnParameters DefaultParameters;
+	
 	void BeginPlay() override;
 	void SpawnReserved();
 

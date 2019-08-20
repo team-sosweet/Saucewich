@@ -7,6 +7,8 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogActorPool, Log, All)
 
+const FActorSpawnParameters AActorPool::DefaultParameters;
+
 APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
 {
 	const auto SpawnImpl = [&]()->APoolActor*

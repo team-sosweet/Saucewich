@@ -24,6 +24,8 @@ public:
 
 	void GiveWeapons();
 
+	virtual void OnDeath() {}
+
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
 
@@ -35,6 +37,7 @@ protected:
 private:	
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
+	// 기본값을 설정해두면 저장된 로드아웃이 없을 경우 기본값을 사용합니다.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> Weapons;
 
