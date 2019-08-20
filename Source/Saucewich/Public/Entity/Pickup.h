@@ -30,11 +30,11 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float BounceScale;
+	float BounceScale = 10;
 
 	UPROPERTY(EditAnywhere)
-	float BounceSpeed;
+	float BounceSpeed = 5;
 
 	UPROPERTY(EditAnywhere)
-	float RotateSpeed;
+	float RotateSpeed = 100;
 };

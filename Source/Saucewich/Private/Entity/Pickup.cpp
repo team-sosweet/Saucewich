@@ -15,6 +15,8 @@ APickup::APickup()
 	Collision->BodyInstance.SetCollisionProfileNameDeferred("Pickup");
 	
 	Mesh->SetupAttachment(Collision);
+	Mesh->BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
+	
 	Shadow->SetupAttachment(Mesh);
 	Shadow->RelativeScale3D = FVector{Collision->GetScaledSphereRadius() / 50};
 }
