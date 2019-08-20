@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "PoolActor.h"
 #include "Colorable.h"
 #include "Translucentable.h"

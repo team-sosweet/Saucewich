@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "ModeWidget.generated.h"
 
@@ -13,7 +12,6 @@ struct FMode
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Name;
 
@@ -29,8 +27,7 @@ class SAUCEWICH_API UModeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-private:
-	virtual void NativeOnInitialized() override;
+	void NativeOnInitialized() override;
 
 public:
 	void SetSelect(bool bIsSelect);

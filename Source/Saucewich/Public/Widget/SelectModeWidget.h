@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ModeWidget.h"
 #include "SelectModeWidget.generated.h"
 
@@ -11,8 +10,7 @@ class SAUCEWICH_API USelectModeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-private:
-	virtual void NativeOnInitialized() override;
+	void NativeOnInitialized() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
