@@ -44,6 +44,9 @@ public:
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 
+	UTexture* GetIcon() const { return Icon.Icon; }
+	UTexture* GetMask() const { return Icon.IconMask; }
+
 	FLinearColor GetColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
@@ -86,7 +89,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FText Description;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FWeaponIcon Icon;
 
 	ATpsCharacter* Owner;

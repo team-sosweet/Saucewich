@@ -14,7 +14,6 @@ void USelectModeWidget::NativeOnInitialized()
 	ModeWidgets.SetNumUninitialized(Modes.Num());
 
 	ModeBox = Cast<UHorizontalBox>(GetWidgetFromName(TEXT("Box_Modes")));
-	check(ModeBox != nullptr);
 
 	FSlateChildSize ModeWidgetSize(ESlateSizeRule::Fill);
 	FSlateChildSize SpacerSize(ESlateSizeRule::Fill);
