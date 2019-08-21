@@ -60,7 +60,6 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerChangedTeam OnPlayerChangedTeam;
 
-private:
 	/**
 	 * 캐릭터가 죽을 때 호출됩니다.
 	 * @param Victim		죽은 캐릭터
@@ -70,6 +69,7 @@ private:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerDeath OnPlayerDeath;
 
+private:
 	// 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
 	// 0번 요소는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
 	// 팀 개수는 사용되지 않는 0번 팀 포함 최소 2개여야 합니다.
