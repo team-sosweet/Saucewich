@@ -23,6 +23,6 @@ Pull을 받고 나면 반드시 rebuild를 해야합니다.
 
 각 팀원들은 자신에게 주어진 branch에서 작업하게 됩니다. 하나의 작업이 끝나면 master branch로 pull request를 날려야 합니다.
 
-Pull request는 conflict 방지를 위해 **자주 날리는게 좋습니다** ([지속적 통합](https://ko.wikipedia.org/wiki/%EC%A7%80%EC%86%8D%EC%A0%81_%ED%86%B5%ED%95%A9) 참고). 보통 commit은 컴파일/빌드에 문제가 없는 수준의 단위로, pull request는 하나의 기능이 완성되어 문제 없이 정상적으로 동작하는 단위로 날리는게 좋습니다.
+Pull request는 conflict 방지를 위해 ***자주 날리는게 좋습니다*** ([지속적 통합](https://ko.wikipedia.org/wiki/%EC%A7%80%EC%86%8D%EC%A0%81_%ED%86%B5%ED%95%A9) 참고). 보통 commit은 컴파일/빌드에 문제가 없는 수준의 단위로, pull request는 하나의 기능이 완성되어 문제 없이 정상적으로 동작하는 단위로 날리는게 좋습니다.
 
 게시된 pull request는 수시로 검토되며 문제가 없다고 판단되면 수락되어 merge됩니다. 만약 conflict가 발생할 경우 스스로 해결하시길 바랍니다. conflict가 발생하는 pull request는 거절될 수 있습니다.
