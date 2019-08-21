@@ -5,27 +5,14 @@
 #include "Saucewich.h"
 #include "GameFramework/Character.h"
 #include "Colorable.h"
+#include "Translucentable.h"
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
 
-USTRUCT(BlueprintType)
-struct FShadowData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxDistance = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Darkness = .9f;
-
-	class UMaterialInstanceDynamic* Material;
-};
-
 UCLASS(Abstract)
-class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable
+class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
 
@@ -39,7 +26,7 @@ class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable
 	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UStaticMeshComponent* Shadow;
+	class UShadowComponent* Shadow;
 
 public:
 	explicit ATpsCharacter(const FObjectInitializer& ObjectInitializer);
@@ -47,7 +34,6 @@ public:
 	USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	UCameraComponent* GetCamera() const { return Camera; }
 	UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
-	UStaticMeshComponent* GetShadow() const { return Shadow; }
 
 	class AWeapon* GetActiveWeapon() const;
 
@@ -67,6 +53,7 @@ public:
 	void SetColor(const FLinearColor& NewColor) override;
 
 	bool IsAlive() const { return bAlive; }
+	bool IsInvincible() const;
 	void SetMaxHP(float Ratio);
 	virtual float GetSpeedRatio() const;
 
@@ -83,7 +70,6 @@ public:
 
 protected:
 	void BeginPlay() override;
-	void Tick(float DeltaSeconds) override;
 	void PostInitializeComponents() override;
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -114,16 +100,9 @@ private:
 	void OnRep_Alive();
 
 	void RegisterGameMode();
-	void UpdateShadow() const;
 
-	void BeTransl();
-	void BeOpaque();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FShadowData ShadowData;
-
-	UPROPERTY(EditAnywhere)
-	class UTranslucentMaterialData* TranslMatData;
+	void BeTranslucent() override;
+	void BeOpaque() override;
 
 	class ASaucewichGameMode* GameMode;
 	class ASaucewichPlayerState* State;
@@ -131,6 +110,9 @@ private:
 
 	UPROPERTY(Transient)
 	UMaterialInstanceDynamic* DynamicMaterial;
+
+	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
+	class UTranslMatData* TranslMatData;
 
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -150,5 +132,5 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
-	uint8 bTransl : 1;
+	uint8 bTranslucent : 1;
 };

@@ -3,10 +3,8 @@
 #include "TpsCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -17,18 +15,19 @@
 #include "SaucewichGameState.h"
 #include "SaucewichPlayerController.h"
 #include "SaucewichPlayerState.h"
+#include "ShadowComponent.h"
 #include "TpsCharacterMovementComponent.h"
-#include "TranslucentMaterialData.h"
+#include "TranslMatData.h"
 #include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
-	WeaponComponent{ CreateDefaultSubobject<UWeaponComponent>("WeaponComponent") },
-	SpringArm{ CreateDefaultSubobject<USpringArmComponent>("SpringArm") },
-	Camera{ CreateDefaultSubobject<UCameraComponent>("Camera") },
-	Shadow{ CreateDefaultSubobject<UStaticMeshComponent>("Shadow") }
+	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
+	SpringArm{CreateDefaultSubobject<USpringArmComponent>("SpringArm")},
+	Camera{CreateDefaultSubobject<UCameraComponent>("Camera")},
+	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
 	WeaponComponent->SetupAttachment(GetMesh(), "Weapon");
 	SpringArm->SetupAttachment(RootComponent);
@@ -54,7 +53,8 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	DynamicMaterial->GetVectorParameterValue({"Color"}, Color);
+	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
+		Mat->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
@@ -69,8 +69,14 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	DynamicMaterial->SetVectorParameterValue("Color", NewColor);
+	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
+		Mat->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
+}
+
+bool ATpsCharacter::IsInvincible() const
+{
+	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f;
 }
 
 void ATpsCharacter::SetMaxHP(const float Ratio)
@@ -114,7 +120,6 @@ void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShadowData.Material = Shadow->CreateDynamicMaterialInstance(0);
 	BindOnTeamChanged();
 
 	if (HasAuthority())
@@ -133,12 +138,6 @@ void ATpsCharacter::BeginPlay()
 			}
 		}
 	}
-}
-
-void ATpsCharacter::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	UpdateShadow();
 }
 
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
@@ -190,7 +189,7 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (!IsAlive())
 		return false;
 
-	if (GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f)
+	if (IsInvincible())
 		return false;
 
 	if (!EventInstigator)
@@ -208,12 +207,15 @@ void ATpsCharacter::SetPlayerDefaults()
 	bAlive = true;
 	SetActorActivated(true);
 
-	BeTransl();
-	GetWorldTimerManager().SetTimer(
-		RespawnInvincibleTimerHandle, 
-		this, &ATpsCharacter::BeOpaque,
-		RespawnInvincibleTime, false
-	);
+	if (RespawnInvincibleTime > 0.f)
+	{
+		BeTranslucent();
+		GetWorldTimerManager().SetTimer(
+			RespawnInvincibleTimerHandle, 
+			this, &ATpsCharacter::BeOpaque,
+			RespawnInvincibleTime, false
+		);
+	}
 	
 	OnCharacterSpawn.Broadcast();
 }
@@ -228,6 +230,7 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 		if (const auto PC = GetController<ASaucewichPlayerController>())
 			GameMode->SetPlayerRespawnTimer(PC);
 
+	State->OnDeath();
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 
@@ -324,73 +327,56 @@ void ATpsCharacter::RegisterGameMode()
 	GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>();
 }
 
-void ATpsCharacter::UpdateShadow() const
+void ATpsCharacter::BeTranslucent()
 {
-	auto Start = GetActorLocation();
-	Start.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	if (bTranslucent || !TranslMatData) return;
 
-	auto End = Start;
-	End.Z -= ShadowData.MaxDistance;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FHitResult Hit;
-	const auto bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
-	Shadow->SetVisibility(bHit);
-	if (bHit)
-	{
-		Hit.Location.Z += .01f;
-		Shadow->SetWorldLocationAndRotation(
-			Hit.Location,
-			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
-		);
-		ShadowData.Material->SetScalarParameterValue("Darkness", (1.f - (Start.Z - Hit.Location.Z) / ShadowData.MaxDistance) * ShadowData.Darkness);
-	}
-}
-
-void ATpsCharacter::BeTransl()
-{
-	if (!TranslMatData || bTransl) return;
-
-	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
 	for (auto i = 0; i < NumMat; ++i)
 	{
-		if (i == DefMesh->GetMaterialIndex("TeamColor"))
-			continue;
+		const auto Ptr = TranslMatData->TranslMatByIdx.Find(i);
+		const auto Mat = Ptr ? *Ptr : TranslMatData->DefTranslMat;
 
-		const auto DefMat = DefMesh->GetMaterial(i);
-		if (!DefMat) continue;
-
-		const auto Ptr = TranslMatData->Get(DefMat);
-		if (!Ptr) continue;
-
-		if (const auto Material = Ptr->LoadSynchronous())
+		if (i == Colored)
 		{
-			GetMesh()->SetMaterial(i, Material);
+			const auto Color = GetColor();
+			GetMesh()->CreateDynamicMaterialInstance(i, Mat)->SetVectorParameterValue("Color", Color);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, Mat);
 		}
 	}
 
-	bTransl = true;
+	WeaponComponent->BeTranslucent();
+	Shadow->BeTranslucent();
+	bTranslucent = true;
 }
 
 void ATpsCharacter::BeOpaque()
 {
-	if (!TranslMatData || !bTransl) return;
+	if (!bTranslucent) return;
 
 	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
 	const auto NumMat = GetMesh()->GetNumMaterials();
 	for (auto i = 0; i < NumMat; ++i)
 	{
-		if (i == DefMesh->GetMaterialIndex("TeamColor"))
-			continue;
-		
-		if (const auto Material = DefMesh->GetMaterial(i))
+		if (i == Colored)
 		{
-			GetMesh()->SetMaterial(i, Material);
+			FLinearColor Color;
+			GetMesh()->GetMaterial(i)->GetVectorParameterValue({"Color"}, Color);
+			DynamicMaterial->SetVectorParameterValue("Color", Color);
+			GetMesh()->SetMaterial(i, DynamicMaterial);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, DefMesh->GetMaterial(i));
 		}
 	}
 
-	bTransl = false;
+	WeaponComponent->BeOpaque();
+	Shadow->BeOpaque();
+	bTranslucent = false;
 }

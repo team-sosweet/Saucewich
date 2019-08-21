@@ -5,13 +5,14 @@
 #include "Saucewich.h"
 #include "Components/SceneComponent.h"
 #include "Colorable.h"
+#include "Translucentable.h"
 #include "WeaponComponent.generated.h"
 
-/*
+/**
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UWeaponComponent : public USceneComponent, public IColorable
+class UWeaponComponent : public USceneComponent, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
 
@@ -20,7 +21,7 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* Input);
 
-	/*
+	/**
 	 * [Server] Gives a weapon. Replaces if already in the same slot.
 	 * @param WeaponClass: Class of weapon to give
 	 * @return: The weapon given
@@ -28,7 +29,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual class AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
 
-	/*
+	/**
 	 * [Shared] Returns active weapon.
 	 * @return: The weapon currently equipped
 	 */
@@ -42,10 +43,14 @@ public:
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
 
 	void OnCharacterDeath();
-	float GetSpeedRatio() const;
 	virtual bool TrySelectWeapon(uint8 Slot);
-	uint8 GetSlots() const { return WeaponSlots; }
+
+	void BeTranslucent() override;
+	void BeOpaque() override;
 	void SetColor(const FLinearColor& NewColor) override;
+
+	float GetSpeedRatio() const;
+	uint8 GetSlots() const { return WeaponSlots; }
 
 	class ATpsCharacter* const Owner = nullptr;
 

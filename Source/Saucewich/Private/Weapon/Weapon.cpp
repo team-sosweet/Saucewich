@@ -8,6 +8,7 @@
 #include "UnrealNetwork.h"
 
 #include "TpsCharacter.h"
+#include "TranslMatData.h"
 #include "WeaponComponent.h"
 
 AWeapon::AWeapon()
@@ -21,24 +22,17 @@ AWeapon::AWeapon()
 	RootComponent = Mesh;
 }
 
-void AWeapon::BeginPlay()
-{
-	Super::BeginPlay();
-	Mesh->SetVisibility(false);
-	Init();
-}
-
 void AWeapon::Init()
 {
-	if (const auto Character = Cast<ATpsCharacter>(GetOwner()))
+	if (const auto MyOwner = GetOwner())
 	{
-		Owner = Character;
-		Role = Owner->Role;
-		if (Owner->GetWeaponComponent()->GetActiveWeapon() == this)
+		if (const auto Character = Cast<ATpsCharacter>(MyOwner))
 		{
-			Deploy();
+			Owner = Character;
+			Role = Owner->Role;
+			Owner->GetWeaponComponent()->GetActiveWeapon() == this ? Deploy() : Holster();
+			if (Owner->IsInvincible()) BeTranslucent();
 		}
-		Material->SetVectorParameterValue("Color", Owner->GetTeamColor());
 	}
 	else
 	{
@@ -50,16 +44,6 @@ void AWeapon::OnRep_Equipped()
 {
 	if (bEquipped) Deploy();
 	else Holster();
-}
-
-void AWeapon::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (const auto Character = GetCharacter())
-	{
-		Role = Character->Role;
-	}
 }
 
 void AWeapon::PostInitializeComponents()
@@ -75,6 +59,16 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	DOREPLIFETIME(AWeapon, bEquipped);
 }
 
+void AWeapon::OnActivated()
+{
+	Init();
+}
+
+void AWeapon::OnReleased()
+{
+	Holster();
+}
+
 bool AWeapon::IsVisible() const
 {
 	return Mesh->bVisible;
@@ -88,13 +82,65 @@ void AWeapon::SetVisibility(const bool bNewVisibility) const
 FLinearColor AWeapon::GetColor() const
 {
 	FLinearColor Color;
-	Material->GetVectorParameterValue({"Color"}, Color);
+	if (const auto Mat = Mesh->GetMaterial(Mesh->GetMaterialIndex("TeamColor")))
+		Mat->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
 void AWeapon::SetColor(const FLinearColor& NewColor)
 {
-	Material->SetVectorParameterValue("Color", NewColor);
+	if (const auto Mat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(Mesh->GetMaterialIndex("TeamColor"))))
+		Mat->SetVectorParameterValue("Color", NewColor);
+}
+
+void AWeapon::BeTranslucent()
+{
+	if (bTransl || !TranslMatData) return;
+
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
+	{
+		const auto Ptr = TranslMatData->TranslMatByIdx.Find(i);
+		const auto Mat = Ptr ? *Ptr : TranslMatData->DefTranslMat;
+
+		if (i == Colored)
+		{
+			const auto Color = GetColor();
+			GetMesh()->CreateDynamicMaterialInstance(i, Mat)->SetVectorParameterValue("Color", Color);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, Mat);
+		}
+	}
+
+	bTransl = true;
+}
+
+void AWeapon::BeOpaque()
+{
+	if (!bTransl) return;
+
+	const auto* const DefMesh = GetDefault<AWeapon>(GetClass())->GetMesh();
+	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
+	{
+		if (i == Colored)
+		{
+			FLinearColor Color;
+			GetMesh()->GetMaterial(i)->GetVectorParameterValue({"Color"}, Color);
+			Material->SetVectorParameterValue("Color", Color);
+			GetMesh()->SetMaterial(i, Material);
+		}
+		else
+		{
+			GetMesh()->SetMaterial(i, DefMesh->GetMaterial(i));
+		}
+	}
+
+	bTransl = false;
 }
 
 ATpsCharacter* AWeapon::GetCharacter() const

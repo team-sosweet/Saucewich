@@ -6,7 +6,6 @@
 #include "UnrealNetwork.h"
 #include "ActorPool.h"
 #include "GunProjectile.h"
-#include "SaucewichGameInstance.h"
 #include "SaucewichGameState.h"
 #include "TpsCharacter.h"
 #include "WeaponComponent.h"
@@ -19,10 +18,7 @@ void AGun::BeginPlay()
 	{
 		FireRandSeed = FMath::Rand();
 		OnRep_FireRandSeed();
-		Clip = ClipSize;
 	}
-
-	ProjectilePool = CastChecked<USaucewichGameInstance>(GetGameInstance())->GetActorPool();
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -57,6 +53,7 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 void AGun::Shoot()
 {
 	if (!CanFire()) return;
+	if (!GetPool()) return;
 
 	const auto& MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
@@ -89,7 +86,7 @@ void AGun::Shoot()
 	Parameters.Owner = this;
 	Parameters.Instigator = GetInstigator();
 
-	if (const auto Projectile = ProjectilePool->Spawn<AGunProjectile>(*ProjectileClass, SpawnTransform, Parameters))
+	if (const auto Projectile = GetPool()->Spawn<AGunProjectile>(*ProjectileClass, SpawnTransform, Parameters))
 	{
 		Projectile->bCosmetic = HitType == EGunTraceHit::Pawn;
 		Projectile->SetColor(GetColor());
@@ -104,8 +101,9 @@ void AGun::Shoot()
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
 	const auto Character = GetCharacter();
-	const auto AimRotation = Character->GetBaseAimRotation();
+	if (!Character) return EGunTraceHit::None;
 
+	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
 	const auto Start = Character->GetSpringArmLocation() + AimDir * TraceStartOffset;
 	const auto End = Start + AimDir * MaxDistance;
@@ -132,6 +130,9 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	auto HitPawn = -1;
 	for (auto i = 0; i < BoxHits.Num(); ++i)
 	{
+		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
+		if (!Chr || Chr->IsInvincible()) continue;
+
 		//if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name, Params))
 		FHitResult a;
 		if (!UKismetSystemLibrary::LineTraceSingleByProfile(this, BoxHits[i].ImpactPoint, Start, NoPawn.Name, false, Ignored, Debug, a, false))
@@ -173,9 +174,26 @@ void AGun::SlotP()
 	GetCharacter()->GetWeaponComponent()->TrySelectWeapon(GetSlot());
 }
 
+void AGun::OnActivated()
+{
+	Super::OnActivated();
+	Clip = ClipSize;
+}
+
+void AGun::OnReleased()
+{
+	Super::OnReleased();
+	bFiring = false;
+	FireLag = 0.f;
+	LastFire = 0.f;
+	bDried = false;
+	ReloadWaitingTime = 0.f;
+	ReloadAlpha = 0.f;
+}
+
 bool AGun::CanFire() const
 {
-	return Clip > 0 && !bDried;
+	return IsActive() && Clip > 0 && !bDried;
 }
 
 void AGun::Reload(const float DeltaSeconds)

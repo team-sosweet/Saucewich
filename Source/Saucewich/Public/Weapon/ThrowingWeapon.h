@@ -15,7 +15,7 @@ class AThrowingWeapon final : public AWeapon
 	GENERATED_BODY()
 
 	void SlotP() override;
-	void BeginPlay() override;
+	void OnActivated() override;
 	void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere)
@@ -23,7 +23,6 @@ class AThrowingWeapon final : public AWeapon
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class AProjectile> ProjectileClass;
-	class AActorPool* ProjectilePool;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ReloadTime;
