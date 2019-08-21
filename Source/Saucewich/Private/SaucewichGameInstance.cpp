@@ -13,6 +13,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameInstance, Log, All)
 USaucewichGameInstance::USaucewichGameInstance()
 	:ActorPoolClass{AActorPool::StaticClass()}
 {
+	Sensitivity = 0.5f;
+	CorrectionValue = 1.0f;
 }
 
 AActorPool* USaucewichGameInstance::GetActorPool()
@@ -49,4 +51,9 @@ void USaucewichGameInstance::CheckGameState()
 void USaucewichGameInstance::NotifyWhenGameStateReady()
 {
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &USaucewichGameInstance::CheckGameState);
+}
+
+float USaucewichGameInstance::GetSensitivity() const
+{
+	return (CorrectionValue * Sensitivity) + (CorrectionValue* 0.5);
 }

@@ -19,16 +19,15 @@ protected:
 private:
 	void OnModeSelect(uint8 Index);
 
-protected:
-	UPROPERTY()
-	class UHorizontalBox* ModeBox;
-
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mode, Meta = (AllowPrivateAccess = true))
 	TArray<FMode> Modes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
 	uint8 SelectIndex;
+
+	UPROPERTY()
+	class UHorizontalBox* ModeBox;
 
 	TArray<class UModeWidget*> ModeWidgets;
 };

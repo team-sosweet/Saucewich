@@ -17,6 +17,9 @@ public:
 	class AActorPool* GetActorPool();
 	ASaucewichGameState* GetGameState() const;
 
+	UFUNCTION(BlueprintCallable)
+	float GetSensitivity() const;
+
 	template <class Fn>
 	void SafeGameState(Fn&& Func)
 	{
@@ -40,6 +43,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<AActorPool> ActorPoolClass;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess=true))
 	AActorPool* ActorPool;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	bool bIsAutoShot;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	float Sensitivity;
+
+	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float CorrectionValue;
 };
