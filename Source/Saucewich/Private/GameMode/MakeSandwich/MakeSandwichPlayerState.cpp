@@ -1,16 +1,16 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "MakeSandwichPlayerState.h"
-#include "ActorPool.h"
-#include "Pickup.h"
+#include "Entity/ActorPool.h"
+#include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 #include "SaucewichGameInstance.h"
 
-void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TSubclassOf<APickup> Class)
+void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TSubclassOf<ASandwichIngredient> Class)
 {
 	++Ingredients.FindOrAdd(Class);
 }
 
-void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<APickup> Class)
+void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngredient> Class)
 {
 	if (!CanPickupIngredient()) return;
 	MulticastPickupIngredient(Class);
