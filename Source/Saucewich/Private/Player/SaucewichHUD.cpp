@@ -16,12 +16,12 @@ void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AliveWidget = CreateWidget<UAliveHUD>(GetOwningPlayerController(), *AliveWidgetClass);
+	DeathWidget = CreateWidget<UDeathHUD>(GetOwningPlayerController(), *DeathWidgetClass);
+	
 	auto Player = Cast<ATpsCharacter>(GetOwningPawn());
 	Player->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
 	Player->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
-
-	AliveWidget = CreateWidget<UAliveHUD>(GetOwningPlayerController(), *AliveWidgetClass);
-	DeathWidget = CreateWidget<UDeathHUD>(GetOwningPlayerController(), *DeathWidgetClass);
 
 	OnSpawn();
 }

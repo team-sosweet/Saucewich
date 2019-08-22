@@ -26,11 +26,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UDeathHUD> DeathWidgetClass;
 
+	UPROPERTY()
+	UAliveHUD* AliveWidget;
+
+	UPROPERTY()
+	UDeathHUD* DeathWidget;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float DeathWidgetDelay;
 
 	FTimerHandle DeathWidgetTimer;
-
-	UAliveHUD* AliveWidget;
-	UDeathHUD* DeathWidget;
 };
