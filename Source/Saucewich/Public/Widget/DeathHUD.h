@@ -9,5 +9,4 @@ UCLASS()
 class SAUCEWICH_API UDeathHUD final : public UUserWidget
 {
 	GENERATED_BODY()
-	
 };

@@ -32,7 +32,7 @@ private:
 	UPROPERTY()
 	UDeathHUD* DeathWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float DeathWidgetDelay;
 
 	FTimerHandle DeathWidgetTimer;

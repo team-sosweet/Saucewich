@@ -26,8 +26,7 @@ UCLASS()
 class SAUCEWICH_API UModeWidget final : public UUserWidget
 {
 	GENERATED_BODY()
-
-private:
+	
 	void NativeOnInitialized() override;
 	
 public:
@@ -45,9 +44,9 @@ private:
 	UPROPERTY()
 	class UButton* ModeButton;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	uint8 Index;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
 	bool bIsSelected;
 };

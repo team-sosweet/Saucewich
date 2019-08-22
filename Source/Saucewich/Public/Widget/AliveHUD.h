@@ -11,7 +11,6 @@ class SAUCEWICH_API UAliveHUD final : public UUserWidget
 {
 	GENERATED_BODY()
 	
-private:
 	void NativeOnInitialized() override;
 
 protected:

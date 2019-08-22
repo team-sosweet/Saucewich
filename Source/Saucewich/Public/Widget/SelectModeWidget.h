@@ -10,7 +10,6 @@ class SAUCEWICH_API USelectModeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-private:
 	void NativeOnInitialized() override;
 	
 protected:
