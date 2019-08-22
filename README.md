@@ -37,4 +37,4 @@ Pull request는 conflict 방지를 위해 **자주 날리는게 좋습니다** (
 
 코드의 일관성을 위해 [Coding Style] 규칙을 지켜주시기 바랍니다.
 
-[Coding Style]: https://github.com/team-sosweet/Saucewich/wiki/Coding-Style
+[Coding Style]: https://github.com/team-sosweet/Saucewich/wiki
