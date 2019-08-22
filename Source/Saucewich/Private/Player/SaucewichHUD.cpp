@@ -1,13 +1,10 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-// 구현하는 클래스의 헤더
 #include "Player/SaucewichHUD.h"
 
-// 엔진 헤더
 #include "CoreMinimal.h"
 #include "TimerManager.h"
 
-//Saucewich 헤더
 #include "Player/TpsCharacter.h"
 #include "Widget/AliveHUD.h"
 #include "Widget/DeathHUD.h"

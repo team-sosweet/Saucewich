@@ -1,9 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-//구현하는 클래스의 헤더
 #include "Widget/ModeWidget.h"
 
-// 엔진 헤더
 #include "Components/Button.h"
 
 void UModeWidget::NativeOnInitialized()

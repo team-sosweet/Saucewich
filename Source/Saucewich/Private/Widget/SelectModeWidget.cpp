@@ -1,9 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-// 구현하는 클래스의 헤더
 #include "Widget/SelectModeWidget.h"
 
-// 엔진 헤더
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Spacer.h"
