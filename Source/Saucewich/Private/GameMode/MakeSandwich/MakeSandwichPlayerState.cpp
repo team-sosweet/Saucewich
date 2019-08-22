@@ -44,12 +44,10 @@ void AMakeSandwichPlayerState::DropIngredients()
 		const auto GI = GetGameInstance<USaucewichGameInstance>();
 		if (!GI) return;
 
+		auto&& Transform = GetPawn()->GetRootComponent()->GetComponentTransform();
 		for (auto&& Ingredient : Ingredients)
-		{
-			 GI->GetActorPool()->Spawn(
-				 Ingredient.Key, GetPawn()->GetRootComponent()->GetComponentTransform()
-			 );
-		}
+			for (auto i = 0; i < Ingredient.Value; ++i)
+				GI->GetActorPool()->Spawn(Ingredient.Key, Transform);
 	}
 	Ingredients.Reset();
 }
