@@ -5,9 +5,6 @@
 #include "Entity/Pickup.h"
 #include "SandwichIngredient.generated.h"
 
-/**
- * 
- */
 UCLASS(Abstract)
 class SAUCEWICH_API ASandwichIngredient final : public APickup
 {
