@@ -15,10 +15,10 @@ class SAUCEWICH_API AMakeSandwichPlayerState final : public ASaucewichPlayerStat
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void PickupIngredient(TSubclassOf<class APickup> Class);
+	void PickupIngredient(TSubclassOf<class ASandwichIngredient> Class);
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPickupIngredient(TSubclassOf<class APickup> Class);
+	void MulticastPickupIngredient(TSubclassOf<ASandwichIngredient> Class);
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetNumIngredients() const;
@@ -31,7 +31,7 @@ protected:
 
 private:
 	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TMap<TSubclassOf<APickup>, uint8> Ingredients;
+	TMap<TSubclassOf<ASandwichIngredient>, uint8> Ingredients;
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MaxIngredients;
