@@ -5,9 +5,6 @@
 #include "Entity/PoolActor.h"
 #include "Pickup.generated.h"
 
-/**
- * 캐릭터가 획득할 수 있는 아이템
- */
 UCLASS()
 class SAUCEWICH_API APickup : public APoolActor
 {
@@ -28,6 +25,9 @@ public:
 protected:
 	void Tick(float DeltaSeconds) override;
 
+	void OnReleased() override;
+	void OnActivated() override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	float BounceScale = 10;
@@ -37,4 +37,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float RotateSpeed = 100;
+
+	// Pickup끼리 겹쳐있을 때 서로 밀어내는 힘의 세기입니다.
+	UPROPERTY(EditAnywhere)
+	float PushStrength = 1000;
 };
