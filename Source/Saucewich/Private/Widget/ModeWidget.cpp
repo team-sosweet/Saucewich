@@ -13,7 +13,7 @@ void UModeWidget::NativeOnInitialized()
 	ModeButton->OnClicked.AddDynamic(this, &UModeWidget::OnClicked);
 }
 
-void UModeWidget::SetSelect(bool bIsSelect)
+void UModeWidget::SetSelect(const bool bIsSelect)
 {
 	bIsSelected = bIsSelect;
 }

@@ -1,6 +1,5 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-
 #include "Widget/SelectModeWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
@@ -15,7 +14,6 @@ void USelectModeWidget::NativeOnInitialized()
 
 	ModeBox = Cast<UHorizontalBox>(GetWidgetFromName(TEXT("Box_Modes")));
 
-	FSlateChildSize ModeWidgetSize(ESlateSizeRule::Fill);
 	FSlateChildSize SpacerSize(ESlateSizeRule::Fill);
 	SpacerSize.Value = 0.1f;
 
@@ -23,7 +21,7 @@ void USelectModeWidget::NativeOnInitialized()
 	{
 		UModeWidget* Widget = CreateModeWidget(Idx);
 		Widget->OnClick.BindUObject(this, &USelectModeWidget::OnModeSelect);
-		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ModeWidgetSize);
+		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ESlateSizeRule::Fill);
 		ModeWidgets[Idx] = Widget;
 
 		if (Idx + 1 < Modes.Num())
@@ -36,7 +34,7 @@ void USelectModeWidget::NativeOnInitialized()
 	OnModeSelect(0);
 }
 
-void USelectModeWidget::OnModeSelect(uint8 Index)
+void USelectModeWidget::OnModeSelect(const uint8 Index)
 {
 	SelectIndex = Index;
 

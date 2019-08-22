@@ -1,10 +1,11 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "SaucewichHUD.h"
-#include "AliveHUD.h"
-#include "DeathHUD.h"
-#include "TpsCharacter.h"
+#include "Player/SaucewichHUD.h"
+#include "CoreMinimal.h"
 #include "TimerManager.h"
+#include "Player/TpsCharacter.h"
+#include "Widget/AliveHUD.h"
+#include "Widget/DeathHUD.h"
 
 void ASaucewichHUD::BeginPlay()
 {

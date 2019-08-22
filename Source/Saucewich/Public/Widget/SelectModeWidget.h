@@ -9,7 +9,8 @@ UCLASS()
 class SAUCEWICH_API USelectModeWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+private:
 	void NativeOnInitialized() override;
 
 protected:
@@ -29,5 +30,6 @@ private:
 	UPROPERTY()
 	class UHorizontalBox* ModeBox;
 
+	UPROPERTY()
 	TArray<class UModeWidget*> ModeWidgets;
 };

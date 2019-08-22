@@ -2,20 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "SaucewichHUD.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class SAUCEWICH_API ASaucewichHUD : public AHUD
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
 private:
 	UFUNCTION()
