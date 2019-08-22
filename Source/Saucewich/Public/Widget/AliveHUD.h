@@ -52,6 +52,5 @@ private:
 	UPROPERTY(Transient)
 	TArray<class UMaterialInstanceDynamic*> Materials;
 
-	UPROPERTY()
 	class ASaucewichGameState* GameState;
 };
