@@ -1,7 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-
 #include "Widget/SelectModeWidget.h"
+
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Spacer.h"
@@ -10,25 +10,24 @@
 void USelectModeWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
+
 	ModeWidgets.SetNumUninitialized(Modes.Num());
 
 	ModeBox = Cast<UHorizontalBox>(GetWidgetFromName(TEXT("Box_Modes")));
 
-	FSlateChildSize ModeWidgetSize(ESlateSizeRule::Fill);
 	FSlateChildSize SpacerSize(ESlateSizeRule::Fill);
 	SpacerSize.Value = 0.1f;
 
 	for (uint8 Idx = 0; Idx < Modes.Num(); Idx++)
 	{
-		UModeWidget* Widget = CreateModeWidget(Idx);
+		const auto Widget = CreateModeWidget(Idx);
 		Widget->OnClick.BindUObject(this, &USelectModeWidget::OnModeSelect);
-		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ModeWidgetSize);
+		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ESlateSizeRule::Fill);
 		ModeWidgets[Idx] = Widget;
 
 		if (Idx + 1 < Modes.Num())
 		{
-			UWidget* Spacer = WidgetTree->ConstructWidget<USpacer>();
+			const auto Spacer = WidgetTree->ConstructWidget<USpacer>();
 			ModeBox->AddChildToHorizontalBox(Spacer)->SetSize(SpacerSize);
 		}
 	}
@@ -36,7 +35,7 @@ void USelectModeWidget::NativeOnInitialized()
 	OnModeSelect(0);
 }
 
-void USelectModeWidget::OnModeSelect(uint8 Index)
+void USelectModeWidget::OnModeSelect(const uint8 Index)
 {
 	SelectIndex = Index;
 

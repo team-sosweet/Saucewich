@@ -9,25 +9,25 @@ UCLASS()
 class SAUCEWICH_API USelectModeWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-	void NativeOnInitialized() override;
 
+	void NativeOnInitialized() override;
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	class UModeWidget* CreateModeWidget(uint8 Index);
 
-private:
+private:	
 	void OnModeSelect(uint8 Index);
-
-private:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mode, Meta = (AllowPrivateAccess = true))
 	TArray<FMode> Modes;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
-	uint8 SelectIndex;
+	UPROPERTY(Transient)
+	TArray<class UModeWidget*> ModeWidgets;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UHorizontalBox* ModeBox;
 
-	TArray<class UModeWidget*> ModeWidgets;
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
+	uint8 SelectIndex;
 };

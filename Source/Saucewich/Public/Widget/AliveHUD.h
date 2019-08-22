@@ -7,12 +7,11 @@
 #include "AliveHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UAliveHUD : public UUserWidget
+class SAUCEWICH_API UAliveHUD final : public UUserWidget
 {
 	GENERATED_BODY()
 	
-private:
-	virtual void NativeOnInitialized() override;
+	void NativeOnInitialized() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -23,22 +22,22 @@ private:
 	void SetTeamColor(uint8 NewTeam);
 
 	void BindOnTeamChanged();
+	
 	void AddProgressBarMaterial(class UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask);
 
-private:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* HealthProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* ClipProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* SubWeaponProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UButton* SubWeaponButton;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UBorder* AttackButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
@@ -50,7 +49,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BindData, meta = (AllowPrivateAccess = true))
 	FLinearColor EnemyTeamColor;
 
+	UPROPERTY(Transient)
 	TArray<class UMaterialInstanceDynamic*> Materials;
 
+	UPROPERTY()
 	class ASaucewichGameState* GameState;
 };

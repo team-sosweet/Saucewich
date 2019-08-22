@@ -1,6 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Widget/ModeWidget.h"
+
 #include "Components/Button.h"
 
 void UModeWidget::NativeOnInitialized()
@@ -8,12 +9,10 @@ void UModeWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	ModeButton = Cast<UButton>(GetWidgetFromName(TEXT("Button")));
-	check(ModeButton != nullptr);
-
 	ModeButton->OnClicked.AddDynamic(this, &UModeWidget::OnClicked);
 }
 
-void UModeWidget::SetSelect(bool bIsSelect)
+void UModeWidget::SetSelect(const bool bIsSelect)
 {
 	bIsSelected = bIsSelect;
 }
