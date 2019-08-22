@@ -22,12 +22,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mode, Meta = (AllowPrivateAccess = true))
 	TArray<FMode> Modes;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TArray<class UModeWidget*> ModeWidgets;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UHorizontalBox* ModeBox;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true))
 	uint8 SelectIndex;
 };

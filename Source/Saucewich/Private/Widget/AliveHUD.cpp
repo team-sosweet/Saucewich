@@ -28,7 +28,7 @@ void UAliveHUD::NativeOnInitialized()
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 
-	auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
+	const auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
 
 	FVector2D HealthBarSize;
 	HealthBarSize.X = HPSlot->GetSize().X;
@@ -54,7 +54,7 @@ void UAliveHUD::SetTeamColor(const uint8 NewTeam)
 	const uint8 EnemyTeam = (NewTeam == 1) ? 2 : 1;
 	EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
-	for (auto Material : Materials)
+	for (const auto Material : Materials)
 	{
 		Material->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 	}
@@ -62,7 +62,7 @@ void UAliveHUD::SetTeamColor(const uint8 NewTeam)
 
 void UAliveHUD::BindOnTeamChanged()
 {
-	auto PlayerState = GetOwningPlayerState<ASaucewichPlayerState>();
+	const auto PlayerState = GetOwningPlayerState<ASaucewichPlayerState>();
 
 	if (PlayerState)
 	{
@@ -77,7 +77,7 @@ void UAliveHUD::BindOnTeamChanged()
 
 void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask)
 {
-	auto Material =
+	const auto Material =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), IconMaterial);
 
 	Material->SetTextureParameterValue(TEXT("Icon"), Icon);

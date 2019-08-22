@@ -41,7 +41,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	FMode Mode;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UButton* ModeButton;
 	
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))

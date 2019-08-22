@@ -20,14 +20,14 @@ void USelectModeWidget::NativeOnInitialized()
 
 	for (uint8 Idx = 0; Idx < Modes.Num(); Idx++)
 	{
-		auto Widget = CreateModeWidget(Idx);
+		const auto Widget = CreateModeWidget(Idx);
 		Widget->OnClick.BindUObject(this, &USelectModeWidget::OnModeSelect);
 		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ESlateSizeRule::Fill);
 		ModeWidgets[Idx] = Widget;
 
 		if (Idx + 1 < Modes.Num())
 		{
-			UWidget* Spacer = WidgetTree->ConstructWidget<USpacer>();
+			const auto Spacer = WidgetTree->ConstructWidget<USpacer>();
 			ModeBox->AddChildToHorizontalBox(Spacer)->SetSize(SpacerSize);
 		}
 	}

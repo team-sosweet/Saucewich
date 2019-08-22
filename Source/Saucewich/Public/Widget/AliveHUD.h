@@ -25,19 +25,19 @@ private:
 	
 	void AddProgressBarMaterial(class UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask);
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* HealthProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* ClipProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UProgressBar* SubWeaponProgressBar;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UButton* SubWeaponButton;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	class UBorder* AttackButton;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
@@ -49,7 +49,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BindData, meta = (AllowPrivateAccess = true))
 	FLinearColor EnemyTeamColor;
 
+	UPROPERTY(Transient)
 	TArray<class UMaterialInstanceDynamic*> Materials;
 
+	UPROPERTY()
 	class ASaucewichGameState* GameState;
 };

@@ -2,7 +2,6 @@
 
 #include "Player/SaucewichHUD.h"
 
-#include "CoreMinimal.h"
 #include "TimerManager.h"
 
 #include "Player/TpsCharacter.h"
