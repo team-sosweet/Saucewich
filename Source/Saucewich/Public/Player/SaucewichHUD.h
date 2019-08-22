@@ -26,10 +26,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UDeathHUD> DeathWidgetClass;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UAliveHUD* AliveWidget;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UDeathHUD* DeathWidget;
 
 	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
