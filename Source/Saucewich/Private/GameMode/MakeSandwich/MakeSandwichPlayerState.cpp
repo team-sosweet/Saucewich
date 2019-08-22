@@ -38,18 +38,18 @@ void AMakeSandwichPlayerState::OnDeath()
 }
 
 void AMakeSandwichPlayerState::DropIngredients()
-{
-	Ingredients.Reset();
-	
-	if (!HasAuthority()) return;
-	
-	const auto GI = GetGameInstance<USaucewichGameInstance>();
-	if (!GI) return;
-
-	for (auto&& Ingredient : Ingredients)
+{	
+	if (HasAuthority())
 	{
-		 GI->GetActorPool()->Spawn(
-			 Ingredient.Key, GetPawn()->GetRootComponent()->GetComponentTransform()
-		 );
+		const auto GI = GetGameInstance<USaucewichGameInstance>();
+		if (!GI) return;
+
+		for (auto&& Ingredient : Ingredients)
+		{
+			 GI->GetActorPool()->Spawn(
+				 Ingredient.Key, GetPawn()->GetRootComponent()->GetComponentTransform()
+			 );
+		}
 	}
+	Ingredients.Reset();
 }
