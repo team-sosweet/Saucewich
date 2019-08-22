@@ -1,18 +1,18 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "AliveHUD.h"
-#include "TpsCharacter.h"
-#include "Weapon.h"
-#include "WeaponComponent.h"
-#include "TimerManager.h"
-#include "SaucewichGameState.h"
-#include "SaucewichPlayerState.h"
+#include "Widget/AliveHUD.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
-#include "Components/ProgressBar.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/ProgressBar.h"
 #include "Classes/Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetMaterialLibrary.h"
+#include "TimerManager.h"
+#include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/Weapon.h"
+#include "Weapon/WeaponComponent.h"
+#include "Online/SaucewichGameState.h"
 
 void UAliveHUD::NativeOnInitialized()
 {

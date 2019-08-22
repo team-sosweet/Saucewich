@@ -6,9 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "AliveHUD.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class SAUCEWICH_API UAliveHUD : public UUserWidget
 {
