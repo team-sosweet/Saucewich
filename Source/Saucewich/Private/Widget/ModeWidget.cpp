@@ -8,8 +8,6 @@ void UModeWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 
 	ModeButton = Cast<UButton>(GetWidgetFromName(TEXT("Button")));
-	check(ModeButton != nullptr);
-
 	ModeButton->OnClicked.AddDynamic(this, &UModeWidget::OnClicked);
 }
 

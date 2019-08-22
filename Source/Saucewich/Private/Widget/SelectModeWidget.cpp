@@ -19,7 +19,7 @@ void USelectModeWidget::NativeOnInitialized()
 
 	for (uint8 Idx = 0; Idx < Modes.Num(); Idx++)
 	{
-		UModeWidget* Widget = CreateModeWidget(Idx);
+		auto Widget = CreateModeWidget(Idx);
 		Widget->OnClick.BindUObject(this, &USelectModeWidget::OnModeSelect);
 		ModeBox->AddChildToHorizontalBox(Widget)->SetSize(ESlateSizeRule::Fill);
 		ModeWidgets[Idx] = Widget;

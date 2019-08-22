@@ -16,7 +16,7 @@ void ASaucewichHUD::BeginPlay()
 
 	AliveWidget->AddToViewport();
 
-	ATpsCharacter* Player = Cast<ATpsCharacter>(GetOwningPawn());
+	auto Player = Cast<ATpsCharacter>(GetOwningPawn());
 	Player->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
 	Player->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
 }

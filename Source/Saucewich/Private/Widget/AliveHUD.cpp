@@ -26,7 +26,7 @@ void UAliveHUD::NativeOnInitialized()
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 
-	UCanvasPanelSlot* HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
+	auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
 
 	FVector2D HealthBarSize;
 	HealthBarSize.X = HPSlot->GetSize().X;
@@ -34,12 +34,12 @@ void UAliveHUD::NativeOnInitialized()
 
 	HPSlot->SetSize(HealthBarSize);
 
-	UWeaponComponent* WeaponComponent = GetOwningPlayerPawn<ATpsCharacter>()->GetWeaponComponent();
+	const auto WeaponComponent = GetOwningPlayerPawn<ATpsCharacter>()->GetWeaponComponent();
 
-	AWeapon* MainWeapon = WeaponComponent->GetWeapon(0);
+	const auto MainWeapon = WeaponComponent->GetWeapon(0);
 	AddProgressBarMaterial(ClipProgressBar, MainWeapon->GetIcon(), MainWeapon->GetMask());
 
-	AWeapon* SubWeapon = WeaponComponent->GetWeapon(1);
+	const auto SubWeapon = WeaponComponent->GetWeapon(1);
 	AddProgressBarMaterial(SubWeaponProgressBar, SubWeapon->GetIcon(), SubWeapon->GetMask());
 
 	BindOnTeamChanged();
@@ -52,7 +52,7 @@ void UAliveHUD::SetTeamColor(uint8 NewTeam)
 	const uint8 EnemyTeam = (NewTeam == 1) ? 2 : 1;
 	EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
-	for (UMaterialInstanceDynamic* Material : Materials)
+	for (auto Material : Materials)
 	{
 		Material->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 	}
@@ -60,7 +60,7 @@ void UAliveHUD::SetTeamColor(uint8 NewTeam)
 
 void UAliveHUD::BindOnTeamChanged()
 {
-	ASaucewichPlayerState* PlayerState = GetOwningPlayerState<ASaucewichPlayerState>();
+	auto PlayerState = GetOwningPlayerState<ASaucewichPlayerState>();
 
 	if (PlayerState)
 	{
@@ -75,7 +75,7 @@ void UAliveHUD::BindOnTeamChanged()
 
 void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask)
 {
-	UMaterialInstanceDynamic* Material =
+	auto Material =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), IconMaterial);
 
 	Material->SetTextureParameterValue(TEXT("Icon"), Icon);
@@ -83,6 +83,6 @@ void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon
 
 	ProgressBar->WidgetStyle.FillImage.SetResourceObject(Material);
 	ProgressBar->WidgetStyle.BackgroundImage.SetResourceObject(Material);
-	
+
 	Materials.Add(Material);
 }
