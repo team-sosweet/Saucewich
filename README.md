@@ -29,7 +29,9 @@ Pull request는 conflict 방지를 위해 **자주 날리는게 좋습니다** (
 
 다른 사람의 pull request가 수락되어 master에 merge가 되고 나면, 자신이 작업중인 브랜치도 master와 동기화하여 최신 상태를 유지해야 할 것입니다. 그래야 다른 사람의 작업물을 자신도 사용할 수 있기 때문입니다.
 
-이를 위해서는 자신이 작업중인 브랜치를 master로 **rebase** 하면 됩니다 (ex: rebase 'dev-core' onto 'master'). 그럼 불필요한 merge commit history 없이 깔끔하게 master와 완전히 동일해집니다.
+이를 위해서는 자신이 작업중인 브랜치를 master로 **rebase** 하면 됩니다. 그럼 불필요한 merge commit history 없이 깔끔하게 master와 완전히 동일해집니다.
+
+![Rebase dev-core onto master](how-to-rebase.png)
 
 ## [Coding Style]
 
