@@ -1,11 +1,11 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 
-#include "SelectModeWidget.h"
-#include "WidgetTree.h"
-#include "Components/Spacer.h"
+#include "Widget/SelectModeWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Components/Spacer.h"
+#include "WidgetTree.h"
 
 void USelectModeWidget::NativeOnInitialized()
 {

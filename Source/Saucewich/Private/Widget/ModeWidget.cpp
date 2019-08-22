@@ -1,6 +1,6 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "ModeWidget.h"
+#include "Widget/ModeWidget.h"
 #include "Components/Button.h"
 
 void UModeWidget::NativeOnInitialized()
