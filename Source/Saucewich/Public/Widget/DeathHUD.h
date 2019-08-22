@@ -6,7 +6,7 @@
 #include "DeathHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UDeathHUD : public UUserWidget
+class SAUCEWICH_API UDeathHUD final : public UUserWidget
 {
 	GENERATED_BODY()
 	

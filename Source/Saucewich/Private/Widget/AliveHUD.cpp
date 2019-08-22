@@ -1,6 +1,9 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
+// 구현하는 클래스의 헤더
 #include "Widget/AliveHUD.h"
+
+// 엔진 헤더
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanelSlot.h"
@@ -8,6 +11,8 @@
 #include "Classes/Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "TimerManager.h"
+
+// Saucewich 헤더
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -45,7 +50,7 @@ void UAliveHUD::NativeOnInitialized()
 	BindOnTeamChanged();
 }
 
-void UAliveHUD::SetTeamColor(uint8 NewTeam)
+void UAliveHUD::SetTeamColor(const uint8 NewTeam)
 {
 	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
 

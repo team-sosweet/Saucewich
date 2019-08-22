@@ -23,30 +23,28 @@ struct FMode
 };
 
 UCLASS()
-class SAUCEWICH_API UModeWidget : public UUserWidget
+class SAUCEWICH_API UModeWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
+private:
 	void NativeOnInitialized() override;
-
+	
 public:
 	void SetSelect(bool bIsSelect);
+
+	FOnClick OnClick;
 
 private:
 	UFUNCTION()
 	void OnClicked();
 
-public:
-	FOnClick OnClick;
-
-protected:
-	UPROPERTY()
-	class UButton* ModeButton;
-
-private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	FMode Mode;
 
+	UPROPERTY()
+	class UButton* ModeButton;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mode, Meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	uint8 Index;
 

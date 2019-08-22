@@ -10,7 +10,7 @@ class SAUCEWICH_API ASaucewichHUD : public AHUD
 {
 	GENERATED_BODY()
 	
-public:
+protected:
 	void BeginPlay() override;
 
 private:
@@ -20,15 +20,14 @@ private:
 	UFUNCTION()
 	void OnDeath();
 
-private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float DeathWidgetDelay;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UAliveHUD> AliveWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UDeathHUD> DeathWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float DeathWidgetDelay;
 
 	FTimerHandle DeathWidgetTimer;
 

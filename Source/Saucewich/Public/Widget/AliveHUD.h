@@ -7,12 +7,12 @@
 #include "AliveHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UAliveHUD : public UUserWidget
+class SAUCEWICH_API UAliveHUD final : public UUserWidget
 {
 	GENERATED_BODY()
 	
 private:
-	virtual void NativeOnInitialized() override;
+	void NativeOnInitialized() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -23,9 +23,9 @@ private:
 	void SetTeamColor(uint8 NewTeam);
 
 	void BindOnTeamChanged();
+	
 	void AddProgressBarMaterial(class UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask);
 
-private:
 	UPROPERTY()
 	UProgressBar* HealthProgressBar;
 
