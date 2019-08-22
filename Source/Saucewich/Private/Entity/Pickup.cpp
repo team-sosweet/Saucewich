@@ -10,6 +10,9 @@ APickup::APickup()
 	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
+	bReplicateMovement = true;
 	
 	RootComponent = Collision;
 	Collision->BodyInstance.SetCollisionProfileNameDeferred("Pickup");

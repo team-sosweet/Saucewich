@@ -1,6 +1,7 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "MakeSandwichPlayerState.h"
+
 #include "Entity/ActorPool.h"
 #include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 #include "SaucewichGameInstance.h"
@@ -33,14 +34,22 @@ bool AMakeSandwichPlayerState::CanPickupIngredient() const
 
 void AMakeSandwichPlayerState::OnDeath()
 {
-	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
-	{
-		for (auto&& Ingredient : Ingredients)
-		{
-			 GI->GetActorPool()->Spawn(
-				 Ingredient.Key, GetPawn()->GetRootComponent()->GetComponentTransform()
-			 );
-		}
-	}
+	DropIngredients();
+}
+
+void AMakeSandwichPlayerState::DropIngredients()
+{
 	Ingredients.Reset();
+	
+	if (!HasAuthority()) return;
+	
+	const auto GI = GetGameInstance<USaucewichGameInstance>();
+	if (!GI) return;
+
+	for (auto&& Ingredient : Ingredients)
+	{
+		 GI->GetActorPool()->Spawn(
+			 Ingredient.Key, GetPawn()->GetRootComponent()->GetComponentTransform()
+		 );
+	}
 }

@@ -1,9 +1,11 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "ActorPool.h"
+#include "Entity/ActorPool.h"
+
 #include "Engine/World.h"
 #include "TimerManager.h"
-#include "PoolActor.h"
+
+#include "Entity/PoolActor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogActorPool, Log, All)
 
