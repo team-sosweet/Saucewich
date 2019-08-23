@@ -38,7 +38,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	SetVisibility(bHit);
 	if (bHit)
 	{
-		Hit.Location.Z += .01f;
+		Hit.Location.Z += .1f;
 		SetWorldLocationAndRotation(
 			Hit.Location,
 			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()

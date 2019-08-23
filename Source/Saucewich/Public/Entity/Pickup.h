@@ -29,6 +29,9 @@ protected:
 	void OnActivated() override;
 
 private:
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSetLocation(FVector Location);
+	
 	UPROPERTY(EditAnywhere)
 	float BounceScale = 10;
 

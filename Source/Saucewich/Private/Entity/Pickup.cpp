@@ -12,12 +12,11 @@ APickup::APickup()
 	Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
 	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	bReplicates = true;
-	bReplicateMovement = true;
+	PrimaryActorTick.bCanEverTick = true;
 	
 	RootComponent = Collision;
+	Collision->SetIsReplicated(true);
 	Collision->BodyInstance.bLockXRotation = true;
 	Collision->BodyInstance.bLockYRotation = true;
 	Collision->BodyInstance.bLockZRotation = true;
@@ -41,7 +40,7 @@ void APickup::Tick(const float DeltaSeconds)
 	Mesh->UpdateComponentToWorld();
 
 	TArray<AActor*> Actors;
-	GetOverlappingActors(Actors, GetClass());
+	GetOverlappingActors(Actors, StaticClass());
 	for (const auto Actor : Actors)
 	{
 		auto Force = Actor->GetActorLocation();
@@ -62,15 +61,16 @@ void APickup::Tick(const float DeltaSeconds)
 
 void APickup::OnReleased()
 {
-	Collision->SetSimulatePhysics(false);
+	Collision->DestroyPhysicsState();
 }
 
 void APickup::OnActivated()
 {
-	Collision->SetSimulatePhysics(true);
+	Collision->CreatePhysicsState();
+	if (HasAuthority()) MulticastSetLocation(GetActorLocation());
+}
 
-	// 물리 시뮬레이션을 키면 이번 틱이 끝나고 시작하는데, 액터 위치가 시뮬레이션을 끄기 전의 위치로 돌아간다
-	// 때문에 현재 위치를 저장해뒀다가 다음 틱에서 복구시켜야 한다
-	const auto Location = GetActorLocation();
-	GetWorldTimerManager().SetTimerForNextTick([this, Location]{SetActorLocation(Location);});
+void APickup::MulticastSetLocation_Implementation(const FVector Location)
+{
+	if (!HasAuthority()) SetActorLocation(Location);
 }
