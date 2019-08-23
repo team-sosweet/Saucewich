@@ -12,17 +12,17 @@ void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!GetOwningPawn())
-		return;
+	const auto PC = GetOwningPlayerController();
+	auto Pawn = Cast<ATpsCharacter>(PC->GetPawn());
+	if (!Pawn) return;
 	
-	auto Player = Cast<ATpsCharacter>(GetOwningPawn());
-	Player->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
-	Player->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
+	Pawn->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
+	Pawn->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
 
-	AliveWidget = CreateWidget<UAliveHUD>(GetOwningPlayerController(), AliveWidgetClass);
-	DeathWidget = CreateWidget<UDeathHUD>(GetOwningPlayerController(), DeathWidgetClass);
+	AliveWidget = CreateWidget<UAliveHUD>(PC, AliveWidgetClass);
+	DeathWidget = CreateWidget<UDeathHUD>(PC, DeathWidgetClass);
 
-	OnSpawn();
+	AliveWidget->AddToViewport();
 }
 
 void ASaucewichHUD::OnSpawn()
