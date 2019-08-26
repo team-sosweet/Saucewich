@@ -2,9 +2,27 @@
 
 #include "Fridge.h"
 
+#include "Engine/World.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
+#include "Online/SaucewichGameState.h"
+
+void AFridge::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		const auto Mesh = GetStaticMeshComponent();
+		const auto Idx = Mesh->GetMaterialIndex("TeamColor");
+		const auto Mat = Mesh->CreateDynamicMaterialInstance(Idx);
+		const auto& Color = GS->GetTeamData(Team).Color;
+		Mat->SetVectorParameterValue("Color", Color);
+	}
+}
 
 void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
 	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
