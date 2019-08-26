@@ -45,16 +45,19 @@ void APickup::Tick(const float DeltaSeconds)
 	{
 		auto Force = Actor->GetActorLocation();
 		Force -= GetActorLocation();
-		const auto SizeSqr = Force.SizeSquared();
-		if (SizeSqr <= SMALL_NUMBER)
+		auto NewSize = PushStrength;
+		const auto SizeSqr2D = Force.SizeSquared2D();
+		if (SizeSqr2D <= SMALL_NUMBER)
 		{
 			Force = FMath::VRand();
-			Force *= PushStrength;
 		}
 		else
 		{
-			Force *= FMath::InvSqrt(SizeSqr) * PushStrength;
+			NewSize *= FMath::InvSqrt(SizeSqr2D);
 		}
+		Force.X *= NewSize;
+		Force.Y *= NewSize;
+		Force.Z = 0;
 		static_cast<APickup*>(Actor)->Collision->AddForce(Force, NAME_None, true);
 	}
 }
