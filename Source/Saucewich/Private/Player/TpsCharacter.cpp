@@ -220,6 +220,7 @@ void ATpsCharacter::SetPlayerDefaults()
 	OnCharacterSpawn.Broadcast();
 }
 
+// 주의: Server와 Client 모두에서 실행되지만, Client에서는 Attacker, Inflictor가 항상 nullptr입니다.
 void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
 	HP = 0.f;
@@ -234,8 +235,9 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 
-	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-		GameState->MulticastPlayerDeath(State, Attacker, Inflictor);
+	if (HasAuthority())
+		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+			GameState->MulticastPlayerDeath(State, Attacker, Inflictor);
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)
