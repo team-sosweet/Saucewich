@@ -20,5 +20,17 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSetIngredients(UClass* Ingredient, uint8 Num, uint8 Team);
 
-	TMap<TSubclassOf<ASandwichIngredient>, uint8> TeamIngredients[3];
+	auto& GetTeamIngredients(const uint8 Team)
+	{
+		if (TeamIngredients.Num() <= Team) TeamIngredients.SetNum(Team + 1);
+		return TeamIngredients[Team];
+	}
+	
+	UFUNCTION(BlueprintCallable, meta=(DisplayName="Get Team Ingredients"))
+	const TMap<TSubclassOf<ASandwichIngredient>, uint8>& BP_GetTeamIngredients(const uint8 Team)
+	{
+		return GetTeamIngredients(Team);
+	}
+
+	TArray<TMap<TSubclassOf<ASandwichIngredient>, uint8>> TeamIngredients;
 };
