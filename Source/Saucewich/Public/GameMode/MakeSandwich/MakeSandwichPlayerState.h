@@ -5,6 +5,8 @@
 #include "Player/SaucewichPlayerState.h"
 #include "MakeSandwichPlayerState.generated.h"
 
+class ASandwichIngredient;
+
 UCLASS()
 class SAUCEWICH_API AMakeSandwichPlayerState final : public ASaucewichPlayerState
 {
@@ -12,8 +14,12 @@ class SAUCEWICH_API AMakeSandwichPlayerState final : public ASaucewichPlayerStat
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void PickupIngredient(TSubclassOf<class ASandwichIngredient> Class);
-	
+	void PickupIngredient(TSubclassOf<ASandwichIngredient> Class);
+
+	void PutIngredientsInFridge();
+
+	auto& GetIngredients() const { return Ingredients; }
+
 	UFUNCTION(BlueprintCallable)
 	uint8 GetNumIngredients() const;
 
@@ -25,12 +31,15 @@ protected:
 
 private:
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPickupIngredient(TSubclassOf<class ASandwichIngredient> Class);
+	void MulticastPickupIngredient(TSubclassOf<ASandwichIngredient> Class);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastResetIngredients();
+	
 	void DropIngredients();
 
 	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TMap<TSubclassOf<class ASandwichIngredient>, uint8> Ingredients;
+	TMap<TSubclassOf<ASandwichIngredient>, uint8> Ingredients;
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MaxIngredients;

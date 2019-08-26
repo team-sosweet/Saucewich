@@ -14,11 +14,9 @@ class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 
 public:
 	USaucewichGameInstance();
+	
 	class AActorPool* GetActorPool();
 	ASaucewichGameState* GetGameState() const;
-
-	UFUNCTION(BlueprintCallable)
-	float GetSensitivity() const;
 
 	template <class Fn>
 	void SafeGameState(Fn&& Func)
@@ -34,16 +32,19 @@ public:
 		}
 	}
 	
+	UFUNCTION(BlueprintCallable)
+	float GetSensitivity() const;
+
 	FOnGameStateReady OnGameStateReady;
 
 private:
 	void CheckGameState();
 	void NotifyWhenGameStateReady();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess=true))
+	UPROPERTY(Transient)
 	AActorPool* ActorPool;
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
