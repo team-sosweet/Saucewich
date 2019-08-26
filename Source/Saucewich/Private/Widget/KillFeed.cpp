@@ -4,7 +4,7 @@
 
 void UKillFeed::GetContent(FFeedContent& OutContent) const
 {
-	auto& Content = *static_cast<FKillFeedContent*>(&OutContent);
+	auto& Content = static_cast<FKillFeedContent&>(OutContent);
 
 	Content.Victim = Victim;
 	Content.Attacker = Attacker;
@@ -13,7 +13,7 @@ void UKillFeed::GetContent(FFeedContent& OutContent) const
 
 void UKillFeed::SetContent(const FFeedContent& InContent)
 {
-	const auto Content = *static_cast<const FKillFeedContent*>(&InContent);
+	const auto& Content = static_cast<const FKillFeedContent&>(InContent);
 
 	Victim = Content.Victim;
 	Attacker = Content.Attacker;

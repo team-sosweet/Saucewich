@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widget/Feed.h"
 #include "KillFeed.generated.h"
 
