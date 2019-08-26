@@ -2,7 +2,10 @@
 
 #include "MakeSandwichPlayerState.h"
 
+#include "Engine/World.h"
+
 #include "Entity/ActorPool.h"
+#include "GameMode/MakeSandwich/MakeSandwichState.h"
 #include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 #include "SaucewichGameInstance.h"
 
@@ -15,6 +18,21 @@ void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngre
 {
 	if (!CanPickupIngredient()) return;
 	MulticastPickupIngredient(Class);
+}
+
+void AMakeSandwichPlayerState::PutIngredientsInFridge()
+{
+	if (Ingredients.Num() <= 0) return;
+	
+	if (const auto GS = GetWorld()->GetGameState<AMakeSandwichState>())
+		GS->StoreIngredients(this);
+
+	MulticastResetIngredients();
+}
+
+void AMakeSandwichPlayerState::MulticastResetIngredients_Implementation()
+{
+	Ingredients.Reset();
 }
 
 uint8 AMakeSandwichPlayerState::GetNumIngredients() const
