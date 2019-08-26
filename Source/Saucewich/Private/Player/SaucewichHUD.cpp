@@ -13,7 +13,7 @@ void ASaucewichHUD::BeginPlay()
 	Super::BeginPlay();
 
 	const auto PC = GetOwningPlayerController();
-	auto Pawn = Cast<ATpsCharacter>(PC->GetPawn());
+	const auto Pawn = Cast<ATpsCharacter>(PC->GetPawn());
 	if (!Pawn) return;
 	
 	Pawn->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
