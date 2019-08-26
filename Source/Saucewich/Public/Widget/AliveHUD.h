@@ -19,12 +19,16 @@ protected:
 
 private:
 	UFUNCTION()
+	void OnPlayerDeath(class ASaucewichPlayerState* Victim,
+		ASaucewichPlayerState* Attacker, AActor* Inflictor);
+	
+	UFUNCTION()
 	void SetTeamColor(uint8 NewTeam);
 
 	void BindOnTeamChanged();
 	
 	void AddProgressBarMaterial(class UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask);
-
+	
 	UPROPERTY(Transient)
 	UProgressBar* HealthProgressBar;
 
@@ -39,6 +43,9 @@ private:
 
 	UPROPERTY(Transient)
 	class UBorder* AttackButton;
+
+	UPROPERTY(Transient)
+	class UFeedBox* KillFeedBox;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* IconMaterial;

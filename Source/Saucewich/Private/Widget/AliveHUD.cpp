@@ -10,11 +10,13 @@
 #include "Kismet/KismetMaterialLibrary.h"
 #include "TimerManager.h"
 
+#include "Online/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
-#include "Online/SaucewichGameState.h"
+#include "Widget/FeedBox.h"
+#include "Widget/KillFeed.h"
 
 void UAliveHUD::NativeOnInitialized()
 {
@@ -25,9 +27,12 @@ void UAliveHUD::NativeOnInitialized()
 	SubWeaponProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar_SubWeapon")));
 	SubWeaponButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_SubWeapon")));
 	AttackButton = Cast<UBorder>(GetWidgetFromName(TEXT("Button_Attack")));
+	KillFeedBox = Cast<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Kill")));
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 
+	GameState->OnPlayerDeath.AddDynamic(this, &UAliveHUD::OnPlayerDeath);
+	
 	const auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
 
 	FVector2D HealthBarSize;
@@ -45,6 +50,12 @@ void UAliveHUD::NativeOnInitialized()
 	AddProgressBarMaterial(SubWeaponProgressBar, SubWeapon->GetIcon(), SubWeapon->GetMask());
 
 	BindOnTeamChanged();
+}
+
+void UAliveHUD::OnPlayerDeath(ASaucewichPlayerState* Victim,
+	ASaucewichPlayerState* Attacker, AActor* Inflictor)
+{
+	KillFeedBox->MakeNewFeed(FKillFeedContent(Victim, Attacker, Inflictor));
 }
 
 void UAliveHUD::SetTeamColor(const uint8 NewTeam)
