@@ -14,6 +14,7 @@ class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 
 public:
 	USaucewichGameInstance();
+	~USaucewichGameInstance();
 	
 	class AActorPool* GetActorPool();
 	ASaucewichGameState* GetGameState() const;

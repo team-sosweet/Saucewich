@@ -17,6 +17,14 @@ USaucewichGameInstance::USaucewichGameInstance()
 	CorrectionValue = 1.0f;
 }
 
+USaucewichGameInstance::~USaucewichGameInstance()
+{
+	if (IsDedicatedServerInstance())
+	{
+		// TODO: 매치 서버에게 이 게임 서버가 종료되었음을 알림
+	}
+}
+
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
 	if (!ActorPool) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
