@@ -21,16 +21,36 @@ class SAUCEWICH_API APickup : public APoolActor
 
 public:
 	APickup();
+	uint8 bSpawnedFromSpawner : 1;
 
 protected:
 	void Tick(float DeltaSeconds) override;
 
-	void OnReleased() override;
-	void OnActivated() override;
+	void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	void NotifyActorEndOverlap(AActor* OtherActor) override;
 
+	void OnActivated() override;
+	void OnReleased() override;
+
+	virtual void BePickedUp(AActor* By);
+	virtual bool CanPickedUp(const AActor* By) const { return true; }
+	
 private:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetLocation(FVector Location);
+
+	void TryPickedUp();
+
+	struct FPickupTimer
+	{
+		FTimerHandle Handle;
+		AActor* Actor;
+		void Reset(FTimerManager& TimerManager);
+	} PickupTimer;
+
+	// 재료를 획득하는데 걸리는 시간
+	UPROPERTY(EditDefaultsOnly)
+	float PickupTime = 1;
 	
 	UPROPERTY(EditAnywhere)
 	float BounceScale = 10;
