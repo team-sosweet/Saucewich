@@ -2,13 +2,19 @@
 
 #pragma once
 
-#include "Engine/StaticMeshActor.h"
+#include "Entity/GameModeDependentLevelActor.h"
 #include "Fridge.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AFridge final : public AStaticMeshActor
+class SAUCEWICH_API AFridge final : public AGameModeDependentLevelActor
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Mesh;
+
+public:
+	AFridge();
 
 protected:
 	void BeginPlay() override;
