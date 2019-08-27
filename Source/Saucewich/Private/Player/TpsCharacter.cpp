@@ -165,31 +165,26 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
 	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (Damage != 0.f)
+	if (HasAuthority() && DamageAmount != 0)
 	{
-		if (Damage > 0.f)
-		{
-			if (const auto Attacker = Cast<ASaucewichPlayerController>(EventInstigator))
-			{
-				Attacker->OnHitEnemy.Broadcast();
-			}
-		}
-
 		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
-		if (HP == 0.f) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
+		if (HP == 0) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
 	return Damage;
 }
 
 bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
 {
-	if (!Super::ShouldTakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser))
+	if (!bCanBeDamaged)
 		return false;
 
 	if (!IsAlive())
 		return false;
 
 	if (IsInvincible())
+		return false;
+
+	if (FMath::IsNearlyZero(DamageAmount))
 		return false;
 
 	if (!EventInstigator)
