@@ -7,7 +7,7 @@
 
 void AGameModeDependentLevelActor::BeginPlay()
 {
-	if (GameStateClass && !GetWorld()->GetGameState()->IsA(GameStateClass))
+	if (GameModeClass && !GetWorld()->GetGameState()->GetDefaultGameMode()->IsA(GameModeClass))
 	{
 		Destroy();
 		return;

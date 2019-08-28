@@ -30,9 +30,10 @@ public:
 	FOnTeamChanged OnTeamChangedDelegate;
 
 protected:
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION()
 	void OnTeamChanged(uint8 OldTeam);
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:	
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.

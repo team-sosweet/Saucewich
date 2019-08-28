@@ -19,9 +19,9 @@ protected:
 	void BeginPlay() override;
 
 private:
-	// 이 액터가 사용될 게임 스테이트를 지정합니다.
-	// 만약 현재 게임 스테이트가 이것이 아니면 액터가 제거됩니다.
+	// 이 액터가 사용될 게임 모드를 지정합니다.
+	// 만약 현재 게임 모드가 이것이 아니면 액터가 제거됩니다.
 	// 비워두면 액터가 제거되지 않습니다.
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AGameStateBase> GameStateClass;
+	TSubclassOf<class AGameModeBase> GameModeClass;
 };

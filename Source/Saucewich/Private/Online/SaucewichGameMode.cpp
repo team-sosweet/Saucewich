@@ -120,3 +120,9 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 {
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
+
+void ASaucewichGameMode::EndMatch()
+{
+	Super::EndMatch();
+	UE_LOG(LogClass, Warning, TEXT("자식 클래스의 가상함수가 호출되었습니다!"));
+}
