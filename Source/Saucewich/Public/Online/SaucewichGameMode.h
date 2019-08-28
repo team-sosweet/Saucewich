@@ -15,6 +15,7 @@ public:
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 
 protected:
+	void EndMatch() override;
 	void PostInitializeComponents() override;
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;

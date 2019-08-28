@@ -1,9 +1,15 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "SaucewichGameState.h"
-#include "SaucewichPlayerState.h"
-#include "TpsCharacter.h"
-#include "Weapon.h"
+#include "Online/SaucewichGameState.h"
+
+#include "Engine/World.h"
+#include "GameFramework/GameMode.h"
+#include "TimerManager.h"
+#include "UnrealNetwork.h"
+
+#include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/Weapon.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -73,6 +79,33 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetWeapons(const uint8 Slot) c
 		}
 	}
 	return SlotWep;
+}
+
+float ASaucewichGameState::GetRemainingRoundSeconds() const
+{
+	return GetWorldTimerManager().GetTimerRemaining(RoundTimer);
+}
+
+void ASaucewichGameState::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+	
+	if (const auto GameMode = GetWorld()->GetAuthGameMode<AGameMode>())
+	{
+		GetWorldTimerManager().SetTimer(RoundTimer, GameMode, &AGameMode::EndMatch, RoundMinutes * 60, false);
+		RoundStartTime = GetWorld()->GetTimeSeconds();
+	}
+}
+
+void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
+}
+
+void ASaucewichGameState::OnRep_RoundStartTime()
+{
+	GetWorldTimerManager().SetTimer(RoundTimer, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime), false);
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(

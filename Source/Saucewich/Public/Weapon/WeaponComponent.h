@@ -8,6 +8,8 @@
 #include "Translucentable.h"
 #include "WeaponComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipWeapon, class AWeapon*, Weapon);
+
 /**
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
  */
@@ -27,7 +29,7 @@ public:
 	 * @return: The weapon given
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual class AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
+	virtual AWeapon* Give(TSubclassOf<AWeapon> WeaponClass);
 
 	/**
 	 * [Shared] Returns active weapon.
@@ -52,6 +54,7 @@ public:
 	float GetSpeedRatio() const;
 	uint8 GetSlots() const { return WeaponSlots; }
 
+	FOnEquipWeapon OnEquipWeapon;
 	class ATpsCharacter* const Owner = nullptr;
 
 protected:
@@ -76,6 +79,9 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotR(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotP(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotR(uint8 Slot);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastEquipWeapon(AWeapon* Weapon);
 
 	// 현재 캐릭터가 가지고 있는 무기 목록입니다.
 	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleInstanceOnly, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

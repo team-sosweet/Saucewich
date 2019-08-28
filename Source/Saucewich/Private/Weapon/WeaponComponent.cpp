@@ -179,8 +179,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 
-	UE_LOG(LogWeaponComponent, Log, TEXT("%s successfully given."), *WeaponClass->GetName());
-
+	MulticastEquipWeapon(Weapon);
 	return Weapon;
 }
 
@@ -243,6 +242,11 @@ void UWeaponComponent::SlotR(const uint8 Slot)
 		W->SlotR();
 		if (Owner->IsLocallyControlled()) ServerSlotR(Slot);
 	}
+}
+
+void UWeaponComponent::MulticastEquipWeapon_Implementation(AWeapon* const Weapon)
+{
+	OnEquipWeapon.Broadcast(Weapon);
 }
 
 void UWeaponComponent::ServerSlotR_Implementation(const uint8 Slot) { MulticastSlotR(Slot); }
