@@ -31,14 +31,11 @@ void UFeedBox::NativeOnInitialized()
 
 void UFeedBox::MakeNewFeed(const FFeedContent& NewFeedContent)
 {
-	if (CurFeedNum > 0)
+	for (auto Index = CurFeedNum; Index > 0u; Index--)
 	{
-		for (auto Index = CurFeedNum; Index > 0u; Index--)
-		{
-			FFeedContent Content;
-			Feeds[Index - 1]->GetContent(Content);
-			Feeds[Index]->SetContent(Content);
-		}
+		FFeedContent Content;
+		Feeds[Index - 1]->GetContent(Content);
+		Feeds[Index]->SetContent(Content);
 	}
 	
 	Feeds[0]->SetContent(NewFeedContent);
