@@ -10,13 +10,19 @@
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "Online/SaucewichGameState.h"
 
+AFridge::AFridge()
+	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")}
+{
+	RootComponent = Mesh;
+}
+
 void AFridge::BeginPlay()
 {
 	Super::BeginPlay();
+	if (IsPendingKill()) return;
 	
 	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
 	{
-		const auto Mesh = GetStaticMeshComponent();
 		const auto Idx = Mesh->GetMaterialIndex("TeamColor");
 		const auto Mat = Mesh->CreateDynamicMaterialInstance(Idx);
 		const auto& Color = GS->GetTeamData(Team).Color;

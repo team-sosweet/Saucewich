@@ -25,11 +25,11 @@ Pull을 받고 나면 rebuild를 해야합니다. **에디터와 Visual Studio�
 
 PR은 conflict 방지를 위해 **자주 올리는게 좋습니다** ([지속적 통합](https://ko.wikipedia.org/wiki/%EC%A7%80%EC%86%8D%EC%A0%81_%ED%86%B5%ED%95%A9) 참고). 보통 commit은 컴파일/빌드에 문제가 없는 수준의 단위로, PR은 하나의 기능이 완성되어 문제 없이 정상적으로 동작하는 단위로 올리는게 좋습니다.
 
-게시된 PR은 수시로 검토되며 문제가 없다고 판단되면 수락되어 merge됩니다. 만약 conflict가 발생할 경우 스스로 해결하시길 바랍니다. conflict가 발생하는 PR은 거절될 수 있습니다.
+게시된 PR은 수시로 검토되며 문제가 없다고 판단되면 수락되어 merge됩니다. Conflict가 발생하는 PR은 개별 논의를 거친 후에 merge됩니다.
 
 다른 사람의 PR이 수락되어 master에 merge가 되고 나면, 자신이 작업중인 브랜치도 master와 동기화하여 최신 상태를 유지해야 할 것입니다. 그래야 다른 사람의 작업물을 자신도 사용할 수 있기 때문입니다.
 
-이를 위해서는 자신이 작업중인 브랜치를 master로 **rebase** 또는 **fast-forward** 하면 됩니다. 그럼 불필요한 merge commit history 없이 깔끔하게 master와 완전히 동일해집니다. 이 작업은 매일 작업 시작 전에 master를 pull 한 뒤 해주시기 바랍니다. 그렇지 않으면 conflict 발생 확률이 높아집니다.
+이를 위해서는 자신이 작업중인 브랜치를 master로 **rebase** 또는 **fast-forward**하거나 master를 현재 브랜치로 **merge**하면 됩니다. 이 작업은 매일 작업 시작 전에 master를 pull 한 뒤 해주시기 바랍니다. 그렇지 않으면 conflict 발생 확률이 높아집니다.
 
 ![Rebase dev-core onto master](how-to-rebase.png)
 
