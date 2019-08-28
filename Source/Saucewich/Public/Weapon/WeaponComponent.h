@@ -54,7 +54,14 @@ public:
 	float GetSpeedRatio() const;
 	uint8 GetSlots() const { return WeaponSlots; }
 
-	FOnEquipWeapon OnEquipWeapon;
+	/**
+	 * 새 무기를 습득했을 때 발동되는 델리게이트에 새 함수를 추가합니다.
+	 * @param UserObject - 함수를 호출할 객체
+	 * @param FuncName - 함수 이름 (예: &AActor::Destroy)
+	 * @param bIncludeCurrentWeapons - 이미 장비중인 무기에 대해서 바로 호출되길 원하면 true
+	 */
+#define AddOnEquipWeapon(UserObject, FuncName, bIncludeCurrentWeapons) __Internal_AddOnEquipWeapon(UserObject, FuncName, STATIC_FUNCTION_FNAME(TEXT(#FuncName)), bIncludeCurrentWeapons)
+
 	class ATpsCharacter* const Owner = nullptr;
 
 protected:
@@ -83,6 +90,8 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastEquipWeapon(AWeapon* Weapon);
 
+	FOnEquipWeapon OnEquipWeapon;
+
 	// 현재 캐릭터가 가지고 있는 무기 목록입니다.
 	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleInstanceOnly, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<AWeapon*> Weapons;
@@ -94,4 +103,15 @@ private:
 	// 현재 활성화된 무기 슬롯 index 입니다.
 	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Active;
+
+public:
+	// 주의: 이 함수를 직접 호출하지 마십시오. 대신 AddOnEquipWeapon 매크로를 사용하시기 바랍니다.
+	template <class UserClass>
+	void __Internal_AddOnEquipWeapon(UserClass* const UserObject, const typename TBaseDynamicDelegate<FWeakObjectPtr, void, AWeapon*>::TMethodPtrResolver<UserClass>::FMethodPtr MethodPtr, FName FunctionName, const bool bIncludeCurrentWeapons)
+	{
+		if (bIncludeCurrentWeapons)
+			for (const auto Weapon : Weapons)
+				if (Weapon) (UserObject->*MethodPtr)(Weapon);
+		OnEquipWeapon.__Internal_AddDynamic(UserObject, MethodPtr, FunctionName);
+	}
 };
