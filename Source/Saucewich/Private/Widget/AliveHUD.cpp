@@ -2,11 +2,11 @@
 
 #include "Widget/AliveHUD.h"
 
+#include "Classes/Materials/MaterialInstanceDynamic.h"
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/ProgressBar.h"
-#include "Classes/Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "TimerManager.h"
 
@@ -30,7 +30,6 @@ void UAliveHUD::NativeOnInitialized()
 	KillFeedBox = Cast<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Kill")));
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-
 	GameState->OnPlayerDeath.AddDynamic(this, &UAliveHUD::OnPlayerDeath);
 	
 	const auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
@@ -60,9 +59,9 @@ void UAliveHUD::OnPlayerDeath(ASaucewichPlayerState* Victim,
 
 void UAliveHUD::SetTeamColor(const uint8 NewTeam)
 {
-	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
-
 	const uint8 EnemyTeam = (NewTeam == 1) ? 2 : 1;
+	
+	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
 	EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
 	for (const auto Material : Materials)

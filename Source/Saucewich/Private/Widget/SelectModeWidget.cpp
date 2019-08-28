@@ -11,7 +11,7 @@ void USelectModeWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	ModeWidgets.SetNumUninitialized(Modes.Num());
+	ModeWidgets.SetNum(Modes.Num());
 
 	ModeBox = Cast<UHorizontalBox>(GetWidgetFromName(TEXT("Box_Modes")));
 
