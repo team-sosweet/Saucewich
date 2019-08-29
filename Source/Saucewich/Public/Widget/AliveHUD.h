@@ -19,6 +19,9 @@ protected:
 
 private:
 	UFUNCTION()
+	void OnEquipWeapon(class AWeapon* Weapon);
+	
+	UFUNCTION()
 	void OnPlayerDeath(class ASaucewichPlayerState* Victim,
 		ASaucewichPlayerState* Attacker, AActor* Inflictor);
 	
@@ -27,7 +30,10 @@ private:
 
 	void BindOnTeamChanged();
 	
-	void AddProgressBarMaterial(class UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask);
+	void AddProgressBarMaterial(class UProgressBar* ProgressBar);
+
+	UPROPERTY(Transient)
+	TArray<class UMaterialInstanceDynamic*> Materials;
 	
 	UPROPERTY(Transient)
 	UProgressBar* HealthProgressBar;
@@ -47,7 +53,7 @@ private:
 	UPROPERTY(Transient)
 	class UFeedBox* KillFeedBox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Resource, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* IconMaterial;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BindData, meta = (AllowPrivateAccess = true))
@@ -55,9 +61,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = BindData, meta = (AllowPrivateAccess = true))
 	FLinearColor EnemyTeamColor;
-
-	UPROPERTY(Transient)
-	TArray<class UMaterialInstanceDynamic*> Materials;
 
 	class ASaucewichGameState* GameState;
 };
