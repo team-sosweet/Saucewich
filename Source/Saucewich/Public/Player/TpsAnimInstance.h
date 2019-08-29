@@ -21,4 +21,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float AimPitch;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float AimPitchMul = 1;
 };
