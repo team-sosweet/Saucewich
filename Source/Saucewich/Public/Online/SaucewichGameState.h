@@ -109,6 +109,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float RoundMinutes = 3;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoundStartTime, Transient)
-	float RoundStartTime;
+	UPROPERTY(ReplicatedUsing=OnRep_RoundStartTime, Transient, VisibleInstanceOnly)
+	float RoundStartTime = -1;
 };
