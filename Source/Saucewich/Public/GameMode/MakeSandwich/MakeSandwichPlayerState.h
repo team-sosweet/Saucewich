@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanPickupIngredient() const;
 
+	ASandwichIngredient* PickingUp;
+
 protected:
 	void OnDeath() override;
 

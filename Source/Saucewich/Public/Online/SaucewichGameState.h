@@ -59,7 +59,7 @@ public:
 
 
 	// 현재 라운드의 남은 시간을 구합니다.
-	// 라운드가 진행중이 아닐 경우 -1을 반환합니다.
+	// 라운드가 진행중이 아닐 경우 -1을 반환합니다. (혹은 뭔가 잘못되었거나)
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
 
