@@ -31,7 +31,7 @@ void UAliveHUD::NativeOnInitialized()
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 	GameState->OnPlayerDeath.AddDynamic(this, &UAliveHUD::OnPlayerDeath);
-	
+
 	const auto HPSlot = Cast<UCanvasPanelSlot>(HealthProgressBar->Slot);
 
 	FVector2D HealthBarSize;
@@ -40,15 +40,33 @@ void UAliveHUD::NativeOnInitialized()
 
 	HPSlot->SetSize(HealthBarSize);
 
+	AddProgressBarMaterial(ClipProgressBar);
+	AddProgressBarMaterial(SubWeaponProgressBar);
+
 	const auto WeaponComponent = GetOwningPlayerPawn<ATpsCharacter>()->GetWeaponComponent();
-
-	const auto MainWeapon = WeaponComponent->GetWeapon(0);
-	AddProgressBarMaterial(ClipProgressBar, MainWeapon->GetIcon(), MainWeapon->GetMask());
-
-	const auto SubWeapon = WeaponComponent->GetWeapon(1);
-	AddProgressBarMaterial(SubWeaponProgressBar, SubWeapon->GetIcon(), SubWeapon->GetMask());
+	WeaponComponent->AddOnEquipWeapon(this, &UAliveHUD::OnEquipWeapon, true);
 
 	BindOnTeamChanged();
+}
+
+void UAliveHUD::OnEquipWeapon(AWeapon* Weapon)
+{
+	const auto WeaponSlot = Weapon->GetSlot();
+	const auto Material = Materials[WeaponSlot];
+	
+	Material->SetTextureParameterValue(TEXT("Icon"), Weapon->GetIcon());
+	Material->SetTextureParameterValue(TEXT("Mask"), Weapon->GetMask());
+
+	auto ProgressBar = ClipProgressBar;
+	auto Visibility = ESlateVisibility::SelfHitTestInvisible;
+
+	if (WeaponSlot == 1)
+	{
+		ProgressBar = SubWeaponProgressBar;
+		Visibility = ESlateVisibility::Visible;
+	}
+
+	ProgressBar->SetVisibility(Visibility);
 }
 
 void UAliveHUD::OnPlayerDeath(ASaucewichPlayerState* Victim,
@@ -85,14 +103,12 @@ void UAliveHUD::BindOnTeamChanged()
 	}
 }
 
-void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar, UTexture* Icon, UTexture* Mask)
+void UAliveHUD::AddProgressBarMaterial(UProgressBar* ProgressBar)
 {
 	const auto Material =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), IconMaterial);
 
-	Material->SetTextureParameterValue(TEXT("Icon"), Icon);
-	Material->SetTextureParameterValue(TEXT("Mask"), Mask);
-
+	ProgressBar->SetVisibility(ESlateVisibility::Hidden);
 	ProgressBar->WidgetStyle.FillImage.SetResourceObject(Material);
 	ProgressBar->WidgetStyle.BackgroundImage.SetResourceObject(Material);
 
