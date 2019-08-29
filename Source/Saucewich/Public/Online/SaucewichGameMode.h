@@ -15,15 +15,14 @@ public:
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 
 protected:
-	void EndMatch() override;
 	void PostInitializeComponents() override;
-	void SetPlayerDefaults(APawn* PlayerPawn) override;
-	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
-	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
-
-	void GiveWeapons(class ATpsCharacter* Character);
+	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	bool FindInactivePlayer(APlayerController* PC) override;
+	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
+	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
 private:
 	class ASaucewichGameState* State;
+	uint8 LastTeam;
 };

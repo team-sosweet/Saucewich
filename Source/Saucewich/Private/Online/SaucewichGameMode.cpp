@@ -10,6 +10,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameMode, Log, All)
 
+void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
+{
+	PC->SetRespawnTimer(MinRespawnDelay);
+}
+
 void ASaucewichGameMode::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -20,38 +25,22 @@ void ASaucewichGameMode::PostInitializeComponents()
 	}
 }
 
-void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
+APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
 {
-	Super::SetPlayerDefaults(PlayerPawn);
-
-	if (const auto PS = PlayerPawn->GetPlayerState<ASaucewichPlayerState>())
+	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
+	if (!PC) return nullptr;
+	
+	if (State)
 	{
-		PS->GiveWeapons();
+		LastTeam = UGameplayStatics::GetIntOption(Options, "Team", 0);
+		if (LastTeam == 0) LastTeam = State->GetMinPlayerTeam();
+		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
+		{
+			PS->SetTeam(LastTeam);
+		}
 	}
-}
-
-void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)
-{
-	if (!IsValid(NewPlayer)) return;
-	if (!StartSpot) return;
-	if (MustSpectate(Cast<APlayerController>(NewPlayer))) return;
-
-	if (!NewPlayer->GetPawn() && GetDefaultPawnClassForController(NewPlayer))
-	{
-		NewPlayer->SetPawn(SpawnDefaultPawnFor(NewPlayer, StartSpot));
-	}
-
-	if (!NewPlayer->GetPawn())
-	{
-		NewPlayer->FailedToSpawnPawn();
-	}
-	else
-	{
-		InitStartSpot(StartSpot, NewPlayer);
-		auto& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
-		NewPlayer->GetPawn()->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
-		FinishRestartPlayer(NewPlayer, StartSpot->GetActorRotation());
-	}
+	
+	return PC;
 }
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
@@ -101,28 +90,52 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 	return nullptr;
 }
 
-APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
+bool ASaucewichGameMode::FindInactivePlayer(APlayerController* const PC)
 {
-	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
-	if (State && PC)
+	const auto bFound = Super::FindInactivePlayer(PC);
+	
+	if (bFound)
 	{
-		auto Team = UGameplayStatics::GetIntOption(Options, "Team", 0);
-		if (Team == 0) Team = State->GetMinPlayerTeam();
-		if (State->IsValidTeam(Team))
+		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
 		{
-			PC->GetPlayerState<ASaucewichPlayerState>()->SetTeam(Team);
+			// PlayerState가 초기화되었으므로 팀을 재설정
+			PS->SetTeam(LastTeam);
 		}
 	}
-	return PC;
+	
+	return bFound;
 }
 
-void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
+void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)
 {
-	PC->SetRespawnTimer(MinRespawnDelay);
+	if (!IsValid(NewPlayer)) return;
+	if (!StartSpot) return;
+	if (MustSpectate(Cast<APlayerController>(NewPlayer))) return;
+
+	if (!NewPlayer->GetPawn() && GetDefaultPawnClassForController(NewPlayer))
+	{
+		NewPlayer->SetPawn(SpawnDefaultPawnFor(NewPlayer, StartSpot));
+	}
+
+	if (!NewPlayer->GetPawn())
+	{
+		NewPlayer->FailedToSpawnPawn();
+	}
+	else
+	{
+		InitStartSpot(StartSpot, NewPlayer);
+		auto& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
+		NewPlayer->GetPawn()->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
+		FinishRestartPlayer(NewPlayer, StartSpot->GetActorRotation());
+	}
 }
 
-void ASaucewichGameMode::EndMatch()
+void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 {
-	Super::EndMatch();
-	UE_LOG(LogClass, Warning, TEXT("자식 클래스의 가상함수가 호출되었습니다!"));
+	Super::SetPlayerDefaults(PlayerPawn);
+
+	if (const auto PS = PlayerPawn->GetPlayerState<ASaucewichPlayerState>())
+	{
+		PS->GiveWeapons();
+	}
 }

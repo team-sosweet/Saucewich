@@ -99,13 +99,9 @@ private:
 	UFUNCTION()
 	void OnRep_Alive();
 
-	void RegisterGameMode();
-
 	void BeTranslucent() override;
 	void BeOpaque() override;
 
-	class ASaucewichGameMode* GameMode;
-	class ASaucewichPlayerState* State;
 	FTimerHandle RespawnInvincibleTimerHandle;
 
 	UPROPERTY(Transient)

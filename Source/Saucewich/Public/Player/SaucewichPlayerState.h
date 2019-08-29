@@ -44,6 +44,6 @@ private:
 
 	// 플레이어의 팀을 나타냅니다. 팀 번호는 1부터 시작합니다.
 	// 팀 관련 함수들은 SaucewichGameState를 확인하세요.
-	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };
