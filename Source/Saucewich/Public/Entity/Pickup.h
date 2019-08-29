@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Entity/PoolActor.h"
+#include "Queue.h"
 #include "Pickup.generated.h"
 
 UCLASS()
@@ -33,20 +34,17 @@ protected:
 	void OnReleased() override;
 
 	virtual void BePickedUp(AActor* By);
+	virtual void StartPickUp(AActor* By) {}
+	virtual void CancelPickUp(AActor* By) {}
 	virtual bool CanPickedUp(const AActor* By) const { return true; }
+	virtual bool CanEverPickedUp(const AActor* By) const { return true; }
 	
 private:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetLocation(FVector Location);
 
-	void TryPickedUp();
-
-	struct FPickupTimer
-	{
-		FTimerHandle Handle;
-		AActor* Actor;
-		void Reset(FTimerManager& TimerManager);
-	} PickupTimer;
+	AActor* PickingActor;
+	float PickingTimer;
 
 	// 재료를 획득하는데 걸리는 시간
 	UPROPERTY(EditDefaultsOnly)
