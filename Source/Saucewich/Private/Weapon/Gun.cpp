@@ -108,24 +108,14 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	const auto Start = Character->GetSpringArmLocation() + AimDir * TraceStartOffset;
 	const auto End = Start + AimDir * MaxDistance;
 
-	/*
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(GetOwner());
-	*/
-
-	const TArray<AActor*> Ignored{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam())};
-	const auto Debug = Character->IsLocallyControlled() ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None;
+	Params.AddIgnoredActors(TArray<AActor*>{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam())});
 
 	TArray<FHitResult> BoxHits;
-	UKismetSystemLibrary::BoxTraceMultiByProfile(this, Start, End, {0.f, TraceBoxSize.X, TraceBoxSize.Y}, AimRotation, PawnOnly.Name, false, Ignored, Debug, BoxHits, false);
-	
-	/*
 	GetWorld()->SweepMultiByProfile(
 		BoxHits, Start, End, AimRotation.Quaternion(), PawnOnly.Name,
 		FCollisionShape::MakeBox({0.f, TraceBoxSize.X, TraceBoxSize.Y}), Params
 	);
-	*/
 
 	auto HitPawn = -1;
 	for (auto i = 0; i < BoxHits.Num(); ++i)
@@ -133,9 +123,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
 		if (!Chr || Chr->IsInvincible()) continue;
 
-		//if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].Location, Start, NoPawn.Name, Params))
-		FHitResult a;
-		if (!UKismetSystemLibrary::LineTraceSingleByProfile(this, BoxHits[i].ImpactPoint, Start, NoPawn.Name, false, Ignored, Debug, a, false))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, NoPawn.Name, Params))
 		{
 			HitPawn = i;
 			break;
@@ -149,8 +137,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	}
 
 	const auto Profile = GetDefault<AGunProjectile>(ProjectileClass)->GetCollisionProfile();
-	// const auto bHit = GetWorld()->LineTraceSingleByProfile(GunTraceCache, Start, End, Profile, Params);
-	return UKismetSystemLibrary::LineTraceSingleByProfile(this, Start, End, Profile, false, Ignored, Debug, OutHit, false) ? EGunTraceHit::Other : EGunTraceHit::None;
+	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, Profile, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
 void AGun::FireP()
