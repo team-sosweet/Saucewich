@@ -101,7 +101,7 @@ void AGun::Shoot()
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
 	const auto Character = GetCharacter();
-	if (!Character) return EGunTraceHit::None;
+	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
 
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();

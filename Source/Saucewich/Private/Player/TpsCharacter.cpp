@@ -37,17 +37,18 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	return WeaponComponent->GetActiveWeapon();
+	return WeaponComponent ? WeaponComponent->GetActiveWeapon() : nullptr;
 }
 
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
-	return WeaponComponent->GunTrace(OutHit);
+	return WeaponComponent ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
 }
 
 uint8 ATpsCharacter::GetTeam() const
 {
-	return State ? State->GetTeam() : 0;
+	const auto Player = GetPlayerState<ASaucewichPlayerState>();
+	return Player ? Player->GetTeam() : 0;
 }
 
 FLinearColor ATpsCharacter::GetColor() const
@@ -112,8 +113,6 @@ void ATpsCharacter::PostInitializeComponents()
 
 	const auto Idx = FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0);
 	DynamicMaterial = GetMesh()->CreateDynamicMaterialInstance(Idx);
-
-	RegisterGameMode();
 }
 
 void ATpsCharacter::BeginPlay()
@@ -126,17 +125,6 @@ void ATpsCharacter::BeginPlay()
 	{
 		bAlive = true;
 		HP = MaxHP = DefaultMaxHP;
-
-		if (State)
-		{
-			if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-			{
-				if (!GS->IsValidTeam(GetTeam()))
-				{
-					State->SetTeam(GS->GetMinPlayerTeam());
-				}
-			}
-		}
 	}
 }
 
@@ -222,17 +210,18 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 	bAlive = false;
 	SetActorActivated(false);
 
-	if (GameMode)
+	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
 		if (const auto PC = GetController<ASaucewichPlayerController>())
 			GameMode->SetPlayerRespawnTimer(PC);
 
-	State->OnDeath();
+	const auto Player = GetPlayerStateChecked<ASaucewichPlayerState>();
+	Player->OnDeath();
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 
 	if (HasAuthority())
 		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-			GameState->MulticastPlayerDeath(State, Attacker, Inflictor);
+			GameState->MulticastPlayerDeath(Player, Attacker, Inflictor);
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)
@@ -269,17 +258,12 @@ void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 
 void ATpsCharacter::BindOnTeamChanged()
 {
-	if (const auto PState = GetPlayerState())
+	if (const auto PS = GetPlayerState())
 	{
-		State = Cast<ASaucewichPlayerState>(PState);
-		if (State)
+		if (const auto Player = Cast<ASaucewichPlayerState>(PS))
 		{
-			State->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-			OnTeamChanged(State->GetTeam());
-		}
-		else
-		{
-			UE_LOG(LogTpsCharacter, Error, TEXT("PlayerState -> SaucewichPlayerState 변환에 실패했습니다. 일부 기능이 작동하지 않을 수 있습니다."));
+			Player->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+			OnTeamChanged(Player->GetTeam());
 		}
 	}
 	else
@@ -316,12 +300,6 @@ void ATpsCharacter::OnRep_Alive()
 {
 	if (bAlive) SetPlayerDefaults();
 	else Kill();
-}
-
-void ATpsCharacter::RegisterGameMode()
-{
-	if (!HasAuthority()) return;
-	GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>();
 }
 
 void ATpsCharacter::BeTranslucent()
