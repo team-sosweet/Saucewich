@@ -26,8 +26,6 @@ void UCombatText::ViewCombatText(const float Damage, ATpsCharacter* DamagedActor
 	if (!UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), Location, ScreenPosition))
 		return;
 	
-	SetPositionInViewport(ScreenPosition + GetRandomPos());
-
 	const auto OwnerLocation = GetOwningPlayerPawn()->GetActorLocation();
 	const auto Distance = FVector::DistSquared(Location, OwnerLocation);
 
@@ -39,6 +37,12 @@ void UCombatText::ViewCombatText(const float Damage, ATpsCharacter* DamagedActor
 
 	SizeBox->SetWidthOverride(Size);
 	SizeBox->SetHeightOverride(Size);
+	
+	const auto SizeRatio = UKismetMathLibrary::MapRangeClamped(-Distance, 
+		MaxDistance * MaxDistance * -1.0f, MinDistance * MinDistance * -1.0f, 0.0f, 1.0f);
+	
+	SetPositionInViewport(ScreenPosition +
+		GetRandomPos(MinExtendSize * SizeRatio, MaxExtendSize * SizeRatio));
 
 	const auto Green = UKismetMathLibrary::MapRangeClamped(Damage * -1.0f,
 		MaxDamage * -1.0f, MinDamage * -1.0f, 0.0f, 1.0f);
@@ -59,20 +63,20 @@ void UCombatText::OnAnimationFinished_Implementation(const UWidgetAnimation* Ani
 {
 	if (Animation == Fade)
 	{
-		OnRemove.Broadcast(this);
+		OnRemove.ExecuteIfBound(this);
 		RemoveFromParent();
 	}
 }
 
-FVector2D UCombatText::GetRandomPos()
+FVector2D UCombatText::GetRandomPos(const FVector2D& MinSize, const FVector2D& MaxSize)
 {
-	const auto ExtendSize = MaxExtendSize - MinExtendSize;
+	const auto Size = MaxSize - MinSize;
 	
-	auto RetX = FMath::RandRange(-ExtendSize.X, ExtendSize.X);
-	auto RetY = FMath::RandRange(-ExtendSize.Y, ExtendSize.Y);
+	auto RetX = FMath::RandRange(-Size.X, Size.X);
+	auto RetY = FMath::RandRange(-Size.Y, Size.Y);
 
-	RetX += MinExtendSize.X * (RetX > 0.0f ? 1.0f : -1.0f);
-	RetY += MinExtendSize.Y * (RetY > 0.0f ? 1.0f : -1.0f);
+	RetX += MinSize.X * (RetX > 0.0f ? 1.0f : -1.0f);
+	RetY += MinSize.Y * (RetY > 0.0f ? 1.0f : -1.0f);
 
 	return FVector2D(RetX, RetY);
 }

@@ -12,7 +12,7 @@ void UCombatTextPool::NewCombatText(const float Damage, ATpsCharacter* DamagedAc
 	if (!Items.Dequeue(CombatText))
 	{
 		CombatText = CreateWidget<UCombatText>(Owner, ItemClass);
-		CombatText->OnRemove.AddDynamic(this, &UCombatTextPool::Arrange);
+		CombatText->OnRemove.BindUObject(this, &UCombatTextPool::Arrange);
 	}
 
 	CombatText->ViewCombatText(Damage, DamagedActor);

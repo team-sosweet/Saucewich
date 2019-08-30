@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "CombatText.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemove, class UCombatText*, Widget);
+DECLARE_DELEGATE_OneParam(FOnRemove, class UCombatText*);
 
 UCLASS()
 class SAUCEWICH_API UCombatText final : public UUserWidget
@@ -24,7 +24,7 @@ public:
 private:
 	void OnAnimationFinished_Implementation(const UWidgetAnimation* Animation) override;
 	
-	FVector2D GetRandomPos();
+	FVector2D GetRandomPos(const FVector2D& MinSize, const FVector2D& MaxSize);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FVector2D MinExtendSize;
