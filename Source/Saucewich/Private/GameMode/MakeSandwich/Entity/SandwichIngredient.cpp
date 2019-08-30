@@ -36,6 +36,6 @@ bool ASandwichIngredient::CanPickedUp(const AActor* const By) const
 bool ASandwichIngredient::CanEverPickedUp(const AActor* const By) const
 {
 	if (const auto Pawn = Cast<APawn>(By))
-		return Pawn->GetPlayerState()->IsA<AMakeSandwichPlayerState>();
+		return Pawn->GetPlayerState<AMakeSandwichPlayerState>() != nullptr;
 	return false;
 }
