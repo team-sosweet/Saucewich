@@ -36,7 +36,7 @@ void ASaucewichGameMode::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	State = GetGameState<ASaucewichGameState>();
-	GUARANTEE(State);
+	GUARANTEE(State != nullptr);
 }
 
 APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
