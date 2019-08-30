@@ -6,9 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "CombatText.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRemove, class UCombatText*, Widget);
+
 UCLASS()
 class SAUCEWICH_API UCombatText final : public UUserWidget
 {
@@ -20,6 +19,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ViewCombatText(float Damage, class ATpsCharacter* DamagedActor);
 
+	FOnRemove OnRemove;
+	
 private:
 	void OnAnimationFinished_Implementation(const UWidgetAnimation* Animation) override;
 	

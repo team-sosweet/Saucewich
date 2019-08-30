@@ -59,6 +59,7 @@ void UCombatText::OnAnimationFinished_Implementation(const UWidgetAnimation* Ani
 {
 	if (Animation == Fade)
 	{
+		OnRemove.Broadcast(this);
 		RemoveFromParent();
 	}
 }
@@ -70,8 +71,8 @@ FVector2D UCombatText::GetRandomPos()
 	auto RetX = FMath::RandRange(-ExtendSize.X, ExtendSize.X);
 	auto RetY = FMath::RandRange(-ExtendSize.Y, ExtendSize.Y);
 
-	RetX += MinExtendSize.X * FMath::Sign(RetX);
-	RetY += MinExtendSize.Y * FMath::Sign(RetY);
+	RetX += MinExtendSize.X * (RetX > 0.0f ? 1.0f : -1.0f);
+	RetY += MinExtendSize.Y * (RetY > 0.0f ? 1.0f : -1.0f);
 
 	return FVector2D(RetX, RetY);
 }
