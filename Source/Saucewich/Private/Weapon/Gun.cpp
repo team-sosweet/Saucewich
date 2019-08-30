@@ -109,7 +109,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	const auto End = Start + AimDir * MaxDistance;
 
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActors(TArray<AActor*>{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharacters(Character->GetTeam())});
+	Params.AddIgnoredActors(TArray<AActor*>{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharactersByTeam(Character->GetTeam())});
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
