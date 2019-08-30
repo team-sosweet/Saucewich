@@ -6,36 +6,37 @@
 
 #include "Saucewich.h"
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
+#include "Player/TpsCharacter.h"
 
-void ASandwichIngredient::BePickedUp(AActor* const By)
+void ASandwichIngredient::BePickedUp(ATpsCharacter* const By)
 {
-	static_cast<AMakeSandwichPlayerState*>(static_cast<APawn*>(By)->GetPlayerState())->PickupIngredient(GetClass());
+	static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickupIngredient(GetClass());
 	Super::BePickedUp(By);
 }
 
-void ASandwichIngredient::StartPickUp(AActor* const By)
+void ASandwichIngredient::StartPickUp(ATpsCharacter* const By)
 {
-	auto& Picking = static_cast<AMakeSandwichPlayerState*>(static_cast<APawn*>(By)->GetPlayerState())->PickingUp;
+	Super::StartPickUp(By);
+	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
 	LOG_ASSERT(!Picking);
 	Picking = this;
 }
 
-void ASandwichIngredient::CancelPickUp(AActor* const By)
+void ASandwichIngredient::CancelPickUp(ATpsCharacter* const By)
 {
-	auto& Picking = static_cast<AMakeSandwichPlayerState*>(static_cast<APawn*>(By)->GetPlayerState())->PickingUp;
+	Super::CancelPickUp(By);
+	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
 	LOG_ASSERT(Picking == this);
 	Picking = nullptr;
 }
 
-bool ASandwichIngredient::CanPickedUp(const AActor* const By) const
+bool ASandwichIngredient::CanPickedUp(const ATpsCharacter* const By) const
 {
-	const auto Player = static_cast<const AMakeSandwichPlayerState*>(static_cast<const APawn*>(By)->GetPlayerState());
+	const auto Player = static_cast<const AMakeSandwichPlayerState*>(By->GetPlayerState());
 	return (!Player->PickingUp || Player->PickingUp == this) && Player->CanPickupIngredient();
 }
 
-bool ASandwichIngredient::CanEverPickedUp(const AActor* const By) const
+bool ASandwichIngredient::CanEverPickedUp(const ATpsCharacter* const By) const
 {
-	if (const auto Pawn = Cast<APawn>(By))
-		return Pawn->GetPlayerState<AMakeSandwichPlayerState>() != nullptr;
-	return false;
+	return By->GetPlayerState<AMakeSandwichPlayerState>() != nullptr;
 }

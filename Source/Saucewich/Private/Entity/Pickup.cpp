@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 
 #include "Entity/PickupSpawner.h"
+#include "Player/TpsCharacter.h"
 #include "ShadowComponent.h"
 
 APickup::APickup()
@@ -59,20 +60,20 @@ void APickup::Tick(const float DeltaSeconds)
 		}
 	}
 
-	if (PickingActor)
+	if (PickingChar)
 	{
-		if (CanPickedUp(PickingActor))
+		if (CanPickedUp(PickingChar))
 		{
-			if (PickingTimer == 0) StartPickUp(PickingActor);
+			if (PickingTimer == 0) StartPickUp(PickingChar);
 			if ((PickingTimer += DeltaSeconds) >= PickupTime)
 			{
-				BePickedUp(PickingActor);
+				BePickedUp(PickingChar);
 			}
 		}
 		else if (PickingTimer != 0)
 		{
 			PickingTimer = 0;
-			CancelPickUp(PickingActor);
+			CancelPickUp(PickingChar);
 		}
 	}
 }
@@ -81,15 +82,18 @@ void APickup::NotifyActorBeginOverlap(AActor* const OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	if (CanEverPickedUp(OtherActor))
+	if (const auto OtherChar = Cast<ATpsCharacter>(OtherActor))
 	{
-		if (PickupTime <= 0)
+		if (CanEverPickedUp(OtherChar))
 		{
-			if (CanPickedUp(OtherActor)) BePickedUp(OtherActor);
-		}
-		else if (!PickingActor)
-		{
-			PickingActor = OtherActor;
+			if (PickupTime <= 0)
+			{
+				if (CanPickedUp(OtherChar)) BePickedUp(OtherChar);
+			}
+			else if (!PickingChar)
+			{
+				PickingChar = OtherChar;
+			}
 		}
 	}
 }
@@ -97,10 +101,11 @@ void APickup::NotifyActorBeginOverlap(AActor* const OtherActor)
 void APickup::NotifyActorEndOverlap(AActor* const OtherActor)
 {
 	Super::NotifyActorEndOverlap(OtherActor);
-	if (PickingActor == OtherActor)
+	
+	if (PickingChar == OtherActor)
 	{
-		if (PickingTimer != 0) CancelPickUp(PickingActor);
-		PickingActor = nullptr;
+		if (PickingTimer != 0) CancelPickUp(PickingChar);
+		PickingChar = nullptr;
 		PickingTimer = 0;
 	}
 }
@@ -114,17 +119,27 @@ void APickup::OnActivated()
 void APickup::OnReleased()
 {
 	bSpawnedFromSpawner = false;
-	PickingActor = nullptr;
+	PickingChar = nullptr;
 	PickingTimer = 0;
 	Collision->DestroyPhysicsState();
 }
 
-void APickup::BePickedUp(AActor* By)
+void APickup::BePickedUp(ATpsCharacter* const By)
 {
 	if (bSpawnedFromSpawner)
 		if (const auto Spawner = Cast<APickupSpawner>(GetOwner()))
 			Spawner->PickedUp();
 	Release();
+}
+
+void APickup::StartPickUp(ATpsCharacter* const By)
+{
+	By->OnPickupStarted.Broadcast(PickupTime);
+}
+
+void APickup::CancelPickUp(ATpsCharacter* const By)
+{
+	By->OnPickupCanceled.Broadcast();
 }
 
 void APickup::MulticastSetLocation_Implementation(const FVector Location)

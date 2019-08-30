@@ -6,6 +6,8 @@
 #include "Queue.h"
 #include "Pickup.generated.h"
 
+class ATpsCharacter;
+
 UCLASS()
 class SAUCEWICH_API APickup : public APoolActor
 {
@@ -33,17 +35,17 @@ protected:
 	void OnActivated() override;
 	void OnReleased() override;
 
-	virtual void BePickedUp(AActor* By);
-	virtual void StartPickUp(AActor* By) {}
-	virtual void CancelPickUp(AActor* By) {}
-	virtual bool CanPickedUp(const AActor* By) const { return true; }
-	virtual bool CanEverPickedUp(const AActor* By) const { return true; }
+	virtual void BePickedUp(ATpsCharacter* By);
+	virtual void StartPickUp(ATpsCharacter* By);
+	virtual void CancelPickUp(ATpsCharacter* By);
+	virtual bool CanPickedUp(const ATpsCharacter* By) const { return true; }
+	virtual bool CanEverPickedUp(const ATpsCharacter* By) const { return true; }
 	
 private:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetLocation(FVector Location);
 
-	AActor* PickingActor;
+	ATpsCharacter* PickingChar;
 	float PickingTimer;
 
 	// 재료를 획득하는데 걸리는 시간
