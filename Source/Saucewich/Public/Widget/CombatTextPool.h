@@ -2,9 +2,8 @@
 
 #pragma once
 
-
+#include <queue>
 #include "CoreMinimal.h"
-#include "Queue.h"
 #include "UObject/NoExportTypes.h"
 #include "CombatTextPool.generated.h"
 
@@ -26,5 +25,5 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	class UUserWidget* Owner;
 	
-	TQueue<UCombatText*> Items;
+	std::queue<UCombatText*> Items;
 };
