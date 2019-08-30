@@ -45,6 +45,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetNumPlayers(uint8 Team) const;
+
+
+	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
+	void SetTeamScore(const uint8 Team, const int32 NewScore)
+	{
+		if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
+		TeamScore[Team] = NewScore;
+	}
 	
 	   
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
@@ -83,20 +91,21 @@ private:
 	UFUNCTION()
 	void OnRep_RoundStartTime();
 	
-	
 	// 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
 	// 0번째는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
 	// 팀 개수는 사용되지 않는 0번 팀 포함 최소 2개여야 합니다.
 	// 실제 팀 index는 1부터 시작합니다.
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FTeam> Teams;
-	
 
 	// 게임에서 사용할 무기 목록입니다.
 	// 플레이어는 무기 선택창에서 이 무기들중 하나를 선택하여 사용할 수 있습니다.
 	// 특정 슬롯의 무기만을 구하고 싶으면 GetAvailableWeapons 함수를 사용하세요.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> AvailableWeapons;
+
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TArray<int32> TeamScore;
 
 
 	FTimerHandle RoundTimer;

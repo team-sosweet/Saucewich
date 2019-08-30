@@ -101,6 +101,7 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
+	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 }
 
 void ASaucewichGameState::OnRep_RoundStartTime()
