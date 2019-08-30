@@ -12,6 +12,9 @@ class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	ASaucewichGameMode();
+	
+	virtual void UpdateMatchState();
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 
 protected:

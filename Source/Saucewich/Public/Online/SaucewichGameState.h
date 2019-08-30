@@ -47,14 +47,19 @@ public:
 	uint8 GetNumPlayers(uint8 Team) const;
 
 
+	UFUNCTION(BlueprintCallable)
+	uint8 GetWinningTeam() const { int32 Team; FMath::Max(TeamScore, &Team); return Team != INDEX_NONE ? Team : 0; }
+
+	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
+
 	void SetTeamScore(const uint8 Team, const int32 NewScore)
 	{
 		if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
 		TeamScore[Team] = NewScore;
 	}
 	
-	   
+	
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<class AWeapon>> GetAvailableWeapons(uint8 Slot) const;
@@ -104,7 +109,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> AvailableWeapons;
 
-	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	TArray<int32> TeamScore;
 
 

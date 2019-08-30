@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "Online/SaucewichGameMode.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -90,9 +91,11 @@ void ASaucewichGameState::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 	
-	if (const auto GameMode = GetWorld()->GetAuthGameMode<AGameMode>())
+	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
 	{
-		GetWorldTimerManager().SetTimer(RoundTimer, GameMode, &AGameMode::EndMatch, RoundMinutes * 60, false);
+		GetWorldTimerManager().SetTimer(
+			RoundTimer, GameMode, &ASaucewichGameMode::UpdateMatchState, RoundMinutes * 60, false
+		);
 		RoundStartTime = GetWorld()->GetTimeSeconds();
 	}
 }
