@@ -18,7 +18,7 @@ void ASandwichIngredient::StartPickUp(ATpsCharacter* const By)
 {
 	Super::StartPickUp(By);
 	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
-	LOG_ASSERT(!Picking);
+	GUARANTEE(!Picking);
 	Picking = this;
 }
 
@@ -26,7 +26,7 @@ void ASandwichIngredient::CancelPickUp(ATpsCharacter* const By)
 {
 	Super::CancelPickUp(By);
 	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
-	LOG_ASSERT(Picking == this);
+	GUARANTEE(Picking == this);
 	Picking = nullptr;
 }
 

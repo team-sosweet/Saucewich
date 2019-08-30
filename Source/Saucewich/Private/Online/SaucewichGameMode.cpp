@@ -1,14 +1,31 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "SaucewichGameMode.h"
+
 #include "Engine/PlayerStartPIE.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "SaucewichGameState.h"
-#include "SaucewichPlayerState.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameMode, Log, All)
+#include "Saucewich.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/SaucewichPlayerState.h"
+
+ASaucewichGameMode::ASaucewichGameMode()
+{
+	// AGameMode::Tick()에서 매 틱마다 매치 상태 업데이트를 하지만 그럴 필요가 없으므로
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+void ASaucewichGameMode::UpdateMatchState()
+{
+	if (GetMatchState() == MatchState::WaitingToStart)
+		if (ReadyToStartMatch())
+			StartMatch();
+	if (GetMatchState() == MatchState::InProgress)
+		if (ReadyToEndMatch())
+			EndMatch();
+}
 
 void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
 {
@@ -19,10 +36,7 @@ void ASaucewichGameMode::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	State = GetGameState<ASaucewichGameState>();
-	if (!State)
-	{
-		UE_LOG(LogSaucewichGameMode, Error, TEXT("GameState가 유효하지 않습니다. GameMode가 비활성화 됩니다. Class가 SaucewichGameState가 맞는지 확인해주세요."));
-	}
+	GUARANTEE(State);
 }
 
 APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)

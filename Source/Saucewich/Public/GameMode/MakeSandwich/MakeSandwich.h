@@ -9,5 +9,7 @@ UCLASS()
 class SAUCEWICH_API AMakeSandwich : public ASaucewichGameMode
 {
 	GENERATED_BODY()
-	
+
+protected:
+	bool ReadyToEndMatch_Implementation() override;
 };

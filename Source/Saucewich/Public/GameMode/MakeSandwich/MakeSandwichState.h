@@ -22,8 +22,8 @@ private:
 
 	auto& GetTeamIngredients(const uint8 Team)
 	{
-		if (TeamIngredients.Num() <= Team) TeamIngredients.SetNum(Team + 1);
-		return TeamIngredients[Team];
+		if (IngredientsByTeam.Num() <= Team) IngredientsByTeam.SetNum(Team + 1);
+		return IngredientsByTeam[Team];
 	}
 	
 	UFUNCTION(BlueprintCallable, meta=(DisplayName="Get Team Ingredients"))
@@ -32,5 +32,5 @@ private:
 		return GetTeamIngredients(Team);
 	}
 
-	TArray<TMap<TSubclassOf<ASandwichIngredient>, uint8>> TeamIngredients;
+	TArray<TMap<TSubclassOf<ASandwichIngredient>, uint8>> IngredientsByTeam;
 };
