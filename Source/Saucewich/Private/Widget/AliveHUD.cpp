@@ -58,15 +58,15 @@ void UAliveHUD::OnEquipWeapon(AWeapon* Weapon)
 	Material->SetTextureParameterValue(TEXT("Mask"), Weapon->GetMask());
 
 	auto ProgressBar = ClipProgressBar;
-	auto Visibility = ESlateVisibility::SelfHitTestInvisible;
+	auto ProgressBarVisibility = ESlateVisibility::SelfHitTestInvisible;
 
 	if (WeaponSlot == 1)
 	{
 		ProgressBar = SubWeaponProgressBar;
-		Visibility = ESlateVisibility::Visible;
+		ProgressBarVisibility = ESlateVisibility::Visible;
 	}
 
-	ProgressBar->SetVisibility(Visibility);
+	ProgressBar->SetVisibility(ProgressBarVisibility);
 }
 
 void UAliveHUD::OnPlayerDeath(ASaucewichPlayerState* Victim,
