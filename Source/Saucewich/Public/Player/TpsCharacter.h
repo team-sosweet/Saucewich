@@ -10,6 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickupStarted, float, Time);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupCanceled);
 
 UCLASS(Abstract)
 class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
@@ -67,6 +69,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCharacterDeath OnCharacterDeath;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPickupStarted OnPickupStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPickupCanceled OnPickupCanceled;
 
 protected:
 	void BeginPlay() override;
