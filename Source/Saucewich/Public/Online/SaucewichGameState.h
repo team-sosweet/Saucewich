@@ -5,7 +5,6 @@
 #include "GameFramework/GameState.h"
 #include "SaucewichGameState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedWeapon, class ASaucewichPlayerState*, Player, uint8, Slot, TSubclassOf<class AWeapon>, NewWeapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
 
@@ -39,19 +38,19 @@ public:
 
 	
 	UFUNCTION(BlueprintCallable)
-	TArray<class ASaucewichPlayerState*> GetPlayers(uint8 Team) const;
+	TArray<class ASaucewichPlayerState*> GetPlayersByTeam(uint8 Team) const;
 
 	UFUNCTION(BlueprintCallable)
-	TArray<class ATpsCharacter*> GetCharacters(uint8 Team) const;
+	TArray<class ATpsCharacter*> GetCharactersByTeam(uint8 Team) const;
 
 	UFUNCTION(BlueprintCallable)
-	uint8 GetPlayerNum(uint8 Team) const;
+	uint8 GetNumPlayers(uint8 Team) const;
 	
 	   
-	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다.
-	// 시간복잡도가 O(n)이고 새 배열을 할당하므로 자주 호출하지는 마세요.
+	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
-	TArray<TSubclassOf<AWeapon>> GetWeapons(uint8 Slot) const;
+	TArray<TSubclassOf<class AWeapon>> GetAvailableWeapons(uint8 Slot) const;
+	auto& GetAvailableWeapons() const { return AvailableWeapons; }
 	
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -64,9 +63,6 @@ public:
 	float GetRemainingRoundSeconds() const;
 
 	
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerChangedWeapon OnPlayerChangedWeapon;
-
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerChangedTeam OnPlayerChangedTeam;
 
@@ -89,7 +85,7 @@ private:
 	
 	
 	// 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
-	// 0번 요소는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
+	// 0번째는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
 	// 팀 개수는 사용되지 않는 0번 팀 포함 최소 2개여야 합니다.
 	// 실제 팀 index는 1부터 시작합니다.
 	UPROPERTY(EditDefaultsOnly)
@@ -98,9 +94,9 @@ private:
 
 	// 게임에서 사용할 무기 목록입니다.
 	// 플레이어는 무기 선택창에서 이 무기들중 하나를 선택하여 사용할 수 있습니다.
-	// 특정 슬롯의 무기만을 구하고 싶으면 GetWeapons 함수를 사용하세요.
+	// 특정 슬롯의 무기만을 구하고 싶으면 GetAvailableWeapons 함수를 사용하세요.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TArray<TSubclassOf<AWeapon>> Weapons;
+	TArray<TSubclassOf<AWeapon>> AvailableWeapons;
 
 
 	FTimerHandle RoundTimer;

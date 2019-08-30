@@ -25,14 +25,14 @@ void ForEachPlayer(const TArray<APlayerState*>& PlayerArray, const uint8 Team, F
 	ForEachEveryPlayer(PlayerArray, [Team, &Do](const auto P){if (P->GetTeam() == Team) Do(P);});
 }
 
-TArray<ASaucewichPlayerState*> ASaucewichGameState::GetPlayers(const uint8 Team) const
+TArray<ASaucewichPlayerState*> ASaucewichGameState::GetPlayersByTeam(const uint8 Team) const
 {
 	TArray<ASaucewichPlayerState*> Players;
 	ForEachPlayer(PlayerArray, Team, [&Players](const auto P){Players.Add(P);});
 	return Players;
 }
 
-TArray<ATpsCharacter*> ASaucewichGameState::GetCharacters(const uint8 Team) const
+TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team) const
 {
 	TArray<ATpsCharacter*> Characters;
 	ForEachPlayer(PlayerArray, Team, [&Characters](ASaucewichPlayerState* const P) {
@@ -68,10 +68,10 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 	return Min[FMath::RandHelper(Min.Num())] + 1;
 }
 
-TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetWeapons(const uint8 Slot) const
+TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint8 Slot) const
 {
 	TArray<TSubclassOf<AWeapon>> SlotWep;
-	for (const auto Class : Weapons)
+	for (const auto Class : AvailableWeapons)
 	{
 		if (GetDefault<AWeapon>(Class)->GetSlot() == Slot)
 		{
@@ -114,7 +114,7 @@ void ASaucewichGameState::MulticastPlayerDeath_Implementation(
 	OnPlayerDeath.Broadcast(Victim, Attacker, Inflictor);
 }
 
-uint8 ASaucewichGameState::GetPlayerNum(const uint8 Team) const
+uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 {
 	uint8 Num = 0;
 	ForEachPlayer(PlayerArray, Team, [&Num](auto){++Num;});

@@ -1,15 +1,17 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "SaucewichPlayerState.h"
+
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
+
 #include "SaucewichGameInstance.h"
-#include "SaucewichGameMode.h"
-#include "SaucewichGameState.h"
-#include "TpsCharacter.h"
-#include "Weapon.h"
-#include "WeaponComponent.h"
+#include "Online/SaucewichGameMode.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/Weapon.h"
+#include "Weapon/WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichPlayerState, Log, All)
 
@@ -21,30 +23,16 @@ void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
 	else UE_LOG(LogSaucewichPlayerState, Error, TEXT("Failed to cast game instance to SaucewichGameInstance"));
 }
 
-void ASaucewichPlayerState::SetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
-	MulticastSetWeapon(Slot, Weapon);
-}
-
-bool ASaucewichPlayerState::SetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
-{
-	return true;
-}
-
-void ASaucewichPlayerState::MulticastSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
-{
-	if (Weapons.Num() <= Slot) Weapons.AddZeroed(Slot - Weapons.Num() + 1);
-	Weapons[Slot] = Weapon;
-	SafeGameState(this, [this, Slot, Weapon](ASaucewichGameState* const GameState)
-	{
-		GameState->OnPlayerChangedWeapon.Broadcast(this, Slot, Weapon);
-	});
+	SetWeapon_Internal(Slot, Weapon);
+	if (!HasAuthority()) ServerSetWeapon(Slot, Weapon);
 }
 
 void ASaucewichPlayerState::GiveWeapons()
 {
 	if (const auto Character = GetPawn<ATpsCharacter>())
-		for (const auto Weapon : Weapons)
+		for (const auto Weapon : WeaponLoadout)
 			Character->GetWeaponComponent()->Give(Weapon);
 }
 
@@ -65,8 +53,27 @@ void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 	});
 }
 
+void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+{
+	if (Slot >= WeaponLoadout.Num()) WeaponLoadout.AddZeroed(Slot - WeaponLoadout.Num() + 1);
+	WeaponLoadout[Slot] = Weapon;
+}
+
+void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+{
+	SetWeapon_Internal(Slot, Weapon);
+}
+
+bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+{
+	if (Weapon) if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+		return GS->GetAvailableWeapons().Contains(Weapon);
+	return true;
+}
+
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichPlayerState, Team);
+	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
 }
