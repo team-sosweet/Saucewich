@@ -9,15 +9,14 @@ void UCombatTextPool::NewCombatText(const float Damage, ATpsCharacter* DamagedAc
 {
 	UCombatText* CombatText;
 	
-	if (Items.empty())
+	if (Items.Num() == 0)
 	{
 		CombatText = CreateWidget<UCombatText>(Owner, ItemClass);
 		CombatText->OnRemove.BindUObject(this, &UCombatTextPool::Arrange);
 	}
 	else
 	{
-		CombatText = Items.front();
-		Items.pop();
+		CombatText = Items.Pop(false);
 	}
 
 	CombatText->ViewCombatText(Damage, DamagedActor);
@@ -25,5 +24,5 @@ void UCombatTextPool::NewCombatText(const float Damage, ATpsCharacter* DamagedAc
 
 void UCombatTextPool::Arrange(UCombatText* Widget)
 {
-	Items.push(Widget);
+	Items.Push(Widget);
 }
