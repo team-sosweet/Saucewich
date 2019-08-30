@@ -16,8 +16,7 @@ void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TS
 
 void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngredient> Class)
 {
-	if (!CanPickupIngredient()) return;
-	MulticastPickupIngredient(Class);
+	if (HasAuthority()) MulticastPickupIngredient(Class);
 }
 
 void AMakeSandwichPlayerState::PutIngredientsInFridge()
