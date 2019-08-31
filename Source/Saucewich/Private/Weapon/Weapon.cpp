@@ -30,7 +30,9 @@ void AWeapon::Init()
 		{
 			Owner = Character;
 			Role = Owner->Role;
-			Owner->GetWeaponComponent()->GetActiveWeapon() == this ? Deploy() : Holster();
+			const auto WeaponComponent = Owner->GetWeaponComponent();
+			WeaponComponent->OnEquipWeapon.Broadcast(this);
+			WeaponComponent->GetActiveWeapon() == this ? Deploy() : Holster();
 			if (Owner->IsInvincible()) BeTranslucent();
 		}
 	}
