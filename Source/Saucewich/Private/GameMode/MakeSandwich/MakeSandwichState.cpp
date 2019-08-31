@@ -11,18 +11,43 @@ void AMakeSandwichState::StoreIngredients(AMakeSandwichPlayerState* const Player
 	auto& TeamIngredients = GetTeamIngredients(Team);
 	
 	for (auto& x : Player->GetIngredients())
-		MulticastSetIngredients(x.Key, TeamIngredients.FindOrAdd(x.Key) += x.Value, Team);
+		TeamIngredients.FindOrAdd(x.Key) += x.Value;
 
-	auto Min = TNumericLimits<uint8>::Max();
-	for (const auto& x : TeamIngredients) if (x.Value < Min) Min = x.Value;
-	if (Min > 0)
+	auto bHasEveryIngredients = true;
+	for (const auto& x : SandwichIngredients)
 	{
+		if (!TeamIngredients.Contains(x))
+		{
+			bHasEveryIngredients = false;
+			break;
+		}
+	}
+	if (bHasEveryIngredients)
+	{
+		auto Min = TNumericLimits<uint8>::Max();
+		for (const auto& x : TeamIngredients) if (x.Value < Min) Min = x.Value;
 		for (auto& x : TeamIngredients) x.Value -= Min;
 		SetTeamScore(Team, GetTeamScore(Team) + Min);
 	}
+
+	TArray<TSubclassOf<ASandwichIngredient>> Ingredients;
+	TArray<uint8> Num;
+	for (const auto& x : TeamIngredients)
+	{
+		Ingredients.Add(x.Key);
+		Num.Add(x.Value);
+	}
+	MulticastSetIngredients(Team, MoveTemp(Ingredients), MoveTemp(Num));
 }
 
-void AMakeSandwichState::MulticastSetIngredients_Implementation(UClass* const Ingredient, const uint8 Num, const uint8 Team)
+void AMakeSandwichState::MulticastSetIngredients_Implementation(const uint8 Team, const TArray<TSubclassOf<ASandwichIngredient>>& Ingredients, const TArray<uint8>& Num)
 {
-	if (!HasAuthority()) GetTeamIngredients(Team).Add(Ingredient, Num);
+	if (!HasAuthority())
+	{
+		auto& TeamIngredients = GetTeamIngredients(Team);
+		for (auto i = 0; i < Num.Num(); ++i)
+		{
+			TeamIngredients.Add(Ingredients[i], Num[i]);
+		}
+	}
 }
