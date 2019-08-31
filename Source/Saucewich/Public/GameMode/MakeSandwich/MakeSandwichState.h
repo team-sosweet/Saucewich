@@ -18,11 +18,11 @@ public:
 
 private:
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSetIngredients(UClass* Ingredient, uint8 Num, uint8 Team);
+	void MulticastSetIngredients(uint8 Team, const TArray<TSubclassOf<ASandwichIngredient>>& Ingredients, const TArray<uint8>& Num);
 
 	auto& GetTeamIngredients(const uint8 Team)
 	{
-		if (IngredientsByTeam.Num() <= Team) IngredientsByTeam.SetNum(Team + 1);
+		if (IngredientsByTeam.Num() <= Team) IngredientsByTeam.AddDefaulted(Team - IngredientsByTeam.Num() + 1);
 		return IngredientsByTeam[Team];
 	}
 	
@@ -31,6 +31,10 @@ private:
 	{
 		return GetTeamIngredients(Team);
 	}
+
+	// 샌드위치 하나를 만드는데 필요한 재료
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TSet<TSubclassOf<ASandwichIngredient>> SandwichIngredients;
 
 	TArray<TMap<TSubclassOf<ASandwichIngredient>, uint8>> IngredientsByTeam;
 };
