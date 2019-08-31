@@ -17,6 +17,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Error, Error)
  * if (GUARANTEE(Cond)) {...}
  */
 #define GUARANTEE(Cond) _Guarantee((Cond), TEXT("Assertion failed: " #Cond " in " __FILE__ "(" STRINGIZE(__LINE__) "): " __FUNCTION__))
+#define GUARANTEE_MSG(Cond, Msg) _Guarantee((Cond), TEXT("Assertion failed: (" #Cond ") \"" Msg "\" in " __FILE__ "(" STRINGIZE(__LINE__) "): " __FUNCTION__))
 
 template <class T>
 static bool _Guarantee(const bool bCond, T&& Text)
