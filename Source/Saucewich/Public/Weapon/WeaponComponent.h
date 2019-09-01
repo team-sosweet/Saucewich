@@ -62,6 +62,8 @@ public:
 	 */
 #define AddOnEquipWeapon(UserObject, FuncName, bIncludeCurrentWeapons) __Internal_AddOnEquipWeapon(UserObject, FuncName, STATIC_FUNCTION_FNAME(TEXT(#FuncName)), bIncludeCurrentWeapons)
 
+	FOnEquipWeapon OnEquipWeapon;
+	
 	class ATpsCharacter* const Owner = nullptr;
 
 protected:
@@ -86,11 +88,6 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotR(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotP(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotR(uint8 Slot);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastEquipWeapon(AWeapon* Weapon);
-
-	FOnEquipWeapon OnEquipWeapon;
 
 	// 현재 캐릭터가 가지고 있는 무기 목록입니다.
 	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleInstanceOnly, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
