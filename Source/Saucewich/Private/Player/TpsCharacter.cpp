@@ -11,14 +11,15 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "SaucewichGameMode.h"
-#include "SaucewichGameState.h"
-#include "SaucewichPlayerController.h"
-#include "SaucewichPlayerState.h"
+#include "Saucewich.h"
+#include "Online/SaucewichGameMode.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/SaucewichPlayerController.h"
+#include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacterMovementComponent.h"
+#include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
-#include "TpsCharacterMovementComponent.h"
 #include "TranslMatData.h"
-#include "WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
@@ -37,12 +38,12 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	return WeaponComponent ? WeaponComponent->GetActiveWeapon() : nullptr;
+	return GUARANTEE(WeaponComponent != nullptr) ? WeaponComponent->GetActiveWeapon() : nullptr;
 }
 
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
-	return WeaponComponent ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
+	return GUARANTEE(WeaponComponent != nullptr) ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
 }
 
 uint8 ATpsCharacter::GetTeam() const

@@ -55,9 +55,10 @@ void AGun::Shoot()
 	if (!CanFire()) return;
 	if (!GetPool()) return;
 
-	const auto& MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
+	const auto MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
-
+	GUARANTEE_MSG(MuzzleLocation != FVector::ZeroVector, "무기 Muzzle 소켓 설정 안 됨");
+	
 	FHitResult Hit;
 	const auto HitType = GunTrace(Hit);
 
