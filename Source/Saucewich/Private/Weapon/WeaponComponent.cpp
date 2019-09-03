@@ -1,13 +1,15 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "WeaponComponent.h"
+
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
-#include "ActorPool.h"
-#include "Gun.h"
+
+#include "Entity/ActorPool.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/Gun.h"
 #include "SaucewichGameInstance.h"
-#include "TpsCharacter.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, Log, All)
 
@@ -100,7 +102,8 @@ void UWeaponComponent::BeTranslucent()
 float UWeaponComponent::GetSpeedRatio() const
 {
 	if (const auto Weapon = GetActiveWeapon())
-		return Weapon->GetSpeedRatio();
+		if (const auto Data = Weapon->GetData(FILE_LINE_FUNC))
+			return Data->WalkSpeedRatio;
 	return 1.f;
 }
 
@@ -131,7 +134,10 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
 	if (!WeaponClass) return nullptr;
 
-	const auto Slot = GetDefault<AWeapon>(WeaponClass)->GetSlot();
+	const auto Data = GetDefault<AWeapon>(WeaponClass)->GetData(FILE_LINE_FUNC);
+	if (!Data) return nullptr;
+	
+	const auto Slot = Data->Slot;
 	if (Slot >= Weapons.Num())
 	{
 		UE_LOG(LogWeaponComponent, Error, TEXT("Failed to give weapon: Invalid slot (Expected: < %d, Actual: %d)"), Weapons.Num(), Slot);
@@ -175,7 +181,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	if (Slot == 0 && !Weapons[Slot]) Owner->SetMaxHP(Weapon->GetHPRatio());
+	if (Slot == 0 && !Weapons[Slot]) Owner->SetMaxHP(Data->HPRatio);
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 

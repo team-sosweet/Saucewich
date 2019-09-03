@@ -49,8 +49,10 @@ void UAliveHUD::NativeOnInitialized()
 	BindOnTeamChanged();
 }
 
-void UAliveHUD::OnEquipWeapon(AWeapon* Weapon)
+void UAliveHUD::OnEquipWeapon(AWeapon* const Weapon)
 {
+	/* TODO: 갈아엎기
+	
 	const auto WeaponSlot = Weapon->GetSlot();
 	const auto Material = Materials[WeaponSlot];
 	
@@ -67,6 +69,7 @@ void UAliveHUD::OnEquipWeapon(AWeapon* Weapon)
 	}
 
 	ProgressBar->SetVisibility(ProgressBarVisibility);
+	*/
 }
 
 void UAliveHUD::OnPlayerDeath(ASaucewichPlayerState* Victim,

@@ -3,20 +3,38 @@
 #pragma once
 
 #include "PoolActor.h"
+#include "Engine/DataTable.h"
 #include "Colorable.h"
 #include "Translucentable.h"
 #include "Weapon.generated.h"
 
+class UTexture;
+
 USTRUCT(BlueprintType)
-struct FWeaponIcon
+struct SAUCEWICH_API FWeaponData : public FTableRowBase
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UTexture> Icon_Team;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UTexture* Icon;
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UTexture> Icon_Rest;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FText Name;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UTexture* IconMask;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FText Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float WalkSpeedRatio = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float HPRatio = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 Slot;
 };
 
 /**
@@ -24,7 +42,7 @@ struct FWeaponIcon
  * 이름과는 달리 '캐릭터가 지니고 있을 수 있으며 슬롯을 누르면 특정 행동을 할 수 있는' 그 어떤 것도 될 수 있습니다.
  */
 UCLASS(Abstract)
-class AWeapon : public APoolActor, public IColorable, public ITranslucentable
+class SAUCEWICH_API AWeapon : public APoolActor, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
 
@@ -36,16 +54,13 @@ public:
 
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	bool IsEquipped() const { return bEquipped; }
-	uint8 GetSlot() const { return Slot; }
 
-	float GetSpeedRatio() const { return WalkSpeedRatio; }
-	float GetHPRatio() const { return HPRatio; }
+	// 무기 데이터를 반환합니다. nullptr일 수 있습니다.
+	template <class T = FWeaponData, class = TEnableIf<TIsDerivedFrom<T, FWeaponData>::IsDerived>>
+	const T* GetData(const TCHAR* const ContextString) const { return WeaponData.GetRow<T>(ContextString); }
 
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
-
-	UTexture* GetIcon() const { return Icon.Icon; }
-	UTexture* GetMask() const { return Icon.IconMask; }
 
 	FLinearColor GetColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
@@ -68,8 +83,6 @@ public:
 	virtual bool CanDeploy() const { return IsActive(); }
 	virtual bool CanHolster() const { return true; }
 
-	class ATpsCharacter* GetCharacter() const;
-
 protected:
 	void PostInitializeComponents() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -84,30 +97,7 @@ private:
 	virtual void OnRep_Equipped();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FText Name;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FText Description;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	FWeaponIcon Icon;
-
-	ATpsCharacter* Owner;
-
-	UPROPERTY(Transient)
-	UMaterialInstanceDynamic* Material;
-
-	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	class UTranslMatData* TranslMatData;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float WalkSpeedRatio = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float HPRatio = 1.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 Slot;
+	FDataTableRowHandle WeaponData;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipped, Transient, meta=(AllowPrivateAccess=true))
 	uint8 bEquipped : 1;
