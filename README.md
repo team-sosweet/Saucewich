@@ -2,6 +2,8 @@
 
 UE4로 개발중인 캐주얼 멀티플레이어 TPS 게임
 
+![Logo](Saucewich.png)
+
 ## 빌드
 
 Pull을 받고 나면 rebuild를 해야합니다. **에디터와 Visual Studio를 종료한 상태에서 진행하시기 바랍니다.**
