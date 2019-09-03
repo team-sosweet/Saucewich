@@ -13,11 +13,16 @@ UShadowComponent::UShadowComponent()
 	bVisible = false;
 }
 
+float UShadowComponent::GetMaxDist() const
+{
+	return RelativeScale3D.X * 200;
+}
+
 void UShadowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Offset.SetLocation(RelativeLocation);
-	Material = CreateDynamicMaterialInstance(0);
+	CreateDynamicMaterialInstance(0);
 }
 
 void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* const ThisTickFunction)
@@ -28,7 +33,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	const auto StartTransform = Offset * GetAttachParent()->GetComponentTransform();
 	const auto Start = StartTransform.GetLocation();
 	auto End = Start;
-	End.Z -= MaxDistance;
+	End.Z -= GetMaxDist();
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Owner);
@@ -43,8 +48,9 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 			Hit.Location,
 			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
 		);
-		auto Dark = Darkness;
-		if (bTranslucent) Dark /= 2;
-		Material->SetScalarParameterValue("Darkness", (1.f - (Start.Z - Hit.Location.Z) / MaxDistance) * Dark);
+
+		auto Dist = (Start.Z - Hit.Location.Z) / GetMaxDist();
+		if (bTranslucent) Dist = (Dist + 1) / 2;
+		static_cast<UMaterialInstanceDynamic*>(GetMaterial(0))->SetScalarParameterValue("Distance", Dist);
 	}
 }
