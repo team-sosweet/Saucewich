@@ -21,8 +21,6 @@ void ASaucewichHUD::BeginPlay()
 
 	AliveWidget = CreateWidget<UAliveHUD>(PC, AliveWidgetClass);
 	DeathWidget = CreateWidget<UDeathHUD>(PC, DeathWidgetClass);
-
-	AliveWidget->AddToViewport();
 }
 
 void ASaucewichHUD::OnSpawn()
