@@ -14,12 +14,12 @@
 #include "Saucewich.h"
 #include "Online/SaucewichGameMode.h"
 #include "Online/SaucewichGameState.h"
+#include "Player/CharacterData.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacterMovementComponent.h"
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
-#include "TranslMatData.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
@@ -83,8 +83,10 @@ bool ATpsCharacter::IsInvincible() const
 
 void ATpsCharacter::SetMaxHP(const float Ratio)
 {
+	if (!GUARANTEE(Data != nullptr)) return;
+	
 	const auto OldMaxHP = MaxHP;
-	MaxHP = DefaultMaxHP * Ratio;
+	MaxHP = Data->DefaultMaxHP * Ratio;
 	if (HP == OldMaxHP) HP = MaxHP;
 }
 
@@ -112,8 +114,11 @@ void ATpsCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	const auto Idx = FMath::Max(GetMesh()->GetMaterialIndex("TeamColor"), 0);
-	DynamicMaterial = GetMesh()->CreateDynamicMaterialInstance(Idx);
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
+	{
+		GetMesh()->CreateDynamicMaterialInstance(i);
+	}
 }
 
 void ATpsCharacter::BeginPlay()
@@ -125,7 +130,10 @@ void ATpsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		bAlive = true;
-		HP = MaxHP = DefaultMaxHP;
+		if (GUARANTEE(Data != nullptr))
+		{
+			HP = MaxHP = Data->DefaultMaxHP;
+		}
 	}
 }
 
@@ -191,13 +199,13 @@ void ATpsCharacter::SetPlayerDefaults()
 	bAlive = true;
 	SetActorActivated(true);
 
-	if (RespawnInvincibleTime > 0.f)
+	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0.f)
 	{
 		BeTranslucent();
 		GetWorldTimerManager().SetTimer(
 			RespawnInvincibleTimerHandle, 
 			this, &ATpsCharacter::BeOpaque,
-			RespawnInvincibleTime, false
+			Data->RespawnInvincibleTime, false
 		);
 	}
 	
@@ -305,28 +313,16 @@ void ATpsCharacter::OnRep_Alive()
 
 void ATpsCharacter::BeTranslucent()
 {
-	if (bTranslucent || !TranslMatData) return;
+	if (bTranslucent) return;
 
-	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
-	const auto NumMat = GetMesh()->GetNumMaterials();
-	for (auto i = 0; i < NumMat; ++i)
+	for (const auto Mat : GetMesh()->GetMaterials())
 	{
-		const auto Ptr = TranslMatData->TranslMatByIdx.Find(i);
-		const auto Mat = Ptr ? *Ptr : TranslMatData->DefTranslMat;
-
-		if (i == Colored)
-		{
-			const auto Color = GetColor();
-			GetMesh()->CreateDynamicMaterialInstance(i, Mat)->SetVectorParameterValue("Color", Color);
-		}
-		else
-		{
-			GetMesh()->SetMaterial(i, Mat);
-		}
+		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Translucent;
 	}
 
 	WeaponComponent->BeTranslucent();
 	Shadow->BeTranslucent();
+	
 	bTranslucent = true;
 }
 
@@ -334,25 +330,13 @@ void ATpsCharacter::BeOpaque()
 {
 	if (!bTranslucent) return;
 
-	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
-	const auto Colored = GetMesh()->GetMaterialIndex("TeamColor");
-	const auto NumMat = GetMesh()->GetNumMaterials();
-	for (auto i = 0; i < NumMat; ++i)
+	for (const auto Mat : GetMesh()->GetMaterials())
 	{
-		if (i == Colored)
-		{
-			FLinearColor Color;
-			GetMesh()->GetMaterial(i)->GetVectorParameterValue({"Color"}, Color);
-			DynamicMaterial->SetVectorParameterValue("Color", Color);
-			GetMesh()->SetMaterial(i, DynamicMaterial);
-		}
-		else
-		{
-			GetMesh()->SetMaterial(i, DefMesh->GetMaterial(i));
-		}
+		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Opaque;
 	}
 
 	WeaponComponent->BeOpaque();
 	Shadow->BeOpaque();
+	
 	bTranslucent = false;
 }
