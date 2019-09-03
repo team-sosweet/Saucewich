@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "Saucewich.h"
 #include "GameFramework/Character.h"
-#include "Colorable.h"
-#include "Translucentable.h"
+
+#include "Saucewich.h"
+#include "Interface/Colorable.h"
+#include "Interface/Translucentable.h"
+
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
@@ -112,15 +114,8 @@ private:
 
 	FTimerHandle RespawnInvincibleTimerHandle;
 
-	UPROPERTY(Transient)
-	UMaterialInstanceDynamic* DynamicMaterial;
-
-	UPROPERTY(EditDefaultsOnly, AdvancedDisplay)
-	class UTranslMatData* TranslMatData;
-
-	// 기본 최대 체력입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float DefaultMaxHP = 100.f;
+	const class UCharacterData* Data;
 
 	// 현재 최대 체력입니다. 장착중인 주무기 등 여러 요인에 의해 달라집니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -129,10 +124,6 @@ private:
 	// 현재 체력입니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
-
-	// 스폰 무적 시간
-	UPROPERTY(EditAnywhere)
-	float RespawnInvincibleTime;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Alive, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bAlive : 1;
