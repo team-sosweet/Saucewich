@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Entity/PoolActor.h"
-#include "Queue.h"
 #include "Pickup.generated.h"
 
 class ATpsCharacter;
