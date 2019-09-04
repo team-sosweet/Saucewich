@@ -62,6 +62,7 @@ public:
 	 */
 #define AddOnEquipWeapon(UserObject, FuncName, bIncludeCurrentWeapons) __Internal_AddOnEquipWeapon(UserObject, FuncName, STATIC_FUNCTION_FNAME(TEXT(#FuncName)), bIncludeCurrentWeapons)
 
+	UPROPERTY(BlueprintAssignable)
 	FOnEquipWeapon OnEquipWeapon;
 	
 	class ATpsCharacter* const Owner = nullptr;
