@@ -17,10 +17,10 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture> Icon_Team;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture> Icon_Rest;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
