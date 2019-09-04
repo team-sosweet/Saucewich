@@ -11,10 +11,9 @@ class SAUCEWICH_API UCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
-	TArray<class UMaterialInterface*> TranslucentMaterials;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+	class UMaterialInterface* GetTranslMat(uint8 Idx, const UMaterialInterface* Mat) const;
+	
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;
 	
 	// 기본 최대 체력입니다.
@@ -22,6 +21,13 @@ public:
 	float DefaultMaxHP = 100.f;
 
 	// 스폰 무적 시간
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly)
 	float RespawnInvincibleTime;
+
+private:
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
+	TMap<uint8, UMaterialInterface*> TranslMatOverride;
+
+	UPROPERTY(EditAnywhere, AdvancedDisplay)
+	const class UTranslMatData* SharedTranslMat;
 };

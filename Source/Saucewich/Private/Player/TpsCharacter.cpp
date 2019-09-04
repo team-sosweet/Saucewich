@@ -118,12 +118,13 @@ void ATpsCharacter::PostInitializeComponents()
 		const auto ColMatIdx = GetColIdx();
 		if (ColMatIdx != INDEX_NONE)
 		{
-			ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
-
-			if (GUARANTEE(Data->TranslucentMaterials.IsValidIndex(ColMatIdx)))
+			const auto Transl = Data->GetTranslMat(ColMatIdx, GetMesh()->GetMaterial(ColMatIdx));
+			if (GUARANTEE(Transl != nullptr))
 			{
-				ColTranslMat = UMaterialInstanceDynamic::Create(Data->TranslucentMaterials[ColMatIdx], GetMesh());
+				ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
 			}
+
+			ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
 		}
 	}
 }
@@ -332,8 +333,8 @@ void ATpsCharacter::BeTranslucent()
 		if (i == ColMatIdx)
 			GetMesh()->SetMaterial(i, ColTranslMat);
 		
-		else if (Data->TranslucentMaterials.IsValidIndex(i))
-			GetMesh()->SetMaterial(i, Data->TranslucentMaterials[i]);
+		else if (const auto Transl = Data->GetTranslMat(i, GetMesh()->GetMaterial(i)))
+			GetMesh()->SetMaterial(i, Transl);
 	}
 
 	WeaponComponent->BeTranslucent();
