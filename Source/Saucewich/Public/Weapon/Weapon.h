@@ -10,6 +10,8 @@
 
 class UTexture;
 
+DECLARE_MULTICAST_DELEGATE(FOnColMatCreated);
+
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FWeaponData : public FTableRowBase
 {
@@ -48,7 +50,6 @@ class SAUCEWICH_API AWeapon : public APoolActor, public IColorable, public ITran
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UStaticMeshComponent* Mesh;
-	
 public:	
 	AWeapon();
 
@@ -96,8 +97,21 @@ private:
 	UFUNCTION()
 	virtual void OnRep_Equipped();
 
+	int32 GetColIdx() const;
+
+	FOnColMatCreated OnColMatCreated;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FDataTableRowHandle WeaponData;
+
+	UPROPERTY(EditAnywhere)
+	class UWeaponSharedData* SharedData;
+
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* ColMat;
+	
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* ColTranslMat;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipped, Transient, meta=(AllowPrivateAccess=true))
 	uint8 bEquipped : 1;

@@ -195,6 +195,9 @@ void UWeaponComponent::OnRep_Weapons()
 	{
 		ActiveWeapon->SetVisibility(true);
 	}
+
+	for (const auto Wep : Weapons)
+		if (Wep) Wep->SetColor(CastChecked<ATpsCharacter>(GetOwner())->GetColor());
 }
 
 void UWeaponComponent::FireP()
