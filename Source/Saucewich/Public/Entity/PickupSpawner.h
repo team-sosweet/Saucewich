@@ -15,7 +15,14 @@ class SAUCEWICH_API APickupSpawner final : public AGameModeDependentLevelActor
 
 public:
 	APickupSpawner();
+	
 	void PickedUp();
+
+	auto GetSpawnClass() const { return Class; }
+	auto GetSpawnInterval() const { return SpawnInterval; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetRemainingSpawnTime() const;
 
 protected:
 	void BeginPlay() override;
@@ -27,10 +34,10 @@ private:
 	FTimerHandle SpawnTimer;
 
 	// 스폰할 픽업의 클래스
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class APickup> Class;
 
 	// 스폰 간격 (초)
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float SpawnInterval;
 };
