@@ -14,9 +14,10 @@ class SAUCEWICH_API UTranslMatData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	// 
 	UPROPERTY(EditAnywhere)
-	TMap<uint8, class UMaterialInterface*> TranslMatByIdx;
-
+	TMap<class UMaterialInterface*, UMaterialInterface*> ByIdx;
+	
 	UPROPERTY(EditAnywhere)
-	UMaterialInterface* DefTranslMat;
+	TMap<UMaterialInterface*, UMaterialInterface*> ByMat;
 };

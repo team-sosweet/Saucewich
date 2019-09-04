@@ -11,6 +11,12 @@ class SAUCEWICH_API UCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+	TArray<class UMaterialInterface*> TranslucentMaterials;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
+	FName ColMatName;
+	
 	// 기본 최대 체력입니다.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float DefaultMaxHP = 100.f;
