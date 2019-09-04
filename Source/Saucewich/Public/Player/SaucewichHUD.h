@@ -2,38 +2,48 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "SaucewichHUD.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeColor, FLinearColor, MyTeamColor);
+
+enum class EGameRule : uint8;
+
 UCLASS()
-class SAUCEWICH_API ASaucewichHUD : public AHUD
+class SAUCEWICH_API ASaucewichHUD final : public AHUD
 {
 	GENERATED_BODY()
-	
-protected:
-	void BeginPlay() override;
 
+	void BeginPlay() override;
+	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeColor OnChangeColor;
+	
 private:
 	UFUNCTION()
-	void OnSpawn();
+	void ChangeColor(uint8 NewTeam);
+	
+	void BindChangeColor();
 
-	UFUNCTION()
-	void OnDeath();
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = true))
+	TMap<EGameRule, TSubclassOf<class UComponentWidget>> AliveComponentsClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UAliveHUD> AliveWidgetClass;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = true))
+	TMap<EGameRule, TSubclassOf<UComponentWidget>> DeathComponentsClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UDeathHUD> DeathWidgetClass;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Components, meta = (AllowPrivateAccess = true))
+	TMap<EGameRule, TSubclassOf<UComponentWidget>> ResultComponentsClass;
+	
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UAliveWidget* AliveWidget;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	UAliveHUD* AliveWidget;
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UDeathWidget* DeathWidget;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	UDeathHUD* DeathWidget;
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UResultWidget* ResultWidget;
 
-	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float DeathWidgetDelay;
-
-	FTimerHandle DeathWidgetTimer;
+	class ASaucewichGameState* GameState;
 };

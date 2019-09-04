@@ -7,6 +7,13 @@
 
 DECLARE_EVENT_OneParam(USaucewichGameInstance, FOnGameStateReady, class ASaucewichGameState*);
 
+UENUM(BlueprintType)
+enum class EGameRule : uint8
+{
+	Lobby UMETA(DisplayName = "Lobby"),
+	MakeSandwich UMETA(DisplayName = "MakeSandwich"),
+};
+
 UCLASS()
 class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 {
@@ -36,6 +43,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
 
+	EGameRule GetGameRule() const;
+	
 	FOnGameStateReady OnGameStateReady;
 
 private:
@@ -56,4 +65,7 @@ private:
 
 	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float CorrectionValue;
+
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	EGameRule GameRule;
 };

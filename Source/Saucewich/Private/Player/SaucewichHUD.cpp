@@ -4,37 +4,47 @@
 
 #include "TimerManager.h"
 
-#include "Player/TpsCharacter.h"
-#include "Widget/AliveHUD.h"
-#include "Widget/DeathHUD.h"
+#include "Online/SaucewichGameState.h"
+#include "SaucewichGameInstance.h"
+#include "Player/SaucewichPlayerState.h"
+#include "Widget/AliveWidget.h"
+#include "Widget/DeathWidget.h"
+#include "Widget/ResultWidget.h"
 
 void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
 	const auto PC = GetOwningPlayerController();
-	const auto Pawn = Cast<ATpsCharacter>(PC->GetPawn());
-	if (!Pawn) return;
 	
-	Pawn->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
-	Pawn->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
+	AliveWidget = CreateWidget<UAliveWidget>(PC);
+	DeathWidget = CreateWidget<UDeathWidget>(PC);
+	ResultWidget = CreateWidget<UResultWidget>(PC);
 
-	AliveWidget = CreateWidget<UAliveHUD>(PC, AliveWidgetClass);
-	DeathWidget = CreateWidget<UDeathHUD>(PC, DeathWidgetClass);
+	const auto GameRule = GetGameInstance<USaucewichGameInstance>()->GetGameRule();
+
+	AliveWidget->SetComponent(AliveComponentsClass[GameRule]);
+	DeathWidget->SetComponent(DeathComponentsClass[GameRule]);
+	ResultWidget->SetComponent(ResultComponentsClass[GameRule]);
 }
 
-void ASaucewichHUD::OnSpawn()
+void ASaucewichHUD::ChangeColor(const uint8 NewTeam)
 {
-	DeathWidget->RemoveFromParent();
-	AliveWidget->AddToViewport();
+	const auto MyTeamColor = GameState->GetTeamData(NewTeam).Color;
+	OnChangeColor.Broadcast(MyTeamColor);
 }
 
-void ASaucewichHUD::OnDeath()
+void ASaucewichHUD::BindChangeColor()
 {
-	AliveWidget->RemoveFromParent();
+	const auto PlayerState = GetOwningPlayerController()->GetPlayerState<ASaucewichPlayerState>();
 
-	GetWorldTimerManager().SetTimer(DeathWidgetTimer, [this]
+	if (PlayerState)
 	{
-		DeathWidget->AddToViewport();
-	}, DeathWidgetDelay, false);
+		PlayerState->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangeColor);
+		ChangeColor(PlayerState->GetTeam());
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ASaucewichHUD::BindChangeColor);
+	}
 }
