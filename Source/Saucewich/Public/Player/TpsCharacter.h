@@ -105,6 +105,7 @@ private:
 	void BindOnTeamChanged();
 	void SetColorToTeamColor();
 	FLinearColor GetTeamColor(class ASaucewichGameState* GameState) const;
+	int32 GetColIdx() const;
 
 	UFUNCTION()
 	void OnRep_Alive();
@@ -116,6 +117,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	const class UCharacterData* Data;
+
+	UPROPERTY(Transient)
+	class UMaterialInstanceDynamic* ColMat;
+
+	UPROPERTY(Transient)
+	class UMaterialInstanceDynamic* ColTranslMat;
 
 	// 현재 최대 체력입니다. 장착중인 주무기 등 여러 요인에 의해 달라집니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

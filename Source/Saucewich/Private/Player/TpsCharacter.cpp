@@ -55,8 +55,7 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
-		Mat->GetVectorParameterValue({"Color"}, Color);
+	GUARANTEE(ColMat->GetVectorParameterValue({"Color"}, Color));
 	return Color;
 }
 
@@ -71,8 +70,8 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	if (const auto Mat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(GetMesh()->GetMaterialIndex("TeamColor"))))
-		Mat->SetVectorParameterValue("Color", NewColor);
+	ColMat->SetVectorParameterValue("Color", NewColor);
+	if (GUARANTEE(ColTranslMat != nullptr)) ColTranslMat->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -114,10 +113,18 @@ void ATpsCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	const auto NumMat = GetMesh()->GetNumMaterials();
-	for (auto i = 0; i < NumMat; ++i)
+	if (GUARANTEE(Data != nullptr))
 	{
-		GetMesh()->CreateDynamicMaterialInstance(i);
+		const auto ColMatIdx = GetColIdx();
+		if (ColMatIdx != INDEX_NONE)
+		{
+			ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
+
+			if (GUARANTEE(Data->TranslucentMaterials.IsValidIndex(ColMatIdx)))
+			{
+				ColTranslMat = UMaterialInstanceDynamic::Create(Data->TranslucentMaterials[ColMatIdx], GetMesh());
+			}
+		}
 	}
 }
 
@@ -285,13 +292,10 @@ void ATpsCharacter::SetColorToTeamColor()
 {
 	if (const auto GameState = GetWorld()->GetGameState())
 	{
-		if (const auto GS = Cast<ASaucewichGameState>(GameState))
+		const auto GS = Cast<ASaucewichGameState>(GameState);
+		if (GUARANTEE_MSG(GS != nullptr, "GameState를 SaucewichGameState로 변환 실패"))
 		{
 			SetColor(GetTeamColor(GS));
-		}
-		else
-		{
-			UE_LOG(LogTpsCharacter, Error, TEXT("GameState가 있긴 한데 ASaucewichGameState가 아닙니다!"));
 		}
 	}
 	else
@@ -305,6 +309,11 @@ FLinearColor ATpsCharacter::GetTeamColor(ASaucewichGameState* const GameState) c
 	return GameState->GetTeamData(GetTeam()).Color;
 }
 
+int32 ATpsCharacter::GetColIdx() const
+{
+	return GUARANTEE(Data != nullptr) ? GetMesh()->GetMaterialIndex(Data->ColMatName) : INDEX_NONE;
+}
+
 void ATpsCharacter::OnRep_Alive()
 {
 	if (bAlive) SetPlayerDefaults();
@@ -314,10 +323,17 @@ void ATpsCharacter::OnRep_Alive()
 void ATpsCharacter::BeTranslucent()
 {
 	if (bTranslucent) return;
+	if (!Data) return;
 
-	for (const auto Mat : GetMesh()->GetMaterials())
+	const auto ColMatIdx = GetColIdx();
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
 	{
-		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Translucent;
+		if (i == ColMatIdx)
+			GetMesh()->SetMaterial(i, ColTranslMat);
+		
+		else if (Data->TranslucentMaterials.IsValidIndex(i))
+			GetMesh()->SetMaterial(i, Data->TranslucentMaterials[i]);
 	}
 
 	WeaponComponent->BeTranslucent();
@@ -330,10 +346,12 @@ void ATpsCharacter::BeOpaque()
 {
 	if (!bTranslucent) return;
 
-	for (const auto Mat : GetMesh()->GetMaterials())
-	{
-		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Opaque;
-	}
+	const auto* const DefMesh = GetDefault<ACharacter>(GetClass())->GetMesh();
+	const auto ColMatIdx = GetColIdx();
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	
+	for (auto i = 0; i < NumMat; ++i)
+		GetMesh()->SetMaterial(i, i == ColMatIdx ? ColMat : DefMesh->GetMaterial(i));
 
 	WeaponComponent->BeOpaque();
 	Shadow->BeOpaque();
