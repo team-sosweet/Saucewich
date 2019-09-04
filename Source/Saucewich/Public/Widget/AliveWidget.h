@@ -1,0 +1,14 @@
+// Copyright 2019 Team Sosweet. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Widget/BaseWidget.h"
+#include "AliveWidget.generated.h"
+
+UCLASS()
+class SAUCEWICH_API UAliveWidget : public UBaseWidget
+{
+	GENERATED_BODY()
+	
+};
