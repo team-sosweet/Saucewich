@@ -21,6 +21,11 @@ void APickupSpawner::PickedUp()
 	SetSpawnTimer();
 }
 
+float APickupSpawner::GetRemainingSpawnTime() const
+{
+	return FMath::Max(GetWorldTimerManager().GetTimerRemaining(SpawnTimer), 0.f);
+}
+
 void APickupSpawner::BeginPlay()
 {
 	Super::BeginPlay();
