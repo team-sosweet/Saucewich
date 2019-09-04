@@ -9,5 +9,5 @@ UMaterialInterface* UCharacterData::GetTranslMat(const uint8 Idx, const UMateria
 	if (const auto Found = TranslMatOverride.Find(Idx))
 		return *Found;
 
-	return SharedTranslMat->Map.FindRef(Mat);
+	return SharedTranslMat->Map.FindRef(Mat).LoadSynchronous();
 }

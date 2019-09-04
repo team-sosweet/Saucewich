@@ -15,5 +15,5 @@ class SAUCEWICH_API UTranslMatData : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere)
-	TMap<class UMaterialInterface*, UMaterialInterface*> Map;
+	TMap<TSoftObjectPtr<UMaterialInterface>, TSoftObjectPtr<UMaterialInterface>> Map;
 };

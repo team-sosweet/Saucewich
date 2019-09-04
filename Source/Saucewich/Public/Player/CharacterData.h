@@ -6,7 +6,7 @@
 #include "CharacterData.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UCharacterData : public UDataAsset
+class SAUCEWICH_API UCharacterData final : public UDataAsset
 {
 	GENERATED_BODY()
 

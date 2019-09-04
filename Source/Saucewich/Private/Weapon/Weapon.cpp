@@ -7,8 +7,9 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "TpsCharacter.h"
-#include "WeaponComponent.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/WeaponComponent.h"
+#include "Weapon/WeaponSharedData.h"
 
 AWeapon::AWeapon()
 	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
@@ -28,6 +29,7 @@ void AWeapon::Init()
 			const auto WeaponComponent = Character->GetWeaponComponent();
 			WeaponComponent->OnEquipWeapon.Broadcast(this);
 			WeaponComponent->GetActiveWeapon() == this ? Deploy() : Holster();
+			SetColor(Character->GetColor());
 			if (Character->IsInvincible()) BeTranslucent();
 		}
 	}
@@ -43,14 +45,32 @@ void AWeapon::OnRep_Equipped()
 	else Holster();
 }
 
+int32 AWeapon::GetColIdx() const
+{
+	return GUARANTEE(SharedData != nullptr) ? Mesh->GetMaterialIndex(SharedData->ColMatName) : INDEX_NONE;
+}
+
 void AWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	const auto NumMat = Mesh->GetNumMaterials();
-	for (auto i = 0; i < NumMat; ++i)
+	if (GUARANTEE(SharedData != nullptr))
 	{
-		Mesh->CreateDynamicMaterialInstance(i);
+		if (const auto Data = GetData(FILE_LINE_FUNC))
+		{
+			const auto ColMatIdx = GetColIdx();
+			if (GUARANTEE(ColMatIdx != INDEX_NONE))
+			{
+				const auto Transl = SharedData->GetTranslMat(GetMesh()->GetMaterial(ColMatIdx));
+				if (GUARANTEE(Transl != nullptr))
+				{
+					ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
+				}
+				ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
+
+				OnColMatCreated.Broadcast();
+			}
+		}
 	}
 }
 
@@ -84,24 +104,33 @@ void AWeapon::SetVisibility(const bool bNewVisibility) const
 FLinearColor AWeapon::GetColor() const
 {
 	FLinearColor Color;
-	if (const auto Mat = Mesh->GetMaterial(Mesh->GetMaterialIndex("TeamColor")))
-		Mat->GetVectorParameterValue({"Color"}, Color);
+	if (ColMat) ColMat->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
 void AWeapon::SetColor(const FLinearColor& NewColor)
 {
-	if (const auto Mat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(Mesh->GetMaterialIndex("TeamColor"))))
-		Mat->SetVectorParameterValue("Color", NewColor);
+	if (ColMat) ColMat->SetVectorParameterValue("Color", NewColor);
+	if (ColTranslMat) ColTranslMat->SetVectorParameterValue("Color", NewColor);
 }
 
 void AWeapon::BeTranslucent()
 {
 	if (bTransl) return;
+	if (!GUARANTEE(SharedData != nullptr)) return;
 
-	for (const auto Mat : Mesh->GetMaterials())
+	const auto Data = GetData(FILE_LINE_FUNC);
+	if (!Data) return;
+
+	const auto ColMatIdx = GetColIdx();
+	const auto NumMat = GetMesh()->GetNumMaterials();
+	for (auto i = 0; i < NumMat; ++i)
 	{
-		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Translucent;
+		if (i == ColMatIdx)
+			GetMesh()->SetMaterial(i, ColTranslMat);
+		
+		else if (const auto Transl = SharedData->GetTranslMat(GetMesh()->GetMaterial(i)))
+			GetMesh()->SetMaterial(i, Transl);
 	}
 
 	bTransl = true;
@@ -111,10 +140,12 @@ void AWeapon::BeOpaque()
 {
 	if (!bTransl) return;
 
-	for (const auto Mat : Mesh->GetMaterials())
-	{
-		static_cast<UMaterialInstanceDynamic*>(Mat)->BlendMode = BLEND_Opaque;
-	}
+	const auto* const DefMesh = GetDefault<AWeapon>(GetClass())->Mesh;
+	const auto NumMat = Mesh->GetNumMaterials();
+	const auto ColMatIdx = GetColIdx();
+	
+	for (auto i = 0; i < NumMat; ++i)
+		GetMesh()->SetMaterial(i, i == ColMatIdx ? ColMat : DefMesh->GetMaterial(i));
 
 	bTransl = false;
 }
