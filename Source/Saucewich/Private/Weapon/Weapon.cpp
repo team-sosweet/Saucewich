@@ -11,6 +11,11 @@
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/WeaponSharedData.h"
 
+AWeapon* AWeapon::GetDefaultWeapon(const TSubclassOf<AWeapon> Class)
+{
+	return Class.GetDefaultObject();
+}
+
 AWeapon::AWeapon()
 	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {

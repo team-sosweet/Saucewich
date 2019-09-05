@@ -71,6 +71,16 @@ bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSu
 	return true;
 }
 
+void ASaucewichPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
+	{
+		PC->OnPlayerStateSpawned.Broadcast(this);
+	}
+}
+
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

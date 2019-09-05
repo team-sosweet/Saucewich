@@ -6,7 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "SaucewichHUD.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeColor, FLinearColor, MyTeamColor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedColor, const FLinearColor&, MyTeamColor);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangedColorSingle, const FLinearColor&, MyTeamColor);
 
 UCLASS()
 class SAUCEWICH_API ASaucewichHUD final : public AHUD
@@ -16,14 +17,17 @@ class SAUCEWICH_API ASaucewichHUD final : public AHUD
 	void BeginPlay() override;
 	
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnChangeColor OnChangeColor;
+	UFUNCTION(BlueprintCallable)
+	void BindChangedColor(const FOnChangedColorSingle& InDelegate);
 
 private:
 	UFUNCTION()
-	void ChangeColor(uint8 NewTeam);
+	void OnGetPlayerState(class ASaucewichPlayerState* PS);
 	
-	void BindChangeColor();
+	UFUNCTION()
+	void ChangedColor(uint8 NewTeam);
+
+	FOnChangedColor OnChangedColor;
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = true))
 	class UAliveWidget* AliveWidget;
@@ -35,4 +39,6 @@ private:
 	class UResultWidget* ResultWidget;
 
 	class ASaucewichGameState* GameState;
+
+	FLinearColor MyTeamColor;
 };

@@ -5,6 +5,9 @@
 #include "GameFramework/PlayerController.h"
 #include "SaucewichPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateSpawned, class ASaucewichPlayerState*, PlayerState);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, class ASaucewichPlayerState*, PlayerState);
+
 UCLASS()
 class SAUCEWICH_API ASaucewichPlayerController : public APlayerController
 {
@@ -22,6 +25,11 @@ public:
 	UFUNCTION(Server, Unreliable, WithValidation)
 	void ServerRespawn();
 
+	UFUNCTION(BlueprintCallable)
+	void SafePlayerState(const FOnPlayerStateSpawnedSingle& InDelegate);
+	
+	FOnPlayerStateSpawned OnPlayerStateSpawned;
+	
 private:
 	FTimerHandle RespawnTimer;
 };

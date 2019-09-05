@@ -53,7 +53,11 @@ class SAUCEWICH_API AWeapon : public APoolActor, public IColorable, public ITran
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UStaticMeshComponent* Mesh;
-public:	
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	static AWeapon* GetDefaultWeapon(TSubclassOf<AWeapon> Class);
+	
 	AWeapon();
 
 	UStaticMeshComponent* GetMesh() const { return Mesh; }

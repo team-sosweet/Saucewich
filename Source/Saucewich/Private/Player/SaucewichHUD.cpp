@@ -3,9 +3,9 @@
 #include "Player/SaucewichHUD.h"
 
 #include "Engine/World.h"
-#include "TimerManager.h"
 
 #include "Online/SaucewichGameState.h"
+#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 
 void ASaucewichHUD::BeginPlay()
@@ -13,26 +13,27 @@ void ASaucewichHUD::BeginPlay()
 	Super::BeginPlay();
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-	BindChangeColor();
+	
+	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController());
+	FOnPlayerStateSpawnedSingle PSDelegate;
+	PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
+	PC->SafePlayerState(PSDelegate);
 }
 
-void ASaucewichHUD::ChangeColor(const uint8 NewTeam)
+void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
-	const auto MyTeamColor = GameState->GetTeamData(NewTeam).Color;
-	OnChangeColor.Broadcast(MyTeamColor);
+	OnChangedColor.Add(InDelegate);
+	InDelegate.ExecuteIfBound(MyTeamColor);
 }
 
-void ASaucewichHUD::BindChangeColor()
+void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
 {
-	const auto PlayerState = GetOwningPlayerController()->GetPlayerState<ASaucewichPlayerState>();
+	PS->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangedColor);
+	ChangedColor(PS->GetTeam());
+}
 
-	if (PlayerState)
-	{
-		PlayerState->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangeColor);
-		ChangeColor(PlayerState->GetTeam());
-	}
-	else
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ASaucewichHUD::BindChangeColor);
-	}
+void ASaucewichHUD::ChangedColor(const uint8 NewTeam)
+{
+	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
+	OnChangedColor.Broadcast(MyTeamColor);
 }

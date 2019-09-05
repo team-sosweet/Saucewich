@@ -22,7 +22,7 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnChangeColor(FLinearColor MyTeamColor);
+	void OnChangedColor(const FLinearColor& MyTeamColor);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* CoolMaterialParent;

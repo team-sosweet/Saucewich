@@ -23,13 +23,16 @@ void UAttackButton::NativeOnInitialized()
 
 	const auto Player = GetOwningPlayer();
 	const auto HUD = Cast<ASaucewichHUD>(Player->GetHUD());
-	HUD->OnChangeColor.AddDynamic(this, &UAttackButton::OnChangeColor);
+	
+	FOnChangedColorSingle ChangeColorDelegate;
+	ChangeColorDelegate.BindDynamic(this, &UAttackButton::OnChangedColor);
+	HUD->BindChangedColor(ChangeColorDelegate);
 
 	const auto WeaponComponent = Cast<ATpsCharacter>(Player->GetPawn())->GetWeaponComponent();
 	WeaponComponent->OnEquipWeapon.AddDynamic(this, &UAttackButton::OnWeaponChanged);
 }
 
-void UAttackButton::OnChangeColor(const FLinearColor MyTeamColor)
+void UAttackButton::OnChangedColor(const FLinearColor& MyTeamColor)
 {
 	CoolMaterial->SetVectorParameterValue(TEXT("Team Color"), MyTeamColor);
 }
