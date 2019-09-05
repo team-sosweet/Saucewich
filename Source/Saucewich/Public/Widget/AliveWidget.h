@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Widget/BaseWidget.h"
 #include "AliveWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UAliveWidget : public UBaseWidget
+class SAUCEWICH_API UAliveWidget final : public UBaseWidget
 {
 	GENERATED_BODY()
 	

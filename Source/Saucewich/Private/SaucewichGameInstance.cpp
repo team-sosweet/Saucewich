@@ -65,8 +65,3 @@ float USaucewichGameInstance::GetSensitivity() const
 {
 	return (CorrectionValue * Sensitivity) + (CorrectionValue* 0.5);
 }
-
-EGameRule USaucewichGameInstance::GetGameRule() const
-{
-	return GameRule;
-}

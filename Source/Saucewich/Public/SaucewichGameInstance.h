@@ -42,8 +42,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
-
-	EGameRule GetGameRule() const;
 	
 	FOnGameStateReady OnGameStateReady;
 
