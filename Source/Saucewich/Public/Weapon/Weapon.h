@@ -3,9 +3,12 @@
 #pragma once
 
 #include "PoolActor.h"
+
 #include "Engine/DataTable.h"
-#include "Colorable.h"
-#include "Translucentable.h"
+
+#include "Interface/Colorable.h"
+#include "Interface/Translucentable.h"
+
 #include "Weapon.generated.h"
 
 class UTexture;
@@ -16,7 +19,7 @@ USTRUCT(BlueprintType)
 struct SAUCEWICH_API FWeaponData : public FTableRowBase
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture> Icon_Team;
 
@@ -36,7 +39,7 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
 	float HPRatio = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 Slot;
+	uint8 Slot = 0;
 };
 
 /**
@@ -56,9 +59,13 @@ public:
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	bool IsEquipped() const { return bEquipped; }
 
-	// 무기 데이터를 반환합니다. nullptr일 수 있습니다.
 	template <class T = FWeaponData, class = TEnableIf<TIsDerivedFrom<T, FWeaponData>::IsDerived>>
 	const T* GetData(const TCHAR* const ContextString) const { return WeaponData.GetRow<T>(ContextString); }
+
+	// 무기 데이터에 대한 레퍼런스를 반환합니다.
+	// 만약 무기 클래스에 데이터가 바인드 되어있지 않거나 하는 이유로 데이터를 구할 수 없을 경우 기본값을 반환합니다.
+	UFUNCTION(BlueprintCallable)
+	const FWeaponData& GetWeaponData() const;
 
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
