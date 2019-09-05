@@ -9,5 +9,11 @@ UCLASS()
 class SAUCEWICH_API UComponentWidget final : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	void Init(class UBaseWidget* InOwnerWidget);
 	
+private:
+	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UBaseWidget* OwnerWidget;
 };

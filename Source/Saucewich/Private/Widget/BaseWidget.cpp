@@ -25,6 +25,7 @@ void UBaseWidget::SetComponent(const TSubclassOf<UComponentWidget> ComponentClas
 	}
 
 	Component = CreateWidget<UComponentWidget>(GetOwningPlayer(), ComponentClass);
+	Component->Init(this);
 	Component->AddToViewport();
 	
 	const auto ComponentSlot = RootPanel->AddChildToCanvas(Component);
