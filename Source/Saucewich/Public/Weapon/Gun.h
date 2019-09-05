@@ -2,21 +2,15 @@
 
 #pragma once
 
+#include <random>
 #include "Saucewich.h"
 #include "Weapon/Weapon.h"
-#include "Engine/CollisionProfile.h"
 #include "Gun.generated.h"
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FGunData : public FWeaponData
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, AdvancedDisplay)
-	FCollisionProfileName PawnOnly;
-
-	UPROPERTY(EditAnywhere, AdvancedDisplay)
-	FCollisionProfileName NoPawn;
 
 	// 자동조준 상자 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -27,9 +21,6 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
 	TSubclassOf<class AGunProjectile> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, AdvancedDisplay)
-	float TraceStartOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Damage;
@@ -101,7 +92,6 @@ public:
 	const FGunData& GetGunData() const;
 
 protected:
-	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -115,19 +105,22 @@ protected:
 	void OnReleased() override;
 
 private:
-	UFUNCTION()
-	void OnRep_FireRandSeed();
+	void StartFire(int32 RandSeed);
 
-	FRandomStream FireRand;
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStartFire(int32 RandSeed);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastStartFire(int32 RandSeed);
+
+	FVector VRandCone(const FVector& Dir, float HorizontalConeHalfAngleRad, float VerticalConeHalfAngleRad);
+	std::default_random_engine FireRand;
 
 	float FireLag;
 	float LastFire;
 
 	float ReloadWaitingTime;
 	float ReloadAlpha;
-
-	UPROPERTY(ReplicatedUsing=OnRep_FireRandSeed, Transient)
-	int32 FireRandSeed;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Clip;
