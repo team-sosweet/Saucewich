@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Saucewich.h"
 #include "Modules/ModuleManager.h"

@@ -1,25 +1,17 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Gun.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UnrealNetwork.h"
-#include "ActorPool.h"
-#include "GunProjectile.h"
-#include "SaucewichGameState.h"
-#include "TpsCharacter.h"
-#include "WeaponComponent.h"
 
-void AGun::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (HasAuthority())
-	{
-		FireRandSeed = FMath::Rand();
-		OnRep_FireRandSeed();
-	}
-}
+#include "Entity/ActorPool.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/GunSharedData.h"
+#include "Weapon/WeaponComponent.h"
+#include "Weapon/Projectile/GunProjectile.h"
 
 void AGun::Tick(const float DeltaSeconds)
 {
@@ -47,7 +39,38 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 	DOREPLIFETIME(AGun, Clip);
 	DOREPLIFETIME(AGun, bDried);
 	DOREPLIFETIME(AGun, bFiring);
-	DOREPLIFETIME_CONDITION(AGun, FireRandSeed, COND_InitialOnly);
+}
+
+FVector AGun::VRandCone(const FVector& Dir, const float HorizontalConeHalfAngleRad, const float VerticalConeHalfAngleRad)
+{
+	if (VerticalConeHalfAngleRad > 0 && HorizontalConeHalfAngleRad > 0)
+	{
+		std::uniform_real_distribution<float> Distribution;
+		const auto Rand = [this, &Distribution]{return Distribution(FireRand);};
+		
+		const auto RandU = Rand();
+		const auto RandV = Rand();
+
+		const auto Theta = 2.f * PI * RandU;
+		auto Phi = FMath::Acos(2.f * RandV - 1.f);
+
+		auto ConeHalfAngleRad = FMath::Square(FMath::Cos(Theta) / VerticalConeHalfAngleRad) + FMath::Square(FMath::Sin(Theta) / HorizontalConeHalfAngleRad);
+		ConeHalfAngleRad = FMath::Sqrt(1.f / ConeHalfAngleRad);
+
+		Phi = FMath::Fmod(Phi, ConeHalfAngleRad);
+
+		const FMatrix DirMat = FRotationMatrix(Dir.Rotation());
+		const auto DirZ = DirMat.GetScaledAxis(EAxis::X);
+		const auto DirY = DirMat.GetScaledAxis(EAxis::Y);
+
+		auto Result = Dir.RotateAngleAxis(Phi * 180.f / PI, DirY);
+		Result = Result.RotateAngleAxis(Theta * 180.f / PI, DirZ);
+
+		Result = Result.GetSafeNormal();
+
+		return Result;
+	}
+	return Dir.GetSafeNormal();
 }
 
 void AGun::Shoot()
@@ -80,10 +103,10 @@ void AGun::Shoot()
 		HitType != EGunTraceHit::None ? Hit.ImpactPoint - MuzzleLocation
 		: MuzzleTransform.GetRotation().Vector();
 
-	const auto Rotation = FireRand.VRandCone(Dir, Data->HorizontalSpread, Data->VerticalSpread).ToOrientationQuat();
+	const auto Rotation = VRandCone(Dir, Data->HorizontalSpread, Data->VerticalSpread).ToOrientationQuat();
 
 	FTransform SpawnTransform{
-		Rotation, MuzzleLocation, FVector{FireRand.FRandRange(Data->MinProjectileSize, Data->MaxProjectileSize)}
+		Rotation, MuzzleLocation, FVector{std::uniform_real_distribution<float>{Data->MinProjectileSize, Data->MaxProjectileSize}(FireRand)}
 	};
 
 	FActorSpawnParameters Parameters;
@@ -104,15 +127,18 @@ void AGun::Shoot()
 
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 {
-	const auto Character = Cast<ATpsCharacter>(GetOwner());
-	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
-
+	const auto Shared = GetSharedData<UGunSharedData>();
+	if (!GUARANTEE(Shared != nullptr)) return EGunTraceHit::None;
+	
 	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
 	if (!Data) return EGunTraceHit::None;
 
+	const auto Character = Cast<ATpsCharacter>(GetOwner());
+	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
+
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
-	const auto Start = Character->GetSpringArmLocation() + AimDir * Data->TraceStartOffset;
+	const auto Start = Character->GetSpringArmLocation() + AimDir * Shared->TraceStartOffset;
 	const auto End = Start + AimDir * Data->MaxDistance;
 
 	FCollisionQueryParams Params;
@@ -120,7 +146,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
-		BoxHits, Start, End, AimRotation.Quaternion(), Data->PawnOnly.Name,
+		BoxHits, Start, End, AimRotation.Quaternion(), Shared->PawnOnly.Name,
 		FCollisionShape::MakeBox({0.f, Data->TraceBoxSize.X, Data->TraceBoxSize.Y}), Params
 	);
 
@@ -130,7 +156,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
 		if (!Chr || Chr->IsInvincible()) continue;
 
-		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Data->NoPawn.Name, Params))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Shared->NoPawn.Name, Params))
 		{
 			HitPawn = i;
 			break;
@@ -156,15 +182,13 @@ const FGunData& AGun::GetGunData() const
 
 void AGun::FireP()
 {
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
-	if (!Data) return;
-	
-	bFiring = true;
-	FireLag = 0.f;
-	if (LastFire + 60.f / Data->Rpm <= GetGameTimeSinceCreation())
+	const auto Pawn = Cast<APawn>(GetOwner());
+	if (Pawn && Pawn->IsLocallyControlled())
 	{
-		Shoot();
-		LastFire = GetGameTimeSinceCreation();
+		static std::default_random_engine Eng{std::random_device{}()};
+		const auto Seed = std::uniform_int_distribution<int32>{}(Eng);
+		StartFire(Seed);
+		ServerStartFire(Seed);
 	}
 }
 
@@ -205,6 +229,38 @@ void AGun::OnReleased()
 	ReloadAlpha = 0.f;
 }
 
+void AGun::StartFire(const int32 RandSeed)
+{
+	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	if (!Data) return;
+
+	FireRand.seed(RandSeed);
+	
+	bFiring = true;
+	FireLag = 0.f;
+	if (LastFire + 60.f / Data->Rpm <= GetGameTimeSinceCreation())
+	{
+		Shoot();
+		LastFire = GetGameTimeSinceCreation();
+	}
+}
+
+void AGun::MulticastStartFire_Implementation(const int32 RandSeed)
+{
+	const auto Pawn = Cast<APawn>(GetOwner());
+	if (Pawn && !Pawn->IsLocallyControlled()) StartFire(RandSeed);
+}
+
+void AGun::ServerStartFire_Implementation(const int32 RandSeed)
+{
+	MulticastStartFire(RandSeed);
+}
+
+bool AGun::ServerStartFire_Validate(int32)
+{
+	return true;
+}
+
 bool AGun::CanFire() const
 {
 	return IsActive() && Clip > 0 && !bDried;
@@ -234,9 +290,4 @@ void AGun::Reload(const float DeltaSeconds)
 			ReloadWaitingTime += DeltaSeconds;
 		}
 	}
-}
-
-void AGun::OnRep_FireRandSeed()
-{
-	FireRand.Initialize(FireRandSeed);
 }

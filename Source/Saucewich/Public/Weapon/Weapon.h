@@ -67,6 +67,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FWeaponData& GetWeaponData() const;
 
+	template <class T, class = TEnableIf<TIsDerivedFrom<T, class UWeaponSharedData>::IsDerived>>
+	const T* GetSharedData() const { return Cast<T>(SharedData); }
+	auto GetSharedData() const { return SharedData; }
+
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 
@@ -108,11 +112,11 @@ private:
 
 	FOnColMatCreated OnColMatCreated;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly)
 	FDataTableRowHandle WeaponData;
 
 	UPROPERTY(EditAnywhere)
-	class UWeaponSharedData* SharedData;
+	const class UWeaponSharedData* SharedData;
 
 	UPROPERTY(Transient)
 	UMaterialInstanceDynamic* ColMat;
