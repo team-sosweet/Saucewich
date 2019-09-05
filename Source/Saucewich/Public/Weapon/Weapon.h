@@ -59,16 +59,24 @@ public:
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	bool IsEquipped() const { return bEquipped; }
 
-	template <class T = FWeaponData, class = TEnableIf<TIsDerivedFrom<T, FWeaponData>::IsDerived>>
-	const T* GetData(const TCHAR* const ContextString) const { return WeaponData.GetRow<T>(ContextString); }
+	template <class T = FWeaponData>
+	const T* GetData(const TCHAR* const ContextString) const
+	{
+		static_assert(TIsDerivedFrom<T, FWeaponData>::IsDerived, "");
+		return WeaponData.GetRow<T>(ContextString);
+	}
 
 	// 무기 데이터에 대한 레퍼런스를 반환합니다.
 	// 만약 무기 클래스에 데이터가 바인드 되어있지 않거나 하는 이유로 데이터를 구할 수 없을 경우 기본값을 반환합니다.
 	UFUNCTION(BlueprintCallable)
 	const FWeaponData& GetWeaponData() const;
 
-	template <class T, class = TEnableIf<TIsDerivedFrom<T, class UWeaponSharedData>::IsDerived>>
-	const T* GetSharedData() const { return Cast<T>(SharedData); }
+	template <class T>
+	const T* GetSharedData() const
+	{
+		static_assert(TIsDerivedFrom<T, class UWeaponSharedData>::IsDerived, "");
+		return Cast<T>(SharedData);
+	}
 	auto GetSharedData() const { return SharedData; }
 
 	bool IsVisible() const;

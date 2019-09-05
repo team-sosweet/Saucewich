@@ -20,7 +20,4 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float TraceStartOffset = 10;
-
-	UPROPERTY(EditAnywhere)
-	float ServerRandomSeedUpdateFrequency = 5;
 };
