@@ -2,30 +2,18 @@
 
 #include "Player/SaucewichHUD.h"
 
+#include "Engine/World.h"
 #include "TimerManager.h"
 
 #include "Online/SaucewichGameState.h"
-#include "SaucewichGameInstance.h"
 #include "Player/SaucewichPlayerState.h"
-#include "Widget/AliveWidget.h"
-#include "Widget/DeathWidget.h"
-#include "Widget/ResultWidget.h"
 
 void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const auto PC = GetOwningPlayerController();
-	
-	AliveWidget = CreateWidget<UAliveWidget>(PC);
-	DeathWidget = CreateWidget<UDeathWidget>(PC);
-	ResultWidget = CreateWidget<UResultWidget>(PC);
-
-	const auto GameRule = GetGameInstance<USaucewichGameInstance>()->GetGameRule();
-
-	AliveWidget->SetComponent(AliveComponentsClass[GameRule]);
-	DeathWidget->SetComponent(DeathComponentsClass[GameRule]);
-	ResultWidget->SetComponent(ResultComponentsClass[GameRule]);
+	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
+	BindChangeColor();
 }
 
 void ASaucewichHUD::ChangeColor(const uint8 NewTeam)
