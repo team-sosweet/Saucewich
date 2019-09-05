@@ -72,6 +72,10 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	// 소스를 완전히 소모하고 재장전중에 소스가 이만큼 차면 다시 발사가 가능해집니다.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 MinClipToFireAfterDried;
+
+	// 한 번에 발사되는 탄자 개수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=1, ClampMin=1))
+	uint8 NumProjectile = 1;
 };
 
 UCLASS(Abstract)
@@ -112,6 +116,8 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartFire(int32 RandSeed);
+
+	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data) const;
 
 	FVector VRandCone(const FVector& Dir, float HorizontalConeHalfAngleRad, float VerticalConeHalfAngleRad);
 	std::default_random_engine FireRand;
