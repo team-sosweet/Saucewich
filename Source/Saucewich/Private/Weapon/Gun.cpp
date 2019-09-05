@@ -147,6 +147,13 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, Profile, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
+const FGunData& AGun::GetGunData() const
+{
+	static const FGunData Default{};
+	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	return Data ? *Data : Default;
+}
+
 void AGun::FireP()
 {
 	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);

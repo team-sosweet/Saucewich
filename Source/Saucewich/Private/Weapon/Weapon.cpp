@@ -91,6 +91,13 @@ void AWeapon::OnReleased()
 	Holster();
 }
 
+const FWeaponData& AWeapon::GetWeaponData() const
+{
+	static const FWeaponData Default;
+	const auto Data = GetData(FILE_LINE_FUNC);
+	return Data ? *Data : Default;
+}
+
 bool AWeapon::IsVisible() const
 {
 	return Mesh->bVisible;
