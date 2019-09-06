@@ -19,11 +19,18 @@ UWeaponComponent::UWeaponComponent()
 	bWantsInitializeComponent = true;
 }
 
+void UWeaponComponent::AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate, const bool bCallbackWithCurrentWeapons)
+{
+	if (!GUARANTEE(Delegate.IsBound())) return;
+	if (bCallbackWithCurrentWeapons)
+		for (const auto Weapon : Weapons)
+			if (Weapon) Delegate.Execute(Weapon);
+	OnEquipWeapon.AddUnique(Delegate);
+}
+
 void UWeaponComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-
-	const_cast<ATpsCharacter*&>(Owner) = CastChecked<ATpsCharacter>(GetOwner());
 	Weapons.Init(nullptr, WeaponSlots);
 }
 
@@ -134,29 +141,20 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
 	if (!WeaponClass) return nullptr;
 
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner) return nullptr;
+
 	const auto Data = GetDefault<AWeapon>(WeaponClass)->GetData(FILE_LINE_FUNC);
 	if (!Data) return nullptr;
 	
 	const auto Slot = Data->Slot;
-	if (Slot >= Weapons.Num())
-	{
-		UE_LOG(LogWeaponComponent, Error, TEXT("Failed to give weapon: Invalid slot (Expected: < %d, Actual: %d)"), Weapons.Num(), Slot);
-		return nullptr;
-	}
+	if (!GUARANTEE(Slot < Weapons.Num())) return nullptr;
 
 	const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
-	if (!GI)
-	{
-		UE_LOG(LogWeaponComponent, Error, TEXT("Give: USaucewichGameInstance를 얻는 데 실패했습니다."));
-		return nullptr;
-	}
+	if (!GUARANTEE(GI != nullptr)) return nullptr;
 
 	const auto Pool = GI->GetActorPool();
-	if (!Pool)
-	{
-		UE_LOG(LogWeaponComponent, Error, TEXT("Give: ActorPool을 얻는 데 실패했습니다."));
-		return nullptr;
-	}
+	if (!GUARANTEE(Pool != nullptr)) return nullptr;
 
 	if (Weapons[Slot])
 	{
@@ -202,7 +200,8 @@ void UWeaponComponent::OnRep_Weapons()
 
 void UWeaponComponent::FireP()
 {
-	if (!Owner->IsAlive()) return;
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner || !Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireP();
@@ -212,11 +211,16 @@ void UWeaponComponent::FireP()
 
 void UWeaponComponent::ServerFireP_Implementation() { MulticastFireP(); }
 bool UWeaponComponent::ServerFireP_Validate() { return true; }
-void UWeaponComponent::MulticastFireP_Implementation() { if (!Owner->IsLocallyControlled()) FireP(); }
+void UWeaponComponent::MulticastFireP_Implementation()
+{
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (Owner && !Owner->IsLocallyControlled()) FireP();
+}
 
 void UWeaponComponent::FireR()
 {
-	if (!Owner->IsAlive()) return;
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner || !Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireR();
@@ -226,11 +230,16 @@ void UWeaponComponent::FireR()
 
 void UWeaponComponent::ServerFireR_Implementation() { MulticastFireR(); }
 bool UWeaponComponent::ServerFireR_Validate() { return true; }
-void UWeaponComponent::MulticastFireR_Implementation() { if (!Owner->IsLocallyControlled()) FireR(); }
+void UWeaponComponent::MulticastFireR_Implementation()
+{
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (Owner && !Owner->IsLocallyControlled()) FireR();
+}
 
 void UWeaponComponent::SlotP(const uint8 Slot)
 {
-	if (!Owner->IsAlive()) return;
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner || !Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotP();
@@ -240,11 +249,16 @@ void UWeaponComponent::SlotP(const uint8 Slot)
 
 void UWeaponComponent::ServerSlotP_Implementation(const uint8 Slot) { MulticastSlotP(Slot); }
 bool UWeaponComponent::ServerSlotP_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
-void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot) { if (!Owner->IsLocallyControlled()) SlotP(Slot); }
+void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot)
+{
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (Owner && !Owner->IsLocallyControlled()) SlotP(Slot);
+}
 
 void UWeaponComponent::SlotR(const uint8 Slot)
 {
-	if (!Owner->IsAlive()) return;
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner || !Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotR();
@@ -254,4 +268,8 @@ void UWeaponComponent::SlotR(const uint8 Slot)
 
 void UWeaponComponent::ServerSlotR_Implementation(const uint8 Slot) { MulticastSlotR(Slot); }
 bool UWeaponComponent::ServerSlotR_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
-void UWeaponComponent::MulticastSlotR_Implementation(const uint8 Slot) { if (!Owner->IsLocallyControlled()) SlotR(Slot); }
+void UWeaponComponent::MulticastSlotR_Implementation(const uint8 Slot)
+{
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (Owner && !Owner->IsLocallyControlled()) SlotR(Slot);
+}

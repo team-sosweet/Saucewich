@@ -29,10 +29,18 @@ class SAUCEWICH_API AThrowingWeapon final : public AWeapon
 {
 	GENERATED_BODY()
 
+public:
+	// 무기 데이터에 대한 레퍼런스를 반환합니다.
+	// 만약 무기 클래스에 데이터가 바인드 되어있지 않거나 하는 이유로 데이터를 구할 수 없을 경우 기본값을 반환합니다.
+	UFUNCTION(BlueprintCallable)
+	const FThrowingWeaponData& GetThrowingWeaponData() const;
+
+protected:
 	void SlotP() override;
 	void OnActivated() override;
 	void Tick(float DeltaSeconds) override;
 
+private:
 	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float ReloadingTime;
 

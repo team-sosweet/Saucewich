@@ -48,15 +48,15 @@ private:
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Objective;
 
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Kill;
 	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Assist;
 	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Death;
 };

@@ -32,7 +32,7 @@ void AWeapon::Init()
 		{
 			Role = MyOwner->Role;
 			const auto WeaponComponent = Character->GetWeaponComponent();
-			WeaponComponent->OnEquipWeapon.Broadcast(this);
+			UWeaponComponent::FBroadcastEquipWeapon(WeaponComponent, this);
 			WeaponComponent->GetActiveWeapon() == this ? Deploy() : Holster();
 			SetColor(Character->GetColor());
 			if (Character->IsInvincible()) BeTranslucent();

@@ -8,6 +8,13 @@
 #include "Entity/ActorPool.h"
 #include "Weapon/Projectile/Projectile.h"
 
+const FThrowingWeaponData& AThrowingWeapon::GetThrowingWeaponData() const
+{
+	static const FThrowingWeaponData Default{};
+	const auto Data = GetData<FThrowingWeaponData>(FILE_LINE_FUNC);
+	return Data ? *Data : Default;
+}
+
 void AThrowingWeapon::SlotP()
 {
 	if (bReloading) return;
