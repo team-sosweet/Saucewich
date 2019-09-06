@@ -31,7 +31,7 @@ void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSing
 	}
 	else
 	{
-		OnPlayerStateSpawned.Add(InDelegate);
+		OnPlayerStateSpawned.AddUnique(InDelegate);
 	}
 }
 
