@@ -69,6 +69,14 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 	return Min[FMath::RandHelper(Min.Num())] + 1;
 }
 
+const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
+{
+	static const FScoreData Default{};
+	const auto Found = ScoreData.Find(ForWhat);
+	return Found ? *Found : Default;
+}
+
+
 TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint8 Slot) const
 {
 	TArray<TSubclassOf<AWeapon>> SlotWep;
@@ -116,6 +124,8 @@ void ASaucewichGameState::OnRep_RoundStartTime()
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
 	ASaucewichPlayerState* const Victim, ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
+	Attacker->OnKill();
+	Victim->OnDeath();
 	OnPlayerDeath.Broadcast(Victim, Attacker, Inflictor);
 }
 

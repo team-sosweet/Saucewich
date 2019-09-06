@@ -6,10 +6,12 @@
 #include "SaucewichPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateSpawned, class ASaucewichPlayerState*, PlayerState);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, class ASaucewichPlayerState*, PlayerState);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, ASaucewichPlayerState*, PlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsCharacter*, Character);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
 
 UCLASS()
-class SAUCEWICH_API ASaucewichPlayerController : public APlayerController
+class SAUCEWICH_API ASaucewichPlayerController final : public APlayerController
 {
 	GENERATED_BODY()
 
@@ -26,10 +28,38 @@ public:
 	void ServerRespawn();
 
 	UFUNCTION(BlueprintCallable)
-	void SafePlayerState(const FOnPlayerStateSpawnedSingle& InDelegate);
+	void SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate);
 	
-	FOnPlayerStateSpawned OnPlayerStateSpawned;
+	UFUNCTION(BlueprintCallable)
+	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
+	
+	struct BroadcastPlayerStateSpawned;	
+	struct BroadcastCharacterSpawned;
 	
 private:
+	FOnPlayerStateSpawned OnPlayerStateSpawned;
+	FOnCharacterSpawned OnCharacterSpawned;
 	FTimerHandle RespawnTimer;
+};
+
+struct ASaucewichPlayerController::BroadcastPlayerStateSpawned
+{
+private:
+	friend ASaucewichPlayerState;
+	BroadcastPlayerStateSpawned(ASaucewichPlayerController* Controller, ASaucewichPlayerState* PlayerState)
+	{
+		Controller->OnPlayerStateSpawned.Broadcast(PlayerState);
+		Controller->OnPlayerStateSpawned.Clear();
+	}
+};
+
+struct ASaucewichPlayerController::BroadcastCharacterSpawned
+{
+private:
+	friend ATpsCharacter;
+	BroadcastCharacterSpawned(ASaucewichPlayerController* Controller, ATpsCharacter* Character)
+	{
+		Controller->OnCharacterSpawned.Broadcast(Character);
+		Controller->OnCharacterSpawned.Clear();
+	}
 };

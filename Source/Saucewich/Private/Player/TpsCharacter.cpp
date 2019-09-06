@@ -133,6 +133,11 @@ void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (const auto PC = GetController<ASaucewichPlayerController>())
+	{
+		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+	}
+
 	BindOnTeamChanged();
 
 	if (HasAuthority())
@@ -231,14 +236,12 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 		if (const auto PC = GetController<ASaucewichPlayerController>())
 			GameMode->SetPlayerRespawnTimer(PC);
 
-	const auto Player = GetPlayerStateChecked<ASaucewichPlayerState>();
-	Player->OnDeath();
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
-
+	
 	if (HasAuthority())
 		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-			GameState->MulticastPlayerDeath(Player, Attacker, Inflictor);
+			GameState->MulticastPlayerDeath(GetPlayerState<ASaucewichPlayerState>(), Attacker, Inflictor);
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

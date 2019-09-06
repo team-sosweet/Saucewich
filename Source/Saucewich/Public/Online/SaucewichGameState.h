@@ -20,6 +20,18 @@ struct FTeam
 	FLinearColor Color;
 };
 
+USTRUCT(BlueprintType)
+struct SAUCEWICH_API FScoreData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 Score;
+};
+
 UCLASS()
 class SAUCEWICH_API ASaucewichGameState : public AGameState
 {
@@ -59,7 +71,10 @@ public:
 		TeamScore[Team] = NewScore;
 	}
 	
+	UFUNCTION(BlueprintCallable)
+	const FScoreData& GetScoreData(FName ForWhat) const;
 	
+
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<class AWeapon>> GetAvailableWeapons(uint8 Slot) const;
@@ -96,6 +111,9 @@ private:
 	UFUNCTION()
 	void OnRep_RoundStartTime();
 	
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, FScoreData> ScoreData;
+
 	// 팀 정보를 저장하는 배열입니다. 게임 플레이 도중 바뀌지 않습니다.
 	// 0번째는 unassigned/connecting 팀으로, 사용되지 않는 팀이어야 합니다.
 	// 팀 개수는 사용되지 않는 0번 팀 포함 최소 2개여야 합니다.
