@@ -20,6 +20,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Weapon Changed"))
 	void OnWeaponChanged(class AWeapon* Weapon);
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Created Material"))
+	void OnCreatedMaterial();
+	
 private:
 	UFUNCTION()
 	void OnChangedColor(const FLinearColor& MyTeamColor);

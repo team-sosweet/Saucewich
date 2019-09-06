@@ -12,6 +12,8 @@
 
 void UAttackButton::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+	
 	CoolProgressBar = Cast<UProgressBar>(GetWidgetFromName("ProgressBar_Cool"));
 	CoolProgressBar->PercentDelegate.BindDynamic(this, &UAttackButton::GetPercent);
 	
@@ -21,6 +23,8 @@ void UAttackButton::NativeOnInitialized()
 	CoolProgressBar->WidgetStyle.FillImage.SetResourceObject(CoolMaterial);
 	CoolProgressBar->WidgetStyle.BackgroundImage.SetResourceObject(CoolMaterial);
 
+	OnCreatedMaterial();
+	
 	const auto Player = GetOwningPlayer();
 	const auto HUD = Cast<ASaucewichHUD>(Player->GetHUD());
 	
@@ -37,5 +41,5 @@ void UAttackButton::NativeOnInitialized()
 
 void UAttackButton::OnChangedColor(const FLinearColor& MyTeamColor)
 {
-	CoolMaterial->SetVectorParameterValue(TEXT("Team Color"), MyTeamColor);
+	CoolMaterial->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 }
