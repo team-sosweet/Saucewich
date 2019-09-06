@@ -22,7 +22,7 @@ void ASaucewichHUD::BeginPlay()
 
 void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
-	OnChangedColor.Add(InDelegate);
+	OnChangedColor.AddUnique(InDelegate);
 	InDelegate.ExecuteIfBound(MyTeamColor);
 }
 
