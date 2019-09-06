@@ -29,6 +29,7 @@ void UAttackButton::NativeOnInitialized()
 	HUD->BindChangedColor(ChangeColorDelegate);
 
 	const auto WeaponComponent = Cast<ATpsCharacter>(Player->GetPawn())->GetWeaponComponent();
+	
 	FOnEquipWeaponSingle Delegate;
 	Delegate.BindDynamic(this, &UAttackButton::OnWeaponChanged);
 	WeaponComponent->AddOnEquipWeapon(Delegate);

@@ -27,7 +27,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* CoolMaterialParent;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInstanceDynamic* CoolMaterial;
 
 	UPROPERTY(Transient)

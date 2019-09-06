@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SubclassOf.h"
 #include "UObject/NoExportTypes.h"
 #include "CombatTextPool.generated.h"
 
