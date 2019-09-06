@@ -71,6 +71,7 @@ public:
 
 protected:
 	void InitializeComponent() override;
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -80,6 +81,8 @@ protected:
 private:
 	UFUNCTION(BlueprintCallable) void FireP();
 	UFUNCTION(BlueprintCallable) void FireR();
+	void StartFire();
+	void StopFire();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireP();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireR();
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireP();
@@ -105,4 +108,8 @@ private:
 	// 현재 활성화된 무기 슬롯 index 입니다.
 	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Active;
+
+	uint8 bFirePressed : 1;
+	uint8 bShouldAutoFire : 1;
+	uint8 bFiring : 1;
 };

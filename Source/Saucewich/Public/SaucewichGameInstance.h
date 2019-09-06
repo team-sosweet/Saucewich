@@ -10,11 +10,10 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameSta
 UENUM(BlueprintType)
 enum class EGameRule : uint8
 {
-	Lobby UMETA(DisplayName = "Lobby"),
-	MakeSandwich UMETA(DisplayName = "MakeSandwich"),
+	Lobby, MakeSandwich
 };
 
-UCLASS()
+UCLASS(Config=Game)
 class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 {
 	GENERATED_BODY()
@@ -42,6 +41,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
 
+	UFUNCTION(BlueprintCallable, DisplayName="Save Config")
+	void BP_SaveConfig() { SaveConfig(); }
+
+	bool IsAutoFire() const { return bAutoFire; }
+
 	struct BroadcastGameStateSpawned;
 	
 private:
@@ -53,17 +57,17 @@ private:
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	bool bIsAutoShot;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
+	float Sensitivity = .5;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float Sensitivity;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float CorrectionValue = 1;
 
-	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float CorrectionValue;
-
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	EGameRule GameRule;
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
+	uint8 bAutoFire : 1;
 };
 
 struct USaucewichGameInstance::BroadcastGameStateSpawned

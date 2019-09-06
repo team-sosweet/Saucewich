@@ -13,8 +13,6 @@ DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameInstance, Log, All)
 USaucewichGameInstance::USaucewichGameInstance()
 	:ActorPoolClass{AActorPool::StaticClass()}
 {
-	Sensitivity = 0.5f;
-	CorrectionValue = 1.0f;
 }
 
 USaucewichGameInstance::~USaucewichGameInstance()
@@ -27,7 +25,7 @@ USaucewichGameInstance::~USaucewichGameInstance()
 
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
-	if (!ActorPool) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
+	if (!IsValid(ActorPool)) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
 	return ActorPool;
 }
 
@@ -38,5 +36,5 @@ ASaucewichGameState* USaucewichGameInstance::GetGameState() const
 
 float USaucewichGameInstance::GetSensitivity() const
 {
-	return (CorrectionValue * Sensitivity) + (CorrectionValue* 0.5);
+	return CorrectionValue * Sensitivity + CorrectionValue * .5f;
 }
