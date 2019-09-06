@@ -11,9 +11,9 @@ class SAUCEWICH_API ASandwichIngredient final : public APickup
 	GENERATED_BODY()
 
 protected:
-	void BePickedUp(ATpsCharacter* By) override;
-	void StartPickUp(ATpsCharacter* By) override;
-	void CancelPickUp(ATpsCharacter* By) override;
-	bool CanPickedUp(const ATpsCharacter* By) const override;
-	bool CanEverPickedUp(const ATpsCharacter* By) const override;
+	void BePickedUp_Implementation(ATpsCharacter* By) override;
+	void StartPickUp_Implementation(ATpsCharacter* By) override;
+	void CancelPickUp_Implementation(ATpsCharacter* By) override;
+	bool CanPickedUp_Implementation(const ATpsCharacter* By) const override;
+	bool CanEverPickedUp_Implementation(const ATpsCharacter* By) const override;
 };

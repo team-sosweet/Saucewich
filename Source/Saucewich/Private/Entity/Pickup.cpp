@@ -124,7 +124,7 @@ void APickup::OnReleased()
 	Collision->DestroyPhysicsState();
 }
 
-void APickup::BePickedUp(ATpsCharacter* const By)
+void APickup::BePickedUp_Implementation(ATpsCharacter* const By)
 {
 	if (bSpawnedFromSpawner)
 		if (const auto Spawner = Cast<APickupSpawner>(GetOwner()))
@@ -132,14 +132,24 @@ void APickup::BePickedUp(ATpsCharacter* const By)
 	Release();
 }
 
-void APickup::StartPickUp(ATpsCharacter* const By)
+void APickup::StartPickUp_Implementation(ATpsCharacter* const By)
 {
 	By->OnPickupStarted.Broadcast(PickupTime);
 }
 
-void APickup::CancelPickUp(ATpsCharacter* const By)
+void APickup::CancelPickUp_Implementation(ATpsCharacter* const By)
 {
 	By->OnPickupCanceled.Broadcast();
+}
+
+bool APickup::CanEverPickedUp_Implementation(const ATpsCharacter* By) const
+{
+	return true;
+}
+
+bool APickup::CanPickedUp_Implementation(const ATpsCharacter* By) const
+{
+	return true;
 }
 
 void APickup::MulticastSetLocation_Implementation(const FVector Location)
