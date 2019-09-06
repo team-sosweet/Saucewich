@@ -2,38 +2,43 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "SaucewichHUD.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedColor, const FLinearColor&, MyTeamColor);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangedColorSingle, const FLinearColor&, MyTeamColor);
+
 UCLASS()
-class SAUCEWICH_API ASaucewichHUD : public AHUD
+class SAUCEWICH_API ASaucewichHUD final : public AHUD
 {
 	GENERATED_BODY()
-	
-protected:
+
 	void BeginPlay() override;
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	void BindChangedColor(const FOnChangedColorSingle& InDelegate);
 
 private:
 	UFUNCTION()
-	void OnSpawn();
-
+	void OnGetPlayerState(class ASaucewichPlayerState* PS);
+	
 	UFUNCTION()
-	void OnDeath();
+	void ChangedColor(uint8 NewTeam);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UAliveHUD> AliveWidgetClass;
+	FOnChangedColor OnChangedColor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UDeathHUD> DeathWidgetClass;
+	UPROPERTY(Transient, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UAliveWidget* AliveWidget;
 
-	UPROPERTY(Transient)
-	UAliveHUD* AliveWidget;
+	UPROPERTY(Transient, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UDeathWidget* DeathWidget;
 
-	UPROPERTY(Transient)
-	UDeathHUD* DeathWidget;
+	UPROPERTY(Transient, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = true))
+	class UResultWidget* ResultWidget;
 
-	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float DeathWidgetDelay;
+	class ASaucewichGameState* GameState;
 
-	FTimerHandle DeathWidgetTimer;
+	FLinearColor MyTeamColor;
 };

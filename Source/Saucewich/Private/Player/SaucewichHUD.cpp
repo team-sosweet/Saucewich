@@ -2,41 +2,38 @@
 
 #include "Player/SaucewichHUD.h"
 
-#include "TimerManager.h"
+#include "Engine/World.h"
 
-#include "Player/TpsCharacter.h"
-#include "Widget/AliveHUD.h"
-#include "Widget/DeathHUD.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/SaucewichPlayerController.h"
+#include "Player/SaucewichPlayerState.h"
 
 void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const auto PC = GetOwningPlayerController();
-	const auto Pawn = Cast<ATpsCharacter>(PC->GetPawn());
-	if (!Pawn) return;
+	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 	
-	Pawn->OnCharacterSpawn.AddDynamic(this, &ASaucewichHUD::OnSpawn);
-	Pawn->OnCharacterDeath.AddDynamic(this, &ASaucewichHUD::OnDeath);
-
-	AliveWidget = CreateWidget<UAliveHUD>(PC, AliveWidgetClass);
-	DeathWidget = CreateWidget<UDeathHUD>(PC, DeathWidgetClass);
-
-	AliveWidget->AddToViewport();
+	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController());
+	FOnPlayerStateSpawnedSingle PSDelegate;
+	PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
+	PC->SafePlayerState(PSDelegate);
 }
 
-void ASaucewichHUD::OnSpawn()
+void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
-	DeathWidget->RemoveFromParent();
-	AliveWidget->AddToViewport();
+	OnChangedColor.Add(InDelegate);
+	InDelegate.ExecuteIfBound(MyTeamColor);
 }
 
-void ASaucewichHUD::OnDeath()
+void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
 {
-	AliveWidget->RemoveFromParent();
+	PS->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangedColor);
+	ChangedColor(PS->GetTeam());
+}
 
-	GetWorldTimerManager().SetTimer(DeathWidgetTimer, [this]
-	{
-		DeathWidget->AddToViewport();
-	}, DeathWidgetDelay, false);
+void ASaucewichHUD::ChangedColor(const uint8 NewTeam)
+{
+	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
+	OnChangedColor.Broadcast(MyTeamColor);
 }

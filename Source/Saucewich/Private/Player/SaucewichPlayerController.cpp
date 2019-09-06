@@ -1,9 +1,12 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "SaucewichPlayerController.h"
+#include "Player/SaucewichPlayerController.h"
+
 #include "Engine/World.h"
 #include "TimerManager.h"
-#include "SaucewichGameMode.h"
+
+#include "Online/SaucewichGameMode.h"
+#include "Player/SaucewichPlayerState.h"
 
 void ASaucewichPlayerController::SetRespawnTimer_Implementation(const float RespawnTime)
 {
@@ -18,6 +21,18 @@ float ASaucewichPlayerController::GetRemainingRespawnTime() const
 void ASaucewichPlayerController::Respawn()
 {
 	if (GetRemainingRespawnTime() <= 0.f) ServerRespawn();
+}
+
+void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& InDelegate)
+{
+	if (const auto PS = GetPlayerState<ASaucewichPlayerState>())
+	{
+		InDelegate.ExecuteIfBound(PS);
+	}
+	else
+	{
+		OnPlayerStateSpawned.Add(InDelegate);
+	}
 }
 
 void ASaucewichPlayerController::ServerRespawn_Implementation()
