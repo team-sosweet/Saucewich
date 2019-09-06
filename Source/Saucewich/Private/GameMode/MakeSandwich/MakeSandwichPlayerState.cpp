@@ -9,22 +9,32 @@
 #include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 #include "SaucewichGameInstance.h"
 
+void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngredient> Class)
+{
+	if (HasAuthority())
+	{
+		AddScore("PickupIngredient");
+		MulticastPickupIngredient(Class);
+	}
+}
+
 void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TSubclassOf<ASandwichIngredient> Class)
 {
 	++Ingredients.FindOrAdd(Class);
 }
 
-void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngredient> Class)
-{
-	if (HasAuthority()) MulticastPickupIngredient(Class);
-}
-
 void AMakeSandwichPlayerState::PutIngredientsInFridge()
 {
 	if (Ingredients.Num() <= 0) return;
-	
+
 	if (const auto GS = GetWorld()->GetGameState<AMakeSandwichState>())
+	{
+		static const FName ScoreName = "PutIngredients";
+		const auto NumIngredients = GetNumIngredients();
+		AddScore(ScoreName, NumIngredients * GS->GetScoreData(ScoreName).Score);
+		Objective += NumIngredients;
 		GS->StoreIngredients(this);
+	}
 
 	MulticastResetIngredients();
 }
@@ -51,6 +61,7 @@ bool AMakeSandwichPlayerState::CanPickupIngredient() const
 
 void AMakeSandwichPlayerState::OnDeath()
 {
+	Super::OnDeath();
 	DropIngredients();
 }
 

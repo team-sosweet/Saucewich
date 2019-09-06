@@ -7,7 +7,6 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Saucewich.h"
 #include "Online/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 
@@ -32,19 +31,12 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
 
-void ASaucewichGameMode::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	State = GetGameState<ASaucewichGameState>();
-	GUARANTEE(State != nullptr);
-}
-
 APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
 {
 	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
 	if (!PC) return nullptr;
 	
-	if (State)
+	if (const auto State = GetGameState<ASaucewichGameState>())
 	{
 		LastTeam = UGameplayStatics::GetIntOption(Options, "Team", 0);
 		if (LastTeam == 0) LastTeam = State->GetMinPlayerTeam();

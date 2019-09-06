@@ -36,6 +36,42 @@ void ASaucewichPlayerState::GiveWeapons()
 			Character->GetWeaponComponent()->Give(Weapon);
 }
 
+void ASaucewichPlayerState::OnKill()
+{
+	if (HasAuthority())
+	{
+		++Kill;
+		AddScore("Kill");
+	}
+}
+
+void ASaucewichPlayerState::OnDeath()
+{
+	if (HasAuthority())
+	{
+		++Death;
+	}
+}
+
+void ASaucewichPlayerState::AddScore(const FName ScoreName)
+{
+	if (!HasAuthority()) return;
+
+	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
+	if (!GS) return;
+
+	const auto ActualScore = GS->GetScoreData(ScoreName).Score;
+	Score += ActualScore;
+	MulticastAddScore(ScoreName, ActualScore);
+}
+
+void ASaucewichPlayerState::AddScore(const FName ScoreName, const int32 ActualScore)
+{
+	if (!HasAuthority()) return;
+	Score += ActualScore;
+	OnScoreAdded.Broadcast(ScoreName, ActualScore);
+}
+
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 {
 	if (Team == NewTeam) return;
@@ -59,6 +95,11 @@ void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclass
 	WeaponLoadout[Slot] = Weapon;
 }
 
+void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore)
+{
+	OnScoreAdded.Broadcast(ScoreName, ActualScore);
+}
+
 void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
 	SetWeapon_Internal(Slot, Weapon);
@@ -75,7 +116,7 @@ void ASaucewichPlayerState::BeginPlay()
 
 	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
 	{
-		PC->OnPlayerStateSpawned.Broadcast(this);
+		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
 	}
 }
 
@@ -85,7 +126,6 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASaucewichPlayerState, Team);
 	DOREPLIFETIME(ASaucewichPlayerState, Objective);
 	DOREPLIFETIME(ASaucewichPlayerState, Kill);
-	DOREPLIFETIME(ASaucewichPlayerState, Assist);
 	DOREPLIFETIME(ASaucewichPlayerState, Death);
 	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
 }

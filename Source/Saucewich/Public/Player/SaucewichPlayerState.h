@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "SaucewichPlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreName, int32, ActualScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
 
 UCLASS()
@@ -20,10 +21,23 @@ public:
 
 	void GiveWeapons();
 
-	virtual void OnDeath() {}
+	virtual void OnKill();
+	virtual void OnDeath();
+
+	void AddScore(FName ScoreName);
+	void AddScore(FName ScoreName, int32 ActualScore);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
+
+	/**
+	 * 점수가 추가될때 호출됩니다.
+	 * @warning 클라이언트에서는 이 델리게이트가 호출된 시점에서 점수 추가가 실제로 반영되었다는 보장이 없습니다.
+	 * @param ScoreName 이 점수의 이름입니다. GameState에서 점수 정보를 얻을 때 사용하는 식별자입니다.
+	 * @param ActualScore 실제로 주어진 점수입니다.
+	 */
+	UPROPERTY(BlueprintAssignable)
+	FOnScoreAdded OnScoreAdded;
 
 protected:
 	void BeginPlay() override;
@@ -32,10 +46,16 @@ protected:
 	UFUNCTION()
 	void OnTeamChanged(uint8 OldTeam);
 
-private:	
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 Objective;
+
+private:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerSetWeapon(uint8 Slot, TSubclassOf<AWeapon> Weapon);
 	void SetWeapon_Internal(uint8 Slot, TSubclassOf<AWeapon> Weapon);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAddScore(FName ScoreName, int32 ActualScore);
 
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
@@ -48,15 +68,9 @@ private:
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 Objective;
-
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Kill;
 	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 Assist;
-	
-	UPROPERTY(Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Death;
 };

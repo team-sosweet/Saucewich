@@ -6,6 +6,7 @@
 #include "TimerManager.h"
 
 #include "Online/SaucewichGameMode.h"
+#include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerState.h"
 
 void ASaucewichPlayerController::SetRespawnTimer_Implementation(const float RespawnTime)
@@ -23,15 +24,29 @@ void ASaucewichPlayerController::Respawn()
 	if (GetRemainingRespawnTime() <= 0.f) ServerRespawn();
 }
 
-void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& InDelegate)
+void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate)
 {
+	if (!Delegate.IsBound()) return;
 	if (const auto PS = GetPlayerState<ASaucewichPlayerState>())
 	{
-		InDelegate.ExecuteIfBound(PS);
+		Delegate.ExecuteIfBound(PS);
 	}
 	else
 	{
-		OnPlayerStateSpawned.AddUnique(InDelegate);
+		OnPlayerStateSpawned.AddUnique(Delegate);
+	}
+}
+
+void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)
+{
+	if (!Delegate.IsBound()) return;
+	if (const auto Char = Cast<ATpsCharacter>(GetCharacter()))
+	{
+		Delegate.Execute(Char);
+	}
+	else
+	{
+		OnCharacterSpawned.AddUnique(Delegate);
 	}
 }
 

@@ -13,12 +13,11 @@ class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 
 public:
 	ASaucewichGameMode();
-	
+
 	virtual void UpdateMatchState();
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 
 protected:
-	void PostInitializeComponents() override;
 	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	bool FindInactivePlayer(APlayerController* PC) override;
@@ -26,6 +25,5 @@ protected:
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
 private:
-	class ASaucewichGameState* State;
 	uint8 LastTeam;
 };
