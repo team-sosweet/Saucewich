@@ -17,6 +17,7 @@ UWeaponComponent::UWeaponComponent()
 {
 	bReplicates = true;
 	bWantsInitializeComponent = true;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UWeaponComponent::AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate, const bool bCallbackWithCurrentWeapons)
@@ -32,6 +33,37 @@ void UWeaponComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 	Weapons.Init(nullptr, WeaponSlots);
+}
+
+void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick TickType,
+	FActorComponentTickFunction* const ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	const auto Owner = Cast<APawn>(GetOwner());
+	if (Owner && Owner->IsLocallyControlled())
+	{
+		const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
+		if (GI && GI->IsAutoFire())
+		{
+			FHitResult Hit;
+			bShouldAutoFire = GunTrace(Hit) == EGunTraceHit::Pawn;
+		}
+		else
+		{
+			bShouldAutoFire = false;
+		}
+
+		const auto bShouldFire = bShouldAutoFire || bFirePressed;
+		if (bFiring)
+		{
+			if (!bShouldFire) StopFire();
+		}
+		else
+		{
+			if (bShouldFire) StartFire();
+		}
+	}
 }
 
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -200,13 +232,7 @@ void UWeaponComponent::OnRep_Weapons()
 
 void UWeaponComponent::FireP()
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner || !Owner->IsAlive()) return;
-	if (auto W = GetActiveWeapon())
-	{
-		W->FireP();
-		if (Owner->IsLocallyControlled()) ServerFireP();
-	}
+	bFirePressed = true;
 }
 
 void UWeaponComponent::ServerFireP_Implementation() { MulticastFireP(); }
@@ -219,6 +245,23 @@ void UWeaponComponent::MulticastFireP_Implementation()
 
 void UWeaponComponent::FireR()
 {
+	bFirePressed = false;
+}
+
+void UWeaponComponent::StartFire()
+{
+	const auto Owner = Cast<ATpsCharacter>(GetOwner());
+	if (!Owner || !Owner->IsAlive()) return;
+	if (auto W = GetActiveWeapon())
+	{
+		W->FireP();
+		if (Owner->IsLocallyControlled()) ServerFireP();
+	}
+	bFiring = true;
+}
+
+void UWeaponComponent::StopFire()
+{
 	const auto Owner = Cast<ATpsCharacter>(GetOwner());
 	if (!Owner || !Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
@@ -226,6 +269,7 @@ void UWeaponComponent::FireR()
 		W->FireR();
 		if (Owner->IsLocallyControlled()) ServerFireR();
 	}
+	bFiring = false;
 }
 
 void UWeaponComponent::ServerFireR_Implementation() { MulticastFireR(); }

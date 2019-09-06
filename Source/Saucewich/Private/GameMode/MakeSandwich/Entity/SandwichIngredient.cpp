@@ -8,35 +8,35 @@
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "Player/TpsCharacter.h"
 
-void ASandwichIngredient::BePickedUp(ATpsCharacter* const By)
+void ASandwichIngredient::BePickedUp_Implementation(ATpsCharacter* const By)
 {
 	static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickupIngredient(GetClass());
-	Super::BePickedUp(By);
+	Super::BePickedUp_Implementation(By);
 }
 
-void ASandwichIngredient::StartPickUp(ATpsCharacter* const By)
+void ASandwichIngredient::StartPickUp_Implementation(ATpsCharacter* const By)
 {
-	Super::StartPickUp(By);
+	Super::StartPickUp_Implementation(By);
 	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
 	GUARANTEE(!Picking);
 	Picking = this;
 }
 
-void ASandwichIngredient::CancelPickUp(ATpsCharacter* const By)
+void ASandwichIngredient::CancelPickUp_Implementation(ATpsCharacter* const By)
 {
-	Super::CancelPickUp(By);
+	Super::CancelPickUp_Implementation(By);
 	auto& Picking = static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickingUp;
 	GUARANTEE(Picking == this);
 	Picking = nullptr;
 }
 
-bool ASandwichIngredient::CanPickedUp(const ATpsCharacter* const By) const
+bool ASandwichIngredient::CanPickedUp_Implementation(const ATpsCharacter* const By) const
 {
 	const auto Player = static_cast<const AMakeSandwichPlayerState*>(By->GetPlayerState());
 	return (!Player->PickingUp || Player->PickingUp == this) && Player->CanPickupIngredient();
 }
 
-bool ASandwichIngredient::CanEverPickedUp(const ATpsCharacter* const By) const
+bool ASandwichIngredient::CanEverPickedUp_Implementation(const ATpsCharacter* const By) const
 {
 	return By->GetPlayerState<AMakeSandwichPlayerState>() != nullptr;
 }

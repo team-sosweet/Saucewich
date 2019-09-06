@@ -104,6 +104,7 @@ public:
 	FOnPlayerDeath OnPlayerDeath;
 
 protected:
+	void BeginPlay() override;
 	void HandleMatchHasStarted() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

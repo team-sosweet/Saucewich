@@ -34,11 +34,20 @@ protected:
 	void OnActivated() override;
 	void OnReleased() override;
 
-	virtual void BePickedUp(ATpsCharacter* By);
-	virtual void StartPickUp(ATpsCharacter* By);
-	virtual void CancelPickUp(ATpsCharacter* By);
-	virtual bool CanPickedUp(const ATpsCharacter* By) const { return true; }
-	virtual bool CanEverPickedUp(const ATpsCharacter* By) const { return true; }
+	UFUNCTION(BlueprintNativeEvent)
+	void BePickedUp(ATpsCharacter* By);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void StartPickUp(ATpsCharacter* By);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void CancelPickUp(ATpsCharacter* By);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	bool CanPickedUp(const ATpsCharacter* By) const;
+	
+	UFUNCTION(BlueprintNativeEvent)
+	bool CanEverPickedUp(const ATpsCharacter* By) const;
 	
 private:
 	UFUNCTION(NetMulticast, Unreliable)

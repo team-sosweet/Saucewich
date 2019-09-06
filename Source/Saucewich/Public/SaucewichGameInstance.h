@@ -5,16 +5,15 @@
 #include "Engine/GameInstance.h"
 #include "SaucewichGameInstance.generated.h"
 
-DECLARE_EVENT_OneParam(USaucewichGameInstance, FOnGameStateReady, class ASaucewichGameState*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
 
 UENUM(BlueprintType)
 enum class EGameRule : uint8
 {
-	Lobby UMETA(DisplayName = "Lobby"),
-	MakeSandwich UMETA(DisplayName = "MakeSandwich"),
+	Lobby, MakeSandwich
 };
 
-UCLASS()
+UCLASS(Config=Game)
 class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 {
 	GENERATED_BODY()
@@ -35,35 +34,49 @@ public:
 		}
 		else
 		{
-			OnGameStateReady.AddLambda(Forward<Fn>(Func));
-			NotifyWhenGameStateReady();
+			OnGameStateSpawned.AddLambda(Forward<Fn>(Func));
 		}
 	}
 	
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
-	
-	FOnGameStateReady OnGameStateReady;
 
-private:
-	void CheckGameState();
-	void NotifyWhenGameStateReady();
+	UFUNCTION(BlueprintCallable, DisplayName="Save Config")
+	void BP_SaveConfig() { SaveConfig(); }
+
+	bool IsAutoFire() const { return bAutoFire; }
+
+	struct BroadcastGameStateSpawned;
 	
+private:
+	FOnGameStateSpawned OnGameStateSpawned;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
 
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	bool bIsAutoShot;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
+	float Sensitivity = .5;
 
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	float Sensitivity;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float CorrectionValue = 1;
 
-	UPROPERTY(Transient, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float CorrectionValue;
-
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	EGameRule GameRule;
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
+	uint8 bAutoFire : 1;
+};
+
+struct USaucewichGameInstance::BroadcastGameStateSpawned
+{
+private:
+	friend ASaucewichGameState;
+	BroadcastGameStateSpawned(USaucewichGameInstance* GI, ASaucewichGameState* GS)
+	{
+		GI->OnGameStateSpawned.Broadcast(GS);
+		GI->OnGameStateSpawned.Clear();
+	}
 };
