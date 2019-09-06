@@ -1,25 +1,17 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "Gun.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UnrealNetwork.h"
-#include "ActorPool.h"
-#include "GunProjectile.h"
-#include "SaucewichGameState.h"
-#include "TpsCharacter.h"
-#include "WeaponComponent.h"
 
-void AGun::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (HasAuthority())
-	{
-		FireRandSeed = FMath::Rand();
-		OnRep_FireRandSeed();
-	}
-}
+#include "Entity/ActorPool.h"
+#include "Online/SaucewichGameState.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/GunSharedData.h"
+#include "Weapon/WeaponComponent.h"
+#include "Weapon/Projectile/GunProjectile.h"
 
 void AGun::Tick(const float DeltaSeconds)
 {
@@ -47,7 +39,38 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 	DOREPLIFETIME(AGun, Clip);
 	DOREPLIFETIME(AGun, bDried);
 	DOREPLIFETIME(AGun, bFiring);
-	DOREPLIFETIME_CONDITION(AGun, FireRandSeed, COND_InitialOnly);
+}
+
+FVector AGun::VRandCone(const FVector& Dir, const float HorizontalConeHalfAngleRad, const float VerticalConeHalfAngleRad)
+{
+	if (VerticalConeHalfAngleRad > 0 && HorizontalConeHalfAngleRad > 0)
+	{
+		std::uniform_real_distribution<float> Distribution;
+		const auto Rand = [this, &Distribution]{return Distribution(FireRand);};
+		
+		const auto RandU = Rand();
+		const auto RandV = Rand();
+
+		const auto Theta = 2.f * PI * RandU;
+		auto Phi = FMath::Acos(2.f * RandV - 1.f);
+
+		auto ConeHalfAngleRad = FMath::Square(FMath::Cos(Theta) / VerticalConeHalfAngleRad) + FMath::Square(FMath::Sin(Theta) / HorizontalConeHalfAngleRad);
+		ConeHalfAngleRad = FMath::Sqrt(1.f / ConeHalfAngleRad);
+
+		Phi = FMath::Fmod(Phi, ConeHalfAngleRad);
+
+		const FMatrix DirMat = FRotationMatrix(Dir.Rotation());
+		const auto DirZ = DirMat.GetScaledAxis(EAxis::X);
+		const auto DirY = DirMat.GetScaledAxis(EAxis::Y);
+
+		auto Result = Dir.RotateAngleAxis(Phi * 180.f / PI, DirY);
+		Result = Result.RotateAngleAxis(Theta * 180.f / PI, DirZ);
+
+		Result = Result.GetSafeNormal();
+
+		return Result;
+	}
+	return Dir.GetSafeNormal();
 }
 
 void AGun::Shoot()
@@ -55,45 +78,67 @@ void AGun::Shoot()
 	if (!CanFire()) return;
 	if (!GetPool()) return;
 
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
-	if (!Data) return;
+	const auto Shared = GetSharedData<UGunSharedData>();
+	if (!Shared) return;
+
+	auto& Data = GetGunData();
 
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
 	GUARANTEE_MSG(!MuzzleLocation.IsNearlyZero(), "무기 Muzzle 소켓 설정 안 됨");
+
+	const auto ProjColProf = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
 	
 	FHitResult Hit;
-	const auto HitType = GunTrace(Hit);
-
-	if (HitType == EGunTraceHit::Pawn)
-	{
-		const auto ShotDir = (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal();
-		Hit.GetActor()->TakeDamage(
-			Data->Damage,
-			FPointDamageEvent{Data->Damage, Hit, ShotDir, Data->DamageType},
-			GetInstigator()->GetController(),
-			this
-		);
-	}
+	const auto HitType = GunTraceInternal(Hit, ProjColProf, Data);
 
 	const auto Dir =
-		HitType != EGunTraceHit::None ? Hit.ImpactPoint - MuzzleLocation
+		HitType != EGunTraceHit::None
+		? (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal()
 		: MuzzleTransform.GetRotation().Vector();
 
-	const auto Rotation = FireRand.VRandCone(Dir, Data->HorizontalSpread, Data->VerticalSpread).ToOrientationQuat();
+	TArray<FVector> RDirs;
+	for (auto i = 0; i < Data.NumProjectile; ++i)
+	{
+		RDirs.Add(VRandCone(Dir, Data.HorizontalSpread, Data.VerticalSpread));
+	}
+
+	TSet<uint8> HitPawnIdx;
+	if (HitType == EGunTraceHit::Pawn)
+	{
+		FHitResult PawnHitResult;
+		for (auto i = 0; i < Data.NumProjectile; ++i)
+		{
+			if (GetWorld()->LineTraceSingleByProfile(PawnHitResult, MuzzleLocation, MuzzleLocation + RDirs[i] * Data.MaxDistance, ProjColProf))
+			{
+				Hit.GetActor()->TakeDamage(
+					Data.Damage,
+					FPointDamageEvent{Data.Damage, PawnHitResult, RDirs[i], Data.DamageType},
+					GetInstigator()->GetController(),
+					this
+				);
+				HitPawnIdx.Add(i);
+			}
+		}
+	}
 
 	FTransform SpawnTransform{
-		Rotation, MuzzleLocation, FVector{FireRand.FRandRange(Data->MinProjectileSize, Data->MaxProjectileSize)}
+		FQuat::Identity, MuzzleLocation,
+		FVector{std::uniform_real_distribution<float>{Data.MinProjectileSize, Data.MaxProjectileSize}(FireRand)}
 	};
 
 	FActorSpawnParameters Parameters;
 	Parameters.Owner = this;
 	Parameters.Instigator = GetInstigator();
 
-	if (const auto Projectile = GetPool()->Spawn<AGunProjectile>(*Data->ProjectileClass, SpawnTransform, Parameters))
+	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
-		Projectile->bCosmetic = HitType == EGunTraceHit::Pawn;
-		Projectile->SetColor(GetColor());
+		SpawnTransform.SetRotation(RDirs[i].ToOrientationQuat());
+		if (const auto Projectile = GetPool()->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
+		{
+			Projectile->bCosmetic = HitPawnIdx.Contains(i);
+			Projectile->SetColor(GetColor());
+		}
 	}
 
 	LastClip = --Clip;
@@ -104,24 +149,31 @@ void AGun::Shoot()
 
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 {
+	auto& Data = GetGunData();
+	const auto Profile = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
+	return GunTraceInternal(OutHit, Profile, Data);
+}
+
+EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data) const
+{
+	const auto Shared = GetSharedData<UGunSharedData>();
+	if (!GUARANTEE(Shared != nullptr)) return EGunTraceHit::None;
+	
 	const auto Character = Cast<ATpsCharacter>(GetOwner());
 	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
 
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
-	if (!Data) return EGunTraceHit::None;
-
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
-	const auto Start = Character->GetSpringArmLocation() + AimDir * Data->TraceStartOffset;
-	const auto End = Start + AimDir * Data->MaxDistance;
+	const auto Start = Character->GetSpringArmLocation() + AimDir * Shared->TraceStartOffset;
+	const auto End = Start + AimDir * Data.MaxDistance;
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActors(TArray<AActor*>{GetWorld()->GetGameState<ASaucewichGameState>()->GetCharactersByTeam(Character->GetTeam())});
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
-		BoxHits, Start, End, AimRotation.Quaternion(), Data->PawnOnly.Name,
-		FCollisionShape::MakeBox({0.f, Data->TraceBoxSize.X, Data->TraceBoxSize.Y}), Params
+		BoxHits, Start, End, AimRotation.Quaternion(), Shared->PawnOnly.Name,
+		FCollisionShape::MakeBox({0.f, Data.TraceBoxSize.X, Data.TraceBoxSize.Y}), Params
 	);
 
 	auto HitPawn = -1;
@@ -130,7 +182,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
 		if (!Chr || Chr->IsInvincible()) continue;
 
-		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Data->NoPawn.Name, Params))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Shared->NoPawn.Name, Params))
 		{
 			HitPawn = i;
 			break;
@@ -143,8 +195,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 		return EGunTraceHit::Pawn;
 	}
 
-	const auto Profile = GetDefault<AGunProjectile>(Data->ProjectileClass)->GetCollisionProfile();
-	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, Profile, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
+	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, ProjColProf, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
 const FGunData& AGun::GetGunData() const
@@ -156,15 +207,13 @@ const FGunData& AGun::GetGunData() const
 
 void AGun::FireP()
 {
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
-	if (!Data) return;
-	
-	bFiring = true;
-	FireLag = 0.f;
-	if (LastFire + 60.f / Data->Rpm <= GetGameTimeSinceCreation())
+	const auto Pawn = Cast<APawn>(GetOwner());
+	if (Pawn && Pawn->IsLocallyControlled())
 	{
-		Shoot();
-		LastFire = GetGameTimeSinceCreation();
+		static std::default_random_engine Eng{std::random_device{}()};
+		const auto Seed = std::uniform_int_distribution<int32>{}(Eng);
+		StartFire(Seed);
+		ServerStartFire(Seed);
 	}
 }
 
@@ -205,6 +254,38 @@ void AGun::OnReleased()
 	ReloadAlpha = 0.f;
 }
 
+void AGun::StartFire(const int32 RandSeed)
+{
+	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	if (!Data) return;
+
+	FireRand.seed(RandSeed);
+	
+	bFiring = true;
+	FireLag = 0.f;
+	if (LastFire + 60.f / Data->Rpm <= GetGameTimeSinceCreation())
+	{
+		Shoot();
+		LastFire = GetGameTimeSinceCreation();
+	}
+}
+
+void AGun::MulticastStartFire_Implementation(const int32 RandSeed)
+{
+	const auto Pawn = Cast<APawn>(GetOwner());
+	if (Pawn && !Pawn->IsLocallyControlled()) StartFire(RandSeed);
+}
+
+void AGun::ServerStartFire_Implementation(const int32 RandSeed)
+{
+	MulticastStartFire(RandSeed);
+}
+
+bool AGun::ServerStartFire_Validate(int32)
+{
+	return true;
+}
+
 bool AGun::CanFire() const
 {
 	return IsActive() && Clip > 0 && !bDried;
@@ -234,9 +315,4 @@ void AGun::Reload(const float DeltaSeconds)
 			ReloadWaitingTime += DeltaSeconds;
 		}
 	}
-}
-
-void AGun::OnRep_FireRandSeed()
-{
-	FireRand.Initialize(FireRandSeed);
 }

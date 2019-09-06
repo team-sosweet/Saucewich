@@ -6,17 +6,17 @@
 #include "WeaponSharedData.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UWeaponSharedData final : public UDataAsset
+class SAUCEWICH_API UWeaponSharedData : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
 	class UMaterialInterface* GetTranslMat(const UMaterialInterface* OrigMat) const;
 	
-	UPROPERTY(EditAnywhere, AdvancedDisplay)
+	UPROPERTY(EditAnywhere)
 	FName ColMatName;
 
 private:
-	UPROPERTY(EditAnywhere, AdvancedDisplay)
+	UPROPERTY(EditAnywhere)
 	const class UTranslMatData* SharedTranslMat;
 };
