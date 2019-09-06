@@ -36,31 +36,6 @@ ASaucewichGameState* USaucewichGameInstance::GetGameState() const
 	return GetWorld()->GetGameState<ASaucewichGameState>();
 }
 
-void USaucewichGameInstance::CheckGameState()
-{
-	if (const auto GS = GetWorld()->GetGameState())
-	{
-		if (const auto SaucewichGS = Cast<ASaucewichGameState>(GS))
-		{
-			OnGameStateReady.Broadcast(SaucewichGS);
-			OnGameStateReady.Clear();
-		}
-		else
-		{
-			UE_LOG(LogSaucewichGameInstance, Error, TEXT("Failed to cast game state to SaucewichGameState"));
-		}
-	}
-	else
-	{
-		NotifyWhenGameStateReady();
-	}
-}
-
-void USaucewichGameInstance::NotifyWhenGameStateReady()
-{
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &USaucewichGameInstance::CheckGameState);
-}
-
 float USaucewichGameInstance::GetSensitivity() const
 {
 	return (CorrectionValue * Sensitivity) + (CorrectionValue* 0.5);

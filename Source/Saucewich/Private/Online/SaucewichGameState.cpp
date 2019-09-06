@@ -11,6 +11,7 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
+#include "SaucewichGameInstance.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -94,6 +95,14 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
 	return GetWorldTimerManager().GetTimerRemaining(RoundTimer);
+}
+
+void ASaucewichGameState::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
+		USaucewichGameInstance::BroadcastGameStateSpawned(GI, this);
 }
 
 void ASaucewichGameState::HandleMatchHasStarted()

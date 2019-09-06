@@ -5,7 +5,7 @@
 #include "Engine/GameInstance.h"
 #include "SaucewichGameInstance.generated.h"
 
-DECLARE_EVENT_OneParam(USaucewichGameInstance, FOnGameStateReady, class ASaucewichGameState*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
 
 UENUM(BlueprintType)
 enum class EGameRule : uint8
@@ -35,20 +35,18 @@ public:
 		}
 		else
 		{
-			OnGameStateReady.AddLambda(Forward<Fn>(Func));
-			NotifyWhenGameStateReady();
+			OnGameStateSpawned.AddLambda(Forward<Fn>(Func));
 		}
 	}
 	
 	UFUNCTION(BlueprintCallable)
 	float GetSensitivity() const;
-	
-	FOnGameStateReady OnGameStateReady;
 
-private:
-	void CheckGameState();
-	void NotifyWhenGameStateReady();
+	struct BroadcastGameStateSpawned;
 	
+private:
+	FOnGameStateSpawned OnGameStateSpawned;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
 
@@ -66,4 +64,15 @@ private:
 
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	EGameRule GameRule;
+};
+
+struct USaucewichGameInstance::BroadcastGameStateSpawned
+{
+private:
+	friend ASaucewichGameState;
+	BroadcastGameStateSpawned(USaucewichGameInstance* GI, ASaucewichGameState* GS)
+	{
+		GI->OnGameStateSpawned.Broadcast(GS);
+		GI->OnGameStateSpawned.Clear();
+	}
 };
