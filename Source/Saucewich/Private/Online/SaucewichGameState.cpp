@@ -118,6 +118,13 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	}
 }
 
+void ASaucewichGameState::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+
+	OnMatchEnd.Broadcast();
+}
+
 void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -143,4 +150,10 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 	uint8 Num = 0;
 	ForEachPlayer(PlayerArray, Team, [&Num](auto){++Num;});
 	return Num;
+}
+
+uint8 ASaucewichGameState::GetWinningTeam() const
+{
+	const auto A = TeamScore[1], B = TeamScore[2];
+	return A > B ? 1 : A < B ? 2 : 0;
 }

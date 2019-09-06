@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMatchEnd);
 
 USTRUCT(BlueprintType)
 struct FTeam
@@ -59,8 +60,10 @@ public:
 	uint8 GetNumPlayers(uint8 Team) const;
 
 
+	// 이기고 있는 (또는 이미 승리한) 팀을 반환합니다.
+	// 비기고 있는 (또는 이미 비겼을) 경우 0을 반환합니다.
 	UFUNCTION(BlueprintCallable)
-	uint8 GetWinningTeam() const { int32 Team; FMath::Max(TeamScore, &Team); return Team != INDEX_NONE ? Team : 0; }
+	uint8 GetWinningTeam() const;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
@@ -103,9 +106,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerDeath OnPlayerDeath;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnMatchEnd OnMatchEnd;
+
 protected:
 	void BeginPlay() override;
 	void HandleMatchHasStarted() override;
+	void HandleMatchHasEnded() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
