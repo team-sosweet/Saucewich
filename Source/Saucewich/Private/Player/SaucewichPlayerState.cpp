@@ -29,6 +29,12 @@ void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapo
 	if (!HasAuthority()) ServerSetWeapon(Slot, Weapon);
 }
 
+void ASaucewichPlayerState::SaveWeaponLoadout() const
+{
+	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+		GI->SaveWeaponLoadout(WeaponLoadout);
+}
+
 void ASaucewichPlayerState::GiveWeapons()
 {
 	if (const auto Character = GetPawn<ATpsCharacter>())
@@ -95,6 +101,21 @@ void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclass
 	WeaponLoadout[Slot] = Weapon;
 }
 
+void ASaucewichPlayerState::LoadWeaponLoadout(ATpsCharacter* const Char)
+{
+	if (Char->IsLocallyControlled())
+	{
+		if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+		{
+			auto& Loadout = GI->GetWeaponLoadout();
+			for (auto i = 0; i < Loadout.Num(); ++i)
+			{
+				SetWeapon(i, Loadout[i]);
+			}
+		}
+	}
+}
+
 void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore)
 {
 	OnScoreAdded.Broadcast(ScoreName, ActualScore);
@@ -117,6 +138,10 @@ void ASaucewichPlayerState::BeginPlay()
 	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
 	{
 		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
+
+		FOnCharacterSpawnedSingle OnCharacterSpawned;
+		OnCharacterSpawned.BindDynamic(this, &ASaucewichPlayerState::LoadWeaponLoadout);
+		PC->SafeCharacter(OnCharacterSpawned);
 	}
 }
 

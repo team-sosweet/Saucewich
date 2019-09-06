@@ -44,11 +44,22 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName="Save Config")
 	void BP_SaveConfig() { SaveConfig(); }
 
+	void SaveWeaponLoadout(const TArray<TSubclassOf<class AWeapon>>& Loadout)
+	{
+		WeaponLoadout = Loadout;
+		SaveConfig();
+	}
+
+	auto& GetWeaponLoadout() const { return WeaponLoadout; }
+
 	bool IsAutoFire() const { return bAutoFire; }
 
 	struct BroadcastGameStateSpawned;
 	
 private:
+	UPROPERTY(Config)
+	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
+	
 	FOnGameStateSpawned OnGameStateSpawned;
 
 	UPROPERTY(EditDefaultsOnly)

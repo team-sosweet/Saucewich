@@ -19,6 +19,9 @@ public:
 
 	void SetWeapon(uint8 Slot, TSubclassOf<class AWeapon> Weapon);
 
+	UFUNCTION(BlueprintCallable)
+	void SaveWeaponLoadout() const;
+
 	void GiveWeapons();
 
 	virtual void OnKill();
@@ -56,6 +59,9 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreName, int32 ActualScore);
+
+	UFUNCTION()
+	void LoadWeaponLoadout(class ATpsCharacter* Char);
 
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
