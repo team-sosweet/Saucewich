@@ -66,8 +66,6 @@ void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, con
 
 bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
-	if (Weapon) if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-		return GS->GetAvailableWeapons().Contains(Weapon);
 	return true;
 }
 
@@ -85,5 +83,9 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichPlayerState, Team);
+	DOREPLIFETIME(ASaucewichPlayerState, Objective);
+	DOREPLIFETIME(ASaucewichPlayerState, Kill);
+	DOREPLIFETIME(ASaucewichPlayerState, Assist);
+	DOREPLIFETIME(ASaucewichPlayerState, Death);
 	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
 }

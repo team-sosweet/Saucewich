@@ -47,4 +47,16 @@ private:
 	// 팀 관련 함수들은 SaucewichGameState를 확인하세요.
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
+	
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	uint8 Objective;
+
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	uint8 Kill;
+	
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	uint8 Assist;
+	
+	UPROPERTY(Replicated, Transient, BlueprintReadOnly)
+	uint8 Death;
 };
