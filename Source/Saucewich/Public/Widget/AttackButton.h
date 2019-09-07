@@ -14,6 +14,9 @@ class SAUCEWICH_API UAttackButton final : public UUserWidget
 	void NativeOnInitialized() override;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Material Spawned"))
+	void OnMaterialSpawned();
+	
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "Get Percent"))
 	float GetPercent();
 

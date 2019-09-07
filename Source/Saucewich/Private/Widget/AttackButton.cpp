@@ -20,6 +20,8 @@ void UAttackButton::NativeOnInitialized()
 	CoolMaterial =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), CoolMaterialParent);
 
+	OnMaterialSpawned();
+	
 	CoolProgressBar->WidgetStyle.FillImage.SetResourceObject(CoolMaterial);
 	CoolProgressBar->WidgetStyle.BackgroundImage.SetResourceObject(CoolMaterial);
 	
