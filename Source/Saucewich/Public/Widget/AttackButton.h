@@ -26,7 +26,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, meta = (DisplayName = "On Changed Color"))
 	void OnChangedColor(const FLinearColor& MyTeamColor);
 	
-private:
+private:	
 	virtual void OnChangedColor_Implementation(const FLinearColor& MyTeamColor);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
