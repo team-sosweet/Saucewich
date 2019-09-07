@@ -26,12 +26,12 @@ public:
 	void SetContent(const FFeedContent& InContent) override;
 
 private:
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
 	class ASaucewichPlayerState* Victim;
 	
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
 	ASaucewichPlayerState* Attacker;
 	
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, Category = Content, meta = (AllowPrivateAccess = true))
 	AActor* Inflictor;
 };
