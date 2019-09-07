@@ -39,7 +39,7 @@ void UAttackButton::NativeOnInitialized()
 	WeaponComponent->AddOnEquipWeapon(Delegate);
 }
 
-void UAttackButton::OnChangedColor(const FLinearColor& MyTeamColor)
+void UAttackButton::OnChangedColor_Implementation(const FLinearColor& MyTeamColor)
 {
 	CoolMaterial->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 }

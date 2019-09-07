@@ -22,10 +22,12 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Weapon Changed"))
 	void OnWeaponChanged(class AWeapon* Weapon);
+
+	UFUNCTION(BlueprintNativeEvent, meta = (DisplayName = "On Changed Color"))
+	void OnChangedColor(const FLinearColor& MyTeamColor);
 	
 private:
-	UFUNCTION()
-	void OnChangedColor(const FLinearColor& MyTeamColor);
+	virtual void OnChangedColor_Implementation(const FLinearColor& MyTeamColor);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* CoolMaterialParent;
