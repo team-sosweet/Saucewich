@@ -38,6 +38,6 @@ void UAliveWidget::OnPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayer
 
 void UAliveWidget::OnScoreAdded(const FName ScoreID, const int32 ActualScore)
 {
-	const auto& DisplayName = GameState->GetScoreData(ScoreID).Name;
+	const auto& DisplayName = GameState->GetScoreData(ScoreID).DisplayName;
 	ScoreFeedBox->MakeNewFeed(FScoreFeedContent(DisplayName, ActualScore));
 }
