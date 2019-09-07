@@ -141,17 +141,16 @@ void AGun::Shoot()
 		}
 	}
 
-	const auto bNewDried = Clip == 0;
-	if (bDried != bNewDried)
-	{
-		bDried = bNewDried;
-		if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-			Char->GetWeaponComponent()->OnGunDried.Broadcast(bNewDried);
-	}
-
 	LastClip = --Clip;
+	if (!bDried && Clip == 0)
+	{
+		bDried = true;
+		if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
+			Char->GetWeaponComponent()->OnGunDried.Broadcast(true);
+	}
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
+
 }
 
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
@@ -315,6 +314,8 @@ void AGun::Reload(const float DeltaSeconds)
 			if (bDried && Clip >= Data->MinClipToFireAfterDried)
 			{
 				bDried = false;
+				if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
+					Char->GetWeaponComponent()->OnGunDried.Broadcast(false);
 			}
 		}
 		else
