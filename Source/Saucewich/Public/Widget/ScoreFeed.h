@@ -7,10 +7,10 @@
 
 struct FScoreFeedContent final : FFeedContent
 {
-	FScoreFeedContent(const FText InName, const int32 InScore)
+	FScoreFeedContent(const FName InName, const int32 InScore)
 		: Name(InName), Score(InScore) {}
 
-	FText Name;
+	FName Name;
 	int32 Score;
 };
 
