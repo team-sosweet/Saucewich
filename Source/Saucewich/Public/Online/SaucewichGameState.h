@@ -27,7 +27,7 @@ struct SAUCEWICH_API FScoreData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText Name;
+	FText DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Score;

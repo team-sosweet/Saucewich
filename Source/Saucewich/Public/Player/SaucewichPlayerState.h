@@ -5,7 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "SaucewichPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreName, int32, ActualScore);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreID, int32, ActualScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
 
 UCLASS()
@@ -27,8 +27,8 @@ public:
 	virtual void OnKill();
 	virtual void OnDeath();
 
-	void AddScore(FName ScoreName);
-	void AddScore(FName ScoreName, int32 ActualScore);
+	void AddScore(FName ScoreID);
+	void AddScore(FName ScoreID, int32 ActualScore);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
@@ -58,7 +58,7 @@ private:
 	void SetWeapon_Internal(uint8 Slot, TSubclassOf<AWeapon> Weapon);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastAddScore(FName ScoreName, int32 ActualScore);
+	void MulticastAddScore(FName ScoreID, int32 ActualScore);
 
 	UFUNCTION()
 	void LoadWeaponLoadout(class ATpsCharacter* Char);
