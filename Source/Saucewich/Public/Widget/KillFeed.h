@@ -5,7 +5,7 @@
 #include "Widget/Feed.h"
 #include "KillFeed.generated.h"
 
-struct FKillFeedContent : FFeedContent
+struct FKillFeedContent final : FFeedContent
 {
 	FKillFeedContent(class ASaucewichPlayerState* InVictim,
 		ASaucewichPlayerState* InAttacker, AActor* InInflictor)
@@ -17,7 +17,7 @@ struct FKillFeedContent : FFeedContent
 };
 
 UCLASS()
-class SAUCEWICH_API UKillFeed : public UFeed
+class SAUCEWICH_API UKillFeed final : public UFeed
 {
 	GENERATED_BODY()
 
