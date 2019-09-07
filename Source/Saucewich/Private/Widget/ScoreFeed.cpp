@@ -6,7 +6,7 @@ void UScoreFeed::GetContent(FFeedContent& OutContent) const
 {
 	auto& Content = static_cast<FScoreFeedContent&>(OutContent);
 
-	Content.Name = FName(*Name.ToString());
+	Content.DisplayName = DisplayName;
 	Content.Score = Score;
 }
 
@@ -14,7 +14,7 @@ void UScoreFeed::SetContent(const FFeedContent& InContent)
 {
 	const auto& Content = static_cast<const FScoreFeedContent&>(InContent);
 
-	Name = FText::FromName(Content.Name);
+	DisplayName = Content.DisplayName;
 	Score = Content.Score;
 
 	OnSetContent();

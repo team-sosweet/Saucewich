@@ -20,11 +20,13 @@ class SAUCEWICH_API UAliveWidget final : public UBaseWidget
 		ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
 	UFUNCTION()
-	void OnScoreAdded(FName ScoreName, int32 ActualScore);
+	void OnScoreAdded(FName ScoreID, int32 ActualScore);
 
 	UPROPERTY(Transient)
 	class UFeedBox* KillFeedBox;
 
 	UPROPERTY(Transient)
 	class UFeedBox* ScoreFeedBox;
+
+	class ASaucewichGameState* GameState;
 };

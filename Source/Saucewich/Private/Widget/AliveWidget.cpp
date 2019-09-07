@@ -16,8 +16,8 @@ void UAliveWidget::NativeOnInitialized()
 	KillFeedBox = Cast<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Kill")));
 	ScoreFeedBox = Cast<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Score")));
 
-	const auto GS = Cast<ASaucewichGameState>(GetWorld()->GetGameState());
-	GS->OnPlayerDeath.AddDynamic(this, &UAliveWidget::OnPlayerDeath);
+	GameState = Cast<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState->OnPlayerDeath.AddDynamic(this, &UAliveWidget::OnPlayerDeath);
 
 	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer());
 
@@ -36,7 +36,8 @@ void UAliveWidget::OnPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayer
 	KillFeedBox->MakeNewFeed(FKillFeedContent(Victim, Attacker, Inflictor));
 }
 
-void UAliveWidget::OnScoreAdded(const FName ScoreName, const int32 ActualScore)
+void UAliveWidget::OnScoreAdded(const FName ScoreID, const int32 ActualScore)
 {
-	ScoreFeedBox->MakeNewFeed(FScoreFeedContent(ScoreName, ActualScore));
+	const auto& DisplayName = GameState->GetScoreData(ScoreID).Name;
+	ScoreFeedBox->MakeNewFeed(FScoreFeedContent(DisplayName, ActualScore));
 }
