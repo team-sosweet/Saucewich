@@ -10,6 +10,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipWeapon, class AWeapon*, Weapon);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnEquipWeaponSingle, class AWeapon*, Weapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGunDried, bool, bDried);
 
 /**
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
@@ -68,6 +69,9 @@ public:
 			WeaponComponent->OnEquipWeapon.Broadcast(Weapon);
 		}
 	};
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGunDried OnGunDried;
 
 protected:
 	void InitializeComponent() override;
