@@ -84,8 +84,6 @@ class SAUCEWICH_API AGun final : public AWeapon
 	GENERATED_BODY()
 
 public:
-	void Shoot();
-
 	// 이 총으로 target을 찾는 trace를 수행합니다.
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
@@ -109,6 +107,7 @@ protected:
 	void OnReleased() override;
 
 private:
+	void Shoot();
 	void StartFire(int32 RandSeed);
 
 	UFUNCTION(Server, Reliable, WithValidation)
