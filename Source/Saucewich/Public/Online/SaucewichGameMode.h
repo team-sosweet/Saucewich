@@ -16,6 +16,7 @@ public:
 
 	virtual void UpdateMatchState();
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
+	float GetNextGameWaitTime() const { return NextGameWaitTime; }
 
 protected:
 	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;

@@ -126,9 +126,12 @@ void APickup::OnReleased()
 
 void APickup::BePickedUp_Implementation(ATpsCharacter* const By)
 {
+	if (!HasAuthority()) return;
+
 	if (bSpawnedFromSpawner)
 		if (const auto Spawner = Cast<APickupSpawner>(GetOwner()))
 			Spawner->PickedUp();
+	
 	Release();
 }
 

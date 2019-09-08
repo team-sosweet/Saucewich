@@ -7,6 +7,8 @@
 
 struct FKillFeedContent final : FFeedContent
 {
+	FKillFeedContent() = default;
+	
 	FKillFeedContent(class ASaucewichPlayerState* InVictim,
 		ASaucewichPlayerState* InAttacker, AActor* InInflictor)
 		: Victim(InVictim), Attacker(InAttacker), Inflictor(InInflictor) {}
