@@ -240,7 +240,7 @@ bool UWeaponComponent::ServerFireP_Validate() { return true; }
 void UWeaponComponent::MulticastFireP_Implementation()
 {
 	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) FireP();
+	if (Owner && !Owner->IsLocallyControlled()) StartFire();
 }
 
 void UWeaponComponent::FireR()
@@ -277,7 +277,7 @@ bool UWeaponComponent::ServerFireR_Validate() { return true; }
 void UWeaponComponent::MulticastFireR_Implementation()
 {
 	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) FireR();
+	if (Owner && !Owner->IsLocallyControlled()) StopFire();
 }
 
 void UWeaponComponent::SlotP(const uint8 Slot)

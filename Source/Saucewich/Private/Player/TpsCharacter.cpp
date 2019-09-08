@@ -6,12 +6,15 @@
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
-#include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
 #include "Saucewich.h"
+#include "Entity/Perk.h"
 #include "Online/SaucewichGameMode.h"
 #include "Online/SaucewichGameState.h"
 #include "Player/CharacterData.h"
@@ -77,7 +80,7 @@ void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 
 bool ATpsCharacter::IsInvincible() const
 {
-	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0.f;
+	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0;
 }
 
 void ATpsCharacter::SetMaxHP(const float Ratio)
@@ -89,7 +92,20 @@ void ATpsCharacter::SetMaxHP(const float Ratio)
 	if (HP == OldMaxHP) HP = MaxHP;
 }
 
-float ATpsCharacter::GetSpeedRatio() const
+void ATpsCharacter::AddPerk(const TSubclassOf<APerk> PerkClass)
+{
+	if (const auto Class = *PerkClass)
+	{
+		MulticastAddPerk(Class);
+	}
+}
+
+bool ATpsCharacter::HasPerk(const TSubclassOf<APerk> PerkClass) const
+{
+	return Perks.Contains(PerkClass);
+}
+
+float ATpsCharacter::GetSpeedRatio_Implementation() const
 {
 	return WeaponComponent->GetSpeedRatio();
 }
@@ -172,15 +188,16 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATpsCharacter, bAlive);
 }
 
-float ATpsCharacter::TakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
+float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
-	const auto Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (DamageAmount > 0) DamageAmount *= 1 - FMath::Clamp(GetArmor(), 0.f, 1.f);
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (HasAuthority() && DamageAmount != 0)
 	{
-		HP = FMath::Clamp(HP - Damage, 0.f, MaxHP);
+		HP = FMath::Clamp(HP - DamageAmount, 0.f, MaxHP);
 		if (HP == 0) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
-	return Damage;
+	return DamageAmount;
 }
 
 bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
@@ -201,7 +218,7 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 		return true;
 
 	if (const auto InstigatorState = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
-		return DamageAmount > 0.f ? GetTeam() != InstigatorState->GetTeam() : GetTeam() == InstigatorState->GetTeam();
+		return DamageAmount > 0 ? GetTeam() != InstigatorState->GetTeam() : GetTeam() == InstigatorState->GetTeam();
 
 	return true;
 }
@@ -212,7 +229,7 @@ void ATpsCharacter::SetPlayerDefaults()
 	bAlive = true;
 	SetActorActivated(true);
 
-	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0.f)
+	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0)
 	{
 		BeTranslucent();
 		GetWorldTimerManager().SetTimer(
@@ -225,10 +242,15 @@ void ATpsCharacter::SetPlayerDefaults()
 	OnCharacterSpawn.Broadcast();
 }
 
+float ATpsCharacter::GetArmor_Implementation() const
+{
+	return 0;
+}
+
 // 주의: Server와 Client 모두에서 실행되지만, Client에서는 Attacker, Inflictor가 항상 nullptr입니다.
 void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
-	HP = 0.f;
+	HP = 0;
 	bAlive = false;
 	SetActorActivated(false);
 
@@ -361,4 +383,37 @@ void ATpsCharacter::BeOpaque()
 	Shadow->BeOpaque();
 	
 	bTranslucent = false;
+}
+
+void ATpsCharacter::MulticastAddPerk_Implementation(UClass* const PerkClass)
+{
+	check(PerkClass);
+	
+	const auto Def = GetDefault<APerk>(PerkClass);
+	auto& Perk = Perks.FindOrAdd(PerkClass);
+
+	if (!Perk.PSC && Def->GetParticle())
+	{
+		Perk.PSC = UGameplayStatics::SpawnEmitterAttached(
+			Def->GetParticle(),
+			GetRootComponent(),
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			FVector::OneVector,
+			EAttachLocation::KeepRelativeOffset,
+			true,
+			EPSCPoolMethod::ManualRelease
+		);
+	}
+
+	auto&& ErasePerk = [this, PerkClass]
+	{
+		if (const auto Found = Perks.Find(PerkClass))
+			if (Found->PSC) Found->PSC->ReleaseToPool();
+		
+		Perks.Remove(PerkClass);
+	};
+
+	GetWorldTimerManager().SetTimer(Perk.Timer, ErasePerk, Def->GetDuration(),	false);
 }
