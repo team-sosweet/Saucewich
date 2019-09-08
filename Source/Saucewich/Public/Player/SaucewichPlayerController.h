@@ -32,14 +32,24 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void PrintMessage(FName MessageID, float Duration);
 	
 	struct BroadcastPlayerStateSpawned;	
 	struct BroadcastCharacterSpawned;
 	
 private:
+	void ClearMessage() { Message = FText::GetEmpty(); }
+	
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FText Message;
+
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
 	FOnCharacterSpawned OnCharacterSpawned;
+	
 	FTimerHandle RespawnTimer;
+	FTimerHandle MessageTimer;
 };
 
 struct ASaucewichPlayerController::BroadcastPlayerStateSpawned
