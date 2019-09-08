@@ -15,6 +15,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickupStarted, float, Time);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupCanceled);
 
+USTRUCT()
+struct FPerkInstance
+{
+	GENERATED_BODY()
+	
+	FTimerHandle Timer;
+	class UParticleSystemComponent* PSC;
+};
+
 UCLASS(Abstract)
 class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
 {
@@ -59,7 +68,19 @@ public:
 	bool IsAlive() const { return bAlive; }
 	bool IsInvincible() const;
 	void SetMaxHP(float Ratio);
-	virtual float GetSpeedRatio() const;
+
+	/**
+	 * 캐릭터의 이동속도 비율을 반환합니다. 기본값은 WeaponComponent::GetSpeedRatio 입니다.
+	 * @return 캐릭터 이동속도 비율 (0~1)
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	float GetSpeedRatio() const;
+
+	UFUNCTION(BlueprintCallable)
+	void AddPerk(TSubclassOf<class APerk> PerkClass);
+
+	UFUNCTION(BlueprintCallable)
+	bool HasPerk(TSubclassOf<APerk> PerkClass) const;
 
 	// 주의: Simulated Proxy에서는 추가 계산이 들어갑니다.
 	FVector GetPawnViewLocation() const override;
@@ -92,6 +113,14 @@ protected:
 	// 캐릭터를 살립니다.
 	void SetPlayerDefaults() override;
 
+	/**
+	 * 캐릭터의 현재 방어력을 구합니다.
+	 * @return 0~1 사이의 값으로, 1이면 무적입니다. 기본값은 0입니다.
+	 * @warning Server/Client 모두에게서 값이 같아야합니다.
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	float GetArmor() const;
+
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -112,6 +141,12 @@ private:
 
 	void BeTranslucent() override;
 	void BeOpaque() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastAddPerk(UClass* PerkClass);
+
+	UPROPERTY(Transient, VisibleInstanceOnly)
+	TMap<TSubclassOf<APerk>, FPerkInstance> Perks;
 
 	FTimerHandle RespawnInvincibleTimerHandle;
 

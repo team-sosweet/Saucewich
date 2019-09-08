@@ -6,10 +6,23 @@
 #include "MakeSandwich.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AMakeSandwich : public ASaucewichGameMode
+class SAUCEWICH_API AMakeSandwich final : public ASaucewichGameMode
 {
 	GENERATED_BODY()
 
 protected:
+	void BeginPlay() override;
 	bool ReadyToEndMatch_Implementation() override;
+	
+private:
+	void SpawnPerk() const;
+	
+	TArray<class APickupSpawnVolume*> PerkSpawnVolumes;
+	FTimerHandle PerkSpawnTimer;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<class APickup>> PerkClasses;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PerkSpawnInterval;
 };

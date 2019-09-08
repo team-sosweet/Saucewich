@@ -2,7 +2,26 @@
 
 #include "MakeSandwich.h"
 
+#include "EngineUtils.h"
+#include "TimerManager.h"
+
+#include "Saucewich.h"
+#include "Entity/PickupSpawnVolume.h"
 #include "GameMode/MakeSandwich/MakeSandwichState.h"
+
+void AMakeSandwich::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (GUARANTEE(PerkSpawnInterval > 0 && PerkClasses.Num() > 0))
+	{
+		for (TActorIterator<APickupSpawnVolume> It{GetWorld()}; It; ++It)
+			PerkSpawnVolumes.Add(*It);
+
+		if (GUARANTEE(PerkSpawnVolumes.Num() > 0))
+			GetWorldTimerManager().SetTimer(PerkSpawnTimer, this, &AMakeSandwich::SpawnPerk, PerkSpawnInterval, true);
+	}
+}
 
 bool AMakeSandwich::ReadyToEndMatch_Implementation()
 {
@@ -11,4 +30,9 @@ bool AMakeSandwich::ReadyToEndMatch_Implementation()
 		return GS->GetRemainingRoundSeconds() <= 0;
 	}
 	return false;
+}
+
+void AMakeSandwich::SpawnPerk() const
+{
+	PerkSpawnVolumes[FMath::RandHelper(PerkSpawnVolumes.Num())]->Spawn(PerkClasses[FMath::RandHelper(PerkClasses.Num())]);
 }
