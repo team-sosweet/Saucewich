@@ -6,7 +6,7 @@
 #include "ComponentWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UComponentWidget final : public UUserWidget
+class SAUCEWICH_API UComponentWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
