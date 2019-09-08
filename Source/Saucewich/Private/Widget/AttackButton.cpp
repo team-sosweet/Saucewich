@@ -20,6 +20,8 @@ void UAttackButton::NativeOnInitialized()
 	CoolMaterial =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), CoolMaterialParent);
 
+	OnMaterialSpawned();
+	
 	CoolProgressBar->WidgetStyle.FillImage.SetResourceObject(CoolMaterial);
 	CoolProgressBar->WidgetStyle.BackgroundImage.SetResourceObject(CoolMaterial);
 	
@@ -37,7 +39,7 @@ void UAttackButton::NativeOnInitialized()
 	WeaponComponent->AddOnEquipWeapon(Delegate);
 }
 
-void UAttackButton::OnChangedColor(const FLinearColor& MyTeamColor)
+void UAttackButton::OnChangedColor_Implementation(const FLinearColor& MyTeamColor)
 {
 	CoolMaterial->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 }

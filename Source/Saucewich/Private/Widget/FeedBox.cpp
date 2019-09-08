@@ -31,17 +31,17 @@ void UFeedBox::NativeOnInitialized()
 
 void UFeedBox::MakeNewFeed(const FFeedContent& NewFeedContent)
 {
-	for (auto Index = CurFeedNum; Index > 0u; Index--)
+	for (auto Index = CurFeedNum++; Index > 0u; Index--)
 	{
-		FFeedContent Content;
-		Feeds[Index - 1]->GetContent(Content);
-		Feeds[Index]->SetContent(Content);
+		CopyContent(Feeds[Index], Feeds[Index - 1]);
+		Feeds[Index]->ViewFeed(Feeds[Index - 1]->GetCurLifeTime());
 	}
 	
 	Feeds[0]->SetContent(NewFeedContent);
+	Feeds[0]->ViewFeed(FeedLifeTime);
+}
 
-	if (CurFeedNum < FeedNum)
-	{
-		Feeds[CurFeedNum++]->ViewFeed();
-	}
+void UFeedBox::CopyContent(UFeed* Dest, UFeed* Src)
+{
+	check(0);
 }
