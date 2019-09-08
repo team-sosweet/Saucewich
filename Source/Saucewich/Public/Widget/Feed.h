@@ -21,8 +21,10 @@ public:
 	virtual void GetContent(FFeedContent& OutContent) const {}
 	virtual void SetContent(const FFeedContent& InContent){}
 	
-	void ViewFeed();
+	void ViewFeed(float LifeTime);
 
+	float GetCurLifeTime() const { return CurLifeTime; };
+	
 	FOnExpiration OnExpiration;
 
 protected:
@@ -30,10 +32,7 @@ protected:
 	void OnSetContent();
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setting, meta = (AllowPrivateAccess = true))
-	float LifeTime;
-
 	FTimerHandle LifeTimerHandle;
-	
-	bool IsSet;
+
+	float CurLifeTime;
 };

@@ -7,7 +7,7 @@
 #include "FeedBox.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UFeedBox final : public UUserWidget
+class SAUCEWICH_API UFeedBox : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -16,9 +16,12 @@ class SAUCEWICH_API UFeedBox final : public UUserWidget
 public:
 	void MakeNewFeed(const struct FFeedContent& NewFeedContent);
 
+protected:
+	virtual void CopyContent(class UFeed* Dest, UFeed* Src);
+	
 private:	
 	UPROPERTY(Transient)
-	TArray<class UFeed*> Feeds;
+	TArray<UFeed*> Feeds;
 
 	UPROPERTY(Transient)
 	class UVerticalBox* FeedBox;
@@ -28,6 +31,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setting, meta = (AllowPrivateAccess = true, ExposeOnSpawn = true))
 	uint8 FeedNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Setting, meta = (AllowPrivateAccess = true))
+	float FeedLifeTime;
 	
 	uint8 CurFeedNum;
 };

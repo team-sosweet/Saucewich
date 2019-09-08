@@ -7,6 +7,8 @@
 
 struct FScoreFeedContent final : FFeedContent
 {
+	FScoreFeedContent() = default;
+	
 	FScoreFeedContent(const FText& InDisplayName, const int32 InScore)
 		: DisplayName(InDisplayName), Score(InScore) {}
 
