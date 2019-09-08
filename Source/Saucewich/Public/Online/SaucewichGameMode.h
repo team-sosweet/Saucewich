@@ -25,5 +25,9 @@ protected:
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
 private:
+	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float NextGameWaitTime = 10;
+	
 	uint8 LastTeam;
 };

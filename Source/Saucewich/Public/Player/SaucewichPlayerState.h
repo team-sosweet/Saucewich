@@ -30,6 +30,10 @@ public:
 	void AddScore(FName ScoreID);
 	void AddScore(FName ScoreID, int32 ActualScore);
 
+	uint8 GetKill() const { return Kill; }
+	uint8 GetDeath() const { return Death; }
+	uint8 GetObjective() const { return Objective; }
+
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
 
