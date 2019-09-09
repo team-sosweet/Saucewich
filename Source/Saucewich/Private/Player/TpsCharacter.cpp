@@ -180,13 +180,22 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
+	if (!GUARANTEE(Data != nullptr)) return 0;
+	
 	if (DamageAmount > 0) DamageAmount /= GetArmorRatio();
 	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (HasAuthority() && DamageAmount != 0 && GUARANTEE(Data != nullptr))
+	
+	if (HasAuthority() && !FMath::IsNearlyZero(DamageAmount))
 	{
+		const auto HealAmount = FMath::Min(-DamageAmount, Data->MaxHP - HP);
+		if (HealAmount >= 2 && EventInstigator && EventInstigator != GetController())
+			if (const auto PS = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
+				PS->AddScore("Heal", FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
+
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
-		if (HP == 0) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
+		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
+	
 	return DamageAmount;
 }
 
