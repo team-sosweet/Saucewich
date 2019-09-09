@@ -17,11 +17,14 @@ AWeapon* AWeapon::GetDefaultWeapon(const TSubclassOf<AWeapon> Class)
 }
 
 AWeapon::AWeapon()
-	:Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
+	:SceneRoot{CreateDefaultSubobject<USceneComponent>("SceneRoot")},
+	Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
-	RootComponent = Mesh;
+	
+	RootComponent = SceneRoot;
+	Mesh->SetupAttachment(SceneRoot);
 }
 
 void AWeapon::Init()
