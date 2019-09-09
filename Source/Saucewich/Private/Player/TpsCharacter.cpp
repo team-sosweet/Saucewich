@@ -191,7 +191,7 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
 	if (DamageAmount > 0) DamageAmount *= 1 - FMath::Clamp(GetArmor(), 0.f, 1.f);
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (HasAuthority() && DamageAmount != 0)
 	{
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, MaxHP);
