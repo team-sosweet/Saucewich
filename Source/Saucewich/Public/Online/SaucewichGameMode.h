@@ -18,6 +18,10 @@ public:
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 	float GetNextGameWaitTime() const { return NextGameWaitTime; }
 
+	UFUNCTION(BlueprintCallable)
+	void PrintMessage(FName MessageID, float Duration = 3) const;
+	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
+
 protected:
 	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
@@ -26,6 +30,9 @@ protected:
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, FText> Messages;
+	
 	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float NextGameWaitTime = 10;

@@ -159,7 +159,7 @@ void ATpsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		bAlive = true;
-		if (GUARANTEE(Data != nullptr))
+		if (MaxHP == 0 && GUARANTEE(Data != nullptr))
 		{
 			HP = MaxHP = Data->DefaultMaxHP;
 		}
@@ -191,7 +191,7 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
 	if (DamageAmount > 0) DamageAmount *= 1 - FMath::Clamp(GetArmor(), 0.f, 1.f);
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (HasAuthority() && DamageAmount != 0)
 	{
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, MaxHP);
@@ -225,8 +225,11 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 
 void ATpsCharacter::SetPlayerDefaults()
 {
-	HP = MaxHP;
-	bAlive = true;
+	if (HasAuthority())
+	{
+		HP = MaxHP;
+		bAlive = true;
+	}
 	SetActorActivated(true);
 
 	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0)

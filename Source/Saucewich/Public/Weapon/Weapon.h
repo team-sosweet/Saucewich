@@ -27,7 +27,7 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
 	TSoftObjectPtr<UTexture> Icon_Rest;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText Name;
+	FText DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
@@ -50,6 +50,9 @@ UCLASS(Abstract)
 class SAUCEWICH_API AWeapon : public APoolActor, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	USceneComponent* SceneRoot;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UStaticMeshComponent* Mesh;
