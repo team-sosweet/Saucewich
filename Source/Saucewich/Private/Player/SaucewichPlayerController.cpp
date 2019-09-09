@@ -6,6 +6,7 @@
 #include "TimerManager.h"
 
 #include "Online/SaucewichGameMode.h"
+#include "Online/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerState.h"
 
@@ -47,6 +48,15 @@ void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& 
 	else
 	{
 		OnCharacterSpawned.AddUnique(Delegate);
+	}
+}
+
+void ASaucewichPlayerController::PrintMessage_Implementation(const FName MessageID, const float Duration)
+{
+	if (const auto Found = GetWorld()->GetGameState()->GetDefaultGameMode<ASaucewichGameMode>()->GetMessage(MessageID))
+	{
+		Message = *Found;
+		GetWorldTimerManager().SetTimer(MessageTimer, this, &ASaucewichPlayerController::ClearMessage, Duration);
 	}
 }
 

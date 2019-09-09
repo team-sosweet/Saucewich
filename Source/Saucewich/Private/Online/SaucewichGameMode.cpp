@@ -19,16 +19,23 @@ ASaucewichGameMode::ASaucewichGameMode()
 void ASaucewichGameMode::UpdateMatchState()
 {
 	if (GetMatchState() == MatchState::WaitingToStart)
-		if (ReadyToStartMatch())
-			StartMatch();
+		if (ReadyToStartMatch()) StartMatch();
+	
 	if (GetMatchState() == MatchState::InProgress)
-		if (ReadyToEndMatch())
-			EndMatch();
+		if (ReadyToEndMatch()) EndMatch();
 }
 
 void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
 {
 	PC->SetRespawnTimer(MinRespawnDelay);
+}
+
+void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duration) const
+{
+	for (TActorIterator<ASaucewichPlayerController> It{GetWorld()}; It; ++It)
+	{
+		It->PrintMessage(MessageID, Duration);
+	}
 }
 
 APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)

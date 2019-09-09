@@ -211,7 +211,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	if (Slot == 0 && !Weapons[Slot]) Owner->SetMaxHP(Data->HPRatio);
+	if (Slot == 0) Owner->SetMaxHP(Data->HPRatio);
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 

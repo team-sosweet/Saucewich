@@ -34,5 +34,6 @@ bool AMakeSandwich::ReadyToEndMatch_Implementation()
 
 void AMakeSandwich::SpawnPerk() const
 {
+	PrintMessage("SpecialIngredientSpawned");
 	PerkSpawnVolumes[FMath::RandHelper(PerkSpawnVolumes.Num())]->Spawn(PerkClasses[FMath::RandHelper(PerkClasses.Num())]);
 }

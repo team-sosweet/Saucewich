@@ -6,15 +6,12 @@
 #include "TpsAnimInstance.generated.h"
 
 UCLASS()
-class UTpsAnimInstance : public UAnimInstance
+class SAUCEWICH_API UTpsAnimInstance final : public UAnimInstance
 {
 	GENERATED_BODY()
 
 protected:
 	void NativeUpdateAnimation(float DeltaSeconds) override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float AimPitchOffsetWhileNoTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Speed;
