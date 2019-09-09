@@ -39,7 +39,7 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 
 	// 지향사격 각도 오프셋
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
-	float HipFireAngleOffset;
+	float HipFireAngleOffset = 25;
 
 	// 자동 조준 최대 거리 (cm)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -122,7 +122,6 @@ private:
 
 	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data) const;
 
-	FVector VRandCone(const FVector& Dir, float HorizontalConeHalfAngleRad, float VerticalConeHalfAngleRad);
 	std::default_random_engine FireRand;
 
 	float FireLag;

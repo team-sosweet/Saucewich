@@ -41,38 +41,6 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 	DOREPLIFETIME(AGun, bFiring);
 }
 
-FVector AGun::VRandCone(const FVector& Dir, const float HorizontalConeHalfAngleRad, const float VerticalConeHalfAngleRad)
-{
-	if (VerticalConeHalfAngleRad > 0 && HorizontalConeHalfAngleRad > 0)
-	{
-		std::uniform_real_distribution<float> Distribution;
-		const auto Rand = [this, &Distribution] {return Distribution(FireRand); };
-
-		const auto RandU = Rand();
-		const auto RandV = Rand();
-
-		const auto Theta = 2.f * PI * RandU;
-		auto Phi = FMath::Acos(2.f * RandV - 1.f);
-
-		auto ConeHalfAngleRad = FMath::Square(FMath::Cos(Theta) / VerticalConeHalfAngleRad) + FMath::Square(FMath::Sin(Theta) / HorizontalConeHalfAngleRad);
-		ConeHalfAngleRad = FMath::Sqrt(1.f / ConeHalfAngleRad);
-
-		Phi = FMath::Fmod(Phi, ConeHalfAngleRad);
-
-		const FMatrix DirMat = FRotationMatrix(Dir.Rotation());
-		const auto DirZ = DirMat.GetScaledAxis(EAxis::X);
-		const auto DirY = DirMat.GetScaledAxis(EAxis::Y);
-
-		auto Result = Dir.RotateAngleAxis(Phi * 180.f / PI, DirY);
-		Result = Result.RotateAngleAxis(Theta * 180.f / PI, DirZ);
-
-		Result = Result.GetSafeNormal();
-
-		return Result;
-	}
-	return Dir.GetSafeNormal();
-}
-
 void AGun::Shoot()
 {
 	if (!CanFire()) return;
@@ -92,15 +60,24 @@ void AGun::Shoot()
 	FHitResult Hit;
 	const auto HitType = GunTraceInternal(Hit, ProjColProf, Data);
 
+	auto& Transform = GetRootComponent()->GetComponentTransform();
+	const auto Forward = Transform.GetUnitAxis(EAxis::X);
+	const auto Right = Transform.GetUnitAxis(EAxis::Y);
+
 	const auto Dir =
 		HitType != EGunTraceHit::None
 		? (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal()
-		: MuzzleTransform.GetRotation().Vector().RotateAngleAxis(Data.HipFireAngleOffset, GetActorForwardVector());
+		: MuzzleTransform.GetRotation().Vector();
 
+	const auto V = 45 * Data.VerticalSpread;
+	const auto H = 45 * Data.HorizontalSpread;
+	std::uniform_real_distribution<float> VRand{-V, V};
+	std::uniform_real_distribution<float> HRand{-H, H};
+	
 	TArray<FVector> RDirs;
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
-		RDirs.Add(VRandCone(Dir, Data.HorizontalSpread, Data.VerticalSpread));
+		RDirs.Add(Dir.RotateAngleAxis(VRand(FireRand), Forward).RotateAngleAxis(HRand(FireRand), Right));
 	}
 
 	TSet<uint8> HitPawnIdx;
@@ -156,8 +133,12 @@ void AGun::Shoot()
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 {
 	auto& Data = GetGunData();
-	const auto Profile = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
-	return GunTraceInternal(OutHit, Profile, Data);
+	if (const auto Def = Data.ProjectileClass.GetDefaultObject())
+	{
+		const auto Profile = Data.ProjectileClass.GetDefaultObject()->GetCollisionProfile();
+		return GunTraceInternal(OutHit, Profile, Data);
+	}
+	return EGunTraceHit::None;
 }
 
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data) const

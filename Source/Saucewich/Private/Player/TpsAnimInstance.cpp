@@ -12,18 +12,16 @@ void UTpsAnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 	const auto Velocity = Pawn->GetVelocity();
 	Speed = Velocity.Size2D();
 
-	auto bSetAimPitch = false;
 	if (const auto Gun = Cast<AGun>(Pawn->GetActiveWeapon()))
 	{
 		FHitResult Hit;
 		if (Gun->GunTrace(Hit) != EGunTraceHit::None)
 		{
 			AimPitch = ((Hit.ImpactPoint - Gun->GetActorLocation()).Rotation() - Pawn->GetActorRotation()).GetNormalized().Pitch * AimPitchMul;
-			bSetAimPitch = true;
 		}
-	}
-	if (!bSetAimPitch)
-	{
-		AimPitch = Pawn->GetBaseAimRotation().Pitch + AimPitchOffsetWhileNoTarget;
+		else
+		{
+			AimPitch = Pawn->GetBaseAimRotation().Pitch + Gun->GetGunData().HipFireAngleOffset;
+		}
 	}
 }
