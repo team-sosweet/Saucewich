@@ -37,6 +37,10 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
 	float HorizontalSpread;
 
+	// 지향사격 각도 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
+	float HipFireAngleOffset;
+
 	// 자동 조준 최대 거리 (cm)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxDistance;

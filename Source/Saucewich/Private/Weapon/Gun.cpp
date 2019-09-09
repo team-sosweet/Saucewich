@@ -95,7 +95,7 @@ void AGun::Shoot()
 	const auto Dir =
 		HitType != EGunTraceHit::None
 		? (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal()
-		: MuzzleTransform.GetRotation().Vector();
+		: MuzzleTransform.GetRotation().Vector().RotateAngleAxis(Data.HipFireAngleOffset, GetActorForwardVector());
 
 	TArray<FVector> RDirs;
 	for (auto i = 0; i < Data.NumProjectile; ++i)
