@@ -159,7 +159,7 @@ void ATpsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		bAlive = true;
-		if (GUARANTEE(Data != nullptr))
+		if (MaxHP == 0 && GUARANTEE(Data != nullptr))
 		{
 			HP = MaxHP = Data->DefaultMaxHP;
 		}
@@ -225,8 +225,11 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 
 void ATpsCharacter::SetPlayerDefaults()
 {
-	HP = MaxHP;
-	bAlive = true;
+	if (HasAuthority())
+	{
+		HP = MaxHP;
+		bAlive = true;
+	}
 	SetActorActivated(true);
 
 	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0)
