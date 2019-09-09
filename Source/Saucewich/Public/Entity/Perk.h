@@ -14,9 +14,6 @@ public:
 	float GetDuration() const { return Duration; }
 	auto GetParticle() const { return Particle; }
 	
-protected:
-	void BePickedUp_Implementation(ATpsCharacter* By) override;
-
 private:
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* Particle;
