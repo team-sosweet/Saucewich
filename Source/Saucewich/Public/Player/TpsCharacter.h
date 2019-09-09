@@ -25,7 +25,7 @@ struct FPerkInstance
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
+class SAUCEWICH_API ATpsCharacter final : public ACharacter, public IColorable, public ITranslucentable
 {
 	GENERATED_BODY()
 
@@ -67,7 +67,6 @@ public:
 
 	bool IsAlive() const { return bAlive; }
 	bool IsInvincible() const;
-	void SetMaxHP(float Ratio);
 
 	/**
 	 * 캐릭터의 이동속도 비율을 반환합니다. 기본값은 WeaponComponent::GetSpeedRatio 입니다.
@@ -114,12 +113,11 @@ protected:
 	void SetPlayerDefaults() override;
 
 	/**
-	 * 캐릭터의 현재 방어력을 구합니다.
-	 * @return 0~1 사이의 값으로, 1이면 무적입니다. 기본값은 0입니다.
-	 * @warning Server/Client 모두에게서 값이 같아야합니다.
+	 * 캐릭터의 현재 방어력을 구합니다. 받는 데미지에서 방어력만큼 나눕니다.
+	 * 주의: Server/Client 모두에게서 값이 같아야합니다.
 	 */
 	UFUNCTION(BlueprintNativeEvent)
-	float GetArmor() const;
+	float GetArmorRatio() const;
 
 private:
 	void MoveForward(float AxisValue);
@@ -159,11 +157,6 @@ private:
 	UPROPERTY(Transient)
 	class UMaterialInstanceDynamic* ColTranslMat;
 
-	// 현재 최대 체력입니다. 장착중인 주무기 등 여러 요인에 의해 달라집니다.
-	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float MaxHP;
-
-	// 현재 체력입니다.
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;
 

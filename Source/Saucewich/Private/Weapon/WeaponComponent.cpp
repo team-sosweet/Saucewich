@@ -141,9 +141,15 @@ void UWeaponComponent::BeTranslucent()
 float UWeaponComponent::GetSpeedRatio() const
 {
 	if (const auto Weapon = GetActiveWeapon())
-		if (const auto Data = Weapon->GetData(FILE_LINE_FUNC))
-			return Data->WalkSpeedRatio;
-	return 1.f;
+		return Weapon->GetWeaponData().WalkSpeedRatio;
+	return 1;
+}
+
+float UWeaponComponent::GetArmorRatio() const
+{
+	if (const auto Weapon = GetWeapon(0))
+		return Weapon->GetWeaponData().ArmorRatio;
+	return 1;
 }
 
 void UWeaponComponent::OnCharacterDeath()
@@ -211,7 +217,6 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	if (Slot == 0) Owner->SetMaxHP(Data->HPRatio);
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 

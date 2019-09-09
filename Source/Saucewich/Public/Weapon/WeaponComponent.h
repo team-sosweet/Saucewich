@@ -54,6 +54,7 @@ public:
 	void SetColor(const FLinearColor& NewColor) override;
 
 	float GetSpeedRatio() const;
+	float GetArmorRatio() const;
 	uint8 GetSlots() const { return WeaponSlots; }
 
 	UFUNCTION(BlueprintCallable)

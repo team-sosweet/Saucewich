@@ -83,15 +83,6 @@ bool ATpsCharacter::IsInvincible() const
 	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0;
 }
 
-void ATpsCharacter::SetMaxHP(const float Ratio)
-{
-	if (!GUARANTEE(Data != nullptr)) return;
-	
-	const auto OldMaxHP = MaxHP;
-	MaxHP = Data->DefaultMaxHP * Ratio;
-	if (HP == OldMaxHP) HP = MaxHP;
-}
-
 void ATpsCharacter::AddPerk(const TSubclassOf<APerk> PerkClass)
 {
 	if (const auto Class = *PerkClass)
@@ -159,9 +150,9 @@ void ATpsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		bAlive = true;
-		if (MaxHP == 0 && GUARANTEE(Data != nullptr))
+		if (GUARANTEE(Data != nullptr))
 		{
-			HP = MaxHP = Data->DefaultMaxHP;
+			HP = Data->MaxHP;
 		}
 	}
 }
@@ -184,17 +175,16 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATpsCharacter, HP);
-	DOREPLIFETIME(ATpsCharacter, MaxHP);
 	DOREPLIFETIME(ATpsCharacter, bAlive);
 }
 
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
-	if (DamageAmount > 0) DamageAmount *= 1 - FMath::Clamp(GetArmor(), 0.f, 1.f);
+	if (DamageAmount > 0) DamageAmount /= GetArmorRatio();
 	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (HasAuthority() && DamageAmount != 0)
+	if (HasAuthority() && DamageAmount != 0 && GUARANTEE(Data != nullptr))
 	{
-		HP = FMath::Clamp(HP - DamageAmount, 0.f, MaxHP);
+		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
 		if (HP == 0) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
 	}
 	return DamageAmount;
@@ -225,29 +215,32 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 
 void ATpsCharacter::SetPlayerDefaults()
 {
-	if (HasAuthority())
-	{
-		HP = MaxHP;
-		bAlive = true;
-	}
 	SetActorActivated(true);
 
-	if (GUARANTEE(Data != nullptr) && Data->RespawnInvincibleTime > 0)
+	if (GUARANTEE(Data != nullptr))
 	{
-		BeTranslucent();
-		GetWorldTimerManager().SetTimer(
-			RespawnInvincibleTimerHandle, 
-			this, &ATpsCharacter::BeOpaque,
-			Data->RespawnInvincibleTime, false
-		);
+		if (HasAuthority())
+		{
+			HP = Data->MaxHP;
+			bAlive = true;
+		}
+		if (Data->RespawnInvincibleTime > 0)
+		{
+			BeTranslucent();
+			GetWorldTimerManager().SetTimer(
+				RespawnInvincibleTimerHandle, 
+				this, &ATpsCharacter::BeOpaque,
+				Data->RespawnInvincibleTime, false
+			);
+		}
 	}
 	
 	OnCharacterSpawn.Broadcast();
 }
 
-float ATpsCharacter::GetArmor_Implementation() const
+float ATpsCharacter::GetArmorRatio_Implementation() const
 {
-	return 0;
+	return WeaponComponent->GetArmorRatio();
 }
 
 // 주의: Server와 Client 모두에서 실행되지만, Client에서는 Attacker, Inflictor가 항상 nullptr입니다.

@@ -32,14 +32,14 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float WalkSpeedRatio = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
+	float WalkSpeedRatio = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
+	float ArmorRatio = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float HPRatio = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 Slot = 0;
+	uint8 Slot;
 };
 
 /**
