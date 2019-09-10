@@ -26,17 +26,23 @@ private:
 	UPROPERTY(Transient, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TArray<class UCanvasPanel*> IngredientPanels;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient)
 	TArray<TSubclassOf<UUserWidget>> IngredientContentClasses;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Transient)
 	TArray<class UCanvasPanelSlot*> IngredientContentSlots;
 	
 	UPROPERTY(Transient)
 	TArray<class UUniformGridSlot*> IngredientsSlot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	bool IsRightDirection;
 	
 	TArray<bool> IsIngredientActives;
 
 	uint8 IngredientsNum;
+	
 	uint8 ActiveNum;
+	
+	int8 DirectionSign;
 };
