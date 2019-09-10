@@ -13,7 +13,7 @@
 
 AWeapon* AWeapon::GetDefaultWeapon(const TSubclassOf<AWeapon> Class)
 {
-	return Class.GetDefaultObject();
+	return Class ? Class.GetDefaultObject() : nullptr;
 }
 
 AWeapon::AWeapon()
