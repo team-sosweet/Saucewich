@@ -50,6 +50,7 @@ public:
 		SaveConfig();
 	}
 
+	auto& GetGameModes() const { return GameModes; }
 	auto& GetWeaponLoadout() const { return WeaponLoadout; }
 
 	bool IsAutoFire() const { return bAutoFire; }
@@ -57,6 +58,9 @@ public:
 	struct BroadcastGameStateSpawned;
 	
 private:
+	UPROPERTY(Config)
+	TArray<TSubclassOf<class ASaucewichGameMode>> GameModes;
+	
 	UPROPERTY(Config)
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 	

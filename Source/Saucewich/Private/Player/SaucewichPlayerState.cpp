@@ -75,7 +75,7 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, const int32 ActualScor
 {
 	if (!HasAuthority()) return;
 	Score += ActualScore;
-	OnScoreAdded.Broadcast(ScoreID, ActualScore);
+	MulticastAddScore(ScoreID, ActualScore);
 }
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)

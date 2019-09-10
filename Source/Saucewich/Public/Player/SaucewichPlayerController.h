@@ -38,7 +38,7 @@ public:
 	
 	struct BroadcastPlayerStateSpawned;	
 	struct BroadcastCharacterSpawned;
-	
+
 private:
 	void ClearMessage() { Message = FText::GetEmpty(); }
 	
