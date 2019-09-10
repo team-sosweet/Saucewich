@@ -10,7 +10,7 @@
 
 void APoolActor::Release(const bool bForce)
 {
-	if (!bActivated && !bForce) return;
+	if (!IsValidLowLevel() || !bActivated && !bForce) return;
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);

@@ -6,14 +6,17 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 
 #include "Online/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
+#include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
 	// AGameMode::Tick()에서 매 틱마다 매치 상태 업데이트를 하지만 그럴 필요가 없으므로
 	PrimaryActorTick.bCanEverTick = false;
+	bUseSeamlessTravel = true;
 }
 
 void ASaucewichGameMode::UpdateMatchState()
@@ -151,4 +154,22 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 	{
 		PS->GiveWeapons();
 	}
+}
+
+void ASaucewichGameMode::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+
+	GetWorldTimerManager().SetTimer(NextGameTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+}
+
+void ASaucewichGameMode::StartNextGame() const
+{
+	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
+	const TSubclassOf<ASaucewichGameMode> GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
+	const auto DefGm = GmClass.GetDefaultObject();
+	const auto Map = Maps.Num() > 0 ? DefGm->Maps[FMath::RandHelper(Maps.Num())].GetAssetName() : GetWorld()->GetMapName();
+
+	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *Map, *GmClass->GetPathName());
+	GetWorld()->ServerTravel(URL);
 }

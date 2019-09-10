@@ -57,6 +57,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 
 void AActorPool::Release(APoolActor* Actor)
 {
+	if (!IsValidLowLevel()) return;
 	const auto Class = Actor->GetClass();
 	Pool.FindOrAdd(Class).Add(Actor);
 #if !UE_BUILD_SHIPPING

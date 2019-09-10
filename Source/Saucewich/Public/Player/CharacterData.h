@@ -16,9 +16,8 @@ public:
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;
 	
-	// 기본 최대 체력입니다.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float DefaultMaxHP = 100.f;
+	float MaxHP = 100;
 
 	// 스폰 무적 시간
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly)
