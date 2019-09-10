@@ -28,10 +28,18 @@ protected:
 	bool FindInactivePlayer(APlayerController* PC) override;
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
+	void HandleMatchHasEnded() override;
 
 private:
+	void StartNextGame() const;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSoftObjectPtr<UWorld>> Maps;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FText> Messages;
+
+	FTimerHandle NextGameTimer;
 	
 	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
