@@ -124,8 +124,13 @@ void ASaucewichGameState::HandleMatchHasStarted()
 void ASaucewichGameState::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-
 	OnMatchEnd.Broadcast();
+}
+
+void ASaucewichGameState::HandleLeavingMap()
+{
+	Super::HandleLeavingMap();
+	OnLeavingMap.Broadcast();
 }
 
 void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

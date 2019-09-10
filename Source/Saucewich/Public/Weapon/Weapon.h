@@ -89,6 +89,7 @@ public:
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 
+	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 

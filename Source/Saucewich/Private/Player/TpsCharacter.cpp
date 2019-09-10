@@ -269,6 +269,8 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 	if (HasAuthority())
 		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
 			GameState->MulticastPlayerDeath(GetPlayerState<ASaucewichPlayerState>(), Attacker, Inflictor);
+
+	OnKilled();
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)

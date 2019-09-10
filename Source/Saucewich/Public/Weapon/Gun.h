@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <random>
 #include "Saucewich.h"
 #include "Weapon/Weapon.h"
 #include "Gun.generated.h"
@@ -110,6 +109,9 @@ protected:
 	void OnActivated() override;
 	void OnReleased() override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnShoot();
+
 private:
 	void Shoot();
 	void StartFire(int32 RandSeed);
@@ -122,7 +124,7 @@ private:
 
 	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data) const;
 
-	std::default_random_engine FireRand;
+	FRandomStream FireRand;
 
 	float FireLag;
 	float LastFire;

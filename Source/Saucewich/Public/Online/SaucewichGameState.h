@@ -8,6 +8,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMatchEnd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeavingMap);
 
 USTRUCT(BlueprintType)
 struct FTeam
@@ -109,10 +110,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnMatchEnd OnMatchEnd;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnLeavingMap OnLeavingMap;
+
 protected:
 	void BeginPlay() override;
 	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
+	void HandleLeavingMap() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
