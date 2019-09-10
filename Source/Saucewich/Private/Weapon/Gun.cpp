@@ -71,13 +71,11 @@ void AGun::Shoot()
 
 	const auto V = 45 * Data.VerticalSpread;
 	const auto H = 45 * Data.HorizontalSpread;
-	std::uniform_real_distribution<float> VRand{-V, V};
-	std::uniform_real_distribution<float> HRand{-H, H};
 	
 	TArray<FVector> RDirs;
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
-		RDirs.Add(Dir.RotateAngleAxis(VRand(FireRand), Forward).RotateAngleAxis(HRand(FireRand), Right));
+		RDirs.Add(Dir.RotateAngleAxis(FireRand.FRandRange(-V, V), Forward).RotateAngleAxis(FireRand.FRandRange(-H, H), Right));
 	}
 
 	TSet<uint8> HitPawnIdx;
@@ -101,7 +99,7 @@ void AGun::Shoot()
 
 	FTransform SpawnTransform{
 		FQuat::Identity, MuzzleLocation,
-		FVector{std::uniform_real_distribution<float>{Data.MinProjectileSize, Data.MaxProjectileSize}(FireRand)}
+		FVector{FireRand.FRandRange(Data.MinProjectileSize, Data.MaxProjectileSize)}
 	};
 
 	FActorSpawnParameters Parameters;
@@ -128,6 +126,7 @@ void AGun::Shoot()
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
 
+	OnShoot();
 }
 
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
@@ -135,7 +134,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 	auto& Data = GetGunData();
 	if (const auto Def = Data.ProjectileClass.GetDefaultObject())
 	{
-		const auto Profile = Data.ProjectileClass.GetDefaultObject()->GetCollisionProfile();
+		const auto Profile = Def->GetCollisionProfile();
 		return GunTraceInternal(OutHit, Profile, Data);
 	}
 	return EGunTraceHit::None;
@@ -200,8 +199,7 @@ void AGun::FireP()
 	const auto Pawn = Cast<APawn>(GetOwner());
 	if (Pawn && Pawn->IsLocallyControlled())
 	{
-		static std::default_random_engine Eng{ std::random_device{}() };
-		const auto Seed = std::uniform_int_distribution<int32>{}(Eng);
+		const auto Seed = FMath::Rand();
 		StartFire(Seed);
 		ServerStartFire(Seed);
 	}
@@ -249,7 +247,7 @@ void AGun::StartFire(const int32 RandSeed)
 	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
 	if (!Data) return;
 
-	FireRand.seed(RandSeed);
+	FireRand.Initialize(RandSeed);
 
 	bFiring = true;
 	FireLag = 0.f;

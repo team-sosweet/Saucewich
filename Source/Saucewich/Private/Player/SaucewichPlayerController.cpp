@@ -29,13 +29,8 @@ void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSing
 {
 	if (!Delegate.IsBound()) return;
 	if (const auto PS = GetPlayerState<ASaucewichPlayerState>())
-	{
-		Delegate.ExecuteIfBound(PS);
-	}
-	else
-	{
-		OnPlayerStateSpawned.AddUnique(Delegate);
-	}
+		Delegate.Execute(PS);
+	else OnPlayerStateSpawned.AddUnique(Delegate);
 }
 
 void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)

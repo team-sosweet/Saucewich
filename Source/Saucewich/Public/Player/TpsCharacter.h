@@ -109,6 +109,9 @@ protected:
 	// 캐릭터를 죽입니다.
 	void Kill(class ASaucewichPlayerState* Attacker = nullptr, AActor* Inflictor = nullptr);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnKilled();
+
 	// 캐릭터를 살립니다.
 	void SetPlayerDefaults() override;
 
