@@ -34,7 +34,6 @@ void UIngredientWidget::NativeTick(const FGeometry& MyGeometry, const float InDe
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
 	const auto IngredientNums = GetIngredientNums();
-
 	auto InactiveRow = IngredientsNum;
 	
 	for (auto Index = 0; Index < IngredientsNum; Index++)
