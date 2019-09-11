@@ -4,6 +4,7 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
@@ -12,6 +13,13 @@
 #include "Weapon/GunSharedData.h"
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/Projectile/GunProjectile.h"
+
+AGun::AGun()
+	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
+{
+	FirePSC->SetupAttachment(GetMesh(), "Muzzle");
+	FirePSC->bAutoActivate = false;
+}
 
 void AGun::Tick(const float DeltaSeconds)
 {
@@ -29,6 +37,9 @@ void AGun::Tick(const float DeltaSeconds)
 		FireLag += DeltaSeconds;
 	}
 
+	if (bFiring && CanFire()) FirePSC->Activate();
+	else FirePSC->Deactivate();
+	
 	Reload(DeltaSeconds);
 }
 
@@ -194,6 +205,16 @@ const FGunData& AGun::GetGunData() const
 	return Data ? *Data : Default;
 }
 
+void AGun::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (const auto Data = GetData<FGunData>(FILE_LINE_FUNC))
+	{
+		FirePSC->SetFloatParameter("RPM", Data->Rpm);
+	}
+}
+
 void AGun::FireP()
 {
 	const auto Pawn = Cast<APawn>(GetOwner());
@@ -240,6 +261,12 @@ void AGun::OnReleased()
 	bDried = false;
 	ReloadWaitingTime = 0.f;
 	ReloadAlpha = 0.f;
+}
+
+void AGun::SetColor(const FLinearColor& NewColor)
+{
+	Super::SetColor(NewColor);
+	FirePSC->SetColorParameter("Color", NewColor);
 }
 
 void AGun::StartFire(const int32 RandSeed)
