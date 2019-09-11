@@ -87,6 +87,8 @@ class SAUCEWICH_API AGun final : public AWeapon
 	GENERATED_BODY()
 
 public:
+	AGun();
+	
 	// 이 총으로 target을 찾는 trace를 수행합니다.
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit) const;
@@ -97,6 +99,7 @@ public:
 	const FGunData& GetGunData() const;
 
 protected:
+	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -108,6 +111,8 @@ protected:
 
 	void OnActivated() override;
 	void OnReleased() override;
+
+	void SetColor(const FLinearColor& NewColor) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnShoot();
@@ -123,6 +128,9 @@ private:
 	void MulticastStartFire(int32 RandSeed);
 
 	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data) const;
+
+	UPROPERTY(VisibleAnywhere)
+	class UParticleSystemComponent* FirePSC;
 
 	FRandomStream FireRand;
 
