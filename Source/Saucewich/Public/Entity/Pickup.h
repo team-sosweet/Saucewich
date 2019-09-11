@@ -12,17 +12,11 @@ class SAUCEWICH_API APickup : public APoolActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class USphereComponent* Collision;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* Mesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UShadowComponent* Shadow;
-
 public:
 	APickup();
+	
+	auto GetIcon() const { return Icon; }
+	
 	uint8 bSpawnedFromSpawner : 1;
 
 protected:
@@ -52,6 +46,18 @@ protected:
 private:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetLocation(FVector Location);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class USphereComponent* Collision;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UShadowComponent* Shadow;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	class UTexture* Icon;
 
 	ATpsCharacter* PickingChar;
 	float PickingTimer;
