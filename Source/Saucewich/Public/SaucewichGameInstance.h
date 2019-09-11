@@ -7,12 +7,6 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
 
-UENUM(BlueprintType)
-enum class EGameRule : uint8
-{
-	Lobby, MakeSandwich
-};
-
 UCLASS(Config=Game)
 class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
 {
@@ -77,9 +71,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float CorrectionValue = 1;
-
-	UPROPERTY(Transient, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
-	EGameRule GameRule;
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bAutoFire : 1;
