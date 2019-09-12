@@ -67,10 +67,10 @@ void UIngredientWidget::SetIngredientImage(const uint8 IngredientIndex, const ui
 {
 	const auto& IngredientPanel = IngredientPanels[IngredientIndex];
 
-	for (auto Needs = Num - IngredientPanel->GetChildrenCount(); Needs; Needs--)
+	for (auto Needs = Num - IngredientPanel->GetChildrenCount(); Needs > 0; Needs--)
 	{
 		const auto NewWidget = CreateWidget(GetOwningPlayer(), IngredientContentClasses[IngredientIndex]);
-		const auto NewSlot = IngredientPanels[IngredientIndex]->AddChildToCanvas(NewWidget);
+		const auto NewSlot = IngredientPanel->AddChildToCanvas(NewWidget);
 		const auto SlotData = IngredientContentSlots[IngredientIndex];
 		
 		NewSlot->SetAnchors(SlotData->GetAnchors());
