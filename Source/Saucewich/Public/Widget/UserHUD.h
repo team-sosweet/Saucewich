@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "Widget/BaseWidget.h"
 #include "UserHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UUserHUD final : public UUserWidget
+class SAUCEWICH_API UUserHUD final : public UBaseWidget
 {
 	GENERATED_BODY()
 
@@ -38,9 +38,11 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ShowAngle;
-	
+
+	UPROPERTY(Transient)
 	APawn* OwnerPawn;
 
+	UPROPERTY(Transient)
 	APawn* LocalPawn;
 
 	float ShowAngleRadian;
