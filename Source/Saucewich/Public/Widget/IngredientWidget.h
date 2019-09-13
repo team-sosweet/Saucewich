@@ -22,6 +22,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	FVector2D GetDistanceFromIndex(uint8 Index);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSetVisibility(uint8 ActivateNum);
 	
 private:
 	void SetIngredientImage(uint8 IngredientIndex, uint8 Num);
@@ -38,7 +41,15 @@ private:
 	UPROPERTY(Transient)
 	TArray<class UUniformGridSlot*> IngredientsSlot;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	bool IsVertical;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	bool IsCentered;
+	
 	TArray<bool> IsIngredientActives;
+
+	ESlateVisibility InactiveVisibility;
 
 	uint8 IngredientsNum;
 	
