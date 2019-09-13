@@ -10,17 +10,17 @@ void UIngredientWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	IngredientsNum = IngredientPanels.Num();
-	DirectionSign = IsRightDirection ? 1 : -1;
-	
+	IngredientsNum = IngredientPanels.Num();	
 	IngredientsSlot.Init(nullptr, IngredientsNum);
 	IngredientContentClasses.Init(nullptr, IngredientsNum);
 	IngredientContentSlots.Init(nullptr, IngredientsNum);
 	IsIngredientActives.Init(false, IngredientsNum);
+	InactiveVisibility = IsCentered ? ESlateVisibility::Collapsed : ESlateVisibility::Hidden;
 	
 	for (auto Index = 0; Index < IngredientsNum; Index++)
 	{
 		IngredientsSlot[Index] = Cast<UUniformGridSlot>(IngredientPanels[Index]->Slot);
+		IngredientPanels[Index]->SetVisibility(InactiveVisibility);
 		
 		const auto IngredientContent = IngredientPanels[Index]->GetChildAt(0);
 		IngredientContentClasses[Index] = IngredientContent->GetClass();
@@ -45,22 +45,41 @@ void UIngredientWidget::NativeTick(const FGeometry& MyGeometry, const float InDe
 			if (!IsIngredientActives[Index])
 			{
 				IngredientPanels[Index]->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-				IngredientsSlot[Index]->SetRow(ActiveNum++);
+
+				if (IsVertical)
+				{
+					IngredientsSlot[Index]->SetColumn(ActiveNum++);
+				}
+				else
+				{
+					IngredientsSlot[Index]->SetRow(ActiveNum++);
+				}
+				
 				IsIngredientActives[Index] = true;
 			}
 		}
 		else
 		{
-			IngredientsSlot[Index]->SetRow(--InactiveRow);
+			if (IsVertical)
+			{
+				IngredientsSlot[Index]->SetColumn(--InactiveRow);
+			}
+			else
+			{
+				IngredientsSlot[Index]->SetRow(--InactiveRow);
+			}
+			
 			
 			if (IsIngredientActives[Index])
 			{
-				IngredientPanels[Index]->SetVisibility(ESlateVisibility::Hidden);
+				IngredientPanels[Index]->SetVisibility(InactiveVisibility);
 				IsIngredientActives[Index] = false;
 				ActiveNum--;
 			}
 		}
 	}
+
+	OnSetVisibility(ActiveNum);
 }
 
 void UIngredientWidget::SetIngredientImage(const uint8 IngredientIndex, const uint8 Num)
@@ -78,8 +97,8 @@ void UIngredientWidget::SetIngredientImage(const uint8 IngredientIndex, const ui
 		NewSlot->SetAlignment(SlotData->GetAlignment());
 		NewSlot->SetAutoSize(SlotData->GetAutoSize());
 
-		const auto Distance = 180.0f * (IngredientPanel->GetChildrenCount() - 1) * DirectionSign;
-		const auto Pos = SlotData->GetPosition() + FVector2D(Distance, 0.0f);
+		const auto Distance = GetDistanceFromIndex(IngredientPanel->GetChildrenCount());
+		const auto Pos = SlotData->GetPosition() + Distance;
 		NewSlot->SetPosition(Pos);
 	}
 
