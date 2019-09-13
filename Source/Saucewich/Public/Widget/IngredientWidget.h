@@ -20,6 +20,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	TArray<uint8> GetIngredientNums();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	FVector2D GetDistanceFromIndex(uint8 Index);
+	
 private:
 	void SetIngredientImage(uint8 IngredientIndex, uint8 Num);
 	
@@ -35,14 +38,9 @@ private:
 	UPROPERTY(Transient)
 	TArray<class UUniformGridSlot*> IngredientsSlot;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	bool IsRightDirection;
-	
 	TArray<bool> IsIngredientActives;
 
 	uint8 IngredientsNum;
 	
 	uint8 ActiveNum;
-	
-	int8 DirectionSign;
 };

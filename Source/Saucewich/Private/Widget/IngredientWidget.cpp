@@ -10,9 +10,7 @@ void UIngredientWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	IngredientsNum = IngredientPanels.Num();
-	DirectionSign = IsRightDirection ? 1 : -1;
-	
+	IngredientsNum = IngredientPanels.Num();	
 	IngredientsSlot.Init(nullptr, IngredientsNum);
 	IngredientContentClasses.Init(nullptr, IngredientsNum);
 	IngredientContentSlots.Init(nullptr, IngredientsNum);
@@ -78,8 +76,9 @@ void UIngredientWidget::SetIngredientImage(const uint8 IngredientIndex, const ui
 		NewSlot->SetAlignment(SlotData->GetAlignment());
 		NewSlot->SetAutoSize(SlotData->GetAutoSize());
 
-		const auto Distance = 180.0f * (IngredientPanel->GetChildrenCount() - 1) * DirectionSign;
-		const auto Pos = SlotData->GetPosition() + FVector2D(Distance, 0.0f);
+		const auto Distance = GetDistanceFromIndex(IngredientPanel->GetChildrenCount());
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Distance.ToString());
+		const auto Pos = SlotData->GetPosition() + Distance;
 		NewSlot->SetPosition(Pos);
 	}
 
