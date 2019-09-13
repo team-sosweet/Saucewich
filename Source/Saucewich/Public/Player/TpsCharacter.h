@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-
+#include "Kismet/KismetMathLibrary.h"
 #include "Saucewich.h"
 #include "Interface/Colorable.h"
 #include "Interface/Translucentable.h"
