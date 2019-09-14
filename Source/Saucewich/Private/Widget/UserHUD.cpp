@@ -21,7 +21,7 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 	LocalPawn = Cast<ATpsCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
 
 	OwnerPawn->OnCharacterSpawn.AddDynamic(this, &UUserHUD::OnSpawn);
-	OwnerPawn->OnCharacterSpawn.AddDynamic(this, &UUserHUD::OnDeath);
+	OwnerPawn->OnCharacterDeath.AddDynamic(this, &UUserHUD::OnDeath);
 	
 	BindPlayerState(OwnerPawn, [this](ASaucewichPlayerState* PS)
 		{
