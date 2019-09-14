@@ -3,7 +3,6 @@
 #include "Widget/UserHUD.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
 
 #include "Player/SaucewichPlayerState.h"
 
@@ -85,19 +84,4 @@ void UUserHUD::OnOwnerTeamChanged(const uint8 NewTeam)
 void UUserHUD::OnLocalTeamChanged(const uint8 NewTeam)
 {
 	LocalTeam = NewTeam;
-}
-
-void UUserHUD::BindPlayerState(const APawn* InPawn, const TFunction<void(ASaucewichPlayerState*)>& Callback)
-{
-	if (const auto PS = InPawn->GetPlayerState<ASaucewichPlayerState>())
-	{
-		Callback(PS);
-	}
-	else
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick([this, InPawn, Callback]
-			{
-				BindPlayerState(InPawn, Callback);
-			});
-	}
 }

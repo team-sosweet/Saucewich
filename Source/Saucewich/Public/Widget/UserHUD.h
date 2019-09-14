@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TimerManager.h"
 #include "Widget/BaseWidget.h"
 #include "UserHUD.generated.h"
 
@@ -30,8 +31,22 @@ private:
 
 	UFUNCTION()
 	void OnLocalTeamChanged(uint8 NewTeam);
-	
-	void BindPlayerState(const APawn* InPawn, const TFunction<void(ASaucewichPlayerState*)>& Callback);
+
+	template <class Fn>
+	void BindPlayerState(const APawn* InPawn, Fn&& Callback)
+	{
+		if (const auto PS = InPawn->GetPlayerState<ASaucewichPlayerState>())
+		{
+			Callback(PS);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, InPawn, Callback]
+				{
+					BindPlayerState(InPawn, Callback);
+				});
+		}
+	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ShowDistance;
