@@ -8,7 +8,7 @@
 /**
  * 재활용 가능한 액터입니다. 자주 생성/소멸되는 액터에 좋습니다.
  */
-UCLASS()
+UCLASS(Abstract)
 class SAUCEWICH_API APoolActor : public AActor
 {
 	GENERATED_BODY()
@@ -19,7 +19,7 @@ public:
 	void Activate(bool bForce = false);
 	bool IsActive() const { return bActivated; }
 	void LifeSpanExpired() override { Release(); }
-	class AActorPool* GetPool() const { return Pool; }
+	class AActorPool* GetPool() const;
 
 protected:
 	virtual void OnReleased() {}
@@ -31,14 +31,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="OnActivated"))
 	void BP_OnActivated();
 
-	void BeginPlay() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	UFUNCTION()
 	void OnRep_Activated();
-
-	AActorPool* Pool;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Activated, Transient)
 	uint8 bActivated : 1;
