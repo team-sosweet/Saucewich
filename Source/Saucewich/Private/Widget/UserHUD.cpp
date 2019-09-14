@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacter.h"
 
 void UUserHUD::NativeOnInitialized()
 {
@@ -14,11 +15,14 @@ void UUserHUD::NativeOnInitialized()
 	ShowAngleRadian = FMath::DegreesToRadians(ShowAngle * 0.5f);
 }
 
-void UUserHUD::Init(APawn* InOwnerPawn)
+void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 {
 	OwnerPawn = InOwnerPawn;
-	LocalPawn = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn();
+	LocalPawn = Cast<ATpsCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
 
+	OwnerPawn->OnCharacterSpawn.AddDynamic(this, &UUserHUD::OnSpawn);
+	OwnerPawn->OnCharacterDeath.AddDynamic(this, &UUserHUD::OnDeath);
+	
 	BindPlayerState(OwnerPawn, [this](ASaucewichPlayerState* PS)
 		{
 			OnInit(PS);
@@ -35,7 +39,7 @@ void UUserHUD::Init(APawn* InOwnerPawn)
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
 {
-	if (OwnerPawn == LocalPawn)
+	if (OwnerPawn == LocalPawn || IsDead)
 	{
 		return ESlateVisibility::Hidden;
 	}
@@ -84,4 +88,14 @@ void UUserHUD::OnOwnerTeamChanged(const uint8 NewTeam)
 void UUserHUD::OnLocalTeamChanged(const uint8 NewTeam)
 {
 	LocalTeam = NewTeam;
+}
+
+void UUserHUD::OnSpawn()
+{
+	IsDead = false;
+}
+
+void UUserHUD::OnDeath()
+{
+	IsDead = true;
 }

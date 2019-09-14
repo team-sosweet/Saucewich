@@ -16,7 +16,7 @@ class SAUCEWICH_API UUserHUD final : public UBaseWidget
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void Init(APawn* InOwnerPawn);
+	void Init(class ATpsCharacter* InOwnerPawn);
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -32,6 +32,12 @@ private:
 	UFUNCTION()
 	void OnLocalTeamChanged(uint8 NewTeam);
 
+	UFUNCTION()
+	void OnSpawn();
+
+	UFUNCTION()
+	void OnDeath();
+	
 	template <class Fn>
 	void BindPlayerState(const APawn* InPawn, Fn&& Callback)
 	{
@@ -55,14 +61,16 @@ private:
 	float ShowAngle;
 
 	UPROPERTY(Transient)
-	APawn* OwnerPawn;
+	ATpsCharacter* OwnerPawn;
 
 	UPROPERTY(Transient)
-	APawn* LocalPawn;
+	ATpsCharacter* LocalPawn;
 
 	float ShowAngleRadian;
 
 	uint8 OwnerTeam;
 
 	uint8 LocalTeam;
+
+	bool IsDead;
 };
