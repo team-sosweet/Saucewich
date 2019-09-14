@@ -15,7 +15,7 @@ void APoolActor::Release(const bool bForce)
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
 	bActivated = false;
-	Pool->Release(this);
+	GetPool()->Release(this);
 	OnReleased();
 	BP_OnReleased();
 }
@@ -32,13 +32,11 @@ void APoolActor::Activate(const bool bForce)
 	BP_OnActivated();
 }
 
-void APoolActor::BeginPlay()
+AActorPool* APoolActor::GetPool() const
 {
-	Super::BeginPlay();
-
-	if (const auto World = GetWorld())
-		if (const auto GI = World->GetGameInstance<USaucewichGameInstance>())
-			Pool = GI->GetActorPool();
+	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+		return GI->GetActorPool();
+	return nullptr;
 }
 
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
