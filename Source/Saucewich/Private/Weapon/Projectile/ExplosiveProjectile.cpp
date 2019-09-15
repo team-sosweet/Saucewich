@@ -8,6 +8,11 @@ void AExplosiveProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* 
 	const bool bSelfMoved, const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	if (!IsNetMode(NM_Client))
+	{
+		UE_LOG(LogClass, Log, TEXT(""));
+	}
 	
 	UGameplayStatics::ApplyRadialDamage(
 		this,
