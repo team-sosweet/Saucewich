@@ -21,7 +21,6 @@ AWeapon::AWeapon()
 	Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {
 	bReplicates = true;
-	PrimaryActorTick.bCanEverTick = true;
 	
 	RootComponent = SceneRoot;
 	Mesh->SetupAttachment(SceneRoot);
