@@ -29,7 +29,7 @@ void AGun::Tick(const float DeltaSeconds)
 	if (bFiring)
 	{
 		const auto CurTime = GetGameTimeSinceCreation();
-		const auto Delay = 60.f / GetData<FGunData>(FILE_LINE_FUNC)->Rpm;
+		const auto Delay = 60.f / GetData<FGunData>(TEXT("AGun::Tick()"))->Rpm;
 		for (; FireLag >= Delay; FireLag -= Delay)
 		{
 			Shoot();
@@ -65,7 +65,6 @@ void AGun::Shoot()
 
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
-	GUARANTEE_MSG(!MuzzleLocation.IsNearlyZero(), "무기 Muzzle 소켓 설정 안 됨");
 
 	const auto ProjColProf = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
 
@@ -129,11 +128,10 @@ void AGun::Shoot()
 	}
 
 	LastClip = --Clip;
-	if (!bDried && Clip == 0)
+	if (!bDried && Clip == 0 && HasAuthority())
 	{
 		bDried = true;
-		if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-			Char->GetWeaponComponent()->OnGunDried.Broadcast(true);
+		OnRep_Dried();
 	}
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
@@ -155,7 +153,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data) const
 {
 	const auto Shared = GetSharedData<UGunSharedData>();
-	if (!GUARANTEE(Shared != nullptr)) return EGunTraceHit::None;
+	if (!Shared) return EGunTraceHit::None;
 
 	const auto Character = Cast<ATpsCharacter>(GetOwner());
 	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
@@ -199,10 +197,16 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, ProjColProf, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
 }
 
+void AGun::OnRep_Dried() const
+{
+	if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
+		Char->GetWeaponComponent()->OnGunDried.Broadcast(bDried);
+}
+
 const FGunData& AGun::GetGunData() const
 {
 	static const FGunData Default{};
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FGunData>(TEXT("AGun::GetGunData()"));
 	return Data ? *Data : Default;
 }
 
@@ -210,7 +214,7 @@ void AGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const auto Data = GetData<FGunData>(FILE_LINE_FUNC))
+	if (const auto Data = GetData<FGunData>(TEXT("AGun::BeginPlay()")))
 	{
 		FirePSC->SetFloatParameter("RPM", Data->Rpm);
 	}
@@ -235,7 +239,7 @@ void AGun::FireR()
 void AGun::SlotP()
 {
 	if (const auto Character = Cast<ATpsCharacter>(GetOwner()))
-		if (const auto Data = GetData(FILE_LINE_FUNC))
+		if (const auto Data = GetData(TEXT("AGun::SlotP()")))
 			Character->GetWeaponComponent()->TrySelectWeapon(Data->Slot);
 }
 
@@ -243,7 +247,7 @@ void AGun::OnActivated()
 {
 	Super::OnActivated();
 
-	if (const auto Data = GetData<FGunData>(FILE_LINE_FUNC))
+	if (const auto Data = GetData<FGunData>(TEXT("AGun::OnActivated()")))
 	{
 		Clip = Data->ClipSize;
 	}
@@ -272,7 +276,7 @@ void AGun::SetColor(const FLinearColor& NewColor)
 
 void AGun::StartFire(const int32 RandSeed)
 {
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FGunData>(TEXT("AGun::StartFire()"));
 	if (!Data) return;
 
 	FireRand.Initialize(RandSeed);
@@ -311,7 +315,7 @@ void AGun::Reload(const float DeltaSeconds)
 {
 	if (!HasAuthority()) return;
 
-	const auto Data = GetData<FGunData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FGunData>(TEXT("AGun::Reload()"));
 	if (!Data) return;
 
 	if (Clip < Data->ClipSize)
@@ -324,8 +328,7 @@ void AGun::Reload(const float DeltaSeconds)
 			if (bDried && Clip >= Data->MinClipToFireAfterDried)
 			{
 				bDried = false;
-				if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-					Char->GetWeaponComponent()->OnGunDried.Broadcast(false);
+				OnRep_Dried();
 			}
 		}
 		else

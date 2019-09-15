@@ -129,6 +129,9 @@ private:
 
 	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data) const;
 
+	UFUNCTION()
+	void OnRep_Dried() const;
+
 	UPROPERTY(VisibleAnywhere)
 	class UParticleSystemComponent* FirePSC;
 
@@ -144,7 +147,7 @@ private:
 	uint8 Clip;
 	uint8 LastClip;
 
-	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(ReplicatedUsing=OnRep_Dried, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bDried : 1;
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

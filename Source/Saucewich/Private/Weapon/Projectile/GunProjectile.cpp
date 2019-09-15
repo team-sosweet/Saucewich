@@ -11,7 +11,7 @@ void AGunProjectile::OnActivated()
 	const auto Gun = Cast<AGun>(GetOwner());
 	if (!Gun) return;
 	
-	if (const auto Data = Gun->GetData<FGunData>(FILE_LINE_FUNC))
+	if (const auto Data = Gun->GetData<FGunData>(TEXT("AGunProjectile::OnActivated()")))
 	{
 		SetSpeed(Data->ProjectileSpeed);
 	}
