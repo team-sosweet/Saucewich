@@ -4,7 +4,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "Gun.h"
 
 AProjectile::AProjectile()
 	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},

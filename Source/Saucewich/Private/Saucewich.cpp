@@ -3,5 +3,4 @@
 #include "Saucewich.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Saucewich, "Saucewich" );
-DEFINE_LOG_CATEGORY(LogSaucewich)
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")

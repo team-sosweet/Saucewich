@@ -5,14 +5,13 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-#include "Saucewich.h"
 #include "Entity/ActorPool.h"
 #include "Weapon/Projectile/Projectile.h"
 
 const FThrowingWeaponData& AThrowingWeapon::GetThrowingWeaponData() const
 {
 	static const FThrowingWeaponData Default{};
-	const auto Data = GetData<FThrowingWeaponData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::GetThrowingWeaponData()"));
 	return Data ? *Data : Default;
 }
 
@@ -26,7 +25,7 @@ void AThrowingWeapon::SlotP()
 	auto& TimerManager = GetWorldTimerManager();
 	if (TimerManager.TimerExists(ReloadTimer)) return;
 
-	const auto Data = GetData<FThrowingWeaponData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::SlotP()"));
 	if (!Data) return;
 
 	FActorSpawnParameters Parameters;
