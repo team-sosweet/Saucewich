@@ -17,6 +17,7 @@
 AGun::AGun()
 	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
 {
+	PrimaryActorTick.bCanEverTick = true;
 	FirePSC->SetupAttachment(GetMesh(), "Muzzle");
 	FirePSC->bAutoActivate = false;
 }
