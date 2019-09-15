@@ -37,6 +37,13 @@ FName AProjectile::GetCollisionProfile() const
 	return Mesh->GetCollisionProfileName();
 }
 
+FLinearColor AProjectile::GetColor() const
+{
+	FLinearColor Color;
+	if (Material) Material->GetVectorParameterValue({"Color"}, Color);
+	return Color;
+}
+
 void AProjectile::SetColor(const FLinearColor& NewColor)
 {
 	if (Material) Material->SetVectorParameterValue("Color", NewColor);
