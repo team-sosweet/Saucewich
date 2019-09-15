@@ -128,11 +128,10 @@ void AGun::Shoot()
 	}
 
 	LastClip = --Clip;
-	if (!bDried && Clip == 0)
+	if (!bDried && Clip == 0 && HasAuthority())
 	{
 		bDried = true;
-		if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-			Char->GetWeaponComponent()->OnGunDried.Broadcast(true);
+		OnRep_Dried();
 	}
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
@@ -196,6 +195,12 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	}
 
 	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, ProjColProf, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
+}
+
+void AGun::OnRep_Dried() const
+{
+	if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
+		Char->GetWeaponComponent()->OnGunDried.Broadcast(bDried);
 }
 
 const FGunData& AGun::GetGunData() const
@@ -323,8 +328,7 @@ void AGun::Reload(const float DeltaSeconds)
 			if (bDried && Clip >= Data->MinClipToFireAfterDried)
 			{
 				bDried = false;
-				if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-					Char->GetWeaponComponent()->OnGunDried.Broadcast(false);
+				OnRep_Dried();
 			}
 		}
 		else
