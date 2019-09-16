@@ -29,7 +29,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 				{
 					Actor->SetOwner(SpawnParameters.Owner);
 					Actor->Instigator = SpawnParameters.Instigator;
-					Actor->SetActorTransform(GetDefault<AActor>(Class)->GetRootComponent()->GetRelativeTransform() * Transform);
+					Actor->SetActorTransform(Class.GetDefaultObject()->GetRootComponent()->GetRelativeTransform() * Transform);
 					Actor->Activate();
 					return Actor;
 				}
@@ -38,9 +38,11 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 
 		if (const auto Actor = static_cast<APoolActor*>(GetWorld()->SpawnActor(Class, &Transform, SpawnParameters)))
 		{
+#if !UE_BUILD_SHIPPING
 			UE_LOG(LogActorPool, Warning,
 			       TEXT("%s에 대한 액터 풀이 비어있어 새 액터를 생성합니다. 해당 클래스를 Reserve에 등록하길 권장합니다. 현재까지 최대 사용량: %d개"),
 			       *Class->GetName(), MaxUse.FindOrAdd(Class) + 1);
+#endif
 			Actor->Activate();
 			return Actor;
 		}

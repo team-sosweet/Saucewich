@@ -28,6 +28,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
+
+	UFUNCTION(BlueprintCallable)
 	void SetColor(const FLinearColor& NewColor) override;
 
 protected:
