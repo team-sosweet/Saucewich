@@ -59,21 +59,14 @@ void ASaucewichPlayerState::OnDeath()
 	}
 }
 
-void ASaucewichPlayerState::AddScore(const FName ScoreID)
+void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 {
 	if (!HasAuthority()) return;
 
-	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
-	if (!GS) return;
-
-	const auto ActualScore = GS->GetScoreData(ScoreID).Score;
-	Score += ActualScore;
-	MulticastAddScore(ScoreID, ActualScore);
-}
-
-void ASaucewichPlayerState::AddScore(const FName ScoreID, const int32 ActualScore)
-{
-	if (!HasAuthority()) return;
+	if (ActualScore == 0)
+		if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+			ActualScore = GS->GetScoreData(ScoreID).Score;
+	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
 }
