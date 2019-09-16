@@ -15,7 +15,10 @@ void APoolActor::Release(const bool bForce)
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
 	bActivated = false;
-	GetPool()->Release(this);
+
+	if (!bReplicates || HasAuthority())
+		GetPool()->Release(this);
+	
 	OnReleased();
 	BP_OnReleased();
 }
