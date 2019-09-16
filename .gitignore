@@ -12,4 +12,5 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
+*.user
 Plugins/socketio-client-ue4/Source/ThirdParty/

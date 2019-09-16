@@ -12,13 +12,14 @@
 APickupSpawner::APickupSpawner()
 	:Body{CreateDefaultSubobject<USphereComponent>("Body")}
 {
+	bReplicates = true;
 	RootComponent = Body;
 	Body->BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
 }
 
 void APickupSpawner::PickedUp()
 {
-	SetSpawnTimer();
+	if (HasAuthority()) MulticastSetSpawnTimer();
 }
 
 float APickupSpawner::GetRemainingSpawnTime() const
@@ -30,12 +31,14 @@ void APickupSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	if (IsPendingKill()) return;
-	
-	SetSpawnTimer();
+
+	if (HasAuthority()) MulticastSetSpawnTimer();
 }
 
 void APickupSpawner::Spawn()
 {
+	if (!HasAuthority()) return;
+	
 	auto&& Transform = Body->GetComponentTransform();
 	
 	FActorSpawnParameters Parameters;
@@ -48,8 +51,8 @@ void APickupSpawner::Spawn()
 	}
 }
 
-void APickupSpawner::SetSpawnTimer()
+void APickupSpawner::MulticastSetSpawnTimer_Implementation()
 {
-	if (!IsNetMode(NM_Client))
-		GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, SpawnInterval);
+	if (HasAuthority()) GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, SpawnInterval);
+	else GetWorldTimerManager().SetTimer(SpawnTimer, SpawnInterval, false);
 }

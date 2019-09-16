@@ -29,7 +29,9 @@ protected:
 
 private:
 	void Spawn();
-	void SetSpawnTimer();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetSpawnTimer();
 
 	FTimerHandle SpawnTimer;
 
