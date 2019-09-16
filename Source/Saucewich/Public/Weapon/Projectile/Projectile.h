@@ -26,6 +26,8 @@ public:
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
+	UFUNCTION(BlueprintCallable)
+	FLinearColor GetColor() const;
 	void SetColor(const FLinearColor& NewColor) override;
 
 protected:

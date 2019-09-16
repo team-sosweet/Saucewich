@@ -13,12 +13,12 @@ void AMakeSandwich::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GUARANTEE(PerkSpawnInterval > 0 && PerkClasses.Num() > 0))
+	if (PerkSpawnInterval > 0 && PerkClasses.Num() > 0)
 	{
 		for (TActorIterator<APickupSpawnVolume> It{GetWorld()}; It; ++It)
 			PerkSpawnVolumes.Add(*It);
 
-		if (GUARANTEE(PerkSpawnVolumes.Num() > 0))
+		if (PerkSpawnVolumes.Num() > 0)
 			GetWorldTimerManager().SetTimer(PerkSpawnTimer, this, &AMakeSandwich::SpawnPerk, PerkSpawnInterval, true);
 	}
 }

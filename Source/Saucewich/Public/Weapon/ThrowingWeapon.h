@@ -35,15 +35,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FThrowingWeaponData& GetThrowingWeaponData() const;
 
+	UFUNCTION(BlueprintCallable)
+	float GetRemainingReloadTime() const;
+
 protected:
 	void SlotP() override;
-	void OnActivated() override;
-	void Tick(float DeltaSeconds) override;
 
 private:
-	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float ReloadingTime;
-
-	UPROPERTY(Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 bReloading : 1;
+	FTimerHandle ReloadTimer;
 };

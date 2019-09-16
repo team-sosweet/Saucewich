@@ -10,6 +10,6 @@ USkeletalMesh* UMeshMergeFunctionLibrary::MergeMeshes(const TArray<USkeletalMesh
 {
 	const auto BaseMesh = NewObject<USkeletalMesh>();
 	FSkeletalMeshMerge Merger{BaseMesh, Meshes, {}, 0};
-	if (GUARANTEE(Merger.DoMerge())) return BaseMesh;
+	if (Merger.DoMerge()) return BaseMesh;
 	return nullptr;
 }

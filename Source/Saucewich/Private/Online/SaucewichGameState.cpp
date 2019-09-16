@@ -85,7 +85,7 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 	{
 		if (const auto Def = Class.GetDefaultObject())
 		{
-			const auto WepDat = Def->GetData(FILE_LINE_FUNC);
+			const auto WepDat = Def->GetData(TEXT("ASaucewichGameState::GetAvailableWeapons()"));
 			if (WepDat && WepDat->Slot == Slot)
 			{
 				SlotWep.Add(Class);

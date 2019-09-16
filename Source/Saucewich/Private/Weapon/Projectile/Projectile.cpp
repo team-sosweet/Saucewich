@@ -4,7 +4,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "Gun.h"
 
 AProjectile::AProjectile()
 	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
@@ -36,6 +35,13 @@ void AProjectile::OnReleased()
 FName AProjectile::GetCollisionProfile() const
 {
 	return Mesh->GetCollisionProfileName();
+}
+
+FLinearColor AProjectile::GetColor() const
+{
+	FLinearColor Color;
+	if (Material) Material->GetVectorParameterValue({"Color"}, Color);
+	return Color;
 }
 
 void AProjectile::SetColor(const FLinearColor& NewColor)

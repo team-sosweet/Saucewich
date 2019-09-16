@@ -3,23 +3,29 @@
 #include "ThrowingWeapon.h"
 
 #include "Engine/World.h"
+#include "TimerManager.h"
 
-#include "Saucewich.h"
 #include "Entity/ActorPool.h"
 #include "Weapon/Projectile/Projectile.h"
 
 const FThrowingWeaponData& AThrowingWeapon::GetThrowingWeaponData() const
 {
 	static const FThrowingWeaponData Default{};
-	const auto Data = GetData<FThrowingWeaponData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::GetThrowingWeaponData()"));
 	return Data ? *Data : Default;
+}
+
+float AThrowingWeapon::GetRemainingReloadTime() const
+{
+	return FMath::Max(GetWorldTimerManager().GetTimerRemaining(ReloadTimer), 0.f);
 }
 
 void AThrowingWeapon::SlotP()
 {
-	if (bReloading) return;
+	auto& TimerManager = GetWorldTimerManager();
+	if (TimerManager.TimerExists(ReloadTimer)) return;
 
-	const auto Data = GetData<FThrowingWeaponData>(FILE_LINE_FUNC);
+	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::SlotP()"));
 	if (!Data) return;
 
 	FActorSpawnParameters Parameters;
@@ -30,32 +36,6 @@ void AThrowingWeapon::SlotP()
 	{
 		Thrown->ResetSpeed();
 		Thrown->SetColor(GetColor());
-		bReloading = true;
-	}
-}
-
-void AThrowingWeapon::OnActivated()
-{
-	Super::OnActivated();
-	
-	ReloadingTime = 0;
-	bReloading = false;
-
-	if (GetData<FThrowingWeaponData>(FILE_LINE_FUNC))
-		SetActorTickEnabled(false);
-}
-
-void AThrowingWeapon::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (bReloading)
-	{
-		ReloadingTime += DeltaSeconds;
-		if (ReloadingTime >= static_cast<const FThrowingWeaponData*>(GetData(FILE_LINE_FUNC))->ReloadTime)
-		{
-			ReloadingTime = 0;
-			bReloading = false;
-		}
+		TimerManager.SetTimer(ReloadTimer, Data->ReloadTime, false);
 	}
 }
