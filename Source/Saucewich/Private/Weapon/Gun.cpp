@@ -2,6 +2,7 @@
 
 #include "Gun.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -15,11 +16,16 @@
 #include "Weapon/Projectile/GunProjectile.h"
 
 AGun::AGun()
-	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
+	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")},
+	FireSound{CreateDefaultSubobject<UAudioComponent>("FireSound")}
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
 	FirePSC->SetupAttachment(GetMesh(), "Muzzle");
 	FirePSC->bAutoActivate = false;
+
+	FireSound->SetupAttachment(GetRootComponent());
+	FireSound->bAutoActivate = false;
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -135,6 +141,8 @@ void AGun::Shoot()
 	}
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
+
+	FireSound->Play();
 
 	OnShoot();
 }

@@ -23,6 +23,7 @@
 #include "Player/TpsCharacterMovementComponent.h"
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
+#include "SoundDamageType.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
 
@@ -194,6 +195,19 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
 		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
+	}
+
+	if (DamageAmount > 0)
+	{
+		if (const TSubclassOf<USoundDamageType> SndDmgTyCls{DamageEvent.DamageTypeClass})
+		{
+			FHitResult HitInfo;
+			FVector ImpulseDir;
+			DamageEvent.GetBestHitInfo(this, DamageCauser, HitInfo, ImpulseDir);
+			
+			const auto Sound = SndDmgTyCls.GetDefaultObject()->GetSound();
+			UGameplayStatics::PlaySoundAtLocation(this, Sound, HitInfo.ImpactPoint);
+		}
 	}
 	
 	return DamageAmount;
