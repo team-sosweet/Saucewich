@@ -41,12 +41,12 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	return GUARANTEE(WeaponComponent != nullptr) ? WeaponComponent->GetActiveWeapon() : nullptr;
+	return WeaponComponent ? WeaponComponent->GetActiveWeapon() : nullptr;
 }
 
 EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
-	return GUARANTEE(WeaponComponent != nullptr) ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
+	return WeaponComponent ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
 }
 
 uint8 ATpsCharacter::GetTeam() const
@@ -58,7 +58,7 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	GUARANTEE(ColMat->GetVectorParameterValue({"Color"}, Color));
+	ColMat->GetVectorParameterValue({"Color"}, Color);
 	return Color;
 }
 
@@ -74,7 +74,7 @@ FLinearColor ATpsCharacter::GetTeamColor() const
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
 	ColMat->SetVectorParameterValue("Color", NewColor);
-	if (GUARANTEE(ColTranslMat != nullptr)) ColTranslMat->SetVectorParameterValue("Color", NewColor);
+	if (ColTranslMat) ColTranslMat->SetVectorParameterValue("Color", NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -120,13 +120,13 @@ void ATpsCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (GUARANTEE(Data != nullptr))
+	if (Data != nullptr)
 	{
 		const auto ColMatIdx = GetColIdx();
 		if (ColMatIdx != INDEX_NONE)
 		{
 			const auto Transl = Data->GetTranslMat(ColMatIdx, GetMesh()->GetMaterial(ColMatIdx));
-			if (GUARANTEE(Transl != nullptr))
+			if (Transl != nullptr)
 			{
 				ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
 			}
@@ -150,7 +150,7 @@ void ATpsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		bAlive = true;
-		if (GUARANTEE(Data != nullptr))
+		if (Data != nullptr)
 		{
 			HP = Data->MaxHP;
 		}
@@ -180,7 +180,7 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
-	if (!GUARANTEE(Data != nullptr)) return 0;
+	if (!Data) return 0;
 	
 	if (DamageAmount > 0) DamageAmount /= GetArmorRatio();
 	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -226,7 +226,7 @@ void ATpsCharacter::SetPlayerDefaults()
 {
 	SetActorActivated(true);
 
-	if (GUARANTEE(Data != nullptr))
+	if (Data != nullptr)
 	{
 		if (HasAuthority())
 		{
@@ -325,11 +325,8 @@ void ATpsCharacter::SetColorToTeamColor()
 {
 	if (const auto GameState = GetWorld()->GetGameState())
 	{
-		const auto GS = Cast<ASaucewichGameState>(GameState);
-		if (GUARANTEE_MSG(GS != nullptr, "GameState를 SaucewichGameState로 변환 실패"))
-		{
+		if (const auto GS = Cast<ASaucewichGameState>(GameState))
 			SetColor(GetTeamColor(GS));
-		}
 	}
 	else
 	{
@@ -344,7 +341,7 @@ FLinearColor ATpsCharacter::GetTeamColor(ASaucewichGameState* const GameState) c
 
 int32 ATpsCharacter::GetColIdx() const
 {
-	return GUARANTEE(Data != nullptr) ? GetMesh()->GetMaterialIndex(Data->ColMatName) : INDEX_NONE;
+	return Data ? GetMesh()->GetMaterialIndex(Data->ColMatName) : INDEX_NONE;
 }
 
 void ATpsCharacter::OnRep_Alive()

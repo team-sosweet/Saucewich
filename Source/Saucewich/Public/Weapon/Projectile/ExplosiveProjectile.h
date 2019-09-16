@@ -11,7 +11,8 @@ class SAUCEWICH_API AExplosiveProjectile final : public AProjectile
 	GENERATED_BODY()
 
 protected:
-	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	UFUNCTION(BlueprintCallable)
+	void ApplyDamage();
 	
 private:
 	UPROPERTY(EditAnywhere)
