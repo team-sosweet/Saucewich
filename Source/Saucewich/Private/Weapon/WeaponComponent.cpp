@@ -22,7 +22,7 @@ UWeaponComponent::UWeaponComponent()
 
 void UWeaponComponent::AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate, const bool bCallbackWithCurrentWeapons)
 {
-	if (!GUARANTEE(Delegate.IsBound())) return;
+	if (!Delegate.IsBound()) return;
 	if (bCallbackWithCurrentWeapons)
 		for (const auto Weapon : Weapons)
 			if (Weapon) Delegate.Execute(Weapon);
@@ -182,17 +182,17 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	const auto Owner = Cast<ATpsCharacter>(GetOwner());
 	if (!Owner) return nullptr;
 
-	const auto Data = GetDefault<AWeapon>(WeaponClass)->GetData(FILE_LINE_FUNC);
+	const auto Data = GetDefault<AWeapon>(WeaponClass)->GetData(TEXT("UWeaponComponent::Give()"));
 	if (!Data) return nullptr;
 	
 	const auto Slot = Data->Slot;
-	if (!GUARANTEE(Slot < Weapons.Num())) return nullptr;
+	if (Slot >= Weapons.Num()) return nullptr;
 
 	const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
-	if (!GUARANTEE(GI != nullptr)) return nullptr;
+	if (!GI) return nullptr;
 
 	const auto Pool = GI->GetActorPool();
-	if (!GUARANTEE(Pool != nullptr)) return nullptr;
+	if (!Pool) return nullptr;
 
 	if (Weapons[Slot])
 	{

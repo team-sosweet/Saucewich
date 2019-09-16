@@ -18,7 +18,7 @@ public:
 	void SetComponent(TSubclassOf<class UComponentWidget> ComponentClass);
 	
 private:
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UComponentWidget* Component;
 
 	UPROPERTY(Transient)

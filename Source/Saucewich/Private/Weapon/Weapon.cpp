@@ -21,7 +21,6 @@ AWeapon::AWeapon()
 	Mesh{ CreateDefaultSubobject<UStaticMeshComponent>("Mesh") }
 {
 	bReplicates = true;
-	PrimaryActorTick.bCanEverTick = true;
 	
 	RootComponent = SceneRoot;
 	Mesh->SetupAttachment(SceneRoot);
@@ -55,22 +54,22 @@ void AWeapon::OnRep_Equipped()
 
 int32 AWeapon::GetColIdx() const
 {
-	return GUARANTEE(SharedData != nullptr) ? Mesh->GetMaterialIndex(SharedData->ColMatName) : INDEX_NONE;
+	return SharedData ? Mesh->GetMaterialIndex(SharedData->ColMatName) : INDEX_NONE;
 }
 
 void AWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (GUARANTEE(SharedData != nullptr))
+	if (SharedData != nullptr)
 	{
-		if (const auto Data = GetData(FILE_LINE_FUNC))
+		if (const auto Data = GetData(TEXT("AWeapon::PostInitializeComponents()")))
 		{
 			const auto ColMatIdx = GetColIdx();
-			if (GUARANTEE(ColMatIdx != INDEX_NONE))
+			if (ColMatIdx != INDEX_NONE)
 			{
 				const auto Transl = SharedData->GetTranslMat(GetMesh()->GetMaterial(ColMatIdx));
-				if (GUARANTEE(Transl != nullptr))
+				if (Transl != nullptr)
 				{
 					ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
 				}
@@ -102,7 +101,7 @@ void AWeapon::OnReleased()
 const FWeaponData& AWeapon::GetWeaponData() const
 {
 	static const FWeaponData Default;
-	const auto Data = GetData(FILE_LINE_FUNC);
+	const auto Data = GetData(TEXT("AWeapon::GetWeaponData()"));
 	return Data ? *Data : Default;
 }
 
@@ -132,9 +131,9 @@ void AWeapon::SetColor(const FLinearColor& NewColor)
 void AWeapon::BeTranslucent()
 {
 	if (bTransl) return;
-	if (!GUARANTEE(SharedData != nullptr)) return;
+	if (!SharedData) return;
 
-	const auto Data = GetData(FILE_LINE_FUNC);
+	const auto Data = GetData(TEXT("AWeapon::BeTranslucent()"));
 	if (!Data) return;
 
 	const auto ColMatIdx = GetColIdx();
