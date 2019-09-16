@@ -12,7 +12,7 @@ class SAUCEWICH_API AExplosiveProjectile final : public AProjectile
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	void ApplyDamage();
+	void ApplyDamage() const;
 	
 private:
 	UPROPERTY(EditAnywhere)

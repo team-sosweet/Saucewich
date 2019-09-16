@@ -4,7 +4,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AExplosiveProjectile::ApplyDamage()
+void AExplosiveProjectile::ApplyDamage() const
 {
 	UGameplayStatics::ApplyRadialDamage(
 		this,
@@ -13,7 +13,7 @@ void AExplosiveProjectile::ApplyDamage()
 		Radius,
 		DamageType,
 		{},
-		this,
+		GetOwner(),
 		GetInstigatorController(),
 		false,
 		DamagePreventionChannel
