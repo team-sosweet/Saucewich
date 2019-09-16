@@ -26,16 +26,20 @@ void AThrowingWeapon::SlotP()
 	if (TimerManager.TimerExists(ReloadTimer)) return;
 
 	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::SlotP()"));
-	if (!Data) return;
+	if (!Data || !Data->ProjectileClass) return;
 
-	FActorSpawnParameters Parameters;
-	Parameters.Owner = this;
-	Parameters.Instigator = GetInstigator();
-
-	if (const auto Thrown = GetPool()->Spawn<AProjectile>(Data->ProjectileClass, Data->ThrowOffset * GetActorTransform(), Parameters))
+	if (HasAuthority() || !Data->ProjectileClass.GetDefaultObject()->GetIsReplicated())
 	{
-		Thrown->ResetSpeed();
-		Thrown->SetColor(GetColor());
-		TimerManager.SetTimer(ReloadTimer, Data->ReloadTime, false);
+		FActorSpawnParameters Parameters;
+		Parameters.Owner = this;
+		Parameters.Instigator = GetInstigator();
+
+		if (const auto Thrown = GetPool()->Spawn<AProjectile>(Data->ProjectileClass, Data->ThrowOffset * GetActorTransform(), Parameters))
+		{
+			Thrown->ResetSpeed();
+			Thrown->SetColor(GetColor());
+		}
 	}
+	
+	TimerManager.SetTimer(ReloadTimer, Data->ReloadTime, false);
 }

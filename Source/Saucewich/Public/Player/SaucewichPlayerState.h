@@ -27,8 +27,13 @@ public:
 	virtual void OnKill();
 	virtual void OnDeath();
 
-	void AddScore(FName ScoreID);
-	void AddScore(FName ScoreID, int32 ActualScore);
+	/**
+	 * 점수를 추가(혹은 차감)합니다. Authority 전용입니다.
+	 * @param ScoreID		점수 ID
+	 * @param ActualScore	0이 아닌 값이면 미리 지정된 점수 말고 이 값만큼 추가
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void AddScore(FName ScoreID, int32 ActualScore = 0);
 
 	uint8 GetKill() const { return Kill; }
 	uint8 GetDeath() const { return Death; }
