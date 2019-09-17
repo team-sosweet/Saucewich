@@ -2,7 +2,7 @@
 
 #include "SaucewichLibrary.h"
 
-#include "Components/DecalComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "SkeletalMeshMerge.h"
 
@@ -18,54 +18,32 @@ USkeletalMesh* USaucewichLibrary::MergeMeshes(const TArray<USkeletalMesh*>& Mesh
 	return nullptr;
 }
 
-ADecalPoolActor* SpawnPoolDecal(UMaterialInterface* const DecalMaterial, const FVector& DecalSize, UWorld* const World, const float LifeSpan)
+ADecalPoolActor* USaucewichLibrary::SpawnSauceDecal(const FHitResult& HitInfo, UMaterialInterface* const Material, const FLinearColor& Color,
+	const FVector SizeMin, const FVector SizeMax, const float LifeSpan)
 {
-	const auto Pool = USaucewichLibrary::GetActorPool(World);
+	const auto Comp = HitInfo.GetComponent();
+	if (!Comp || Comp->Mobility != EComponentMobility::Static) return nullptr;
+	
+	const auto World = Comp->GetWorld();
+	if (!World) return nullptr;
+
+	const auto Pool = GetActorPool(World);
 	if (!Pool) return nullptr;
 
-	const auto Decal = Pool->Spawn<ADecalPoolActor>();
-	if (Decal)
-	{
-		const auto DecalComp = Decal->GetDecal();
-		DecalComp->SetDecalMaterial(DecalMaterial);
-		DecalComp->DecalSize = DecalSize;
-		Decal->SetLifeSpan(LifeSpan);
-	}
+	auto Rot = HitInfo.ImpactNormal.Rotation();
+	Rot.Roll = FMath::FRandRange(0, 360);
 	
-	return Decal;
-}
-
-ADecalPoolActor* USaucewichLibrary::SpawnPoolDecalAtLocation(const UObject* const WorldContextObject, UMaterialInterface* const DecalMaterial, const FVector DecalSize, const FVector Location, const FRotator Rotation, const float LifeSpan)
-{
-	if (!WorldContextObject) return nullptr;
-	const auto World = WorldContextObject->GetWorld();
-	if (!World) return nullptr;
-
-	const auto Decal = SpawnPoolDecal(DecalMaterial, DecalSize, World, LifeSpan);
-	if (Decal) Decal->SetActorLocationAndRotation(Location, Rotation);
-
-	return Decal;
-}
-
-ADecalPoolActor* USaucewichLibrary::SpawnPoolDecalAttached(UMaterialInterface* const DecalMaterial, const FVector DecalSize, USceneComponent* const AttachToComponent, const FName AttachPointName, const FVector Location, const FRotator Rotation, const EAttachmentRule LocationType, const float LifeSpan)
-{
-	if (!AttachToComponent) return nullptr;
-	const auto World = AttachToComponent->GetWorld();
-	if (!World) return nullptr;
-
-	const auto Decal = SpawnPoolDecal(DecalMaterial, DecalSize, World, LifeSpan);
+	const auto Decal = Pool->Spawn<ADecalPoolActor>({Rot, HitInfo.ImpactPoint});
 	if (Decal)
 	{
-		Decal->AttachToComponent(AttachToComponent, FAttachmentTransformRules::KeepRelativeTransform, AttachPointName);
-		if (LocationType == EAttachmentRule::KeepWorld)
-		{
-			Decal->SetActorLocationAndRotation(Location, Rotation);
-		}
-		else
-		{
-			Decal->SetActorRelativeLocation(Location);
-			Decal->SetActorRelativeRotation(Rotation);
-		}
+		Decal->SetDecalMaterial(Material);
+		Decal->SetColor(Color);
+		Decal->SetDecalSize({
+			FMath::RandRange(SizeMin.X, SizeMax.X),
+			FMath::RandRange(SizeMin.Y, SizeMax.Y),
+			FMath::RandRange(SizeMin.Z, SizeMax.Z)
+		});
+		Decal->SetLifeSpan(LifeSpan);
 	}
 
 	return Decal;

@@ -18,10 +18,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDamageType> DamageType;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Damage = 100;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Radius = 300;
 
 	UPROPERTY(EditAnywhere)

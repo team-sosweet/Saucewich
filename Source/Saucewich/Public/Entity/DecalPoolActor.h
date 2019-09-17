@@ -13,10 +13,12 @@ class SAUCEWICH_API ADecalPoolActor final : public APoolActor, public IColorable
 
 public:
 	ADecalPoolActor();
-	UDecalComponent* GetDecal() const { return Decal; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetColor(const FLinearColor& NewColor) override;
+
+	void SetDecalMaterial(UMaterialInterface* NewMaterial) const;
+	void SetDecalSize(const FVector& NewSize) const;
 	
 protected:
 	void Tick(float DeltaSeconds) override;
@@ -24,4 +26,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UDecalComponent* Decal;
+
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* Collision;
 };
