@@ -13,9 +13,21 @@ UHttpGameInstance::UHttpGameInstance()
 	Http = &FHttpModule::Get();
 }
 
-void UHttpGameInstance::GetRequest(const FString& Url, const FOnResponded& OnResponded)
+void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
 {
-	auto Request = CreateRequest(Url, OnResponded);
+	if (ResponseDelegates.Contains(Url))
+	{
+		return;
+	}
+
+	FString Content;
+	if (!GetStringFromJson(Json, Content))
+	{
+		OnResponded.ExecuteIfBound(false, FJson());
+		return;
+	}
+	
+	auto Request = CreateRequest(Url + "?" + Content, OnResponded);
 	Request->SetVerb("GET");
 	Request->ProcessRequest();
 }

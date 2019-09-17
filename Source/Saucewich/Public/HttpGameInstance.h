@@ -28,7 +28,7 @@ public:
 	UHttpGameInstance();
 	
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GET"))
-	void GetRequest(const FString& Url, const FOnResponded& OnResponded);
+	void GetRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "POST"))
 	void PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded);
