@@ -13,6 +13,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameInstance, Log, All)
 USaucewichGameInstance::USaucewichGameInstance()
 	:ActorPoolClass{AActorPool::StaticClass()}
 {
+	
 }
 
 USaucewichGameInstance::~USaucewichGameInstance()

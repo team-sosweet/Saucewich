@@ -6,62 +6,40 @@
 #include "JsonReader.h"
 #include "JsonSerializer.h"
 
-void UJsonData::Create(const FString& Json)
+void UJsonData::Create(const TSharedPtr<FJsonValue>& InJsonValue)
 {
-	const auto Reader = TJsonReaderFactory<>::Create(Json);
-	FJsonSerializer::Deserialize(Reader, JsonObject);
+	JsonValue = InJsonValue;
 }
 
-void UJsonData::Create(const TSharedPtr<FJsonValue>& JsonValuePtr)
+bool UJsonData::AsFloat(float& Out) const
 {
-	JsonValuePtr->AsArgumentType(JsonObject);
-}
-
-void UJsonData::Create(const TSharedPtr<FJsonObject>& JsonObjectPtr)
-{
-	JsonObject = JsonObjectPtr;
-}
-
-bool UJsonData::GetNumberValue(const FString& Key, float& Out)
-{
-	double Number;
-	if (!JsonObject->TryGetNumberField(Key, Number))
+	double Value;
+	if (!JsonValue->TryGetNumber(Value))
 		return false;
 
-	Out = Number;
+	Out = Value;
 	return true;
 }
 
-bool UJsonData::GetIntegerValue(const FString& Key, int32& Out)
+bool UJsonData::AsInteger(int32& Out) const
 {
-	return JsonObject->TryGetNumberField(Key, Out);
+	return JsonValue->TryGetNumber(Out);
 }
 
-bool UJsonData::GetBooleanValue(const FString& Key, bool& Out)
+bool UJsonData::AsBoolean(bool& Out) const
 {
-	return JsonObject->TryGetBoolField(Key, Out);
+	return JsonValue->TryGetBool(Out);
 }
 
-bool UJsonData::GetStringValue(const FString& Key, FString& Out)
+bool UJsonData::AsString(FString& Out) const
 {
-	return JsonObject->TryGetStringField(Key, Out);
+	return JsonValue->TryGetString(Out);
 }
 
-bool UJsonData::GetObjectValue(const FString& Key, UJsonData*& Out)
-{
-	const TSharedPtr<FJsonObject>* Object;
-	if (!JsonObject->TryGetObjectField(Key, Object))
-		return false;
-
-	Out = NewObject<UJsonData>();
-	Out->Create(*Object);
-	return true;
-}
-
-bool UJsonData::GetArrayValue(const FString& Key, TArray<UJsonData*>& Out)
+bool UJsonData::AsArray(TArray<UJsonData*>& Out) const
 {
 	const TArray<TSharedPtr<FJsonValue>>* Arr;
-	if (!JsonObject->TryGetArrayField(Key, Arr))
+	if (!JsonValue->TryGetArray(Arr))
 		return false;
 
 	const auto Num = Arr->Num();
@@ -72,5 +50,24 @@ bool UJsonData::GetArrayValue(const FString& Key, TArray<UJsonData*>& Out)
 		Out[Index]->Create((*Arr)[Index]);
 	}
 
+	return true;
+}
+
+bool UJsonData::AsObject(TMap<FString, UJsonData*>& Out) const
+{
+	const TSharedPtr<FJsonObject>* Object;
+	if (!JsonValue->TryGetObject(Object))
+		return false;
+
+	Out.Empty();
+	const auto Values = (*Object)->Values;
+	
+	for (const auto& Value : Values)
+	{
+		auto Data = NewObject<UJsonData>();
+		Data->Create(Value.Value);
+		Out.Add(Value.Key, Data);
+	}
+	
 	return true;
 }
