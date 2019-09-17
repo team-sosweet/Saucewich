@@ -10,23 +10,9 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameInstance, Log, All)
 
-USaucewichGameInstance::USaucewichGameInstance()
-	:ActorPoolClass{AActorPool::StaticClass()}
-{
-	
-}
-
-USaucewichGameInstance::~USaucewichGameInstance()
-{
-	if (IsDedicatedServerInstance())
-	{
-		// TODO: 매치 서버에게 이 게임 서버가 종료되었음을 알림
-	}
-}
-
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
-	if (!IsValid(ActorPool)) ActorPool = static_cast<AActorPool*>(GetWorld()->SpawnActor(ActorPoolClass));
+	if (!IsValid(ActorPool)) ActorPool = GetWorld()->SpawnActor<AActorPool>();
 	return ActorPool;
 }
 
