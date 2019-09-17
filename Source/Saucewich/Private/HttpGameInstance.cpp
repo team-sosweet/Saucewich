@@ -22,6 +22,11 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FOnResponded& OnRes
 
 void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
 {
+	if (ResponseDelegates.Contains(Url))
+	{
+		return;
+	}
+	
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
@@ -55,7 +60,7 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 {
 	const auto OnResponded = ResponseDelegates.FindAndRemoveChecked(Request->GetURL());
 	
-	if (!bWasSuccessful || !Response.IsValid() || !EHttpResponseCodes::IsOk(Response->GetResponseCode()))
+	if (!bWasSuccessful || !Response.IsValid())
 	{
 		OnResponded.ExecuteIfBound(false, FJson());
 		return;
