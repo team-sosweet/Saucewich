@@ -2,13 +2,13 @@
 
 #include "Gun.h"
 
-#include "Components/AudioComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
+#include "Kismet/GameplayStatics.h"
 #include "Online/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/GunSharedData.h"
@@ -16,16 +16,12 @@
 #include "Weapon/Projectile/GunProjectile.h"
 
 AGun::AGun()
-	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")},
-	FireSound{CreateDefaultSubobject<UAudioComponent>("FireSound")}
+	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
 	FirePSC->SetupAttachment(GetMesh(), "Muzzle");
 	FirePSC->bAutoActivate = false;
-
-	FireSound->SetupAttachment(GetRootComponent());
-	FireSound->bAutoActivate = false;
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -142,7 +138,7 @@ void AGun::Shoot()
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
 
-	FireSound->Play();
+	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLocation);
 
 	OnShoot();
 }
