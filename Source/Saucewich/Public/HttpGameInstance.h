@@ -4,8 +4,6 @@
 
 #include "Engine/GameInstance.h"
 #include "Http.h"
-#include "Json.h"
-#include "JsonData.h"
 #include "HttpGameInstance.generated.h"
 
 USTRUCT(Atomic, BlueprintType)
@@ -14,7 +12,7 @@ struct FJson
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<FString, UJsonData*> Data;
+	TMap<FString, class UJsonData*> Data;
 };
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnResponded, bool, IsSuccess, FJson, Json);
@@ -34,7 +32,9 @@ public:
 	void PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded);
 
 private:
-	TSharedRef<class IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
+	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
+	
+	bool CanRequest(const FString& Url);
 	
 	bool GetStringFromJson(const FJson& Json, FString& Out);
 

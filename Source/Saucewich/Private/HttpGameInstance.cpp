@@ -2,7 +2,6 @@
 
 #include "HttpGameInstance.h"
 
-#include "Http.h"
 #include "Json.h"
 #include "JsonObjectConverter.h"
 
@@ -15,57 +14,57 @@ UHttpGameInstance::UHttpGameInstance()
 
 void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
 {
-	if (ResponseDelegates.Contains(Url))
-	{
-		return;
-	}
-
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
 		OnResponded.ExecuteIfBound(false, FJson());
 		return;
 	}
-	
-	auto Request = CreateRequest(Url + "?" + Content, OnResponded);
-	Request->SetVerb("GET");
-	Request->ProcessRequest();
+
+	const auto FinalUrl = BaseUrl + Url + "?" + Content;
+	if (CanRequest(FinalUrl))
+	{
+		const auto Request = CreateRequest(FinalUrl, OnResponded);
+		Request->SetVerb("GET");
+		Request->ProcessRequest();
+	}
 }
 
 void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
 {
-	if (ResponseDelegates.Contains(Url))
-	{
-		return;
-	}
-	
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
 		OnResponded.ExecuteIfBound(false, FJson());
 		return;
 	}
-	
-	auto Request = CreateRequest(Url, OnResponded);
-	Request->SetVerb("POST");
 
-	Request->SetContentAsString(Content);
-	Request->ProcessRequest();
+	const auto FinalUrl = BaseUrl + Url;
+	if (CanRequest(FinalUrl))
+	{
+		const auto Request = CreateRequest(FinalUrl, OnResponded);
+		Request->SetVerb("POST");
+		Request->SetContentAsString(Content);
+		Request->ProcessRequest();
+	}
 }
 
 TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& Url, const FOnResponded& OnResponded)
 {
 	const auto Request = Http->CreateRequest();
+	ResponseDelegates.Add(Url, OnResponded);
 	Request->OnProcessRequestComplete().BindUObject(this, &UHttpGameInstance::OnResponse);
-
-	const auto FinalUrl = BaseUrl + Url;
 	
-	ResponseDelegates.Add(FinalUrl, OnResponded);
-	Request->SetURL(FinalUrl);
+	Request->SetURL(Url);
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
 	Request->SetHeader(TEXT("Accepts"), TEXT("application/json"));
 	return Request;
+}
+
+bool UHttpGameInstance::CanRequest(const FString& Url)
+{
+	return !ResponseDelegates.Contains(Url);
 }
 
 void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpResponsePtr Response, const bool bWasSuccessful)
