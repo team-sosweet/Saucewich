@@ -135,6 +135,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UParticleSystemComponent* FirePSC;
 
+	UPROPERTY(VisibleAnywhere)
+	class UAudioComponent* FireSound;
+
 	FRandomStream FireRand;
 
 	float FireLag;
