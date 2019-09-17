@@ -31,6 +31,9 @@ public:
 protected:
 	void OnDeath() override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPutIngredients();
+
 private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPickupIngredient(TSubclassOf<ASandwichIngredient> Class);

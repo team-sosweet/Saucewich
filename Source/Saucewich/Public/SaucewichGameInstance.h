@@ -14,9 +14,6 @@ class SAUCEWICH_API USaucewichGameInstance final : public UHttpGameInstance
 	GENERATED_BODY()
 
 public:
-	USaucewichGameInstance();
-	~USaucewichGameInstance();
-	
 	class AActorPool* GetActorPool();
 	ASaucewichGameState* GetGameState() const;
 
@@ -60,9 +57,6 @@ private:
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 	
 	FOnGameStateSpawned OnGameStateSpawned;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AActorPool> ActorPoolClass;
 
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;

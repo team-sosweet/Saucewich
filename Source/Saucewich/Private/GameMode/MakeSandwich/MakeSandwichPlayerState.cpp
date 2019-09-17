@@ -42,6 +42,7 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 void AMakeSandwichPlayerState::MulticastResetIngredients_Implementation()
 {
 	Ingredients.Reset();
+	OnPutIngredients();
 }
 
 uint8 AMakeSandwichPlayerState::GetNumIngredients() const
