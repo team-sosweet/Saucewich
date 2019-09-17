@@ -30,10 +30,14 @@ ADecalPoolActor* USaucewichLibrary::SpawnSauceDecal(const FHitResult& HitInfo, U
 	const auto Pool = GetActorPool(World);
 	if (!Pool) return nullptr;
 
-	auto Rot = HitInfo.ImpactNormal.Rotation();
+	FHitResult ComplexHit;
+	const auto bHitComplex = World->LineTraceSingleByChannel(ComplexHit, HitInfo.ImpactPoint + HitInfo.ImpactNormal * .1, HitInfo.ImpactPoint - HitInfo.ImpactNormal * 10, ECC_Visibility, {NAME_None, true});
+	auto& ActualHit = bHitComplex ? ComplexHit : HitInfo;
+
+	auto Rot = ActualHit.ImpactNormal.Rotation();
 	Rot.Roll = FMath::FRandRange(0, 360);
 	
-	const auto Decal = Pool->Spawn<ADecalPoolActor>({Rot, HitInfo.ImpactPoint});
+	const auto Decal = Pool->Spawn<ADecalPoolActor>({Rot, ActualHit.ImpactPoint});
 	if (Decal)
 	{
 		Decal->SetDecalMaterial(Material);
