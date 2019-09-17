@@ -11,13 +11,20 @@ class SAUCEWICH_API AActorPool final : public AActor
 	GENERATED_BODY()
 	
 public:
-	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
+	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform = FTransform::Identity, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
 
 	template <class T>
-	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters = DefaultParameters)
+	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform = FTransform::Identity, const FActorSpawnParameters& SpawnParameters = DefaultParameters)
 	{
 		static_assert(TIsDerivedFrom<T, APoolActor>::IsDerived, "T must be derived from APoolActor");
 		return Cast<T>(Spawn(*Class, Transform, SpawnParameters));
+	}
+
+	template <class T>
+	T* Spawn(const FTransform& Transform = FTransform::Identity, const FActorSpawnParameters& SpawnParameters = DefaultParameters)
+	{
+		static_assert(TIsDerivedFrom<T, APoolActor>::IsDerived, "T must be derived from APoolActor");
+		return static_cast<T*>(Spawn(T::StaticClass(), Transform, SpawnParameters));
 	}
 
 	void Release(APoolActor* Actor);

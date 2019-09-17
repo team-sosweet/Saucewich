@@ -24,8 +24,6 @@
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogTpsCharacter, Log, All)
-
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
 	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
