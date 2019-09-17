@@ -141,7 +141,6 @@ private:
 	FRandomStream FireRand;
 
 	float FireLag;
-	float LastFire;
 
 	float ReloadWaitingTime;
 	float ReloadAlpha;
