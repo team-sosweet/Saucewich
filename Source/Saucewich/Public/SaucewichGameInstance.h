@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "Engine/GameInstance.h"
+#include "HttpGameInstance.h"
 #include "SaucewichGameInstance.generated.h"
+
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
 
 UCLASS(Config=Game)
-class SAUCEWICH_API USaucewichGameInstance final : public UGameInstance
+class SAUCEWICH_API USaucewichGameInstance final : public UHttpGameInstance
 {
 	GENERATED_BODY()
 
@@ -65,7 +66,7 @@ private:
 
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
-
+	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	float Sensitivity = .5;
 
