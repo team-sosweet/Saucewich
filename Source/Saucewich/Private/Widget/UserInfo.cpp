@@ -4,7 +4,7 @@
 
 #include "Components/TextBlock.h"
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 
 void UUserInfo::NativeOnInitialized()

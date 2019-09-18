@@ -5,8 +5,8 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
-#include "Online/SaucewichGameMode.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerState.h"
 

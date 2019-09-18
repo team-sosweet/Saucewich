@@ -4,28 +4,19 @@
 
 #include "Engine/PlayerStartPIE.h"
 #include "EngineUtils.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
-	// AGameMode::Tick()에서 매 틱마다 매치 상태 업데이트를 하지만 그럴 필요가 없으므로
 	PrimaryActorTick.bCanEverTick = false;
 	bUseSeamlessTravel = true;
-}
-
-void ASaucewichGameMode::UpdateMatchState()
-{
-	if (GetMatchState() == MatchState::WaitingToStart)
-		if (ReadyToStartMatch()) StartMatch();
-	
-	if (GetMatchState() == MatchState::InProgress)
-		if (ReadyToEndMatch()) EndMatch();
 }
 
 void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
@@ -41,22 +32,26 @@ void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duratio
 	}
 }
 
-APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
+void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
-	if (!PC) return nullptr;
+	Super::InitGame(MapName, Options, ErrorMessage);
+	if (GameSession) GameSession->MaxPlayers = MaxPlayers;
+}
+
+void ASaucewichGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
+}
+
+void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
+{
+	Super::GenericPlayerInitialization(C);
 	
-	if (const auto State = GetGameState<ASaucewichGameState>())
-	{
-		LastTeam = UGameplayStatics::GetIntOption(Options, "Team", 0);
-		if (LastTeam == 0) LastTeam = State->GetMinPlayerTeam();
-		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
-		{
-			PS->SetTeam(LastTeam);
-		}
-	}
-	
-	return PC;
+	if (const auto GS = GetGameState<ASaucewichGameState>())
+		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
+			if (PS->GetTeam() == 0 || GS->GetNumPlayers(PS->GetTeam()) > GameSession->MaxPlayers / GS->GetNumTeam())
+				PS->SetTeam(GS->GetMinPlayerTeam());
 }
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
@@ -106,22 +101,6 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 	return nullptr;
 }
 
-bool ASaucewichGameMode::FindInactivePlayer(APlayerController* const PC)
-{
-	const auto bFound = Super::FindInactivePlayer(PC);
-	
-	if (bFound)
-	{
-		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
-		{
-			// PlayerState가 초기화되었으므로 팀을 재설정
-			PS->SetTeam(LastTeam);
-		}
-	}
-	
-	return bFound;
-}
-
 void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)
 {
 	if (!IsValid(NewPlayer)) return;
@@ -156,6 +135,29 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 	}
 }
 
+bool ASaucewichGameMode::ReadyToStartMatch_Implementation()
+{
+	return NumPlayers + NumBots >= MinPlayerToStart;
+}
+
+bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
+{
+	if (const auto GS = GetGameState<ASaucewichGameState>())
+	{
+		if (GS->GetRemainingRoundSeconds() <= 0)
+		{
+			return true;
+		}
+
+		if (GS->GetEmptyTeam() != 0)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
@@ -163,13 +165,37 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	GetWorldTimerManager().SetTimer(NextGameTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 }
 
+void ASaucewichGameMode::UpdateMatchState()
+{
+	if (GetMatchState() == MatchState::WaitingToStart)
+	{
+		if (ReadyToStartMatch())
+		{
+			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
+			StartMatch();
+		}
+	}
+	if (GetMatchState() == MatchState::InProgress)
+	{
+		if (ReadyToEndMatch())
+		{
+			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToEndMatch"));
+			EndMatch();
+		}
+	}
+}
+
 void ASaucewichGameMode::StartNextGame() const
 {
 	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
 	const TSubclassOf<ASaucewichGameMode> GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
 	const auto DefGm = GmClass.GetDefaultObject();
-	const auto Map = Maps.Num() > 0 ? DefGm->Maps[FMath::RandHelper(Maps.Num())].GetAssetName() : GetWorld()->GetMapName();
 
-	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *Map, *GmClass->GetPathName());
+	const TSoftObjectPtr<UWorld> CurMap{GetWorld()->GetPathName()};
+	auto AvailableMaps = DefGm->Maps;
+	AvailableMaps.RemoveSingleSwap(CurMap, false);
+	const auto NewMap = AvailableMaps.Num() > 0 ? AvailableMaps[FMath::RandHelper(AvailableMaps.Num())].GetAssetName() : CurMap.GetAssetName();
+
+	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
 }

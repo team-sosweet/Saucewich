@@ -8,8 +8,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "TimerManager.h"
 
-#include "Online/SaucewichGameMode.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Widget/UsersInfo.h"
