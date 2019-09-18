@@ -13,14 +13,13 @@
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogSaucewichPlayerState, Log, All)
+DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
 
 template <class Fn>
 void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
 {
 	if (const auto GI = PlayerState->GetWorld()->GetGameInstance<USaucewichGameInstance>())
 		GI->SafeGameState(Func);
-	else UE_LOG(LogSaucewichPlayerState, Error, TEXT("Failed to cast game instance to SaucewichGameInstance"));
 }
 
 void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
@@ -69,6 +68,8 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
+
+	UE_LOG(LogPlayerState, Log, TEXT("Add %d score to %s by %s"), ActualScore, *GetPlayerName(), *ScoreID.ToString())
 }
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
