@@ -90,7 +90,6 @@ public:
 
 
 	// 현재 라운드의 남은 시간을 구합니다.
-	// 라운드가 진행중이 아닐 경우 -1을 반환합니다. (혹은 뭔가 잘못되었거나)
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
 
@@ -121,9 +120,6 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UFUNCTION()
-	void OnRep_RoundStartTime();
-	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
 
@@ -150,6 +146,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float RoundMinutes = 3;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoundStartTime, Transient, VisibleInstanceOnly)
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	float RoundStartTime = -1;
 };

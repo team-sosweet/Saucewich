@@ -12,7 +12,6 @@ class SAUCEWICH_API AMakeSandwich final : public ASaucewichGameMode
 
 protected:
 	void BeginPlay() override;
-	bool ReadyToEndMatch_Implementation() override;
 	
 private:
 	void SpawnPerk() const;

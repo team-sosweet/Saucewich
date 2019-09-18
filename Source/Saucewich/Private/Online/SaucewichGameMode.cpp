@@ -14,18 +14,7 @@
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
-	// AGameMode::Tick()에서 매 틱마다 매치 상태 업데이트를 하지만 그럴 필요가 없으므로
-	PrimaryActorTick.bCanEverTick = false;
 	bUseSeamlessTravel = true;
-}
-
-void ASaucewichGameMode::UpdateMatchState()
-{
-	if (GetMatchState() == MatchState::WaitingToStart)
-		if (ReadyToStartMatch()) StartMatch();
-	
-	if (GetMatchState() == MatchState::InProgress)
-		if (ReadyToEndMatch()) EndMatch();
 }
 
 void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const PC) const
@@ -154,6 +143,29 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 	{
 		PS->GiveWeapons();
 	}
+}
+
+bool ASaucewichGameMode::ReadyToStartMatch_Implementation()
+{
+	return NumPlayers + NumBots >= MinPlayerToStart;
+}
+
+bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
+{
+	if (const auto GS = GetGameState<ASaucewichGameState>())
+	{
+		if (GS->GetRemainingRoundSeconds() <= 0)
+		{
+			return true;
+		}
+	}
+	
+	if (NumPlayers + NumBots < MinPlayerToStart)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()

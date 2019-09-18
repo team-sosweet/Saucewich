@@ -97,7 +97,7 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return GetWorldTimerManager().GetTimerRemaining(RoundTimer);
+	return FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime));
 }
 
 void ASaucewichGameState::BeginPlay()
@@ -111,14 +111,7 @@ void ASaucewichGameState::BeginPlay()
 void ASaucewichGameState::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-	
-	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-	{
-		GetWorldTimerManager().SetTimer(
-			RoundTimer, GameMode, &ASaucewichGameMode::UpdateMatchState, RoundMinutes * 60, false
-		);
-		RoundStartTime = GetWorld()->GetTimeSeconds();
-	}
+	RoundStartTime = GetServerWorldTimeSeconds();
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -151,11 +144,6 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
-}
-
-void ASaucewichGameState::OnRep_RoundStartTime()
-{
-	GetWorldTimerManager().SetTimer(RoundTimer, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime), false);
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
