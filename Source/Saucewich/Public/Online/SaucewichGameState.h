@@ -61,8 +61,8 @@ public:
 	uint8 GetNumPlayers(uint8 Team) const;
 
 
-	// 이기고 있는 (또는 이미 승리한) 팀을 반환합니다.
-	// 비기고 있는 (또는 이미 비겼을) 경우 0을 반환합니다.
+	// 이기고 있는 팀을 반환합니다.
+	// 비기고 있는 경우 0을 반환합니다.
 	UFUNCTION(BlueprintCallable)
 	uint8 GetWinningTeam() const;
 
@@ -148,4 +148,8 @@ private:
 
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	float RoundStartTime = -1;
+
+
+	UPROPERTY(Replicated, Transient)
+	uint8 WonTeam;
 };

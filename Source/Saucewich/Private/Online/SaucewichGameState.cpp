@@ -120,10 +120,10 @@ void ASaucewichGameState::HandleMatchHasEnded()
 
 	if (HasAuthority())
 	{
-		const auto Won = GetWinningTeam();
-		if (Won != 0)
+		WonTeam = GetWinningTeam();
+		if (WonTeam != 0)
 		{
-			ForEachPlayer(PlayerArray, Won, [](ASaucewichPlayerState* const Player)
+			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
 			{
 				Player->AddScore("Win");
 			});
@@ -144,6 +144,7 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
+	DOREPLIFETIME(ASaucewichGameState, WonTeam);
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
@@ -163,6 +164,18 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
+	if (WonTeam != 0) return WonTeam;
+	
+	auto T1 = 0, T2 = 0;
+	ForEachEveryPlayer(PlayerArray, [&T1, &T2](ASaucewichPlayerState* const Ply)
+	{
+		const auto T = Ply->GetTeam();
+		if (T == 1) ++T1;
+		else if (T == 2) ++T2;
+	});
+	if (T1 == 0 && T2 > 0) return 2;
+	if (T1 > 0 && T2 == 0) return 1;
+	
 	const auto A = TeamScore[1], B = TeamScore[2];
 	return A > B ? 1 : A < B ? 2 : 0;
 }
