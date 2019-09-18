@@ -128,9 +128,6 @@ private:
 	void MoveRight(float AxisValue);
 	void SetActorActivated(bool bActive);
 
-	UFUNCTION(BlueprintCallable)
-	void Respawn();
-
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();

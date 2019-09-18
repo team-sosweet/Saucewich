@@ -22,6 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRespawnTime() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic)
 	void Respawn();
 
 	UFUNCTION(Server, Unreliable, WithValidation)
