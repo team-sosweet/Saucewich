@@ -23,6 +23,8 @@ public:
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 protected:
+	void BeginPlay() override;
+	
 	void OverridePlayerState(APlayerController* PC, APlayerState* OldPlayerState) override;
 	void GenericPlayerInitialization(AController* C) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
@@ -34,6 +36,7 @@ protected:
 	void HandleMatchHasEnded() override;
 
 private:
+	void UpdateMatchState();
 	void StartNextGame() const;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -43,6 +46,7 @@ private:
 	TMap<FName, FText> Messages;
 
 	FTimerHandle NextGameTimer;
+	FTimerHandle MatchStateUpdateTimer;
 
 	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
@@ -50,6 +54,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
 	float PickupSpawnInterval = 20;
+
+	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
+	float MatchStateUpdateInterval = 1;
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MinPlayerToStart = 2;

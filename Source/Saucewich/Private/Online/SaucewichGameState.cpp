@@ -169,7 +169,16 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
 	if (WonTeam != 0) return WonTeam;
+
+	const auto Empty = GetEmptyTeam();
+	if (Empty) return 3 - Empty;
 	
+	const auto A = GetTeamScore(1), B = GetTeamScore(2);
+	return A > B ? 1 : A < B ? 2 : 0;
+}
+
+uint8 ASaucewichGameState::GetEmptyTeam() const
+{
 	auto T1 = 0, T2 = 0;
 	ForEachEveryPlayer(PlayerArray, [&T1, &T2](ASaucewichPlayerState* const Ply)
 	{
@@ -177,9 +186,8 @@ uint8 ASaucewichGameState::GetWinningTeam() const
 		if (T == 1) ++T1;
 		else if (T == 2) ++T2;
 	});
-	if (T1 == 0 && T2 > 0) return 2;
-	if (T1 > 0 && T2 == 0) return 1;
-	
-	const auto A = GetTeamScore(1), B = GetTeamScore(2);
-	return A > B ? 1 : A < B ? 2 : 0;
+	if (T1 == 0 && T2 > 0) return 1;
+	if (T1 > 0 && T2 == 0) return 2;
+
+	return 0;
 }

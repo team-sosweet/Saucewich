@@ -14,6 +14,7 @@
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
+	PrimaryActorTick.bCanEverTick = false;
 	bUseSeamlessTravel = true;
 }
 
@@ -28,6 +29,12 @@ void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duratio
 	{
 		It->PrintMessage(MessageID, Duration);
 	}
+}
+
+void ASaucewichGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
 }
 
 void ASaucewichGameMode::OverridePlayerState(APlayerController* const PC, APlayerState* const OldPlayerState)
@@ -144,13 +151,13 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 		{
 			return true;
 		}
+
+		if (GS->GetEmptyTeam() != 0)
+		{
+			return true;
+		}
 	}
 	
-	if (NumPlayers + NumBots < MinPlayerToStart)
-	{
-		return true;
-	}
-
 	return false;
 }
 
@@ -159,6 +166,26 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	Super::HandleMatchHasEnded();
 
 	GetWorldTimerManager().SetTimer(NextGameTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+}
+
+void ASaucewichGameMode::UpdateMatchState()
+{
+	if (GetMatchState() == MatchState::WaitingToStart)
+	{
+		if (ReadyToStartMatch())
+		{
+			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
+			StartMatch();
+		}
+	}
+	if (GetMatchState() == MatchState::InProgress)
+	{
+		if (ReadyToEndMatch())
+		{
+			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToEndMatch"));
+			EndMatch();
+		}
+	}
 }
 
 void ASaucewichGameMode::StartNextGame() const

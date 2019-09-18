@@ -65,6 +65,7 @@ public:
 	// 비기고 있는 경우 0을 반환합니다.
 	UFUNCTION(BlueprintCallable)
 	uint8 GetWinningTeam() const;
+	uint8 GetEmptyTeam() const;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
