@@ -131,6 +131,13 @@ void ASaucewichGameState::HandleMatchHasEnded()
 			{
 				Player->AddScore("Win");
 			});
+
+			UE_LOG(LogGameState, Log, TEXT("Match result: The %s(%d) team won the game!"),
+			       *GetTeamData(WonTeam).Name.ToString(), static_cast<int>(WonTeam));
+		}
+		else
+		{
+			UE_LOG(LogGameState, Log, TEXT("Match result: Draw!"));
 		}
 	}
 	
