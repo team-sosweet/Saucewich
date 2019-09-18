@@ -8,7 +8,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 
 AFridge::AFridge()
 	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")}

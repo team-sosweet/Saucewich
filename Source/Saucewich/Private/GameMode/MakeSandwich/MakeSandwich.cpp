@@ -5,9 +5,7 @@
 #include "EngineUtils.h"
 #include "TimerManager.h"
 
-#include "Saucewich.h"
 #include "Entity/PickupSpawnVolume.h"
-#include "GameMode/MakeSandwich/MakeSandwichState.h"
 
 void AMakeSandwich::BeginPlay()
 {
@@ -21,15 +19,6 @@ void AMakeSandwich::BeginPlay()
 		if (PerkSpawnVolumes.Num() > 0)
 			GetWorldTimerManager().SetTimer(PerkSpawnTimer, this, &AMakeSandwich::SpawnPerk, PerkSpawnInterval, true);
 	}
-}
-
-bool AMakeSandwich::ReadyToEndMatch_Implementation()
-{
-	if (const auto GS = GetGameState<ASaucewichGameState>())
-	{
-		return GS->GetRemainingRoundSeconds() <= 0;
-	}
-	return false;
 }
 
 void AMakeSandwich::SpawnPerk() const

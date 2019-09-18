@@ -8,8 +8,8 @@
 
 #include "Entity/ActorPool.h"
 #include "Entity/Pickup.h"
-#include "Online/SaucewichGameMode.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameState.h"
 #include "SaucewichGameInstance.h"
 
 APickupSpawner::APickupSpawner()
@@ -22,10 +22,7 @@ APickupSpawner::APickupSpawner()
 
 void APickupSpawner::PickedUp()
 {
-	if (HasAuthority())
-	{
-		SetSpawnTimer();
-	}
+	SetSpawnTimer();
 }
 
 float APickupSpawner::GetSpawnInterval() const
@@ -39,7 +36,7 @@ float APickupSpawner::GetSpawnInterval() const
 	return 0;
 }
 
-float APickupSpawner::GetSpawnInterval(const ASaucewichGameState* const GS) const
+float APickupSpawner::GetSpawnInterval(const AGameStateBase* const GS) const
 {
 	if (SpawnIntervalOverride > 0) return SpawnIntervalOverride;
 
@@ -51,7 +48,13 @@ float APickupSpawner::GetSpawnInterval(const ASaucewichGameState* const GS) cons
 
 float APickupSpawner::GetRemainingSpawnTime() const
 {
-	return FMath::Max(GetWorldTimerManager().GetTimerRemaining(SpawnTimer), 0.f);
+	if (HasAuthority())
+		return FMath::Max(GetWorldTimerManager().GetTimerRemaining(SpawnTimer), 0.f);
+
+	if (const auto GS = GetWorld()->GetGameState())
+		return FMath::Max(GetSpawnInterval(GS) - (GS->GetServerWorldTimeSeconds() - TimerStartTime), 0.f);
+
+	return 0;
 }
 
 void APickupSpawner::BeginPlay()
@@ -59,10 +62,7 @@ void APickupSpawner::BeginPlay()
 	Super::BeginPlay();
 	if (IsPendingKill()) return;
 
-	if (HasAuthority())
-	{
-		SetSpawnTimer();
-	}
+	SetSpawnTimer();
 }
 
 void APickupSpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -101,18 +101,6 @@ void APickupSpawner::SetSpawnTimer()
 			{
 				GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, Interval);
 			}
-		});
-	}
-}
-
-void APickupSpawner::OnRep_TimerStartTime()
-{
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-	{
-		GI->SafeGameState([this](ASaucewichGameState* const GS)
-		{
-			const auto Rate = GetSpawnInterval() - (GS->GetServerWorldTimeSeconds() - TimerStartTime);
-			if (Rate > 0) GetWorldTimerManager().SetTimer(SpawnTimer, Rate, false);
 		});
 	}
 }

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "MakeSandwichState.generated.h"
 
 class ASandwichIngredient;

@@ -36,7 +36,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void PrintMessage(FName MessageID, float Duration);
 	
-	struct BroadcastPlayerStateSpawned;	
+	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
 private:

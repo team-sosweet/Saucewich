@@ -1,13 +1,12 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 
 #include "Engine/World.h"
 #include "GameFramework/GameMode.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Online/SaucewichGameMode.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -70,6 +69,16 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 	return Min[FMath::RandHelper(Min.Num())] + 1;
 }
 
+void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
+{
+	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
+	
+	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
+		NewScore - TeamScore[Team], static_cast<int>(Team), *GetTeamData(Team).Name.ToString(), NewScore);
+	
+	TeamScore[Team] = NewScore;
+}
+
 const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
 {
 	static const FScoreData Default{};
@@ -97,7 +106,7 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return GetWorldTimerManager().GetTimerRemaining(RoundTimer);
+	return FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime));
 }
 
 void ASaucewichGameState::BeginPlay()
@@ -111,13 +120,10 @@ void ASaucewichGameState::BeginPlay()
 void ASaucewichGameState::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-	
-	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+
+	if (HasAuthority())
 	{
-		GetWorldTimerManager().SetTimer(
-			RoundTimer, GameMode, &ASaucewichGameMode::UpdateMatchState, RoundMinutes * 60, false
-		);
-		RoundStartTime = GetWorld()->GetTimeSeconds();
+		RoundStartTime = GetServerWorldTimeSeconds();
 	}
 }
 
@@ -127,13 +133,20 @@ void ASaucewichGameState::HandleMatchHasEnded()
 
 	if (HasAuthority())
 	{
-		const auto Won = GetWinningTeam();
-		if (Won != 0)
+		WonTeam = GetWinningTeam();
+		if (WonTeam != 0)
 		{
-			ForEachPlayer(PlayerArray, Won, [](ASaucewichPlayerState* const Player)
+			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
 			{
 				Player->AddScore("Win");
 			});
+
+			UE_LOG(LogGameState, Log, TEXT("Match result: The [%d] %s team won the game!"),
+			       static_cast<int>(WonTeam), *GetTeamData(WonTeam).Name.ToString());
+		}
+		else
+		{
+			UE_LOG(LogGameState, Log, TEXT("Match result: Draw!"));
 		}
 	}
 	
@@ -151,18 +164,14 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
-}
-
-void ASaucewichGameState::OnRep_RoundStartTime()
-{
-	GetWorldTimerManager().SetTimer(RoundTimer, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime), false);
+	DOREPLIFETIME(ASaucewichGameState, WonTeam);
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
 	ASaucewichPlayerState* const Victim, ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
-	Attacker->OnKill();
-	Victim->OnDeath();
+	if (Attacker) Attacker->OnKill();
+	if (Victim) Victim->OnDeath();
 	OnPlayerDeath.Broadcast(Victim, Attacker, Inflictor);
 }
 
@@ -175,6 +184,26 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
-	const auto A = TeamScore[1], B = TeamScore[2];
+	if (WonTeam != 0) return WonTeam;
+
+	const auto Empty = GetEmptyTeam();
+	if (Empty) return 3 - Empty;
+	
+	const auto A = GetTeamScore(1), B = GetTeamScore(2);
 	return A > B ? 1 : A < B ? 2 : 0;
+}
+
+uint8 ASaucewichGameState::GetEmptyTeam() const
+{
+	auto T1 = 0, T2 = 0;
+	ForEachEveryPlayer(PlayerArray, [&T1, &T2](ASaucewichPlayerState* const Ply)
+	{
+		const auto T = Ply->GetTeam();
+		if (T == 1) ++T1;
+		else if (T == 2) ++T2;
+	});
+	if (T1 == 0 && T2 > 0) return 1;
+	if (T1 > 0 && T2 == 0) return 2;
+
+	return 0;
 }

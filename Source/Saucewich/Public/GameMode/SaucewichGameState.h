@@ -44,6 +44,9 @@ public:
 	const FTeam& GetTeamData(const uint8 Team) const { return Teams[Team]; }
 
 	UFUNCTION(BlueprintCallable)
+	uint8 GetNumTeam() const { return Teams.Num() - 1; }
+
+	UFUNCTION(BlueprintCallable)
 	bool IsValidTeam(const uint8 Team) const { return Team > 0 && Team < Teams.Num(); }
 
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
@@ -61,19 +64,15 @@ public:
 	uint8 GetNumPlayers(uint8 Team) const;
 
 
-	// 이기고 있는 (또는 이미 승리한) 팀을 반환합니다.
-	// 비기고 있는 (또는 이미 비겼을) 경우 0을 반환합니다.
+	// 이기고 있는 팀을 반환합니다.
+	// 비기고 있는 경우 0을 반환합니다.
 	UFUNCTION(BlueprintCallable)
 	uint8 GetWinningTeam() const;
+	uint8 GetEmptyTeam() const;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
-
-	void SetTeamScore(const uint8 Team, const int32 NewScore)
-	{
-		if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
-		TeamScore[Team] = NewScore;
-	}
+	void SetTeamScore(uint8 Team, int32 NewScore);
 	
 	UFUNCTION(BlueprintCallable)
 	const FScoreData& GetScoreData(FName ForWhat) const;
@@ -90,7 +89,6 @@ public:
 
 
 	// 현재 라운드의 남은 시간을 구합니다.
-	// 라운드가 진행중이 아닐 경우 -1을 반환합니다. (혹은 뭔가 잘못되었거나)
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
 
@@ -121,9 +119,6 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UFUNCTION()
-	void OnRep_RoundStartTime();
-	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
 
@@ -150,6 +145,10 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float RoundMinutes = 3;
 
-	UPROPERTY(ReplicatedUsing=OnRep_RoundStartTime, Transient, VisibleInstanceOnly)
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	float RoundStartTime = -1;
+
+
+	UPROPERTY(Replicated, Transient)
+	uint8 WonTeam;
 };

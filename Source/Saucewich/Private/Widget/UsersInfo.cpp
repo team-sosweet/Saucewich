@@ -2,7 +2,7 @@
 
 #include "Widget/UsersInfo.h"
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Widget/UserInfo.h"
 

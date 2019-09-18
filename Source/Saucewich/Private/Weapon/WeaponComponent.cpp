@@ -11,8 +11,6 @@
 #include "Weapon/Gun.h"
 #include "SaucewichGameInstance.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, Log, All)
-
 UWeaponComponent::UWeaponComponent()
 {
 	bReplicates = true;
@@ -166,13 +164,7 @@ void UWeaponComponent::OnCharacterDeath()
 void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 {
 	for (const auto Weapon : Weapons)
-	{
-		if (Weapon)
-		{
-			UE_LOG(LogWeaponComponent, Log, TEXT("Set color of %s from %s to %s"), *Weapon->GetName(), *Weapon->GetColor().ToString(), *NewColor.ToString());
-			Weapon->SetColor(NewColor);
-		}
-	}
+		if (Weapon) Weapon->SetColor(NewColor);
 }
 
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
@@ -209,11 +201,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	Parameters.Instigator = Owner;
 
 	const auto Weapon = Pool->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
-	if (!Weapon)
-	{
-		UE_LOG(LogWeaponComponent, Error, TEXT("Failed to give weapon: Can't spawn the weapon"));
-		return nullptr;
-	}
+	if (!Weapon) return nullptr;
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 

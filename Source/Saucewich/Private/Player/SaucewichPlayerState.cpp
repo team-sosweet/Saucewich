@@ -7,20 +7,19 @@
 #include "UnrealNetwork.h"
 
 #include "SaucewichGameInstance.h"
-#include "Online/SaucewichGameMode.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogSaucewichPlayerState, Log, All)
+DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
 
 template <class Fn>
 void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
 {
 	if (const auto GI = PlayerState->GetWorld()->GetGameInstance<USaucewichGameInstance>())
 		GI->SafeGameState(Func);
-	else UE_LOG(LogSaucewichPlayerState, Error, TEXT("Failed to cast game instance to SaucewichGameInstance"));
 }
 
 void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
@@ -69,14 +68,18 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
+
+	UE_LOG(LogPlayerState, Log, TEXT("Add %d score to %s by %s"), ActualScore, *GetPlayerName(), *ScoreID.ToString())
 }
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 {
-	if (Team == NewTeam) return;
-	const auto OldTeam = Team;
-	Team = NewTeam;
-	OnTeamChanged(OldTeam);
+	if (Team != NewTeam)
+	{
+		const auto OldTeam = Team;
+		Team = NewTeam;
+		OnTeamChanged(OldTeam);
+	}
 }
 
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
@@ -146,4 +149,17 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASaucewichPlayerState, Kill);
 	DOREPLIFETIME(ASaucewichPlayerState, Death);
 	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
+}
+
+void ASaucewichPlayerState::CopyProperties(APlayerState* const PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (const auto PS = Cast<ASaucewichPlayerState>(PlayerState))
+	{
+		PS->SetTeam(Team);
+		PS->Kill = Kill;
+		PS->Death = Death;
+		PS->Objective = Objective;
+	}
 }

@@ -10,6 +10,7 @@ AProjectile::AProjectile()
 	Movement{CreateDefaultSubobject<UProjectileMovementComponent>("Movement")}
 {
 	RootComponent = Mesh;
+	InitialLifeSpan = 5;
 }
 
 void AProjectile::ResetSpeed() const
