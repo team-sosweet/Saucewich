@@ -124,8 +124,10 @@ void APickup::OnReleased()
 	Collision->DestroyPhysicsState();
 }
 
-void APickup::BePickedUp_Implementation(ATpsCharacter* const By)
+void APickup::BePickedUp(ATpsCharacter* const By)
 {
+	OnPickedUp(By);
+	
 	if (!HasAuthority()) return;
 
 	if (bSpawnedFromSpawner)
@@ -133,6 +135,10 @@ void APickup::BePickedUp_Implementation(ATpsCharacter* const By)
 			Spawner->PickedUp();
 	
 	Release();
+}
+
+void APickup::OnPickedUp_Implementation(ATpsCharacter* By)
+{
 }
 
 void APickup::StartPickUp_Implementation(ATpsCharacter* const By)

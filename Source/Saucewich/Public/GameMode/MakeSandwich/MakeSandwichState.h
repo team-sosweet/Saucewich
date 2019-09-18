@@ -15,6 +15,7 @@ class SAUCEWICH_API AMakeSandwichState : public ASaucewichGameState
 
 public:
 	void StoreIngredients(AMakeSandwichPlayerState* Player);
+	auto& GetRequiredIngredients() const { return SandwichIngredients; }
 
 private:
 	UFUNCTION(NetMulticast, Reliable)

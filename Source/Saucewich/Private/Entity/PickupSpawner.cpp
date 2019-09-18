@@ -4,9 +4,12 @@
 
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
+#include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
 #include "Entity/Pickup.h"
+#include "Online/SaucewichGameMode.h"
+#include "Online/SaucewichGameState.h"
 #include "SaucewichGameInstance.h"
 
 APickupSpawner::APickupSpawner()
@@ -19,7 +22,31 @@ APickupSpawner::APickupSpawner()
 
 void APickupSpawner::PickedUp()
 {
-	if (HasAuthority()) MulticastSetSpawnTimer();
+	if (HasAuthority())
+	{
+		SetSpawnTimer();
+	}
+}
+
+float APickupSpawner::GetSpawnInterval() const
+{
+	if (SpawnIntervalOverride > 0) return SpawnIntervalOverride;
+
+	if (const auto GS = GetWorld()->GetGameState())
+		if (const auto DefGm = GS->GetDefaultGameMode<ASaucewichGameMode>())
+			return DefGm->GetPickupSpawnInterval();
+
+	return 0;
+}
+
+float APickupSpawner::GetSpawnInterval(const ASaucewichGameState* const GS) const
+{
+	if (SpawnIntervalOverride > 0) return SpawnIntervalOverride;
+
+	if (const auto DefGm = GS->GetDefaultGameMode<ASaucewichGameMode>())
+		return DefGm->GetPickupSpawnInterval();
+
+	return 0;
 }
 
 float APickupSpawner::GetRemainingSpawnTime() const
@@ -32,7 +59,16 @@ void APickupSpawner::BeginPlay()
 	Super::BeginPlay();
 	if (IsPendingKill()) return;
 
-	if (HasAuthority()) MulticastSetSpawnTimer();
+	if (HasAuthority())
+	{
+		SetSpawnTimer();
+	}
+}
+
+void APickupSpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(APickupSpawner, TimerStartTime);
 }
 
 void APickupSpawner::Spawn()
@@ -51,8 +87,32 @@ void APickupSpawner::Spawn()
 	}
 }
 
-void APickupSpawner::MulticastSetSpawnTimer_Implementation()
+void APickupSpawner::SetSpawnTimer()
 {
-	if (HasAuthority()) GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, SpawnInterval);
-	else GetWorldTimerManager().SetTimer(SpawnTimer, SpawnInterval, false);
+	if (!HasAuthority()) return;
+
+	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+	{
+		GI->SafeGameState([this](ASaucewichGameState* const GS)
+		{
+			TimerStartTime = GS->GetServerWorldTimeSeconds();
+			const auto Interval = GetSpawnInterval(GS);
+			if (Interval > 0)
+			{
+				GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, Interval);
+			}
+		});
+	}
+}
+
+void APickupSpawner::OnRep_TimerStartTime()
+{
+	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+	{
+		GI->SafeGameState([this](ASaucewichGameState* const GS)
+		{
+			const auto Rate = GetSpawnInterval() - (GS->GetServerWorldTimeSeconds() - TimerStartTime);
+			if (Rate > 0) GetWorldTimerManager().SetTimer(SpawnTimer, Rate, false);
+		});
+	}
 }

@@ -7,10 +7,22 @@
 
 void AGameModeDependentLevelActor::BeginPlay()
 {
-	if (GameModeClass && !GetWorld()->GetGameState()->GetDefaultGameMode()->IsA(GameModeClass))
+	if (GameModeClass)
 	{
-		Destroy();
-		return;
+		if (const auto World = GetWorld())
+		{
+			if (const auto GS = World->GetGameState())
+			{
+				if (const auto GmCls = GS->GetDefaultGameMode())
+				{
+					if (!GmCls->IsA(GameModeClass))
+					{
+						Destroy();
+						return;
+					}
+				}
+			}
+		}
 	}
 	
 	Super::BeginPlay();
