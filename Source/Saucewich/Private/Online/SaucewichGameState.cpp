@@ -176,6 +176,6 @@ uint8 ASaucewichGameState::GetWinningTeam() const
 	if (T1 == 0 && T2 > 0) return 2;
 	if (T1 > 0 && T2 == 0) return 1;
 	
-	const auto A = TeamScore[1], B = TeamScore[2];
+	const auto A = GetTeamScore(1), B = GetTeamScore(2);
 	return A > B ? 1 : A < B ? 2 : 0;
 }

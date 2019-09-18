@@ -30,22 +30,24 @@ void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duratio
 	}
 }
 
-APlayerController* ASaucewichGameMode::SpawnPlayerController(const ENetRole InRemoteRole, const FString& Options)
+void ASaucewichGameMode::OverridePlayerState(APlayerController* const PC, APlayerState* const OldPlayerState)
 {
-	const auto PC = Super::SpawnPlayerController(InRemoteRole, Options);
-	if (!PC) return nullptr;
+	Super::OverridePlayerState(PC, OldPlayerState);
+
+	if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
+		if (const auto OldPS = Cast<ASaucewichPlayerState>(OldPlayerState))
+			PS->SetTeam(OldPS->GetTeam());
+}
+
+void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
+{
+	Super::GenericPlayerInitialization(C);
 	
 	if (const auto State = GetGameState<ASaucewichGameState>())
 	{
-		LastTeam = UGameplayStatics::GetIntOption(Options, "Team", 0);
-		if (LastTeam == 0) LastTeam = State->GetMinPlayerTeam();
-		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
-		{
-			PS->SetTeam(LastTeam);
-		}
+		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
+			PS->SetTeam(State->GetMinPlayerTeam());
 	}
-	
-	return PC;
 }
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
@@ -93,22 +95,6 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 	}
 
 	return nullptr;
-}
-
-bool ASaucewichGameMode::FindInactivePlayer(APlayerController* const PC)
-{
-	const auto bFound = Super::FindInactivePlayer(PC);
-	
-	if (bFound)
-	{
-		if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
-		{
-			// PlayerState가 초기화되었으므로 팀을 재설정
-			PS->SetTeam(LastTeam);
-		}
-	}
-	
-	return bFound;
 }
 
 void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)

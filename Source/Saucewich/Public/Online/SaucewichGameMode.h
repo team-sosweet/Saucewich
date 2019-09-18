@@ -23,9 +23,9 @@ public:
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 protected:
-	APlayerController* SpawnPlayerController(ENetRole InRemoteRole, const FString& Options) override;
+	void OverridePlayerState(APlayerController* PC, APlayerState* OldPlayerState) override;
+	void GenericPlayerInitialization(AController* C) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
-	bool FindInactivePlayer(APlayerController* PC) override;
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
@@ -53,6 +53,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MinPlayerToStart = 2;
-	
-	uint8 LastTeam;
 };

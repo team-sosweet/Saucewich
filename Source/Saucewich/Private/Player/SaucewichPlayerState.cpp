@@ -73,10 +73,12 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 
 void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 {
-	if (Team == NewTeam) return;
-	const auto OldTeam = Team;
-	Team = NewTeam;
-	OnTeamChanged(OldTeam);
+	if (Team != NewTeam)
+	{
+		const auto OldTeam = Team;
+		Team = NewTeam;
+		OnTeamChanged(OldTeam);
+	}
 }
 
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
