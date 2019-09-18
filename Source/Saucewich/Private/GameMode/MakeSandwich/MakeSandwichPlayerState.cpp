@@ -21,6 +21,7 @@ void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngre
 void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TSubclassOf<ASandwichIngredient> Class)
 {
 	++Ingredients.FindOrAdd(Class);
+	OnPickupIngredient();
 }
 
 void AMakeSandwichPlayerState::PutIngredientsInFridge()
