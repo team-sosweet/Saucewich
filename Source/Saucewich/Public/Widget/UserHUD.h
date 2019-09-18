@@ -25,6 +25,9 @@ protected:
 private:
 	UFUNCTION()
 	ESlateVisibility GetHUDVisibility();
+
+	UFUNCTION()
+	void OnLocalCharacterSpawned(ATpsCharacter* Character);
 	
 	UFUNCTION()
 	void OnOwnerTeamChanged(uint8 NewTeam);

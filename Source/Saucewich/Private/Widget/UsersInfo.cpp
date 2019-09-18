@@ -12,10 +12,13 @@ void UUsersInfo::NativeOnInitialized()
 	
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 
-	for (auto Index = 0; Index < 8; Index++)
+	for (auto Index = 0; ; Index++)
 	{
 		const auto WidgetName = FString::Printf(TEXT("UserInfo_%d"), Index);
 		const auto UserInfo = Cast<UUserInfo>(GetWidgetFromName(FName(*WidgetName)));
+
+		if (UserInfo == nullptr) break;
+		
 		UserInfos.Add(UserInfo);
 	}
 }

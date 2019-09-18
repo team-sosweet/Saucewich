@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
+#include "BaseHUD.h"
 #include "SaucewichHUD.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedColor, const FLinearColor&, MyTeamColor);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangedColorSingle, const FLinearColor&, MyTeamColor);
 
 UCLASS()
-class SAUCEWICH_API ASaucewichHUD final : public AHUD
+class SAUCEWICH_API ASaucewichHUD final : public ABaseHUD
 {
 	GENERATED_BODY()
 
