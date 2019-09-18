@@ -22,6 +22,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetSpawnInterval() const;
+	float GetSpawnInterval(const class ASaucewichGameState* GS) const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingSpawnTime() const;
@@ -32,9 +33,10 @@ protected:
 
 private:
 	void Spawn();
+	void SetSpawnTimer();
 
 	UFUNCTION()
-	void SetSpawnTimer();
+	void OnRep_TimerStartTime();
 
 	FTimerHandle SpawnTimer;
 
@@ -46,6 +48,6 @@ private:
 	UPROPERTY(EditAnywhere, meta=(UIMin=0))
 	float SpawnIntervalOverride;
 
-	UPROPERTY(ReplicatedUsing=SetSpawnTimer, Transient)
-	uint8 bSpawnTimerFlag : 1;
+	UPROPERTY(ReplicatedUsing=OnRep_TimerStartTime, Transient)
+	float TimerStartTime = -1;
 };
