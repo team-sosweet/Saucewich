@@ -165,7 +165,6 @@ void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 	Input->BindAxis("MoveRight", this, &ATpsCharacter::MoveRight);
 	Input->BindAxis("Turn", this, &ATpsCharacter::AddControllerYawInput);
 	Input->BindAxis("LookUp", this, &ATpsCharacter::AddControllerPitchInput);
-	Input->BindAction("Respawn", IE_Pressed, this, &ATpsCharacter::Respawn);
 
 	WeaponComponent->SetupPlayerInputComponent(Input);
 }
@@ -291,15 +290,6 @@ void ATpsCharacter::MoveForward(const float AxisValue)
 void ATpsCharacter::MoveRight(const float AxisValue)
 {
 	AddMovementInput(GetActorRightVector(), FMath::Sign(AxisValue));
-}
-
-void ATpsCharacter::Respawn()
-{
-	if (IsAlive()) return;
-	if (const auto PC = GetController<ASaucewichPlayerController>())
-	{
-		PC->Respawn();
-	}
 }
 
 void ATpsCharacter::SetActorActivated(const bool bActive)
