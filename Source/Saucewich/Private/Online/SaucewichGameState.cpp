@@ -7,7 +7,6 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Online/SaucewichGameMode.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -68,6 +67,16 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 		}
 	}
 	return Min[FMath::RandHelper(Min.Num())] + 1;
+}
+
+void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
+{
+	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
+	
+	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
+		NewScore - TeamScore[Team], static_cast<int>(Team), *GetTeamData(Team).Name.ToString(), NewScore);
+	
+	TeamScore[Team] = NewScore;
 }
 
 const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
@@ -132,8 +141,8 @@ void ASaucewichGameState::HandleMatchHasEnded()
 				Player->AddScore("Win");
 			});
 
-			UE_LOG(LogGameState, Log, TEXT("Match result: The %s(%d) team won the game!"),
-			       *GetTeamData(WonTeam).Name.ToString(), static_cast<int>(WonTeam));
+			UE_LOG(LogGameState, Log, TEXT("Match result: The [%d] %s team won the game!"),
+			       static_cast<int>(WonTeam), *GetTeamData(WonTeam).Name.ToString());
 		}
 		else
 		{

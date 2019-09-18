@@ -69,12 +69,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
-
-	void SetTeamScore(const uint8 Team, const int32 NewScore)
-	{
-		if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
-		TeamScore[Team] = NewScore;
-	}
+	void SetTeamScore(uint8 Team, int32 NewScore);
 	
 	UFUNCTION(BlueprintCallable)
 	const FScoreData& GetScoreData(FName ForWhat) const;
