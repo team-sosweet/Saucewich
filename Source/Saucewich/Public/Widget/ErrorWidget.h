@@ -10,7 +10,7 @@ UCLASS()
 class SAUCEWICH_API UErrorWidget final : public UUserWidget
 {
 	GENERATED_BODY()
-	bool Initialize() override;
+
 	void NativeOnInitialized() override;
 	
 public:
