@@ -4,6 +4,7 @@
 
 #include "Engine/PlayerStartPIE.h"
 #include "EngineUtils.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
@@ -31,30 +32,26 @@ void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duratio
 	}
 }
 
+void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+	if (GameSession) GameSession->MaxPlayers = MaxPlayers;
+}
+
 void ASaucewichGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
 }
 
-void ASaucewichGameMode::OverridePlayerState(APlayerController* const PC, APlayerState* const OldPlayerState)
-{
-	Super::OverridePlayerState(PC, OldPlayerState);
-
-	if (const auto PS = PC->GetPlayerState<ASaucewichPlayerState>())
-		if (const auto OldPS = Cast<ASaucewichPlayerState>(OldPlayerState))
-			PS->SetTeam(OldPS->GetTeam());
-}
-
 void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 {
 	Super::GenericPlayerInitialization(C);
 	
-	if (const auto State = GetGameState<ASaucewichGameState>())
-	{
+	if (const auto GS = GetGameState<ASaucewichGameState>())
 		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
-			PS->SetTeam(State->GetMinPlayerTeam());
-	}
+			if (PS->GetTeam() == 0 || GS->GetNumPlayers(PS->GetTeam()) > GameSession->MaxPlayers / GS->GetNumTeam())
+				PS->SetTeam(GS->GetMinPlayerTeam());
 }
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)

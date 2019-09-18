@@ -23,9 +23,9 @@ public:
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 protected:
+	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
 	
-	void OverridePlayerState(APlayerController* PC, APlayerState* OldPlayerState) override;
 	void GenericPlayerInitialization(AController* C) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
@@ -60,4 +60,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MinPlayerToStart = 2;
+
+	UPROPERTY(EditDefaultsOnly)
+	uint8 MaxPlayers = 8;
 };

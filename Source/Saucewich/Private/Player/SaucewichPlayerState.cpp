@@ -150,3 +150,16 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASaucewichPlayerState, Death);
 	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
 }
+
+void ASaucewichPlayerState::CopyProperties(APlayerState* const PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (const auto PS = Cast<ASaucewichPlayerState>(PlayerState))
+	{
+		PS->SetTeam(Team);
+		PS->Kill = Kill;
+		PS->Death = Death;
+		PS->Objective = Objective;
+	}
+}

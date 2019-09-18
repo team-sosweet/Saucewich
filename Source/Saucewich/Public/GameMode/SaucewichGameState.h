@@ -44,6 +44,9 @@ public:
 	const FTeam& GetTeamData(const uint8 Team) const { return Teams[Team]; }
 
 	UFUNCTION(BlueprintCallable)
+	uint8 GetNumTeam() const { return Teams.Num() - 1; }
+
+	UFUNCTION(BlueprintCallable)
 	bool IsValidTeam(const uint8 Team) const { return Team > 0 && Team < Teams.Num(); }
 
 	// 플레이어 수가 가장 적은 팀을 반환합니다. 여러 개일 경우 무작위로 반환됩니다.
