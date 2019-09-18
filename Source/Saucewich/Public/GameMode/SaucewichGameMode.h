@@ -26,6 +26,7 @@ protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
 	
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	void GenericPlayerInitialization(AController* C) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
@@ -33,6 +34,7 @@ protected:
 
 	bool ReadyToStartMatch_Implementation() override;
 	bool ReadyToEndMatch_Implementation() override;
+	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
 
 private:
