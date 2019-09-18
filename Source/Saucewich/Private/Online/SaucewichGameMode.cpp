@@ -193,8 +193,12 @@ void ASaucewichGameMode::StartNextGame() const
 	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
 	const TSubclassOf<ASaucewichGameMode> GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
 	const auto DefGm = GmClass.GetDefaultObject();
-	const auto Map = Maps.Num() > 0 ? DefGm->Maps[FMath::RandHelper(Maps.Num())].GetAssetName() : GetWorld()->GetMapName();
 
-	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *Map, *GmClass->GetPathName());
+	const TSoftObjectPtr<UWorld> CurMap{GetWorld()->GetPathName()};
+	auto AvailableMaps = DefGm->Maps;
+	AvailableMaps.RemoveSingleSwap(CurMap, false);
+	const auto NewMap = AvailableMaps.Num() > 0 ? AvailableMaps[FMath::RandHelper(AvailableMaps.Num())].GetAssetName() : CurMap.GetAssetName();
+
+	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
 }
