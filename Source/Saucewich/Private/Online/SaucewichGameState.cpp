@@ -154,8 +154,8 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
 	ASaucewichPlayerState* const Victim, ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
-	Attacker->OnKill();
-	Victim->OnDeath();
+	if (Attacker) Attacker->OnKill();
+	if (Victim) Victim->OnDeath();
 	OnPlayerDeath.Broadcast(Victim, Attacker, Inflictor);
 }
 

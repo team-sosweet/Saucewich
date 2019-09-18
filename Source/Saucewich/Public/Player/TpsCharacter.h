@@ -107,6 +107,7 @@ protected:
 	bool ShouldTakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 
 	// 캐릭터를 죽입니다.
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void Kill(class ASaucewichPlayerState* Attacker = nullptr, AActor* Inflictor = nullptr);
 
 	UFUNCTION(BlueprintImplementableEvent)
