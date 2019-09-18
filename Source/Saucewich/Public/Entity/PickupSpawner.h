@@ -19,19 +19,22 @@ public:
 	void PickedUp();
 
 	auto GetSpawnClass() const { return Class; }
-	auto GetSpawnInterval() const { return SpawnInterval; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetSpawnInterval() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingSpawnTime() const;
 
 protected:
 	void BeginPlay() override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	void Spawn();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSetSpawnTimer();
+	UFUNCTION()
+	void SetSpawnTimer();
 
 	FTimerHandle SpawnTimer;
 
@@ -39,7 +42,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class APickup> Class;
 
-	// 스폰 간격 (초)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float SpawnInterval;
+	// 스폰 간격 오버라이드 (초)
+	UPROPERTY(EditAnywhere, meta=(UIMin=0))
+	float SpawnIntervalOverride;
+
+	UPROPERTY(ReplicatedUsing=SetSpawnTimer, Transient)
+	uint8 bSpawnTimerFlag : 1;
 };
