@@ -13,7 +13,7 @@ class SAUCEWICH_API AMakeSandwichPlayerState final : public ASaucewichPlayerStat
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
 	void PickupIngredient(TSubclassOf<ASandwichIngredient> Class);
 
 	void PutIngredientsInFridge();
@@ -30,6 +30,12 @@ public:
 
 protected:
 	void OnDeath() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPutIngredients();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPickupIngredient();
 
 private:
 	UFUNCTION(NetMulticast, Reliable)

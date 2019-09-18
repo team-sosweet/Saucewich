@@ -17,6 +17,7 @@ public:
 	virtual void UpdateMatchState();
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 	float GetNextGameWaitTime() const { return NextGameWaitTime; }
+	float GetPickupSpawnInterval() const { return PickupSpawnInterval; }
 
 	UFUNCTION(BlueprintCallable)
 	void PrintMessage(FName MessageID, float Duration = 3) const;
@@ -42,8 +43,11 @@ private:
 	FTimerHandle NextGameTimer;
 	
 	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
 	float NextGameWaitTime = 10;
 	
+	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
+	float PickupSpawnInterval = 20;
+
 	uint8 LastTeam;
 };

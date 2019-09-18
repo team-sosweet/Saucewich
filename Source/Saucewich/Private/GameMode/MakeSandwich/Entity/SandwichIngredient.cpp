@@ -4,14 +4,12 @@
 
 #include "GameFramework/Pawn.h"
 
-#include "Saucewich.h"
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "Player/TpsCharacter.h"
 
-void ASandwichIngredient::BePickedUp_Implementation(ATpsCharacter* const By)
+void ASandwichIngredient::OnPickedUp_Implementation(ATpsCharacter* const By)
 {
 	static_cast<AMakeSandwichPlayerState*>(By->GetPlayerState())->PickupIngredient(GetClass());
-	Super::BePickedUp_Implementation(By);
 }
 
 void ASandwichIngredient::StartPickUp_Implementation(ATpsCharacter* const By)

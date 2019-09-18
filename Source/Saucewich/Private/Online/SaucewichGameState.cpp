@@ -124,6 +124,19 @@ void ASaucewichGameState::HandleMatchHasStarted()
 void ASaucewichGameState::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
+
+	if (HasAuthority())
+	{
+		const auto Won = GetWinningTeam();
+		if (Won != 0)
+		{
+			ForEachPlayer(PlayerArray, Won, [](ASaucewichPlayerState* const Player)
+			{
+				Player->AddScore("Win");
+			});
+		}
+	}
+	
 	OnMatchEnd.Broadcast();
 }
 

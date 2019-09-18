@@ -19,19 +19,24 @@ public:
 	void PickedUp();
 
 	auto GetSpawnClass() const { return Class; }
-	auto GetSpawnInterval() const { return SpawnInterval; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetSpawnInterval() const;
+	float GetSpawnInterval(const class ASaucewichGameState* GS) const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingSpawnTime() const;
 
 protected:
 	void BeginPlay() override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	void Spawn();
+	void SetSpawnTimer();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSetSpawnTimer();
+	UFUNCTION()
+	void OnRep_TimerStartTime();
 
 	FTimerHandle SpawnTimer;
 
@@ -39,7 +44,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TSubclassOf<class APickup> Class;
 
-	// 스폰 간격 (초)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float SpawnInterval;
+	// 스폰 간격 오버라이드 (초)
+	UPROPERTY(EditAnywhere, meta=(UIMin=0))
+	float SpawnIntervalOverride;
+
+	UPROPERTY(ReplicatedUsing=OnRep_TimerStartTime, Transient)
+	float TimerStartTime = -1;
 };

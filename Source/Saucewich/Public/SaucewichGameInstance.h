@@ -44,9 +44,6 @@ class SAUCEWICH_API USaucewichGameInstance final : public UHttpGameInstance
 	GENERATED_BODY()
 
 public:
-	USaucewichGameInstance();
-	~USaucewichGameInstance();
-	
 	class AActorPool* GetActorPool();
 	ASaucewichGameState* GetGameState() const;
 

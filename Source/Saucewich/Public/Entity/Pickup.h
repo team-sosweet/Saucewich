@@ -39,8 +39,10 @@ protected:
 	void OnActivated() override;
 	void OnReleased() override;
 
-	UFUNCTION(BlueprintNativeEvent)
 	void BePickedUp(ATpsCharacter* By);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void OnPickedUp(ATpsCharacter* By);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void StartPickUp(ATpsCharacter* By);

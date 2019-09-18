@@ -23,6 +23,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<class APickup>> PerkClasses;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
 	float PerkSpawnInterval;
 };
