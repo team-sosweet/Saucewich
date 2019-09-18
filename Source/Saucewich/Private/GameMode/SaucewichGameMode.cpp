@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "SaucewichGameInstance.h"
 

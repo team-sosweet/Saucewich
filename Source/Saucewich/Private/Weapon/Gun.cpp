@@ -9,7 +9,7 @@
 
 #include "Entity/ActorPool.h"
 #include "Kismet/GameplayStatics.h"
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/GunSharedData.h"
 #include "Weapon/WeaponComponent.h"

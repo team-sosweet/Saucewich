@@ -2,7 +2,7 @@
 
 #include "Widget/AliveWidget.h"
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Widget/FeedBox.h"

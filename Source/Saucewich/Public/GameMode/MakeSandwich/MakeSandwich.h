@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Online/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
 #include "MakeSandwich.generated.h"
 
 UCLASS()

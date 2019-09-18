@@ -1,6 +1,6 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "Online/SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 
 #include "Engine/World.h"
 #include "GameFramework/GameMode.h"
