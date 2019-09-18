@@ -21,10 +21,20 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const 
 		return;
 	}
 
-	const auto FinalUrl = BaseUrl + Url + "?" + Content;
+	const auto FinalUrl = BaseUrl + Url;
 	if (!ResponseDelegates.Contains(FinalUrl))
 	{
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
+	
+		TArray<FString> Params, Pair;
+		Content.ParseIntoArray(Params, TEXT("&"));
+		
+		for (const auto& Param : Params)
+		{
+			Param.ParseIntoArray(Pair, TEXT("="));
+			Request->SetHeader(Pair[0], Pair[1]);
+		}
+		
 		Request->SetVerb("GET");
 		Request->ProcessRequest();
 	}
