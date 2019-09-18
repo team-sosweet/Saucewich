@@ -24,6 +24,8 @@
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
+
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
 	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
@@ -265,8 +267,18 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 	OnCharacterDeath.Broadcast();
 	
 	if (HasAuthority())
+	{
+		const auto MyPS = GetPlayerState();
+		
 		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-			GameState->MulticastPlayerDeath(GetPlayerState<ASaucewichPlayerState>(), Attacker, Inflictor);
+			GameState->MulticastPlayerDeath(Cast<ASaucewichPlayerState>(MyPS), Attacker, Inflictor);
+
+		UE_LOG(LogCharacter, Log, TEXT("%s was killed by %s with %s"),
+			MyPS ? *MyPS->GetPlayerName() : *GetName(),
+			Attacker ? *Attacker->GetPlayerName() : TEXT("unknown"),
+			Inflictor ? *Inflictor->GetName() : TEXT("unknown")
+		);
+	}
 
 	OnKilled();
 }
