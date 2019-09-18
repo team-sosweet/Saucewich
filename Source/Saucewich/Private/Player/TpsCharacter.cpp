@@ -136,15 +136,21 @@ void ATpsCharacter::PostInitializeComponents()
 	}
 }
 
+void ATpsCharacter::PossessedBy(AController* const NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (const auto PC = Cast<ASaucewichPlayerController>(NewController))
+		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+}
+
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (const auto PC = GetController<ASaucewichPlayerController>())
-	{
 		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
-	}
-
+	
 	BindOnTeamChanged();
 
 	if (HasAuthority())
