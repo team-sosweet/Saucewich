@@ -15,7 +15,7 @@ struct FJson
 	TMap<FString, class UJsonData*> Data;
 };
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnResponded, bool, IsSuccess, FJson, Json);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnResponded, bool, IsSuccess, int32, Code, FJson, Json);
 
 UCLASS()
 class SAUCEWICH_API UHttpGameInstance : public UGameInstance
@@ -33,8 +33,6 @@ public:
 
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
-	
-	bool CanRequest(const FString& Url);
 	
 	bool GetStringFromJson(const FJson& Json, FString& Out);
 

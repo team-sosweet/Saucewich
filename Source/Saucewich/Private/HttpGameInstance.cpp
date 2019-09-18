@@ -17,12 +17,12 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const 
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
-		OnResponded.ExecuteIfBound(false, FJson());
+		OnResponded.ExecuteIfBound(false, 0, FJson());
 		return;
 	}
 
 	const auto FinalUrl = BaseUrl + Url + "?" + Content;
-	if (CanRequest(FinalUrl))
+	if (!ResponseDelegates.Contains(FinalUrl))
 	{
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
 		Request->SetVerb("GET");
@@ -35,12 +35,12 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
-		OnResponded.ExecuteIfBound(false, FJson());
+		OnResponded.ExecuteIfBound(false, 0, FJson());
 		return;
 	}
 
 	const auto FinalUrl = BaseUrl + Url;
-	if (CanRequest(FinalUrl))
+	if (!ResponseDelegates.Contains(FinalUrl))
 	{
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
 		Request->SetVerb("POST");
@@ -62,18 +62,13 @@ TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& Url, co
 	return Request;
 }
 
-bool UHttpGameInstance::CanRequest(const FString& Url)
-{
-	return !ResponseDelegates.Contains(Url);
-}
-
 void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpResponsePtr Response, const bool bWasSuccessful)
 {
 	const auto OnResponded = ResponseDelegates.FindAndRemoveChecked(Request->GetURL());
 	
 	if (!bWasSuccessful || !Response.IsValid())
 	{
-		OnResponded.ExecuteIfBound(false, FJson());
+		OnResponded.ExecuteIfBound(false, 0, FJson());
 		return;
 	}
 	
@@ -89,9 +84,8 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 		Value->Create(Datum.Value);
 		JsonData.Add(Datum.Key, Value);
 	}
-	
-	const auto Json = FJson{ JsonData };
-	OnResponded.ExecuteIfBound(true, Json);
+
+	OnResponded.ExecuteIfBound(true, Response->GetResponseCode(), FJson{ JsonData });
 }
 
 bool UHttpGameInstance::GetStringFromJson(const FJson& Json, FString& Out)

@@ -4,6 +4,7 @@
 
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "UserWidget.h"
 
 #include "ActorPool.h"
 #include "SaucewichGameState.h"

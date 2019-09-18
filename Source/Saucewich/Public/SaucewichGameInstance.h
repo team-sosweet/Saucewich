@@ -5,8 +5,38 @@
 #include "HttpGameInstance.h"
 #include "SaucewichGameInstance.generated.h"
 
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnChangeAccount);
+
+USTRUCT(Atomic, BlueprintType)
+struct FAccount
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Id;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Exp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float KillDeath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WinLose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString PlayTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString AccessToken;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString RefreshToken;
+};
 
 UCLASS(Config=Game)
 class SAUCEWICH_API USaucewichGameInstance final : public UHttpGameInstance
@@ -39,6 +69,23 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName="Save Config")
 	void BP_SaveConfig() { SaveConfig(); }
 
+	UFUNCTION(BlueprintCallable)
+	void SetAccount(const FAccount& InAccount)
+	{
+		Account = InAccount;
+		bHaveAccount = true;
+		SaveConfig();
+		OnChangeAccount.Broadcast();
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void ClearAccount()
+	{
+		bHaveAccount = false;
+		SaveConfig();
+		OnChangeAccount.Broadcast();
+	}
+	
 	void SaveWeaponLoadout(const TArray<TSubclassOf<class AWeapon>>& Loadout)
 	{
 		WeaponLoadout = Loadout;
@@ -51,6 +98,9 @@ public:
 	bool IsAutoFire() const { return bAutoFire; }
 
 	struct BroadcastGameStateSpawned;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnChangeAccount OnChangeAccount;
 	
 private:
 	UPROPERTY(Config)
@@ -61,12 +111,15 @@ private:
 	
 	FOnGameStateSpawned OnGameStateSpawned;
 
+	UPROPERTY(Config, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FAccount Account;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
-
+	
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
-	
+
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	float Sensitivity = .5;
 
@@ -75,6 +128,9 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bAutoFire : 1;
+
+	UPROPERTY(Config, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	uint8 bHaveAccount : 1;
 };
 
 struct USaucewichGameInstance::BroadcastGameStateSpawned
