@@ -2,11 +2,13 @@
 
 #include "SaucewichGameMode.h"
 
+#include "Engine/Engine.h"
 #include "Engine/PlayerStartPIE.h"
-#include "EngineUtils.h"
+#include "GameFramework/CheatManager.h"
 #include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 #include "TimerManager.h"
 
 #include "GameMode/SaucewichGameState.h"
@@ -42,6 +44,10 @@ void ASaucewichGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
+}
+
+void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
+{
 }
 
 void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
@@ -156,6 +162,34 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 	}
 	
 	return false;
+}
+
+void ASaucewichGameMode::HandleMatchHasStarted()
+{
+	GameSession->HandleMatchHasStarted();
+
+	GEngine->BlockTillLevelStreamingCompleted(GetWorld());
+	GetWorldSettings()->NotifyBeginPlay();
+	GetWorldSettings()->NotifyMatchStarted();
+
+	const auto BugLocString = UGameplayStatics::ParseOption(OptionsString, TEXT("BugLoc"));
+	const auto BugRotString = UGameplayStatics::ParseOption(OptionsString, TEXT("BugRot"));
+	if (!BugLocString.IsEmpty() || !BugRotString.IsEmpty())
+	{
+		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			const auto PlayerController = Iterator->Get();
+			if (PlayerController && PlayerController->CheatManager)
+			{
+				PlayerController->CheatManager->BugItGoString(BugLocString, BugRotString);
+			}
+		}
+	}
+
+	if (IsHandlingReplays() && GetGameInstance() != nullptr)
+	{
+		GetGameInstance()->StartRecordingReplay(GetWorld()->GetMapName(), GetWorld()->GetMapName());
+	}
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()
