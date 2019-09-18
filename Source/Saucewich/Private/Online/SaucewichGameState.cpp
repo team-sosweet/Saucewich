@@ -111,7 +111,11 @@ void ASaucewichGameState::BeginPlay()
 void ASaucewichGameState::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-	RoundStartTime = GetServerWorldTimeSeconds();
+
+	if (HasAuthority())
+	{
+		RoundStartTime = GetServerWorldTimeSeconds();
+	}
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
