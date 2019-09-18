@@ -2,7 +2,6 @@
 
 #include "HttpGameInstance.h"
 
-#include "Http.h"
 #include "Json.h"
 #include "JsonObjectConverter.h"
 
@@ -13,79 +12,158 @@ UHttpGameInstance::UHttpGameInstance()
 	Http = &FHttpModule::Get();
 }
 
-void UHttpGameInstance::GetRequest(const FString& URL, const FOnResponded& OnResponded)
+void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
 {
-	auto Request = CreateRequest(URL, OnResponded);
-	Request->SetVerb("GET");
-	Request->ProcessRequest();
-}
-
-void UHttpGameInstance::PostRequest(const FString& URL, const FJson& Json, const FOnResponded& OnResponded)
-{
-	auto Request = CreateRequest(URL, OnResponded);
-	Request->SetVerb("POST");
-
-	TArray<TSharedPtr<FJsonValue>> JsonValues;
-
-	for (const auto& Pair : DeserializeJson(Json.Data))
+	FString Content;
+	if (!GetStringFromJson(Json, Content))
 	{
-		JsonValues.Add(Pair.Value);
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
 	}
-	
-	FString JsonString;
-	const auto Writer = TJsonWriterFactory<>::Create(&JsonString);
-	FJsonSerializer::Serialize(JsonValues, Writer);
-	Writer->Close();
 
-	Request->SetContentAsString(JsonString);
-	Request->ProcessRequest();
+	const auto FinalUrl = BaseUrl + Url;
+	if (!ResponseDelegates.Contains(FinalUrl))
+	{
+		const auto Request = CreateRequest(FinalUrl, OnResponded);
+	
+		TArray<FString> Params, Pair;
+		Content.ParseIntoArray(Params, TEXT("&"));
+		
+		for (const auto& Param : Params)
+		{
+			Param.ParseIntoArray(Pair, TEXT("="));
+			Request->SetHeader(Pair[0], Pair[1]);
+		}
+		
+		Request->SetVerb("GET");
+		Request->ProcessRequest();
+	}
 }
 
-TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& URL, const FOnResponded& OnResponded)
+void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
+{
+	FString Content;
+	if (!GetStringFromJson(Json, Content))
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
+
+	const auto FinalUrl = BaseUrl + Url;
+	if (!ResponseDelegates.Contains(FinalUrl))
+	{
+		const auto Request = CreateRequest(FinalUrl, OnResponded);
+		Request->SetVerb("POST");
+		Request->SetContentAsString(Content);
+		Request->ProcessRequest();
+	}
+}
+
+void UHttpGameInstance::PatchRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
+{
+	FString Content;
+	if (!GetStringFromJson(Json, Content))
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
+
+	const auto FinalUrl = BaseUrl + Url;
+	if (!ResponseDelegates.Contains(FinalUrl))
+	{
+		const auto Request = CreateRequest(FinalUrl, OnResponded);
+
+		TArray<FString> Params, Pair;
+		Content.ParseIntoArray(Params, TEXT("&"));
+
+		for (const auto& Param : Params)
+		{
+			Param.ParseIntoArray(Pair, TEXT("="));
+			Request->SetHeader(Pair[0], Pair[1]);
+		}
+
+		Request->SetVerb("PATCH");
+		Request->ProcessRequest();
+	}
+}
+
+TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& Url, const FOnResponded& OnResponded)
 {
 	const auto Request = Http->CreateRequest();
+	ResponseDelegates.Add(Url, OnResponded);
 	Request->OnProcessRequestComplete().BindUObject(this, &UHttpGameInstance::OnResponse);
-	ResponseDelegates.Add(URL, OnResponded);
-
-	Request->SetURL(BaseURL + URL);
+	
+	Request->SetURL(Url);
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
 	Request->SetHeader(TEXT("Accepts"), TEXT("application/json"));
 	return Request;
 }
 
-TMap<FString, UJsonData*> UHttpGameInstance::SerializeJson(const TMap<FString, TSharedPtr<FJsonValue>>& Data) const
-{
-	TMap<FString, UJsonData*> Ret;
-
-	for (const auto& Datum : Data)
-	{
-		auto Value = NewObject<UJsonData>();
-		Value->Create(Datum.Value);
-		Ret.Add(Datum.Key, Value);
-	}
-
-	return Ret;
-}
-
-TMap<FString, TSharedPtr<FJsonValue>> UHttpGameInstance::DeserializeJson(const TMap<FString, UJsonData*>& Json)
-{
-	TMap<FString, TSharedPtr<FJsonValue>> Ret;
-
-	for (const auto& Pair : Json)
-	{
-		Ret.Add(Pair.Key, **Pair.Value);
-	}
-
-	return Ret;
-}
-
 void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpResponsePtr Response, const bool bWasSuccessful)
 {
+	const auto OnResponded = ResponseDelegates.FindAndRemoveChecked(Request->GetURL());
+	
+	if (!bWasSuccessful || !Response.IsValid())
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
+	
 	const auto Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 	TSharedPtr<FJsonObject> JsonObject;
 	FJsonSerializer::Deserialize(Reader, JsonObject);
 
-	const auto Json = FJson{ SerializeJson(JsonObject->Values) };
-	ResponseDelegates.FindAndRemoveChecked(Request->GetURL()).ExecuteIfBound(Json);
+	TMap<FString, UJsonData*> JsonData;
+	
+	for (const auto& Datum : JsonObject->Values)
+	{
+		auto Value = NewObject<UJsonData>();
+		Value->Create(Datum.Value);
+		JsonData.Add(Datum.Key, Value);
+	}
+
+	OnResponded.ExecuteIfBound(true, Response->GetResponseCode(), FJson{ JsonData });
+}
+
+bool UHttpGameInstance::GetStringFromJson(const FJson& Json, FString& Out)
+{
+	auto IsContinuous = false;
+	
+	for (const auto& Elem : Json.Data)
+	{
+		FString ValueStr;
+
+		const auto Value = **Elem.Value;
+		switch (Value->Type)
+		{
+		case EJson::Boolean:
+			ValueStr = Value->AsBool() ? TEXT("true") : TEXT("false");
+			break;
+
+		case EJson::Number:
+			ValueStr = FString::SanitizeFloat(Value->AsNumber());
+			break;
+
+		case EJson::String:
+			ValueStr = Value->AsString();
+			break;
+
+		default:
+			return false;
+		}
+
+		if (IsContinuous)
+		{
+			Out += TEXT("&");
+		}
+		else
+		{
+			IsContinuous = true;
+		}
+		
+		Out += FString::Printf(TEXT("%s=%s"), *Elem.Key, *ValueStr);
+	}
+
+	return true;
 }

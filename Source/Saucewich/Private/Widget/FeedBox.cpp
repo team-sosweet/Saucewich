@@ -10,10 +10,11 @@
 void UFeedBox::NativeOnInitialized()
 {
 	FeedBox = Cast<UVerticalBox>(GetWidgetFromName(TEXT("Box")));
+	const auto Player = GetOwningPlayer();
 	
 	for (uint8 Num = 0; Num < FeedNum; Num++)
 	{
-		const auto Feed = CreateWidget<UFeed>(GetOwningPlayer(), FeedClass);
+		const auto Feed = CreateWidget<UFeed>(Player, FeedClass);
 		Feed->OnExpiration.BindLambda([this]
 			{
 				CurFeedNum--;
@@ -24,7 +25,7 @@ void UFeedBox::NativeOnInitialized()
 		Feeds.Add(Feed);
 	}
 
-	const auto CollapseFeed = CreateWidget<UFeed>(GetOwningPlayer(), FeedClass);
+	const auto CollapseFeed = CreateWidget<UFeed>(Player, FeedClass);
 	CollapseFeed->SetVisibility(ESlateVisibility::Collapsed);
 	Feeds.Add(CollapseFeed);
 }

@@ -32,11 +32,32 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool AsObject(TMap<FString, UJsonData*>& Out) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeFloatData(float Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeIntegerData(int32 Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeBooleanData(bool Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeStringData(const FString& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeArrayData(const TArray<UJsonData*>& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Create JsonData")
+	static UJsonData* MakeObjectData(const TMap<FString, UJsonData*>& Value);
+
 	TSharedPtr<class FJsonValue>& operator*()
 	{
 		return JsonValue;
 	}
 	
 private:
+	static TArray<TSharedPtr<FJsonValue>> GetValues(const TArray<UJsonData*>& Array);
+	static TArray<TSharedPtr<FJsonValue>> GetValues(const TMap<FString, UJsonData*>& Map);
+	
 	TSharedPtr<class FJsonValue> JsonValue;
 };

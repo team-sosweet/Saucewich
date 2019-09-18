@@ -4,6 +4,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 
@@ -18,7 +19,12 @@ void UUserHUD::NativeOnInitialized()
 void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 {
 	OwnerPawn = InOwnerPawn;
-	LocalPawn = Cast<ATpsCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
+
+	FOnCharacterSpawnedSingle OnCharacterSpawned;
+	OnCharacterSpawned.BindDynamic(this, &UUserHUD::OnLocalCharacterSpawned);
+	
+	const auto LocalPlayer = Cast<ASaucewichPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	LocalPlayer->SafeCharacter(OnCharacterSpawned);
 
 	OwnerPawn->OnCharacterSpawn.AddDynamic(this, &UUserHUD::OnSpawn);
 	OwnerPawn->OnCharacterDeath.AddDynamic(this, &UUserHUD::OnDeath);
@@ -29,17 +35,11 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 			PS->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnOwnerTeamChanged);
 			OnOwnerTeamChanged(PS->GetTeam());
 		});
-
-	BindPlayerState(LocalPawn, [this](ASaucewichPlayerState* PS)
-		{
-			PS->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnLocalTeamChanged);
-			OnLocalTeamChanged(PS->GetTeam());
-		});
 }
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
 {
-	if (OwnerPawn == LocalPawn || IsDead)
+	if (!OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
 	{
 		return ESlateVisibility::Hidden;
 	}
@@ -78,6 +78,17 @@ ESlateVisibility UUserHUD::GetHUDVisibility()
 	}
 
 	return ESlateVisibility::SelfHitTestInvisible;
+}
+
+void UUserHUD::OnLocalCharacterSpawned(ATpsCharacter* Character)
+{
+	LocalPawn = Character;
+
+	BindPlayerState(LocalPawn, [this](ASaucewichPlayerState* PS)
+		{
+			PS->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnLocalTeamChanged);
+			OnLocalTeamChanged(PS->GetTeam());
+		});
 }
 
 void UUserHUD::OnOwnerTeamChanged(const uint8 NewTeam)
