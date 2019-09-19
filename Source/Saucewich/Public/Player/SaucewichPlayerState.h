@@ -26,6 +26,7 @@ public:
 
 	virtual void OnKill();
 	virtual void OnDeath();
+	virtual void OnCharDestroyed() {}
 
 	/**
 	 * 점수를 추가(혹은 차감)합니다. Authority 전용입니다.

@@ -30,6 +30,7 @@ public:
 
 protected:
 	void OnDeath() override;
+	void OnCharDestroyed() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnPutIngredients();

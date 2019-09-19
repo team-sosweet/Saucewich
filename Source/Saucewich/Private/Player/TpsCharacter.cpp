@@ -163,6 +163,15 @@ void ATpsCharacter::BeginPlay()
 	}
 }
 
+void ATpsCharacter::Destroyed()
+{
+	if (const auto PS = GetPlayerState<ASaucewichPlayerState>())
+	{
+		PS->OnCharDestroyed();
+	}
+	Super::Destroyed();
+}
+
 void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 {
 	Super::SetupPlayerInputComponent(Input);

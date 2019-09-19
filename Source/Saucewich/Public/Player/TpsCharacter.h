@@ -104,6 +104,7 @@ public:
 
 protected:
 	void BeginPlay() override;
+	void Destroyed() override;
 	void PostInitializeComponents() override;
 	void PossessedBy(AController* NewController) override;
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
