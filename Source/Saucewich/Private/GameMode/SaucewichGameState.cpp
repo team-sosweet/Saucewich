@@ -8,7 +8,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Entity/PoolActor.h"
+#include "PoolActor.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
@@ -192,7 +192,6 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void ASaucewichGameState::CleanupGame() const
 {
-	TSubclassOf<AActor>{TSubclassOf<APoolActor>{}};
 	for (const auto Actor : TActorRange<APoolActor>{GetWorld()})
 		Actor->Release();
 }
