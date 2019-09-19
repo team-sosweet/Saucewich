@@ -59,7 +59,7 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const 
 	}
 }
 
-void UHttpGameInstance::PatchRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::PutRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -82,7 +82,7 @@ void UHttpGameInstance::PatchRequest(const FString& Url, const FJson Json, const
 			Request->SetHeader(Pair[0], Pair[1]);
 		}
 
-		Request->SetVerb("PATCH");
+		Request->SetVerb("PUT");
 		Request->ProcessRequest();
 	}
 }

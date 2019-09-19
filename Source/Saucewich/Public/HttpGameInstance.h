@@ -31,8 +31,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "POST"))
 	void PostRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PATCH"))
-	void PatchRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PUT"))
+	void PutRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded);
 	
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
