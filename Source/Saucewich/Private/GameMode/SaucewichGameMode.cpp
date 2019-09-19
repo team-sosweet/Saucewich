@@ -13,6 +13,7 @@
 
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -189,6 +190,11 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	if (IsHandlingReplays() && GetGameInstance() != nullptr)
 	{
 		GetGameInstance()->StartRecordingReplay(GetWorld()->GetMapName(), GetWorld()->GetMapName());
+	}
+
+	for (auto It = TActorIterator<ATpsCharacter>{GetWorld()}; It; ++It)
+	{
+		It->KillSilent();
 	}
 }
 
