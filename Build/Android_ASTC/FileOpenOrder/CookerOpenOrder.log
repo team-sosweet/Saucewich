@@ -5,6 +5,7 @@
 "../../../Engine/Content/EngineMaterials/WorldGridMaterial.uasset" 4
 "../../../Engine/Content/ArtTools/RenderToTexture/Meshes/S_1_Unit_Plane.uasset" 5
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 "../../../Engine/Content/BasicShapes/BasicShapeMaterial.uasset" 6
 "../../../Engine/Content/EngineMaterials/DefaultMaterial.uasset" 7
 "../../../Engine/Content/BasicShapes/Cone.uasset" 8
@@ -742,6 +743,8 @@
 "../../../../../../Users/seokj/Desktop/Saucewich/Content/Assets/Props/Lobby/TestLobby.uasset" 740
 "../../../../../../Users/seokj/Desktop/Saucewich/Content/Maps/Lobby.umap" 741
 =======
+=======
+>>>>>>> Stashed changes
 "../../../Engine/Content/EngineMaterials/DefaultMaterial.uasset" 6
 "../../../Engine/Content/BasicShapes/Cone.uasset" 7
 "../../../Engine/Content/BasicShapes/Cylinder.uasset" 8
@@ -1314,4 +1317,7 @@
 "D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Transition/BP_TransitionHUD.uasset" 575
 "D:/Programming/Game Engine/Unreal/Saucewich/Content/Blueprints/Transition/BP_TransitionGameMode.uasset" 576
 "D:/Programming/Game Engine/Unreal/Saucewich/Content/Maps/Transition.umap" 577
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
