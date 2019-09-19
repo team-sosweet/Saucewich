@@ -42,6 +42,7 @@ protected:
 private:
 	void UpdateMatchState();
 	void StartNextGame() const;
+	void CleanupGame() const;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UWorld>> Maps;
