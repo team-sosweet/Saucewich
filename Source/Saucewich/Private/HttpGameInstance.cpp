@@ -107,7 +107,7 @@ TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& Url, co
 	
 	Request->SetURL(Url);
 	Request->SetHeader(TEXT("User-Agent"), TEXT("X-UnrealEngine-Agent"));
-	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
 	Request->SetHeader(TEXT("Accepts"), TEXT("application/json"));
 	return Request;
 }
