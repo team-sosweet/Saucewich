@@ -20,7 +20,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 			{
 				Actor->SetOwner(SpawnParameters.Owner);
 				Actor->Instigator = SpawnParameters.Instigator;
-				Actor->SetActorTransform(Class.GetDefaultObject()->GetRootComponent()->GetRelativeTransform() * Transform);
+				Actor->SetActorTransform(Transform);
 				Actor->Activate();
 				return Actor;
 			}

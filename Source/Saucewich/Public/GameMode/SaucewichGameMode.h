@@ -22,6 +22,8 @@ public:
 	void PrintMessage(FName MessageID, float Duration = 3) const;
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
+	auto& GetAvailableMaps() const { return Maps; }
+
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
@@ -42,7 +44,6 @@ protected:
 private:
 	void UpdateMatchState();
 	void StartNextGame() const;
-	void CleanupGame() const;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UWorld>> Maps;

@@ -152,11 +152,15 @@ float UWeaponComponent::GetArmorRatio() const
 
 void UWeaponComponent::OnCharacterDeath()
 {
-	for (auto& Weapon : Weapons)
+	if (GetOwner()->HasAuthority())
 	{
-		if (Weapon)
+		for (auto& Weapon : Weapons)
 		{
-			Weapon->Release();
+			if (Weapon)
+			{
+				Weapon->Release();
+				Weapon = nullptr;
+			}
 		}
 	}
 }
@@ -189,11 +193,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	if (Weapons[Slot])
 	{
 		Weapons[Slot]->Release();
-		if (Weapons[Slot]->GetClass() == WeaponClass)
-		{
-			Weapons[Slot]->Activate();
-			return Weapons[Slot];
-		}
+		Weapons[Slot] = nullptr;
 	}
 
 	FActorSpawnParameters Parameters;
@@ -203,7 +203,7 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	const auto Weapon = Pool->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
 	if (!Weapon) return nullptr;
 
-	Weapon->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Weapon->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
 
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();

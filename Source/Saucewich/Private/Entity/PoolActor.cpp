@@ -11,9 +11,14 @@
 void APoolActor::Release(const bool bForce)
 {
 	if (!IsValidLowLevel() || !bActivated && !bForce) return;
+	
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
+
+	SetOwner(nullptr);
+	DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+	
 	bActivated = false;
 
 	if (!bReplicates || HasAuthority())

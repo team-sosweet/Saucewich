@@ -40,6 +40,7 @@ public:
 
 protected:
 	void SlotP() override;
+	void OnReleased() override;
 
 private:
 	FTimerHandle ReloadTimer;

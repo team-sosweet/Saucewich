@@ -278,16 +278,11 @@ void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const In
 
 void ATpsCharacter::KillSilent()
 {
-	HP = 0;
 	bAlive = false;
 	SetActorActivated(false);
 
 	if (HasAuthority())
 	{
-		if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-			if (const auto PC = GetController<ASaucewichPlayerController>())
-				GameMode->SetPlayerRespawnTimer(PC);
-
 		const auto MyPS = GetPlayerState();
 		UE_LOG(LogCharacter, Log, TEXT("%s was killed silently"), MyPS ? *MyPS->GetPlayerName() : *GetName());
 	}
