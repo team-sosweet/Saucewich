@@ -43,6 +43,7 @@ public:
 	struct BroadcastCharacterSpawned;
 
 private:
+	bool CanRespawn() const;
 	void ClearMessage() { Message = FText::GetEmpty(); }
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))

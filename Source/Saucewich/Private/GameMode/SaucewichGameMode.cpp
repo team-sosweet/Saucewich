@@ -15,6 +15,7 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
+#include "Weapon/Projectile/Projectile.h"
 #include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -207,12 +208,15 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	{
 		It->SetSpawnTimer();
 	}
+
+	CleanupGame();
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
+	CleanupGame();
 	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 }
 
@@ -264,4 +268,12 @@ void ASaucewichGameMode::StartNextGame() const
 
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
+}
+
+void ASaucewichGameMode::CleanupGame() const
+{
+	for (auto It = TActorIterator<AProjectile>{GetWorld()}; It; ++It)
+	{
+		It->Release();
+	}
 }
