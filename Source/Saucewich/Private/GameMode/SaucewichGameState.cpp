@@ -120,7 +120,7 @@ bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, fl
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime));
+	return IsMatchInProgress() ? FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
 }
 
 void ASaucewichGameState::BeginPlay()
