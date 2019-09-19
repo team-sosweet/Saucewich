@@ -8,6 +8,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "Entity/PoolActor.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
@@ -116,7 +117,7 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
 	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
 {
-	return IsMatchInProgress();
+	return !HasMatchEnded();
 }
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
