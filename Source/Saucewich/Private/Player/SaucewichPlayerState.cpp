@@ -62,9 +62,11 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 {
 	if (!HasAuthority()) return;
 
+	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
+	if (!GS || !GS->CanAddPersonalScore()) return;
+
 	if (ActualScore == 0)
-		if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-			ActualScore = GS->GetScoreData(ScoreID).Score;
+		ActualScore = GS->GetScoreData(ScoreID).Score;
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);

@@ -87,6 +87,11 @@ const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
 	return Found ? *Found : Default;
 }
 
+bool ASaucewichGameState::CanAddPersonalScore() const
+{
+	return IsMatchInProgress();
+}
+
 
 TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint8 Slot) const
 {

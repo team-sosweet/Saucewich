@@ -76,7 +76,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	const FScoreData& GetScoreData(FName ForWhat) const;
-	
+
+	virtual bool CanAddPersonalScore() const;
 
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
