@@ -7,9 +7,9 @@
 
 #include "Entity/PickupSpawnVolume.h"
 
-void AMakeSandwich::BeginPlay()
+void AMakeSandwich::HandleMatchHasStarted()
 {
-	Super::BeginPlay();
+	Super::HandleMatchHasStarted();
 
 	if (PerkSpawnInterval > 0 && PerkClasses.Num() > 0)
 	{

@@ -76,7 +76,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	const FScoreData& GetScoreData(FName ForWhat) const;
-	
+
+	virtual bool CanAddPersonalScore() const;
 
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
@@ -86,6 +87,8 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayerState* Attacker, AActor* Inflictor);
+
+	virtual bool ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount, const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const;
 
 
 	// 현재 라운드의 남은 시간을 구합니다.

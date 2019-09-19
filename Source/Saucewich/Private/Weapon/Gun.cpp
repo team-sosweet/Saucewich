@@ -145,7 +145,7 @@ void AGun::Shoot()
 	OnShoot();
 }
 
-EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
+EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
 	auto& Data = GetGunData();
 	if (const auto Def = Data.ProjectileClass.GetDefaultObject())
@@ -156,7 +156,7 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit) const
 	return EGunTraceHit::None;
 }
 
-EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data) const
+EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
 	const auto Shared = GetSharedData<UGunSharedData>();
 	if (!Shared) return EGunTraceHit::None;
@@ -184,8 +184,10 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	auto HitPawn = -1;
 	for (auto i = 0; i < BoxHits.Num(); ++i)
 	{
-		const auto Chr = Cast<ATpsCharacter>(BoxHits[i].GetActor());
-		if (!Chr || Chr->IsInvincible()) continue;
+		const auto Chr = Cast<APawn>(BoxHits[i].GetActor());
+		if (!Chr || !Chr->ShouldTakeDamage(Data.Damage, FPointDamageEvent{
+			Data.Damage, BoxHits[i], (End-Start).GetSafeNormal(), Data.DamageType
+		}, GetInstigatorController(), this)) continue;
 
 		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Shared->NoPawn.Name, Params))
 		{

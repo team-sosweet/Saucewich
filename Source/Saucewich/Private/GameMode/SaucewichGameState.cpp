@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -71,6 +72,8 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 
 void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
 {
+	if (!IsMatchInProgress()) return;
+	
 	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
 	
 	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
@@ -84,6 +87,11 @@ const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
 	static const FScoreData Default{};
 	const auto Found = ScoreData.Find(ForWhat);
 	return Found ? *Found : Default;
+}
+
+bool ASaucewichGameState::CanAddPersonalScore() const
+{
+	return IsMatchInProgress();
 }
 
 
@@ -104,9 +112,15 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 	return SlotWep;
 }
 
+bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
+	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
+{
+	return IsMatchInProgress();
+}
+
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime));
+	return IsMatchInProgress() ? FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
 }
 
 void ASaucewichGameState::BeginPlay()
@@ -125,6 +139,10 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	{
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
+
+	const auto PC = GetWorld()->GetFirstPlayerController<ASaucewichPlayerController>();
+	if (PC && PC->IsLocalController())
+		PC->InitMessage();
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()

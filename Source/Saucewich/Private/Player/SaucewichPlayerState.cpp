@@ -43,28 +43,34 @@ void ASaucewichPlayerState::GiveWeapons()
 
 void ASaucewichPlayerState::OnKill()
 {
-	if (HasAuthority())
-	{
-		++Kill;
-		AddScore("Kill");
-	}
+	if (!HasAuthority()) return;
+
+	const auto GS = GetWorld()->GetGameState<AGameState>();
+	if (!GS || !GS->IsMatchInProgress()) return;
+
+	++Kill;
+	AddScore("Kill");
 }
 
 void ASaucewichPlayerState::OnDeath()
 {
-	if (HasAuthority())
-	{
-		++Death;
-	}
+	if (!HasAuthority()) return;
+
+	const auto GS = GetWorld()->GetGameState<AGameState>();
+	if (!GS || !GS->IsMatchInProgress()) return;
+
+	++Death;
 }
 
 void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
 {
 	if (!HasAuthority()) return;
 
+	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
+	if (!GS || !GS->CanAddPersonalScore()) return;
+
 	if (ActualScore == 0)
-		if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-			ActualScore = GS->GetScoreData(ScoreID).Score;
+		ActualScore = GS->GetScoreData(ScoreID).Score;
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
@@ -125,6 +131,18 @@ void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, con
 bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
 	return true;
+}
+
+void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
+{
+	if (!HasAuthority()) return;
+
+	if (Objective == NewObjective) return;
+
+	const auto GS = GetWorld()->GetGameState<AGameState>();
+	if (!GS || !GS->IsMatchInProgress()) return;
+
+	Objective = NewObjective;
 }
 
 void ASaucewichPlayerState::BeginPlay()

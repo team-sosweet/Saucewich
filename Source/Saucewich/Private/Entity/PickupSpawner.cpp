@@ -57,14 +57,6 @@ float APickupSpawner::GetRemainingSpawnTime() const
 	return 0;
 }
 
-void APickupSpawner::BeginPlay()
-{
-	Super::BeginPlay();
-	if (IsPendingKill()) return;
-
-	SetSpawnTimer();
-}
-
 void APickupSpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

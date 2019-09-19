@@ -11,8 +11,10 @@
 #include "EngineUtils.h"
 #include "TimerManager.h"
 
+#include "Entity/PickupSpawner.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
+#include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -58,6 +60,11 @@ void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
 			if (PS->GetTeam() == 0 || GS->GetNumPlayers(PS->GetTeam()) > GameSession->MaxPlayers / GS->GetNumTeam())
 				PS->SetTeam(GS->GetMinPlayerTeam());
+}
+
+bool ASaucewichGameMode::ShouldSpawnAtStartSpot(AController* Player)
+{
+	return false;
 }
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
@@ -190,13 +197,23 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	{
 		GetGameInstance()->StartRecordingReplay(GetWorld()->GetMapName(), GetWorld()->GetMapName());
 	}
+
+	for (auto It = TActorIterator<ATpsCharacter>{GetWorld()}; It; ++It)
+	{
+		It->KillSilent();
+	}
+
+	for (auto It = TActorIterator<APickupSpawner>{GetWorld()}; It; ++It)
+	{
+		It->SetSpawnTimer();
+	}
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	GetWorldTimerManager().SetTimer(NextGameTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 }
 
 void ASaucewichGameMode::UpdateMatchState()
@@ -205,8 +222,23 @@ void ASaucewichGameMode::UpdateMatchState()
 	{
 		if (ReadyToStartMatch())
 		{
-			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
-			StartMatch();
+			const auto bTimerExists = GetWorldTimerManager().TimerExists(MatchStateTimer);
+			if (bAboutToStartMatch && !bTimerExists)
+			{
+				UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
+				StartMatch();
+			}
+			else if (!bAboutToStartMatch && !bTimerExists)
+			{
+				bAboutToStartMatch = true;
+				GetWorldTimerManager().SetTimer(MatchStateTimer, MatchStartingTime, false);
+				PrintMessage("StartingMatch", MatchStartingTime);
+			}
+		}
+		else
+		{
+			bAboutToStartMatch = false;
+			GetWorldTimerManager().ClearTimer(MatchStateTimer);
 		}
 	}
 	if (GetMatchState() == MatchState::InProgress)

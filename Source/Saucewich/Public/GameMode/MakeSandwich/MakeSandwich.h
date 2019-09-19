@@ -11,7 +11,7 @@ class SAUCEWICH_API AMakeSandwich final : public ASaucewichGameMode
 	GENERATED_BODY()
 
 protected:
-	void BeginPlay() override;
+	void HandleMatchHasStarted() override;
 	
 private:
 	void SpawnPerk() const;
