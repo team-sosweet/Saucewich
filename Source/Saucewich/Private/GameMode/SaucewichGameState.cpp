@@ -112,6 +112,12 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 	return SlotWep;
 }
 
+bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
+	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
+{
+	return IsMatchInProgress();
+}
+
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
 	return FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime));

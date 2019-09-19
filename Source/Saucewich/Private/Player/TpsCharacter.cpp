@@ -80,7 +80,7 @@ void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 
 bool ATpsCharacter::IsInvincible() const
 {
-	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimerHandle) > 0;
+	return GetWorldTimerManager().GetTimerRemaining(RespawnInvincibleTimer) > 0;
 }
 
 void ATpsCharacter::AddPerk(const TSubclassOf<APerk> PerkClass)
@@ -218,6 +218,10 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (FMath::IsNearlyZero(DamageAmount))
 		return false;
 
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+		if (!GS->ShouldPlayerTakeDamage(this, DamageAmount, DamageEvent, EventInstigator, DamageCauser))
+			return false;
+
 	if (!EventInstigator)
 		return true;
 
@@ -242,9 +246,9 @@ void ATpsCharacter::SetPlayerDefaults()
 		{
 			BeTranslucent();
 			GetWorldTimerManager().SetTimer(
-				RespawnInvincibleTimerHandle, 
+				RespawnInvincibleTimer, 
 				this, &ATpsCharacter::BeOpaque,
-				Data->RespawnInvincibleTime, false
+				Data->RespawnInvincibleTime
 			);
 		}
 	}

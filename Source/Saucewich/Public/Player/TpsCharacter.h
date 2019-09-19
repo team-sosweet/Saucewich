@@ -148,7 +148,7 @@ private:
 	UPROPERTY(Transient, VisibleInstanceOnly)
 	TMap<TSubclassOf<APerk>, FPerkInstance> Perks;
 
-	FTimerHandle RespawnInvincibleTimerHandle;
+	FTimerHandle RespawnInvincibleTimer;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	const class UCharacterData* Data;

@@ -88,6 +88,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
+	virtual bool ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount, const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const;
+
 
 	// 현재 라운드의 남은 시간을 구합니다.
 	UFUNCTION(BlueprintCallable)
