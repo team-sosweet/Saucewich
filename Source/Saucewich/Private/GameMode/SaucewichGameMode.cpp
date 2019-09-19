@@ -15,7 +15,6 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
-#include "Weapon/Projectile/Projectile.h"
 #include "SaucewichGameInstance.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -47,6 +46,23 @@ void ASaucewichGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
+}
+
+APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENetRole InRemoteRole, const FString& Portal,
+	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	const auto PC = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+	if (!PC || !ErrorMessage.IsEmpty()) return nullptr;
+
+	if (const auto Spc = Cast<ASaucewichPlayerController>(PC))
+	{
+		const auto ID = UGameplayStatics::ParseOption(Options, "Id");
+		const auto Token = UGameplayStatics::ParseOption(Options, "AccessToken");
+		UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
+		Spc->SetID(ID, Token);
+	}
+	
+	return PC;
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
