@@ -32,7 +32,7 @@ public:
 	void PostRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PUT"))
-	void PutRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded);
+	void PutRequest(const FString& Url, FJson HeaderJson, FJson BodyJson, const FOnResponded& OnResponded);
 	
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);

@@ -2,6 +2,7 @@
 
 #include "Widget/UserHUD.h"
 
+#include "GameFramework/GameState.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Player/SaucewichPlayerController.h"
@@ -20,6 +21,8 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 {
 	OwnerPawn = InOwnerPawn;
 
+	GameState = GetWorld()->GetGameState<AGameState>();
+	
 	FOnCharacterSpawnedSingle OnCharacterSpawned;
 	OnCharacterSpawned.BindDynamic(this, &UUserHUD::OnLocalCharacterSpawned);
 	
@@ -39,7 +42,7 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
 {
-	if (!OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
+	if (!GameState->IsMatchInProgress() || !OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
 	{
 		return ESlateVisibility::Hidden;
 	}
