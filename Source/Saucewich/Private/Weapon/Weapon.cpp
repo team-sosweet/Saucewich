@@ -99,7 +99,7 @@ void AWeapon::OnReleased()
 
 const FWeaponData& AWeapon::GetWeaponData() const
 {
-	static const FWeaponData Default;
+	static const FWeaponData Default{};
 	const auto Data = GetData(TEXT("AWeapon::GetWeaponData()"));
 	return Data ? *Data : Default;
 }
