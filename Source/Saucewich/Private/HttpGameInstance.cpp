@@ -112,7 +112,11 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 	
 	const auto Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 	TSharedPtr<FJsonObject> JsonObject;
-	FJsonSerializer::Deserialize(Reader, JsonObject);
+	if (!FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
 
 	TMap<FString, UJsonData*> JsonData;
 	
