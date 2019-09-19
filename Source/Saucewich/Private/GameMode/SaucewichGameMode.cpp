@@ -254,7 +254,8 @@ void ASaucewichGameMode::UpdateMatchState()
 void ASaucewichGameMode::StartNextGame() const
 {
 	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
-	const TSubclassOf<ASaucewichGameMode> GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
+	
+	const auto GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : TSubclassOf<ASaucewichGameMode>{GetClass()};
 	const auto DefGm = GmClass.GetDefaultObject();
 
 	const TSoftObjectPtr<UWorld> CurMap{GetWorld()->GetPathName()};
