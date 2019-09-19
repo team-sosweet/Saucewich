@@ -192,7 +192,7 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void ASaucewichGameState::CleanupGame() const
 {
-	for (auto It = TActorIterator<APoolActor>{GetWorld()}; It; ++It)
+	for (auto It = TActorIterator<APoolActor>{GetWorld(), APoolActor::StaticClass()}; It; ++It)
 		It->Release();
 }
 
