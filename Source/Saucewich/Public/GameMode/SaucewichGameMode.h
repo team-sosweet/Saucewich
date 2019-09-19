@@ -47,12 +47,16 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FText> Messages;
 
-	FTimerHandle NextGameTimer;
+	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
 
 	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
 	float NextGameWaitTime = 10;
+	
+	// 게임 시작 대기하다가 게임을 시작하려고 하기까지의 시간 (초)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
+	float MatchStartingTime = 2;
 	
 	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
 	float PickupSpawnInterval = 20;
@@ -65,4 +69,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 MaxPlayers = 8;
+
+	uint8 bAboutToStartMatch : 1;
 };

@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
@@ -125,6 +126,10 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	{
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
+
+	const auto PC = GetWorld()->GetFirstPlayerController<ASaucewichPlayerController>();
+	if (PC && PC->IsLocalController())
+		PC->InitMessage();
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()

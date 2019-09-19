@@ -196,7 +196,7 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 
-	GetWorldTimerManager().SetTimer(NextGameTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 }
 
 void ASaucewichGameMode::UpdateMatchState()
@@ -205,8 +205,23 @@ void ASaucewichGameMode::UpdateMatchState()
 	{
 		if (ReadyToStartMatch())
 		{
-			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
-			StartMatch();
+			const auto bTimerExists = GetWorldTimerManager().TimerExists(MatchStateTimer);
+			if (bAboutToStartMatch && !bTimerExists)
+			{
+				UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
+				StartMatch();
+			}
+			else if (!bAboutToStartMatch && !bTimerExists)
+			{
+				bAboutToStartMatch = true;
+				GetWorldTimerManager().SetTimer(MatchStateTimer, MatchStartingTime, false);
+				PrintMessage("StartingMatch", MatchStartingTime);
+			}
+		}
+		else
+		{
+			bAboutToStartMatch = false;
+			GetWorldTimerManager().ClearTimer(MatchStateTimer);
 		}
 	}
 	if (GetMatchState() == MatchState::InProgress)
