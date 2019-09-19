@@ -59,10 +59,17 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const 
 	}
 }
 
-void UHttpGameInstance::PutRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, const FJson BodyJson, const FOnResponded& OnResponded)
 {
-	FString Content;
-	if (!GetStringFromJson(Json, Content))
+	FString HeaderContent;
+	if (!GetStringFromJson(HeaderJson, HeaderContent))
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
+
+	FString BodyContent;
+	if (!GetStringFromJson(HeaderJson, BodyContent))
 	{
 		OnResponded.ExecuteIfBound(false, 0, FJson());
 		return;
@@ -74,12 +81,17 @@ void UHttpGameInstance::PutRequest(const FString& Url, const FJson Json, const F
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
 
 		TArray<FString> Params, Pair;
-		Content.ParseIntoArray(Params, TEXT("&"));
+		HeaderContent.ParseIntoArray(Params, TEXT("&"));
 
 		for (const auto& Param : Params)
 		{
 			Param.ParseIntoArray(Pair, TEXT("="));
 			Request->SetHeader(Pair[0], Pair[1]);
+		}
+
+		if (!BodyContent.IsEmpty())
+		{
+			Request->SetContentAsString(BodyContent);
 		}
 
 		Request->SetVerb("PUT");
