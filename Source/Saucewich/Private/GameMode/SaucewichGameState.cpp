@@ -192,8 +192,8 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void ASaucewichGameState::CleanupGame() const
 {
-	for (auto It = TActorIterator<APoolActor>{GetWorld()}; It; ++It)
-		It->Release();
+	for (const auto Actor : TActorRange<APoolActor>{GetWorld()})
+		Actor->Release();
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(

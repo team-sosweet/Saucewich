@@ -38,7 +38,9 @@ public:
 	void PrintMessage(FName MessageID, float Duration);
 
 	void InitMessage();
-	
+
+	void SetID(const FString& NewID, const FString& NewToken) { ID = NewID; Token = NewToken; }
+
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
@@ -54,6 +56,12 @@ private:
 	
 	FTimerHandle RespawnTimer;
 	FTimerHandle MessageTimer;
+
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FString ID;
+
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FString Token;
 };
 
 struct ASaucewichPlayerController::BroadcastPlayerStateSpawned
