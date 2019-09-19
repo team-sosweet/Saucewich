@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "TextProperty.h"
 #include "GameFramework/HUD.h"
 #include "BaseHUD.generated.h"
 
