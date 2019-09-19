@@ -57,18 +57,20 @@ private:
 		}
 	}
 
+	UPROPERTY(Transient)
+	ATpsCharacter* OwnerPawn;
+
+	UPROPERTY(Transient)
+	ATpsCharacter* LocalPawn;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ShowDistance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ShowAngle;
 
-	UPROPERTY(Transient)
-	ATpsCharacter* OwnerPawn;
-
-	UPROPERTY(Transient)
-	ATpsCharacter* LocalPawn;
-
+	class AGameState* GameState;
+	
 	float ShowAngleRadian;
 
 	uint8 OwnerTeam;
