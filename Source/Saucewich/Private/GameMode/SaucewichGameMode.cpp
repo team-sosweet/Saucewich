@@ -58,8 +58,27 @@ APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENe
 	{
 		const auto ID = UGameplayStatics::ParseOption(Options, "Id");
 		const auto Token = UGameplayStatics::ParseOption(Options, "AccessToken");
-		UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
-		Spc->SetID(ID, Token);
+
+#if UE_BUILD_SHIPPING
+		if (ID.IsEmpty())
+		{
+			ErrorMessage = TEXT("No ID provided");
+			return nullptr;
+		}
+		if (Token.IsEmpty())
+		{
+			ErrorMessage = TEXT("No token provided");
+			return nullptr;
+		}
+#else
+		if (!ID.IsEmpty() && !Token.IsEmpty())
+#endif 
+		{
+			UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
+			
+			Spc->SetID(ID, Token);
+			ChangeName(Spc, ID, false);
+		}
 	}
 	
 	return PC;
