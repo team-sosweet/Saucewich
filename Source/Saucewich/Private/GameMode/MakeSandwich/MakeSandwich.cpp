@@ -13,8 +13,8 @@ void AMakeSandwich::HandleMatchHasStarted()
 
 	if (PerkSpawnInterval > 0 && PerkClasses.Num() > 0)
 	{
-		for (TActorIterator<APickupSpawnVolume> It{GetWorld()}; It; ++It)
-			PerkSpawnVolumes.Add(*It);
+		for (const auto SpawnVolume : TActorRange<APickupSpawnVolume>{GetWorld()})
+			PerkSpawnVolumes.Add(SpawnVolume);
 
 		if (PerkSpawnVolumes.Num() > 0)
 			GetWorldTimerManager().SetTimer(PerkSpawnTimer, this, &AMakeSandwich::SpawnPerk, PerkSpawnInterval, true);

@@ -30,9 +30,9 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 
 void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duration) const
 {
-	for (TActorIterator<ASaucewichPlayerController> It{GetWorld()}; It; ++It)
+	for (const auto PC : TActorRange<ASaucewichPlayerController>{GetWorld()})
 	{
-		It->PrintMessage(MessageID, Duration);
+		PC->PrintMessage(MessageID, Duration);
 	}
 }
 
@@ -96,10 +96,8 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 	// 4개의 TArray는 우선순위를 나타내며 0번이 가장 높다.
 	TArray<APlayerStart*> StartPoints[4];
 
-	for (TActorIterator<APlayerStart> It{World}; It; ++It)
+	for (const auto PlayerStart : TActorRange<APlayerStart>{GetWorld()})
 	{
-		const auto PlayerStart = *It;
-
 #if WITH_EDITOR
 		if (PlayerStart->IsA<APlayerStartPIE>())
 		{
@@ -215,14 +213,14 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 		GetGameInstance()->StartRecordingReplay(GetWorld()->GetMapName(), GetWorld()->GetMapName());
 	}
 
-	for (auto It = TActorIterator<ATpsCharacter>{GetWorld()}; It; ++It)
+	for (const auto Character : TActorRange<ATpsCharacter>{GetWorld()})
 	{
-		It->KillSilent();
+		Character->KillSilent();
 	}
 
-	for (auto It = TActorIterator<APickupSpawner>{GetWorld()}; It; ++It)
+	for (const auto Spawner : TActorRange<APickupSpawner>{GetWorld()})
 	{
-		It->SetSpawnTimer();
+		Spawner->SetSpawnTimer();
 	}
 }
 

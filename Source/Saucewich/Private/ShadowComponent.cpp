@@ -1,15 +1,12 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "ShadowComponent.h"
-#include "ConstructorHelpers.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 UShadowComponent::UShadowComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> Plane{TEXT("/Engine/BasicShapes/Plane")};
-	Super::SetStaticMesh(Plane.Object);
 	bVisible = false;
 }
 

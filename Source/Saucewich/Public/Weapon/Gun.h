@@ -4,7 +4,10 @@
 
 #include "Saucewich.h"
 #include "Weapon/Weapon.h"
+#include "Sound/SoundBase.h"
 #include "Gun.generated.h"
+
+class USoundBase;
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FGunData : public FWeaponData
@@ -12,7 +15,7 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<USoundBase> FireSound;
+	TSoftObjectPtr<class USoundBase> FireSound;
 
 	// 자동조준 상자 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
