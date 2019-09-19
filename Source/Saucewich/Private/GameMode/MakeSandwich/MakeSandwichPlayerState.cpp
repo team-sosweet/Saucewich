@@ -33,7 +33,7 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 		static const FName ScoreName = "PutIngredients";
 		const auto NumIngredients = GetNumIngredients();
 		AddScore(ScoreName, NumIngredients * GS->GetScoreData(ScoreName).Score);
-		Objective += NumIngredients;
+		SetObjective(GetObjective() + NumIngredients);
 		GS->StoreIngredients(this);
 	}
 
