@@ -27,7 +27,8 @@ public:
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
-	
+
+	APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	void GenericPlayerInitialization(AController* C) override;
 
