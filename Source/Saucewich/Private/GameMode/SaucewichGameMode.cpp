@@ -62,6 +62,11 @@ void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 				PS->SetTeam(GS->GetMinPlayerTeam());
 }
 
+bool ASaucewichGameMode::ShouldSpawnAtStartSpot(AController* Player)
+{
+	return false;
+}
+
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
 {
 	const auto PawnClass = GetDefaultPawnClassForController(Player);

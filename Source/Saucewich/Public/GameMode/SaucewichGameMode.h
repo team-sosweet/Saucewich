@@ -28,6 +28,8 @@ protected:
 	
 	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	void GenericPlayerInitialization(AController* C) override;
+
+	bool ShouldSpawnAtStartSpot(AController* Player) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
