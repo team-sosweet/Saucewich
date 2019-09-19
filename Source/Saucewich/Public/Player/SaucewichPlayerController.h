@@ -36,6 +36,8 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void PrintMessage(FName MessageID, float Duration);
+
+	void InitMessage();
 	
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
@@ -43,7 +45,7 @@ public:
 private:
 	void ClearMessage() { Message = FText::GetEmpty(); }
 	
-	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FText Message;
 
 	FOnPlayerStateSpawned OnPlayerStateSpawned;

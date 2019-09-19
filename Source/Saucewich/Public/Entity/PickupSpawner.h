@@ -17,7 +17,7 @@ public:
 	APickupSpawner();
 	
 	void PickedUp();
-
+	void SetSpawnTimer();
 	auto GetSpawnClass() const { return Class; }
 
 	UFUNCTION(BlueprintCallable)
@@ -28,12 +28,10 @@ public:
 	float GetRemainingSpawnTime() const;
 
 protected:
-	void BeginPlay() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	void Spawn();
-	void SetSpawnTimer();
 
 	FTimerHandle SpawnTimer;
 

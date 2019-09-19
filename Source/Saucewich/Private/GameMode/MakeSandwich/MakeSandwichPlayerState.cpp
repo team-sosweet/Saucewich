@@ -33,7 +33,7 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 		static const FName ScoreName = "PutIngredients";
 		const auto NumIngredients = GetNumIngredients();
 		AddScore(ScoreName, NumIngredients * GS->GetScoreData(ScoreName).Score);
-		Objective += NumIngredients;
+		SetObjective(GetObjective() + NumIngredients);
 		GS->StoreIngredients(this);
 	}
 
@@ -67,17 +67,25 @@ void AMakeSandwichPlayerState::OnDeath()
 	DropIngredients();
 }
 
+void AMakeSandwichPlayerState::OnCharDestroyed()
+{
+	DropIngredients();
+}
+
 void AMakeSandwichPlayerState::DropIngredients()
 {	
 	if (HasAuthority())
 	{
-		const auto GI = GetGameInstance<USaucewichGameInstance>();
-		if (!GI) return;
-
-		auto&& Transform = GetPawn()->GetRootComponent()->GetComponentTransform();
-		for (auto&& Ingredient : Ingredients)
-			for (auto i = 0; i < Ingredient.Value; ++i)
-				GI->GetActorPool()->Spawn(Ingredient.Key, Transform);
+		if (const auto GI = GetGameInstance<USaucewichGameInstance>())
+		{
+			if (const auto Pawn = GetPawn())
+			{
+				auto&& Transform = Pawn->GetRootComponent()->GetComponentTransform();
+				for (auto&& Ingredient : Ingredients)
+					for (auto i = 0; i < Ingredient.Value; ++i)
+						GI->GetActorPool()->Spawn(Ingredient.Key, Transform);
+			}
+		}
 	}
 	Ingredients.Reset();
 }

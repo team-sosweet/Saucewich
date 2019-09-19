@@ -26,6 +26,7 @@ public:
 
 	virtual void OnKill();
 	virtual void OnDeath();
+	virtual void OnCharDestroyed() {}
 
 	/**
 	 * 점수를 추가(혹은 차감)합니다. Authority 전용입니다.
@@ -38,6 +39,7 @@ public:
 	uint8 GetKill() const { return Kill; }
 	uint8 GetDeath() const { return Death; }
 	uint8 GetObjective() const { return Objective; }
+	void SetObjective(uint8 NewObjective);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
@@ -59,9 +61,6 @@ protected:
 
 	UFUNCTION()
 	void OnTeamChanged(uint8 OldTeam);
-
-	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 Objective;
 
 private:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
@@ -85,6 +84,9 @@ private:
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 	
+	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 Objective;
+
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Kill;
 	

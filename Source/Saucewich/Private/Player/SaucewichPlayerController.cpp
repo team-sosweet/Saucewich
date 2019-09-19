@@ -33,6 +33,12 @@ void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSing
 	else OnPlayerStateSpawned.AddUnique(Delegate);
 }
 
+void ASaucewichPlayerController::InitMessage()
+{
+	if (!GetWorldTimerManager().TimerExists(MessageTimer))
+		ClearMessage();
+}
+
 void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)
 {
 	if (!Delegate.IsBound()) return;
