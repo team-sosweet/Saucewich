@@ -190,9 +190,8 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
 }
 
-void ASaucewichGameState::CleanupGame() const
+FORCENOINLINE void ASaucewichGameState::CleanupGame() const
 {
-	TSubclassOf<AActor>{TSubclassOf<APoolActor>{}};
 	for (const auto Actor : TActorRange<APoolActor>{GetWorld()})
 		Actor->Release();
 }
