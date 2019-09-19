@@ -261,35 +261,30 @@ float ATpsCharacter::GetArmorRatio_Implementation() const
 	return WeaponComponent->GetArmorRatio();
 }
 
-// 주의: Server와 Client 모두에서 실행되지만, Client에서는 Attacker, Inflictor가 항상 nullptr입니다.
 void ATpsCharacter::Kill(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
+{
+	if (HasAuthority())
+		MulticastKill(Attacker, Inflictor);
+}
+
+void ATpsCharacter::KillSilent()
 {
 	HP = 0;
 	bAlive = false;
 	SetActorActivated(false);
 
-	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-		if (const auto PC = GetController<ASaucewichPlayerController>())
-			GameMode->SetPlayerRespawnTimer(PC);
+	if (HasAuthority())
+	{
+		if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+			if (const auto PC = GetController<ASaucewichPlayerController>())
+				GameMode->SetPlayerRespawnTimer(PC);
+
+		const auto MyPS = GetPlayerState();
+		UE_LOG(LogCharacter, Log, TEXT("%s was killed silently"), MyPS ? *MyPS->GetPlayerName() : *GetName());
+	}
 
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
-	
-	if (HasAuthority())
-	{
-		const auto MyPS = GetPlayerState();
-		
-		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-			GameState->MulticastPlayerDeath(Cast<ASaucewichPlayerState>(MyPS), Attacker, Inflictor);
-
-		UE_LOG(LogCharacter, Log, TEXT("%s was killed by %s with %s"),
-			MyPS ? *MyPS->GetPlayerName() : *GetName(),
-			Attacker ? *Attacker->GetPlayerName() : TEXT("unknown"),
-			Inflictor ? *Inflictor->GetName() : TEXT("unknown")
-		);
-	}
-
-	OnKilled();
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)
@@ -357,7 +352,42 @@ int32 ATpsCharacter::GetColIdx() const
 void ATpsCharacter::OnRep_Alive()
 {
 	if (bAlive) SetPlayerDefaults();
-	else Kill();
+	else KillSilent();
+}
+
+void ATpsCharacter::MulticastKill_Implementation(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
+{
+	Kill_Internal(Attacker, Inflictor);
+}
+
+void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
+{
+	HP = 0;
+	bAlive = false;
+	SetActorActivated(false);
+
+	WeaponComponent->OnCharacterDeath();
+	OnCharacterDeath.Broadcast();
+	
+	if (HasAuthority())
+	{
+		if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+			if (const auto PC = GetController<ASaucewichPlayerController>())
+				GameMode->SetPlayerRespawnTimer(PC);
+
+		const auto MyPS = GetPlayerState();
+		
+		if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
+			GameState->MulticastPlayerDeath(Cast<ASaucewichPlayerState>(MyPS), Attacker, Inflictor);
+
+		UE_LOG(LogCharacter, Log, TEXT("%s was killed by %s with %s"),
+			MyPS ? *MyPS->GetPlayerName() : *GetName(),
+			Attacker ? *Attacker->GetPlayerName() : TEXT("unknown"),
+			Inflictor ? *Inflictor->GetName() : TEXT("unknown")
+		);
+	}
+
+	OnKilled();
 }
 
 void ATpsCharacter::BeTranslucent()

@@ -65,6 +65,10 @@ public:
 
 	void SetColor(const FLinearColor& NewColor) override;
 
+	// 캐릭터를 조용히 죽입니다.
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
+	void KillSilent();
+
 	bool IsAlive() const { return bAlive; }
 	bool IsInvincible() const;
 
@@ -138,6 +142,10 @@ private:
 
 	UFUNCTION()
 	void OnRep_Alive();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastKill(ASaucewichPlayerState* Attacker, AActor* Inflictor);
+	void Kill_Internal(ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
 	void BeTranslucent() override;
 	void BeOpaque() override;
