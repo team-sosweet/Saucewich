@@ -4,6 +4,7 @@
 
 #include "Engine/World.h"
 #include "GameFramework/GameMode.h"
+#include "EngineUtils.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
@@ -143,6 +144,8 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	const auto PC = GetWorld()->GetFirstPlayerController<ASaucewichPlayerController>();
 	if (PC && PC->IsLocalController())
 		PC->InitMessage();
+
+	CleanupGame();
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -167,7 +170,8 @@ void ASaucewichGameState::HandleMatchHasEnded()
 			UE_LOG(LogGameState, Log, TEXT("Match result: Draw!"));
 		}
 	}
-	
+
+	CleanupGame();
 	OnMatchEnd.Broadcast();
 }
 
@@ -183,6 +187,12 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
+}
+
+void ASaucewichGameState::CleanupGame() const
+{
+	for (auto It = TActorIterator<APoolActor>{GetWorld()}; It; ++It)
+		It->Release();
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
