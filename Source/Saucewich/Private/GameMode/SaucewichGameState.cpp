@@ -72,6 +72,8 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 
 void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
 {
+	if (!IsMatchInProgress()) return;
+	
 	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
 	
 	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
