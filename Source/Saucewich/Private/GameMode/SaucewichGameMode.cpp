@@ -11,6 +11,7 @@
 #include "EngineUtils.h"
 #include "TimerManager.h"
 
+#include "Entity/PickupSpawner.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
@@ -195,6 +196,11 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	for (auto It = TActorIterator<ATpsCharacter>{GetWorld()}; It; ++It)
 	{
 		It->KillSilent();
+	}
+
+	for (auto It = TActorIterator<APickupSpawner>{GetWorld()}; It; ++It)
+	{
+		It->SetSpawnTimer();
 	}
 }
 
