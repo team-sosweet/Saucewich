@@ -12,7 +12,7 @@ UHttpGameInstance::UHttpGameInstance()
 	Http = &FHttpModule::Get();
 }
 
-void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -40,7 +40,7 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson& Json, const 
 	}
 }
 
-void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -59,7 +59,7 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson& Json, const
 	}
 }
 
-void UHttpGameInstance::PatchRequest(const FString& Url, const FJson& Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::PatchRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -112,7 +112,11 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 	
 	const auto Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 	TSharedPtr<FJsonObject> JsonObject;
-	FJsonSerializer::Deserialize(Reader, JsonObject);
+	if (!FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		OnResponded.ExecuteIfBound(false, 0, FJson());
+		return;
+	}
 
 	TMap<FString, UJsonData*> JsonData;
 	

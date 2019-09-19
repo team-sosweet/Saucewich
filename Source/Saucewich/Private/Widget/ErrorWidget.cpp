@@ -18,7 +18,7 @@ void UErrorWidget::NativeOnInitialized()
 void UErrorWidget::Activate(const FText& Message)
 {
 	DescriptionText->SetText(Message);
-	AddToViewport();
+	AddToViewport(10);
 }
 
 void UErrorWidget::OnClicked()

@@ -110,13 +110,19 @@ private:
 
 	UPROPERTY(Config, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FAccount Account;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString GameCode;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	FString GamePort;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
 	
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
-
+	
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	float Sensitivity = .5;
 
