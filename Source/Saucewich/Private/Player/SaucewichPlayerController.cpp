@@ -22,7 +22,7 @@ float ASaucewichPlayerController::GetRemainingRespawnTime() const
 
 void ASaucewichPlayerController::Respawn()
 {
-	if (GetRemainingRespawnTime() <= 0.f) ServerRespawn();
+	if (CanRespawn()) ServerRespawn();
 }
 
 void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate)
@@ -37,6 +37,12 @@ void ASaucewichPlayerController::InitMessage()
 {
 	if (!GetWorldTimerManager().TimerExists(MessageTimer))
 		ClearMessage();
+}
+
+bool ASaucewichPlayerController::CanRespawn() const
+{
+	const auto Char = Cast<ATpsCharacter>(GetPawn());
+	return !Char || !Char->IsAlive() && GetRemainingRespawnTime() <= 0.f;
 }
 
 void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)
@@ -74,7 +80,8 @@ void ASaucewichPlayerController::ServerRespawn_Implementation()
 	// 그래서 다음 틱에서 호출하도록 했다. 찜찜하지만 작동은 잘 된다.
 	GetWorldTimerManager().SetTimerForNextTick([this]
 	{
-		if (GetRemainingRespawnTime() > 0.f) return;
+		if (!CanRespawn()) return;
+		
 		if (const auto Gm = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
 		{
 			Gm->RestartPlayer(this);
