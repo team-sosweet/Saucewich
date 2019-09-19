@@ -43,3 +43,9 @@ void AThrowingWeapon::SlotP()
 	
 	TimerManager.SetTimer(ReloadTimer, Data->ReloadTime, false);
 }
+
+void AThrowingWeapon::OnReleased()
+{
+	Super::OnReleased();
+	GetWorldTimerManager().ClearTimer(ReloadTimer);
+}

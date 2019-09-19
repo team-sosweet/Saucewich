@@ -4,9 +4,11 @@
 
 #include "Engine/World.h"
 #include "GameFramework/GameMode.h"
+#include "EngineUtils.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
+#include "Entity/PoolActor.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
@@ -115,7 +117,7 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
 	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
 {
-	return IsMatchInProgress();
+	return !HasMatchEnded();
 }
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
@@ -143,6 +145,8 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	const auto PC = GetWorld()->GetFirstPlayerController<ASaucewichPlayerController>();
 	if (PC && PC->IsLocalController())
 		PC->InitMessage();
+
+	CleanupGame();
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -167,7 +171,8 @@ void ASaucewichGameState::HandleMatchHasEnded()
 			UE_LOG(LogGameState, Log, TEXT("Match result: Draw!"));
 		}
 	}
-	
+
+	CleanupGame();
 	OnMatchEnd.Broadcast();
 }
 
@@ -183,6 +188,12 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
+}
+
+void ASaucewichGameState::CleanupGame() const
+{
+	for (auto It = TActorIterator<APoolActor>{GetWorld(), APoolActor::StaticClass()}; It; ++It)
+		It->Release();
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
