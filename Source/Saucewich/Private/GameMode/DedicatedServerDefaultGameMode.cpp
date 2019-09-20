@@ -37,6 +37,10 @@ void ADedicatedServerDefaultGameMode::OnServerRegistered(const bool bIsSuccess, 
 {
 	if (bIsSuccess)
 	{
+		if (const auto GI = GetGameInstance<UHttpGameInstance>())
+		{
+			GI->Port = GetWorld()->URL.Port;
+		}
 		UE_LOG(LogGameMode, Log, TEXT("Server registration successful"));
 	}
 	else
