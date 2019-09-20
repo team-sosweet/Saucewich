@@ -98,6 +98,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeAccount OnChangeAccount;
+
+protected:
+	void BeginDestroy() override;
 	
 private:
 	UPROPERTY(Config)
@@ -108,13 +111,13 @@ private:
 	
 	FOnGameStateSpawned OnGameStateSpawned;
 
-	UPROPERTY(Config, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FAccount Account;
 
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	FString GameCode;
 
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	FString GamePort;
 	
 	UPROPERTY(EditDefaultsOnly)
@@ -122,7 +125,7 @@ private:
 	
 	UPROPERTY(Transient)
 	AActorPool* ActorPool;
-	
+
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	float Sensitivity = .5;
 
@@ -132,7 +135,7 @@ private:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bAutoFire : 1;
 
-	UPROPERTY(Config, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bHaveAccount : 1;
 };
 
