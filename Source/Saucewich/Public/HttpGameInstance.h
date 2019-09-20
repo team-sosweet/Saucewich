@@ -35,6 +35,7 @@ public:
 	void PutRequest(const FString& Url, FJson HeaderJson, FJson BodyJson, const FOnResponded& OnResponded);
 
 	int32 GetMaxPort() const { return MaxPort; }
+	int32 Port;
 	
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);

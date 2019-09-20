@@ -28,7 +28,10 @@ void USaucewichGameInstance::BeginDestroy()
 {
 	Super::BeginDestroy();
 
-	FJson Json;
-	Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(GetWorld()->URL.Port)));
-	PostRequest(TEXT("crash"), Json, {});
+	if (Port != 0)
+	{
+		FJson Json;
+		Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(Port)));
+		PostRequest(TEXT("crash"), Json, {});
+	}
 }
