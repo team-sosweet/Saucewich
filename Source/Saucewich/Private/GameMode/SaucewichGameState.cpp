@@ -8,12 +8,18 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "PoolActor.h"
+#include "Entity/PoolActor.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
 #include "SaucewichGameInstance.h"
+
+static void CleanupGame(UWorld* const World)
+{
+	for (const auto Actor : TActorRange<APoolActor>{World})
+		Actor->Release();
+}
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -146,7 +152,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	if (PC && PC->IsLocalController())
 		PC->InitMessage();
 
-	CleanupGame();
+	CleanupGame(GetWorld());
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -172,7 +178,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	CleanupGame();
+	CleanupGame(GetWorld());
 	OnMatchEnd.Broadcast();
 }
 
@@ -188,12 +194,6 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
-}
-
-void ASaucewichGameState::CleanupGame() const
-{
-	for (const auto Actor : TActorRange<APoolActor>{GetWorld()})
-		Actor->Release();
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(
