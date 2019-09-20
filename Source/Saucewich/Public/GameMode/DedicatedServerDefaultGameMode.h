@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
+#include "HttpGameInstance.h"
 #include "DedicatedServerDefaultGameMode.generated.h"
 
 UCLASS()
@@ -12,4 +13,10 @@ class SAUCEWICH_API ADedicatedServerDefaultGameMode final : public AGameModeBase
 
 protected:
 	void BeginPlay() override;
+
+private:
+	UFUNCTION()
+	void OnServerRegistered(bool bIsSuccess, int32 Code, FJson Json);
+
+	void StartServer() const;
 };

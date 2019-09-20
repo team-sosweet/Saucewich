@@ -3,13 +3,10 @@
 #include "SaucewichGameInstance.h"
 
 #include "Engine/World.h"
-#include "TimerManager.h"
-#include "UserWidget.h"
 
-#include "ActorPool.h"
-#include "SaucewichGameState.h"
-
-DEFINE_LOG_CATEGORY_STATIC(LogSaucewichGameInstance, Log, All)
+#include "Entity/ActorPool.h"
+#include "GameMode/SaucewichGameState.h"
+#include "JsonData.h"
 
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
@@ -25,4 +22,13 @@ ASaucewichGameState* USaucewichGameInstance::GetGameState() const
 float USaucewichGameInstance::GetSensitivity() const
 {
 	return CorrectionValue * Sensitivity + CorrectionValue * .5f;
+}
+
+void USaucewichGameInstance::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	FJson Json;
+	Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(GetWorld()->URL.Port)));
+	PostRequest(TEXT("crash"), Json, {});
 }

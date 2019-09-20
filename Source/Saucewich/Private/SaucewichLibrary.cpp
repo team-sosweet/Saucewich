@@ -4,6 +4,7 @@
 
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "SkeletalMeshMerge.h"
 
 #include "Entity/ActorPool.h"
@@ -60,4 +61,16 @@ AActorPool* USaucewichLibrary::GetActorPool(const UObject* const WorldContextObj
 			if (const auto GI = World->GetGameInstance<USaucewichGameInstance>())
 				return GI->GetActorPool();
 	return nullptr;
+}
+
+void USaucewichLibrary::CleanupGame(const UObject* WorldContextObject)
+{
+	if (!WorldContextObject) return;
+	const auto World = WorldContextObject->GetWorld();
+	if (!World) return;
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, APoolActor::StaticClass(), Actors);
+	for (const auto Actor : Actors)
+		CastChecked<APoolActor>(Actor)->Release();
 }
