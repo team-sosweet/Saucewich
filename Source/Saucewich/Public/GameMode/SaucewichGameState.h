@@ -122,8 +122,6 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	void CleanupGame() const;
-
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
 

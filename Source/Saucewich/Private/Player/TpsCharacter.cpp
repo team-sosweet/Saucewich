@@ -293,12 +293,12 @@ void ATpsCharacter::KillSilent()
 
 void ATpsCharacter::MoveForward(const float AxisValue)
 {
-	AddMovementInput(GetActorForwardVector(), FMath::Sign(AxisValue));
+	AddMovementInput(GetActorForwardVector(), AxisValue);
 }
 
 void ATpsCharacter::MoveRight(const float AxisValue)
 {
-	AddMovementInput(GetActorRightVector(), FMath::Sign(AxisValue));
+	AddMovementInput(GetActorRightVector(), AxisValue);
 }
 
 void ATpsCharacter::SetActorActivated(const bool bActive)
