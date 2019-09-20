@@ -17,7 +17,8 @@
 
 static void CleanupGame(UWorld* const World)
 {
-	for (const auto Actor : TActorRange<APoolActor>{World})
+	const TSubclassOf<APoolActor> PoolActorClass = APoolActor::StaticClass();
+	for (const auto Actor : TActorRange<APoolActor>{World, PoolActorClass})
 		Actor->Release();
 }
 
