@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PUT"))
 	void PutRequest(const FString& Url, FJson HeaderJson, FJson BodyJson, const FOnResponded& OnResponded);
+
+	int32 GetMaxPort() const { return MaxPort; }
 	
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
@@ -47,4 +49,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FString BaseUrl;
+
+	UPROPERTY(Config)
+	int32 MaxPort = 8000;
 };
