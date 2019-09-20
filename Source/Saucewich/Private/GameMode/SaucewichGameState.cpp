@@ -8,19 +8,12 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Entity/PoolActor.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
+#include "SaucewichLibrary.h"
 #include "SaucewichGameInstance.h"
-
-static void CleanupGame(UWorld* const World)
-{
-	const TSubclassOf<APoolActor> PoolActorClass = APoolActor::StaticClass();
-	for (const auto Actor : TActorRange<APoolActor>{World, PoolActorClass})
-		Actor->Release();
-}
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -153,7 +146,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	if (PC && PC->IsLocalController())
 		PC->InitMessage();
 
-	CleanupGame(GetWorld());
+	USaucewichLibrary::CleanupGame(this);
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -179,7 +172,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	CleanupGame(GetWorld());
+	USaucewichLibrary::CleanupGame(this);
 	OnMatchEnd.Broadcast();
 }
 
