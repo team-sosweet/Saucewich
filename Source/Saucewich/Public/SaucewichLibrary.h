@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
 	static class AActorPool* GetActorPool(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
+	static void CleanupGame(const UObject* WorldContextObject);
 };
