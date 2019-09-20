@@ -119,6 +119,9 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	FString GamePort;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	FString GameServerAddress;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
