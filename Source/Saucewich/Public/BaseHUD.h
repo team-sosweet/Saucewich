@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/HUD.h"
-#include "TextProperty.h"
 #include "BaseHUD.generated.h"
 
 class UTextProperty;
