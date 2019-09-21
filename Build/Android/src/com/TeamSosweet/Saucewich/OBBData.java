@@ -1,4 +1,4 @@
-package com.YourCompany.Saucewich;
+package com.TeamSosweet.Saucewich;
 
 public class OBBData
 {
@@ -19,7 +19,7 @@ public static final XAPKFile[] xAPKS = {
 new XAPKFile(
 true, // true signifies a main file
 "1", // the version of the APK that the file was uploaded against
-99624442L // the length of the file in bytes
+230381900L // the length of the file in bytes
 )
 };
 };
