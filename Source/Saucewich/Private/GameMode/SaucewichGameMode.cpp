@@ -13,9 +13,11 @@
 
 #include "Entity/PickupSpawner.h"
 #include "GameMode/SaucewichGameState.h"
+#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
+#include "JsonData.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
@@ -82,6 +84,24 @@ APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENe
 	}
 	
 	return PC;
+}
+
+void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	ExtUpdatePlyCnt();
+}
+
+void ASaucewichGameMode::Logout(AController* const Exiting)
+{
+	Super::Logout(Exiting);
+	ExtUpdatePlyCnt();
+}
+
+void ASaucewichGameMode::InitSeamlessTravelPlayer(AController* const NewController)
+{
+	Super::InitSeamlessTravelPlayer(NewController);
+	ExtUpdatePlyCnt();
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -298,4 +318,35 @@ void ASaucewichGameMode::StartNextGame() const
 
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
+}
+
+void ASaucewichGameMode::ExtUpdatePlyCnt() const
+{
+	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
+	{
+		GI->GetGameCode([this, GI](const FString& GameCode)
+		{
+			FJson Body;
+			Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(NumPlayers));
+
+			FOnResponded OnResponded;
+			OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
+
+			GI->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
+		});
+	}
+}
+
+void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)
+{
+	if (bIsSuccess) return;
+	
+	if (Code == 429)
+	{
+		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, 1);
+	}
+	else
+	{
+		UE_LOG(LogExternalServer, Error, TEXT("Failed to update player count of external server. Error code: %d"), Code);
+	}
 }
