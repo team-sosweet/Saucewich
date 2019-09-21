@@ -108,7 +108,7 @@ public:
 			OnRespondGetGameCode.AddLambda(Forward<Fn>(Callback));
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &USaucewichGameInstance::RespondGetGameCode);
-			GetRequest(FString::Printf(TEXT("game/%d"), Port), {}, OnResponded);
+			GetRequest(FString::Printf(TEXT("room/game/%d"), Port), {}, OnResponded);
 		}
 	}
 

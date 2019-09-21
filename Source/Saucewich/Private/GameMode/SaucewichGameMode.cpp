@@ -332,7 +332,7 @@ void ASaucewichGameMode::ExtUpdatePlyCnt() const
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
 
-			GI->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
+			GI->PutRequest("room/people" + GameCode, {}, Body, OnResponded);
 		});
 	}
 }
