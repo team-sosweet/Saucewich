@@ -7,6 +7,8 @@
 
 #include "JsonData.h"
 
+DEFINE_LOG_CATEGORY(LogExternalServer)
+
 UHttpGameInstance::UHttpGameInstance()
 {
 	Http = &FHttpModule::Get();
@@ -17,7 +19,7 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const F
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 
@@ -45,7 +47,7 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const 
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 
@@ -64,39 +66,42 @@ void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, c
 	FString HeaderContent;
 	if (!GetStringFromJson(HeaderJson, HeaderContent))
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 
 	FString BodyContent;
 	if (!GetStringFromJson(HeaderJson, BodyContent))
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 
 	const auto FinalUrl = BaseUrl + Url;
-	if (!ResponseDelegates.Contains(FinalUrl))
+	if (ResponseDelegates.Contains(FinalUrl))
 	{
-		const auto Request = CreateRequest(FinalUrl, OnResponded);
-
-		TArray<FString> Params, Pair;
-		HeaderContent.ParseIntoArray(Params, TEXT("&"));
-
-		for (const auto& Param : Params)
-		{
-			Param.ParseIntoArray(Pair, TEXT("="));
-			Request->SetHeader(Pair[0], Pair[1]);
-		}
-
-		if (!BodyContent.IsEmpty())
-		{
-			Request->SetContentAsString(BodyContent);
-		}
-
-		Request->SetVerb("PUT");
-		Request->ProcessRequest();
+		OnResponded.ExecuteIfBound(false, 429, {});
+		return;
 	}
+
+	const auto Request = CreateRequest(FinalUrl, OnResponded);
+
+	TArray<FString> Params, Pair;
+	HeaderContent.ParseIntoArray(Params, TEXT("&"));
+
+	for (const auto& Param : Params)
+	{
+		Param.ParseIntoArray(Pair, TEXT("="));
+		Request->SetHeader(Pair[0], Pair[1]);
+	}
+
+	if (!BodyContent.IsEmpty())
+	{
+		Request->SetContentAsString(BodyContent);
+	}
+
+	Request->SetVerb("PUT");
+	Request->ProcessRequest();
 }
 
 TSharedRef<IHttpRequest> UHttpGameInstance::CreateRequest(const FString& Url, const FOnResponded& OnResponded)
@@ -118,7 +123,7 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 	
 	if (!bWasSuccessful || !Response.IsValid())
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 	
@@ -126,7 +131,7 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 	TSharedPtr<FJsonObject> JsonObject;
 	if (!FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		OnResponded.ExecuteIfBound(false, 0, FJson());
+		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
 	}
 
@@ -139,10 +144,10 @@ void UHttpGameInstance::OnResponse(const FHttpRequestPtr Request, const FHttpRes
 		JsonData.Add(Datum.Key, Value);
 	}
 
-	OnResponded.ExecuteIfBound(true, Response->GetResponseCode(), FJson{ JsonData });
+	OnResponded.ExecuteIfBound(true, Response->GetResponseCode(), {JsonData});
 }
 
-bool UHttpGameInstance::GetStringFromJson(const FJson& Json, FString& Out)
+bool UHttpGameInstance::GetStringFromJson(const FJson& Json, FString& Out) const
 {
 	auto IsContinuous = false;
 	

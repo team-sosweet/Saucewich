@@ -30,8 +30,24 @@ void USaucewichGameInstance::BeginDestroy()
 
 	if (Port != 0)
 	{
-		FJson Json;
-		Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(Port)));
-		PostRequest(TEXT("crash"), Json, {});
+		GetRequest(FString::Printf(TEXT("room/crash/%d"), Port), {}, {});
 	}
+}
+
+void USaucewichGameInstance::RespondGetGameCode(const bool bIsSuccess, const int32 Code, const FJson Json)
+{
+	if (!bIsSuccess)
+	{
+		UE_LOG(LogExternalServer, Error, TEXT("Failed to get game code! Error code: %d"), Code);
+		return;
+	}
+
+	const auto bIsJsonValid = Json.Data.FindRef("roomCode")->AsString(GameCode);
+	if (!bIsJsonValid || GameCode.IsEmpty())
+	{
+		UE_LOG(LogExternalServer, Error, TEXT("Failed to get game code: Invalid Json format"));
+		return;
+	}
+
+	OnRespondGetGameCode.Broadcast(GameCode);
 }

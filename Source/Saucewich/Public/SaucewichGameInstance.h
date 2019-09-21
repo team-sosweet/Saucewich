@@ -7,6 +7,7 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnChangeAccount);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnRespondGetGameCode, const FString&)
 
 USTRUCT(Atomic, BlueprintType)
 struct FAccount
@@ -94,6 +95,23 @@ public:
 
 	bool IsAutoFire() const { return bAutoFire; }
 
+	// void Callback(const FString&)
+	template <class Fn>
+	void GetGameCode(Fn&& Callback)
+	{
+		if (!GameCode.IsEmpty())
+		{
+			Callback(GameCode);
+		}
+		else
+		{
+			OnRespondGetGameCode.AddLambda(Forward<Fn>(Callback));
+			FOnResponded OnResponded;
+			OnResponded.BindDynamic(this, &USaucewichGameInstance::RespondGetGameCode);
+			GetRequest(FString::Printf(TEXT("game/%d"), Port), {}, OnResponded);
+		}
+	}
+
 	struct BroadcastGameStateSpawned;
 
 	UPROPERTY(BlueprintAssignable)
@@ -103,6 +121,9 @@ protected:
 	void BeginDestroy() override;
 	
 private:
+	UFUNCTION()
+	void RespondGetGameCode(bool bIsSuccess, int32 Code, FJson Json);
+
 	UPROPERTY(Config)
 	TArray<TSubclassOf<class ASaucewichGameMode>> GameModes;
 	
@@ -110,6 +131,7 @@ private:
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 	
 	FOnGameStateSpawned OnGameStateSpawned;
+	FOnRespondGetGameCode OnRespondGetGameCode;
 
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FAccount Account;

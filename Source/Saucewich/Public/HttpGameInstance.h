@@ -6,6 +6,8 @@
 #include "Http.h"
 #include "HttpGameInstance.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogExternalServer, Log, All)
+
 USTRUCT(Atomic, BlueprintType)
 struct FJson
 {
@@ -40,7 +42,7 @@ public:
 private:
 	TSharedRef<IHttpRequest> CreateRequest(const FString& Url, const FOnResponded& OnResponded);
 	
-	bool GetStringFromJson(const FJson& Json, FString& Out);
+	bool GetStringFromJson(const FJson& Json, FString& Out) const;
 
 	void OnResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
