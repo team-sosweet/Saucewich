@@ -22,7 +22,7 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &ADedicatedServerDefaultGameMode::OnServerRegistered);
 			
-			GI->PostRequest(TEXT("room/port"), Json, OnResponded);
+			GI->PostRequest(TEXT("room/game/port"), Json, OnResponded);
 			UE_LOG(LogGameMode, Log, TEXT("Requesting server registration with port %d..."), Port);
 		}
 		else
