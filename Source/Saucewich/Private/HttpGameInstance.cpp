@@ -73,7 +73,7 @@ void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, c
 	}
 
 	FString BodyContent;
-	if (!GetStringFromJson(HeaderJson, BodyContent))
+	if (!GetStringFromJson(BodyJson, BodyContent))
 	{
 		OnResponded.ExecuteIfBound(false, 403, {});
 		return;
