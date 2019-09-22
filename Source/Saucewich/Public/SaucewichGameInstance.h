@@ -108,7 +108,8 @@ public:
 			OnRespondGetGameCode.AddLambda(Forward<Fn>(Callback));
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &USaucewichGameInstance::RespondGetGameCode);
-			GetRequest(FString::Printf(TEXT("room/game/%d"), Port), {}, OnResponded);
+			GetRequest(FString::Printf(TEXT("room/game/%d"), PortForServer), {}, OnResponded);
+			UE_LOG(LogExternalServer, Log, TEXT("Requesting get game code..."));
 		}
 	}
 
@@ -140,7 +141,7 @@ private:
 	FString GameCode;
 
 	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
-	FString GamePort;
+	FString PortForClient;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	FString GameServerAddress;

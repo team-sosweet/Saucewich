@@ -332,18 +332,25 @@ void ASaucewichGameMode::ExtUpdatePlyCnt() const
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
 
-			GI->PutRequest("room/people" + GameCode, {}, Body, OnResponded);
+			GI->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
+			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NumPlayers);
 		});
 	}
 }
 
 void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)
 {
-	if (bIsSuccess) return;
+	if (bIsSuccess)
+	{
+		UE_LOG(LogExternalServer, Log, TEXT("Player count update successful"));
+		return;
+	}
 	
 	if (Code == 429)
 	{
-		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, 1);
+		constexpr float RetryRate = 1;
+		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, RetryRate);
+		UE_LOG(LogExternalServer, Warning, TEXT("Requested player count update too frequently! Retrying in %f seconds..."), RetryRate);
 	}
 	else
 	{
