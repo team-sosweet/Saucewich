@@ -15,10 +15,11 @@ class SAUCEWICH_API UMakeSandwichResultComponent final : public UComponentWidget
 
 	void NativeOnInitialized() override;
 
-	void NativeConstruct() override;
-
-	void SetWidget();
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetWidget(uint8 WinningTeam);
 	
+private:
 	UFUNCTION()
 	void GetPlayerState(class ASaucewichPlayerState* InPlayerState);
 
@@ -69,6 +70,4 @@ class SAUCEWICH_API UMakeSandwichResultComponent final : public UComponentWidget
 	ASaucewichPlayerState* PlayerState;
 
 	FTimerHandle WaitTimer;
-	
-	bool IsInit;
 };

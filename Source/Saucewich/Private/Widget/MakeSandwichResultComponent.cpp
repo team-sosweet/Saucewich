@@ -1,6 +1,6 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "MakeSandwichResultComponent.h"
+#include "Widget/MakeSandwichResultComponent.h"
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -43,17 +43,6 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 
 	MyTeamSandwich->SetBrushFromMaterial(MyTeamSandwichMat);
 	EnemyTeamSandwich->SetBrushFromMaterial(EnemyTeamSandwichMat);
-}
-
-void UMakeSandwichResultComponent::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	if (!IsInit)
-	{
-		IsInit = true;
-		return;
-	}
 
 	const auto GameModeClass = *GameState->GameModeClass;
 	const auto GameMode = GameModeClass->GetDefaultObject<ASaucewichGameMode>();
@@ -69,10 +58,9 @@ void UMakeSandwichResultComponent::NativeConstruct()
 		}, 1.0f, true);
 
 	UsersInfo->UpdateInfo();
-	SetWidget();
 }
 
-void UMakeSandwichResultComponent::SetWidget()
+void UMakeSandwichResultComponent::SetWidget(uint8 WinningTeam)
 {
 	const auto MyTeam = PlayerState->GetTeam();
 	const auto EnemyTeam = MyTeam == 1u ? 2u : 1u;
@@ -83,11 +71,11 @@ void UMakeSandwichResultComponent::SetWidget()
 	const auto MyTeamColor = GameState->GetTeamData(MyTeam).Color;
 	const auto EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
-	const auto ScoreDifferentSign = FMath::Sign(EnemyTeamScore - MyTeamScore);
+	const auto ScoreIndex = (WinningTeam == MyTeam ? 1 : WinningTeam == 0u ? 0 : -1) - 1;
 
-	ResultText->SetText(ResultTexts[ScoreDifferentSign + 1]);
+	ResultText->SetText(ResultTexts[ScoreIndex]);
 
-	const auto ResultColor = ScoreDifferentSign != 0 ? MyTeamColor : (MyTeamColor + EnemyTeamColor) * 0.5f;
+	const auto ResultColor = ScoreIndex != 1 ? MyTeamColor : (MyTeamColor + EnemyTeamColor) * 0.5f;
 	ResultText->SetColorAndOpacity(FSlateColor(ResultColor));
 
 	MyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
@@ -99,8 +87,8 @@ void UMakeSandwichResultComponent::SetWidget()
 	MyTeamScoreText->SetColorAndOpacity(FSlateColor(MyTeamColor));
 	EnemyTeamScoreText->SetColorAndOpacity(FSlateColor(EnemyTeamColor));
 
-	MyTeamResultImage->SetBrushFromTexture(ResultTextures[ScoreDifferentSign + 1]);
-	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures[-ScoreDifferentSign + 1]);
+	MyTeamResultImage->SetBrushFromTexture(ResultTextures[ScoreIndex]);
+	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures[-(ScoreIndex - 1) + 1]);
 }
 
 void UMakeSandwichResultComponent::GetPlayerState(ASaucewichPlayerState* InPlayerState)
