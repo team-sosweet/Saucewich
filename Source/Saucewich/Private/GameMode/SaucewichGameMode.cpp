@@ -76,6 +76,15 @@ APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENe
 		if (!ID.IsEmpty() && !Token.IsEmpty())
 #endif 
 		{
+			for (const auto OtherPC : TActorRange<ASaucewichPlayerController>{GetWorld()})
+			{
+				if (ID == OtherPC->GetID() || Token == OtherPC->GetToken())
+				{
+					ErrorMessage = TEXT("User with same ID or token has already connected to server");
+					return nullptr;
+				}
+			}
+
 			UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
 			
 			Spc->SetID(ID, Token);
