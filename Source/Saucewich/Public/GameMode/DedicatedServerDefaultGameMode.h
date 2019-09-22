@@ -18,12 +18,5 @@ private:
 	UFUNCTION()
 	void OnServerRegistered(bool bIsSuccess, int32 Code, FJson Json);
 
-	UFUNCTION()
-	void OnProcessRegistered(bool bIsSuccess, int32 Code, FJson Json);
-
-	void TryStartServer() const;
 	void StartServer() const;
-
-	uint8 bRegSv : 1;
-	uint8 bRegProc : 1;
 };

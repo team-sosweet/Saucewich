@@ -26,13 +26,6 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 			
 			GI->PostRequest(TEXT("room/port"), Json, OnResponded);
 			UE_LOG(LogExternalServer, Log, TEXT("Requesting server registration with port %d..."), Port);
-
-			FOnResponded OnProcReg;
-			OnProcReg.BindDynamic(this, &ADedicatedServerDefaultGameMode::OnProcessRegistered);
-
-			const auto ProcID = FPlatformProcess::GetCurrentProcessId();
-			GI->PostRequest(FString::Printf(TEXT("game/port/%d"), ProcID), Json, OnProcReg, "localhost:7000/");
-			UE_LOG(LogExternalServer, Log, TEXT("Requesting process registration with process ID %d..."), ProcID);
 		}
 		else
 		{
@@ -52,27 +45,7 @@ void ADedicatedServerDefaultGameMode::OnServerRegistered(const bool bIsSuccess, 
 	{
 		UE_LOG(LogExternalServer, Error, TEXT("Failed to register server! Error code: %d"), Code);
 	}
-	bRegSv = true;
-	TryStartServer();
-}
-
-void ADedicatedServerDefaultGameMode::OnProcessRegistered(const bool bIsSuccess, const int32 Code, FJson Json)
-{
-	if (bIsSuccess)
-	{
-		UE_LOG(LogExternalServer, Log, TEXT("Process registration successful"));
-	}
-	else
-	{
-		UE_LOG(LogExternalServer, Error, TEXT("Failed to register process! Error code: %d"), Code);
-	}
-	bRegProc = true;
-	TryStartServer();
-}
-
-void ADedicatedServerDefaultGameMode::TryStartServer() const
-{
-	if (bRegProc && bRegSv) StartServer();
+	StartServer();
 }
 
 void ADedicatedServerDefaultGameMode::StartServer() const

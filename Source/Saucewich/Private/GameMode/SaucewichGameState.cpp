@@ -156,6 +156,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 	if (HasAuthority())
 	{
 		WonTeam = GetWinningTeam();
+		OnRep_WonTeam();
 		if (WonTeam != 0)
 		{
 			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
@@ -173,7 +174,6 @@ void ASaucewichGameState::HandleMatchHasEnded()
 	}
 
 	USaucewichLibrary::CleanupGame(this);
-	OnMatchEnd.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
@@ -229,4 +229,9 @@ uint8 ASaucewichGameState::GetEmptyTeam() const
 	if (T1 > 0 && T2 == 0) return 2;
 
 	return 0;
+}
+
+void ASaucewichGameState::OnRep_WonTeam()
+{
+	OnMatchEnd.Broadcast(WonTeam);
 }

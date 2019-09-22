@@ -40,6 +40,8 @@ public:
 	void InitMessage();
 
 	void SetID(const FString& NewID, const FString& NewToken) { ID = NewID; Token = NewToken; }
+	auto& GetID() const { return ID; }
+	auto& GetToken() const { return Token; }
 
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;

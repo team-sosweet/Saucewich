@@ -5,6 +5,12 @@
 #include "GameFramework/Actor.h"
 #include "PoolActor.generated.h"
 
+UENUM()
+enum class EActivation : uint8
+{
+	Invalid, Released, Activated
+};
+
 /**
  * 재활용 가능한 액터입니다. 자주 생성/소멸되는 액터에 좋습니다.
  */
@@ -17,7 +23,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Release(bool bForce = false);
 	void Activate(bool bForce = false);
-	bool IsActive() const { return bActivated; }
+	bool IsActive() const { return Activation == EActivation::Activated; }
 	void LifeSpanExpired() override { Release(); }
 	class AActorPool* GetPool() const;
 
@@ -35,8 +41,8 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnRep_Activated();
+	void OnRep_Activation();
 
-	UPROPERTY(ReplicatedUsing=OnRep_Activated, Transient)
-	uint8 bActivated : 1;
+	UPROPERTY(ReplicatedUsing=OnRep_Activation, Transient)
+	EActivation Activation;
 };

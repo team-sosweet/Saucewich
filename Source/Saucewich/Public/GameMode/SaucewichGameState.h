@@ -7,7 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMatchEnd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchEnd, uint8, WonTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeavingMap);
 
 USTRUCT(BlueprintType)
@@ -66,7 +66,6 @@ public:
 
 	// 이기고 있는 팀을 반환합니다.
 	// 비기고 있는 경우 0을 반환합니다.
-	UFUNCTION(BlueprintCallable)
 	uint8 GetWinningTeam() const;
 	uint8 GetEmptyTeam() const;
 
@@ -122,6 +121,9 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	UFUNCTION()
+	void OnRep_WonTeam();
+
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
 
@@ -152,6 +154,6 @@ private:
 	float RoundStartTime = -1;
 
 
-	UPROPERTY(Replicated, Transient)
+	UPROPERTY(ReplicatedUsing=OnRep_WonTeam, Transient)
 	uint8 WonTeam;
 };
