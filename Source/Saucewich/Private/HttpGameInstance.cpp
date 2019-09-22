@@ -14,7 +14,7 @@ UHttpGameInstance::UHttpGameInstance()
 	Http = &FHttpModule::Get();
 }
 
-void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded, const FString Base)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -23,7 +23,8 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const F
 		return;
 	}
 
-	const auto FinalUrl = BaseUrl + Url;
+	const auto& CurBaseUrl = Base.IsEmpty() ? BaseUrl : Base;
+	const auto FinalUrl = CurBaseUrl + Url;
 	if (!ResponseDelegates.Contains(FinalUrl))
 	{
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
@@ -42,7 +43,7 @@ void UHttpGameInstance::GetRequest(const FString& Url, const FJson Json, const F
 	}
 }
 
-void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded)
+void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const FOnResponded& OnResponded, const FString Base)
 {
 	FString Content;
 	if (!GetStringFromJson(Json, Content))
@@ -51,7 +52,8 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const 
 		return;
 	}
 
-	const auto FinalUrl = BaseUrl + Url;
+	const auto& CurBaseUrl = Base.IsEmpty() ? BaseUrl : Base;
+	const auto FinalUrl = CurBaseUrl + Url;
 	if (!ResponseDelegates.Contains(FinalUrl))
 	{
 		const auto Request = CreateRequest(FinalUrl, OnResponded);
@@ -61,7 +63,7 @@ void UHttpGameInstance::PostRequest(const FString& Url, const FJson Json, const 
 	}
 }
 
-void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, const FJson BodyJson, const FOnResponded& OnResponded)
+void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, const FJson BodyJson, const FOnResponded& OnResponded, const FString Base)
 {
 	FString HeaderContent;
 	if (!GetStringFromJson(HeaderJson, HeaderContent))
@@ -77,7 +79,8 @@ void UHttpGameInstance::PutRequest(const FString& Url, const FJson HeaderJson, c
 		return;
 	}
 
-	const auto FinalUrl = BaseUrl + Url;
+	const auto& CurBaseUrl = Base.IsEmpty() ? BaseUrl : Base;
+	const auto FinalUrl = CurBaseUrl + Url;
 	if (ResponseDelegates.Contains(FinalUrl))
 	{
 		OnResponded.ExecuteIfBound(false, 429, {});
