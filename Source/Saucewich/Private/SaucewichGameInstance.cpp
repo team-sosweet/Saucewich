@@ -24,16 +24,6 @@ float USaucewichGameInstance::GetSensitivity() const
 	return CorrectionValue * Sensitivity + CorrectionValue * .5f;
 }
 
-void USaucewichGameInstance::BeginDestroy()
-{
-	Super::BeginDestroy();
-
-	if (PortForServer != 0)
-	{
-		GetRequest(FString::Printf(TEXT("room/crash/%d"), PortForServer), {}, {});
-	}
-}
-
 void USaucewichGameInstance::RespondGetGameCode(const bool bIsSuccess, const int32 Code, const FJson Json)
 {
 	if (!bIsSuccess)
