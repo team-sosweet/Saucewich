@@ -118,6 +118,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeAccount OnChangeAccount;
 
+protected:
+	void ShutdownAfterError() override;
+
 private:
 	UFUNCTION()
 	void RespondGetGameCode(bool bIsSuccess, int32 Code, FJson Json);
