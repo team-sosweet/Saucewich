@@ -107,12 +107,6 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 	ExtUpdatePlyCnt();
 }
 
-void ASaucewichGameMode::InitSeamlessTravelPlayer(AController* const NewController)
-{
-	Super::InitSeamlessTravelPlayer(NewController);
-	ExtUpdatePlyCnt();
-}
-
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
 {
 }

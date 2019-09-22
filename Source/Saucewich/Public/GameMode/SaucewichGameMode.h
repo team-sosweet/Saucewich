@@ -34,7 +34,6 @@ protected:
 	void PostLogin(APlayerController* NewPlayer) override;
 	void Logout(AController* Exiting) override;
 	
-	void InitSeamlessTravelPlayer(AController* NewController) override;
 	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	void GenericPlayerInitialization(AController* C) override;
 

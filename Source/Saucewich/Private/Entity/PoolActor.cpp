@@ -10,16 +10,16 @@
 
 void APoolActor::Release(const bool bForce)
 {
-	if (!IsValidLowLevel() || !bActivated && !bForce) return;
+	if (!IsValidLowLevel() || Activation == EActivation::Released && !bForce) return;
 	
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
 	SetActorHiddenInGame(true);
 
-	SetOwner(nullptr);
 	DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+	SetOwner(nullptr);
 	
-	bActivated = false;
+	Activation = EActivation::Released;
 
 	if (!bReplicates || HasAuthority())
 		GetPool()->Release(this);
@@ -30,12 +30,12 @@ void APoolActor::Release(const bool bForce)
 
 void APoolActor::Activate(const bool bForce)
 {
-	if (bActivated && !bForce) return;
+	if (IsActive() && !bForce) return;
 	SetActorTickEnabled(true);
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetLifeSpan(InitialLifeSpan);
-	bActivated = true;
+	Activation = EActivation::Activated;
 	OnActivated();
 	BP_OnActivated();
 }
@@ -50,11 +50,11 @@ AActorPool* APoolActor::GetPool() const
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(APoolActor, bActivated);
+	DOREPLIFETIME(APoolActor, Activation);
 }
 
-void APoolActor::OnRep_Activated()
+void APoolActor::OnRep_Activation()
 {
-	if (bActivated) Activate(true);
+	if (IsActive()) Activate(true);
 	else Release(true);
 }
