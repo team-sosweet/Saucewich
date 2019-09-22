@@ -28,9 +28,9 @@ void USaucewichGameInstance::BeginDestroy()
 {
 	Super::BeginDestroy();
 
-	if (Port != 0)
+	if (PortForServer != 0)
 	{
-		GetRequest(FString::Printf(TEXT("room/crash/%d"), Port), {}, {});
+		GetRequest(FString::Printf(TEXT("room/crash/%d"), PortForServer), {}, {});
 	}
 }
 
@@ -42,12 +42,13 @@ void USaucewichGameInstance::RespondGetGameCode(const bool bIsSuccess, const int
 		return;
 	}
 
-	const auto bIsJsonValid = Json.Data.FindRef("roomCode")->AsString(GameCode);
-	if (!bIsJsonValid || GameCode.IsEmpty())
+	const auto JsonData = Json.Data.FindRef("roomCode");
+	if (!JsonData || !JsonData->AsString(GameCode) || GameCode.IsEmpty())
 	{
 		UE_LOG(LogExternalServer, Error, TEXT("Failed to get game code: Invalid Json format"));
 		return;
 	}
 
 	OnRespondGetGameCode.Broadcast(GameCode);
+	UE_LOG(LogExternalServer, Log, TEXT("Get game code successful! Game code: %s"), *GameCode);
 }

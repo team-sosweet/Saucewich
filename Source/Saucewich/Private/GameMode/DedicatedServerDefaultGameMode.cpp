@@ -16,6 +16,8 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 		const auto MaxPort = GI->GetMaxPort();
 		if (Port <= MaxPort)
 		{
+			GI->PortForServer = GetWorld()->URL.Port;
+
 			FJson Json;
 			Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(Port)));
 			
@@ -37,10 +39,6 @@ void ADedicatedServerDefaultGameMode::OnServerRegistered(const bool bIsSuccess, 
 {
 	if (bIsSuccess)
 	{
-		if (const auto GI = GetGameInstance<UHttpGameInstance>())
-		{
-			GI->Port = GetWorld()->URL.Port;
-		}
 		UE_LOG(LogGameMode, Log, TEXT("Server registration successful"));
 	}
 	else
