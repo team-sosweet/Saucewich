@@ -64,6 +64,11 @@ public:
 	uint8 GetNumPlayers(uint8 Team) const;
 
 
+	// 이기고 있는 팀을 반환합니다.
+	// 비기고 있는 경우 0을 반환합니다.
+	uint8 GetWinningTeam() const;
+	uint8 GetEmptyTeam() const;
+
 	UFUNCTION(BlueprintCallable)
 	int32 GetTeamScore(const uint8 Team) const { return TeamScore.Num() <= Team ? 0 : TeamScore[Team]; }
 	void SetTeamScore(uint8 Team, int32 NewScore);
@@ -116,11 +121,6 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	// 이기고 있는 팀을 반환합니다.
-	// 비기고 있는 경우 0을 반환합니다.
-	uint8 GetWinningTeam() const;
-	uint8 GetEmptyTeam() const;
-
 	UFUNCTION()
 	void OnRep_WonTeam();
 
