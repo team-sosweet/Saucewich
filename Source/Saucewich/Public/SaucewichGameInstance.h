@@ -118,9 +118,6 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnChangeAccount OnChangeAccount;
 
-protected:
-	void BeginDestroy() override;
-	
 private:
 	UFUNCTION()
 	void RespondGetGameCode(bool bIsSuccess, int32 Code, FJson Json);
