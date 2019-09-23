@@ -324,7 +324,6 @@ void ASaucewichGameMode::StartNextGame() const
 
 void ASaucewichGameMode::ExtUpdatePlyCnt() const
 {
-// #if UE_BUILD_SHIPPING
 	if (!IsRunningDedicatedServer()) return;
 	
 	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
@@ -341,7 +340,6 @@ void ASaucewichGameMode::ExtUpdatePlyCnt() const
 			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NumPlayers);
 		});
 	}
-// #endif
 }
 
 void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)
