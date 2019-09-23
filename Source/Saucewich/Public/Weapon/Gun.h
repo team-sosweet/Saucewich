@@ -42,6 +42,14 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
 	float HorizontalSpread;
 
+	// 초탄퍼짐 비율
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
+	float FirstSpreadRatio = .1f;
+
+	// 탄퍼짐 비율 증가
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
+	float SpreadIncrease = .3f;
+
 	// 지향사격 각도 오프셋
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
 	float HipFireAngleOffset = 25;
@@ -142,6 +150,7 @@ private:
 	class UParticleSystemComponent* FirePSC;
 
 	FRandomStream FireRand;
+	float SpreadAlpha;
 
 	float FireLag;
 

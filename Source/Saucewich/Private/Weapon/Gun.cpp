@@ -88,12 +88,17 @@ void AGun::Shoot()
 	const auto H = 45 * Data.HorizontalSpread;
 	
 	TArray<FVector> RDirs;
+	RDirs.Reserve(Data.NumProjectile);
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
-		RDirs.Add(Dir.RotateAngleAxis(FireRand.FRandRange(-V, V), Forward).RotateAngleAxis(FireRand.FRandRange(-H, H), Right));
+		const auto VR = FireRand.FRandRange(-V, V) * SpreadAlpha;
+		const auto HR = FireRand.FRandRange(-H, H) * SpreadAlpha;
+		RDirs.Add(Dir.RotateAngleAxis(VR, Forward).RotateAngleAxis(HR, Right));
+		SpreadAlpha = FMath::Min(SpreadAlpha + Data.SpreadIncrease, 1.f);
 	}
 
-	TSet<uint8> HitPawnIdx;
+	TArray<bool> HitPawn;
+	HitPawn.AddZeroed(Data.NumProjectile);
 	if (HitType == EGunTraceHit::Pawn)
 	{
 		FHitResult PawnHitResult;
@@ -107,7 +112,7 @@ void AGun::Shoot()
 					GetInstigator()->GetController(),
 					this
 				);
-				HitPawnIdx.Add(i);
+				HitPawn[i] = true;
 			}
 		}
 	}
@@ -126,7 +131,7 @@ void AGun::Shoot()
 		SpawnTransform.SetRotation(RDirs[i].ToOrientationQuat());
 		if (const auto Projectile = GetPool()->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
 		{
-			Projectile->bCosmetic = HitPawnIdx.Contains(i);
+			Projectile->bCosmetic = HitPawn[i];
 			Projectile->SetColor(GetColor());
 		}
 	}
@@ -285,6 +290,7 @@ void AGun::StartFire(const int32 RandSeed)
 {
 	FireRand.Initialize(RandSeed);
 	bFiring = true;
+	SpreadAlpha = GetGunData().FirstSpreadRatio;
 }
 
 void AGun::MulticastStartFire_Implementation(const int32 RandSeed)
