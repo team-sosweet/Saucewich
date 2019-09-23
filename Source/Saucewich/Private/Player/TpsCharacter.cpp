@@ -261,6 +261,11 @@ void ATpsCharacter::SetPlayerDefaults()
 			);
 		}
 	}
+
+	if (const auto PC = GetController<ASaucewichPlayerController>())
+	{
+		PC->OnCharRespawn.Broadcast();
+	}
 	
 	OnCharacterSpawn.Broadcast();
 }

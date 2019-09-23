@@ -24,10 +24,10 @@ private:
 	void GetPlayerState(class ASaucewichPlayerState* InPlayerState);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TArray<FText> ResultTexts;
+	TMap<FName, FText> ResultTexts;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TArray<UTexture2D*> ResultTextures;
+	TMap<FName, UTexture2D*> ResultTextures;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	UMaterialInterface* SandwichMaterialParent;

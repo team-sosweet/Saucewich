@@ -61,6 +61,12 @@ bool AMakeSandwichPlayerState::CanPickupIngredient() const
 	return GetNumIngredients() < MaxIngredients;
 }
 
+void AMakeSandwichPlayerState::Reset()
+{
+	Super::Reset();
+	Ingredients.Reset();
+}
+
 void AMakeSandwichPlayerState::OnDeath()
 {
 	Super::OnDeath();

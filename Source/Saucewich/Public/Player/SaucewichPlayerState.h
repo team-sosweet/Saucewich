@@ -57,8 +57,6 @@ protected:
 	void BeginPlay() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void CopyProperties(APlayerState* PlayerState) override;
-
 	UFUNCTION()
 	void OnTeamChanged(uint8 OldTeam);
 
@@ -72,6 +70,8 @@ private:
 
 	UFUNCTION()
 	void LoadWeaponLoadout(class ATpsCharacter* Char);
+
+	void NotifySpawnToController();
 
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.

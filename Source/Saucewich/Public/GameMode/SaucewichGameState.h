@@ -121,6 +121,8 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	static constexpr uint8 InvalidTeam = -1;
+	
 	UFUNCTION()
 	void OnRep_WonTeam();
 
@@ -153,7 +155,6 @@ private:
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	float RoundStartTime = -1;
 
-
 	UPROPERTY(ReplicatedUsing=OnRep_WonTeam, Transient)
-	uint8 WonTeam;
+	uint8 WonTeam = InvalidTeam;
 };

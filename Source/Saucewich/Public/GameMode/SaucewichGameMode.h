@@ -36,6 +36,8 @@ protected:
 	
 	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 	void GenericPlayerInitialization(AController* C) override;
+	bool FindInactivePlayer(APlayerController* PC) override { return false; }
+	void AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC) override {}
 
 	bool ShouldSpawnAtStartSpot(AController* Player) override;
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;

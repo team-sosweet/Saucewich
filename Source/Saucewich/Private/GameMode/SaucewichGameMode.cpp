@@ -76,19 +76,10 @@ APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENe
 		if (!ID.IsEmpty() && !Token.IsEmpty())
 #endif 
 		{
-			for (const auto OtherPC : TActorRange<ASaucewichPlayerController>{GetWorld()})
-			{
-				if (ID == OtherPC->GetID() || Token == OtherPC->GetToken())
-				{
-					ErrorMessage = TEXT("User with same ID or token has already connected to server");
-					return nullptr;
-				}
-			}
-
 			UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
 			
 			Spc->SetID(ID, Token);
-			ChangeName(Spc, ID, false);
+			ChangeName(Spc, ID, true);
 		}
 	}
 	
@@ -116,9 +107,17 @@ void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 	Super::GenericPlayerInitialization(C);
 	
 	if (const auto GS = GetGameState<ASaucewichGameState>())
+	{
 		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
-			if (PS->GetTeam() == 0 || GS->GetNumPlayers(PS->GetTeam()) > GameSession->MaxPlayers / GS->GetNumTeam())
+		{
+			const auto MinTeamNum = GS->GetNumPlayers(GS->GetMinPlayerTeam());
+			const auto MyTeamNum = GS->GetNumPlayers(PS->GetTeam());
+			if (PS->GetTeam() == 0 || MyTeamNum - MinTeamNum > 1)
+			{
 				PS->SetTeam(GS->GetMinPlayerTeam());
+			}
+		}
+	}
 }
 
 bool ASaucewichGameMode::ShouldSpawnAtStartSpot(AController* Player)
@@ -325,7 +324,7 @@ void ASaucewichGameMode::StartNextGame() const
 
 void ASaucewichGameMode::ExtUpdatePlyCnt() const
 {
-#if UE_BUILD_SHIPPING
+// #if UE_BUILD_SHIPPING
 	if (!IsRunningDedicatedServer()) return;
 	
 	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
@@ -342,7 +341,7 @@ void ASaucewichGameMode::ExtUpdatePlyCnt() const
 			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NumPlayers);
 		});
 	}
-#endif
+// #endif
 }
 
 void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)

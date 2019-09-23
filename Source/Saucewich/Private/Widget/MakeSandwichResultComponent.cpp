@@ -50,20 +50,21 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 	WaitTime = GameMode->GetNextGameWaitTime();
 
 	GetWorld()->GetTimerManager().SetTimer(WaitTimer, [this]
+	{
+		if (!IsValidLowLevel()) return;
+		if (--WaitTime <= 0)
 		{
-			if (--WaitTime <= 0)
-			{
-				GetWorld()->GetTimerManager().ClearTimer(WaitTimer);
-			}
-		}, 1.0f, true);
+			GetWorld()->GetTimerManager().ClearTimer(WaitTimer);
+		}
+	}, 1.0f, true);
 
 	UsersInfo->UpdateInfo();
 }
 
-void UMakeSandwichResultComponent::SetWidget(uint8 WinningTeam)
+void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam)
 {
 	const auto MyTeam = PlayerState->GetTeam();
-	const auto EnemyTeam = MyTeam == 1u ? 2u : 1u;
+	const uint8 EnemyTeam = MyTeam == 1 ? 2 : 1;
 
 	const auto MyTeamScore = GameState->GetTeamScore(MyTeam);
 	const auto EnemyTeamScore = GameState->GetTeamScore(EnemyTeam);
@@ -71,11 +72,11 @@ void UMakeSandwichResultComponent::SetWidget(uint8 WinningTeam)
 	const auto MyTeamColor = GameState->GetTeamData(MyTeam).Color;
 	const auto EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
 
-	const auto ScoreIndex = (WinningTeam == MyTeam ? 1 : WinningTeam == 0u ? 0 : -1) - 1;
+	const auto ResultName = WinningTeam == MyTeam ? "Win" : WinningTeam == 0 ? "Draw" : "Lose";
+	const auto EnemyResultName = WinningTeam == MyTeam ? "Lose" : WinningTeam == 0 ? "Draw" : "Win";
+	ResultText->SetText(ResultTexts.FindRef(ResultName));
 
-	ResultText->SetText(ResultTexts[ScoreIndex]);
-
-	const auto ResultColor = ScoreIndex != 1 ? MyTeamColor : (MyTeamColor + EnemyTeamColor) * 0.5f;
+	const auto ResultColor = WinningTeam == 0 ? (MyTeamColor + EnemyTeamColor) * 0.5f : MyTeamColor;
 	ResultText->SetColorAndOpacity(FSlateColor(ResultColor));
 
 	MyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
@@ -87,8 +88,8 @@ void UMakeSandwichResultComponent::SetWidget(uint8 WinningTeam)
 	MyTeamScoreText->SetColorAndOpacity(FSlateColor(MyTeamColor));
 	EnemyTeamScoreText->SetColorAndOpacity(FSlateColor(EnemyTeamColor));
 
-	MyTeamResultImage->SetBrushFromTexture(ResultTextures[ScoreIndex]);
-	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures[-(ScoreIndex - 1) + 1]);
+	MyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(ResultName));
+	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(EnemyResultName));
 }
 
 void UMakeSandwichResultComponent::GetPlayerState(ASaucewichPlayerState* InPlayerState)

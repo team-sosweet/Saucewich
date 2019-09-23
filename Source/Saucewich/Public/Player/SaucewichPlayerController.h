@@ -9,6 +9,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateSpawned, class ASaucew
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, ASaucewichPlayerState*, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsCharacter*, Character);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharRespawn);
 
 UCLASS()
 class SAUCEWICH_API ASaucewichPlayerController final : public APlayerController
@@ -46,6 +47,9 @@ public:
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnCharRespawn OnCharRespawn;
+	
 private:
 	bool CanRespawn() const;
 	void ClearMessage() { Message = FText::GetEmpty(); }
@@ -55,7 +59,7 @@ private:
 
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
 	FOnCharacterSpawned OnCharacterSpawned;
-	
+
 	FTimerHandle RespawnTimer;
 	FTimerHandle MessageTimer;
 
@@ -73,7 +77,6 @@ private:
 	BroadcastPlayerStateSpawned(ASaucewichPlayerController* Controller, ASaucewichPlayerState* PlayerState)
 	{
 		Controller->OnPlayerStateSpawned.Broadcast(PlayerState);
-		Controller->OnPlayerStateSpawned.Clear();
 	}
 };
 
@@ -84,6 +87,5 @@ private:
 	BroadcastCharacterSpawned(ASaucewichPlayerController* Controller, ATpsCharacter* Character)
 	{
 		Controller->OnCharacterSpawned.Broadcast(Character);
-		Controller->OnCharacterSpawned.Clear();
 	}
 };

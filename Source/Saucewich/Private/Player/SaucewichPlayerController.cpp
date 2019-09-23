@@ -28,8 +28,8 @@ void ASaucewichPlayerController::Respawn()
 void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate)
 {
 	if (!Delegate.IsBound()) return;
-	if (const auto PS = GetPlayerState<ASaucewichPlayerState>())
-		Delegate.Execute(PS);
+	const auto PS = GetPlayerState<ASaucewichPlayerState>();
+	if (IsValid(PS)) Delegate.Execute(PS);
 	else OnPlayerStateSpawned.AddUnique(Delegate);
 }
 

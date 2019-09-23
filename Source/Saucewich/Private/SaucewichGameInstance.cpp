@@ -8,8 +8,6 @@
 #include "GameMode/SaucewichGameState.h"
 #include "JsonData.h"
 
-#include <fstream>
-
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
 	if (!IsValid(ActorPool)) ActorPool = GetWorld()->SpawnActor<AActorPool>();
@@ -30,12 +28,12 @@ void USaucewichGameInstance::ShutdownAfterError()
 {
 	Super::ShutdownAfterError();
 
-#if UE_BUILD_SHIPPING
+// #if UE_BUILD_SHIPPING
 	if (IsRunningDedicatedServer())
 	{
 		GetRequest(FString::Printf(TEXT("room/crash/%d"), PortForServer), {}, {});
 	}
-#endif
+// #endif
 }
 
 void USaucewichGameInstance::RespondGetGameCode(const bool bIsSuccess, const int32 Code, const FJson Json)

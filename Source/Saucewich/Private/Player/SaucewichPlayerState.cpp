@@ -7,9 +7,9 @@
 #include "UnrealNetwork.h"
 
 #include "SaucewichGameInstance.h"
-#include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
+#include "Player/SaucewichPlayerController.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
 
@@ -118,6 +118,17 @@ void ASaucewichPlayerState::LoadWeaponLoadout(ATpsCharacter* const Char)
 	}
 }
 
+void ASaucewichPlayerState::NotifySpawnToController()
+{
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
+	{
+		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
+		FOnCharacterSpawnedSingle OnCharacterSpawned;
+		OnCharacterSpawned.BindDynamic(this, &ASaucewichPlayerState::LoadWeaponLoadout);
+		PC->SafeCharacter(OnCharacterSpawned);
+	}
+}
+
 void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore)
 {
 	OnScoreAdded.Broadcast(ScoreName, ActualScore);
@@ -148,15 +159,7 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 void ASaucewichPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
-	{
-		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
-
-		FOnCharacterSpawnedSingle OnCharacterSpawned;
-		OnCharacterSpawned.BindDynamic(this, &ASaucewichPlayerState::LoadWeaponLoadout);
-		PC->SafeCharacter(OnCharacterSpawned);
-	}
+	NotifySpawnToController();
 }
 
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -167,17 +170,4 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASaucewichPlayerState, Kill);
 	DOREPLIFETIME(ASaucewichPlayerState, Death);
 	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
-}
-
-void ASaucewichPlayerState::CopyProperties(APlayerState* const PlayerState)
-{
-	Super::CopyProperties(PlayerState);
-
-	if (const auto PS = Cast<ASaucewichPlayerState>(PlayerState))
-	{
-		PS->SetTeam(Team);
-		PS->Kill = Kill;
-		PS->Death = Death;
-		PS->Objective = Objective;
-	}
 }

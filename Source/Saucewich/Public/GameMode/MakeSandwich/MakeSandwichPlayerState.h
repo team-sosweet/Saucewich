@@ -29,6 +29,7 @@ public:
 	ASandwichIngredient* PickingUp;
 
 protected:
+	void Reset() override;
 	void OnDeath() override;
 	void OnCharDestroyed() override;
 

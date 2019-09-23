@@ -207,7 +207,7 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
-	if (WonTeam != 0) return WonTeam;
+	if (WonTeam != InvalidTeam) return WonTeam;
 
 	const auto Empty = GetEmptyTeam();
 	if (Empty) return 3 - Empty;
