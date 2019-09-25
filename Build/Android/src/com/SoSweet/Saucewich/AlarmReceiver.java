@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.TeamSosweet.Saucewich;
+package com.SoSweet.Saucewich;
 
 import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
 
