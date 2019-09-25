@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.TeamSosweet.Saucewich;
+package com.SoSweet.Saucewich;
 
 import com.google.android.vending.expansion.downloader.impl.DownloaderService;
 
@@ -61,6 +61,6 @@ public class OBBDownloaderService extends DownloaderService {
      */
     @Override
     public String getAlarmReceiverClassName() {
-        return com.TeamSosweet.Saucewich.AlarmReceiver.class.getName();
+        return com.SoSweet.Saucewich.AlarmReceiver.class.getName();
     }
 }

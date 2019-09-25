@@ -1,10 +1,10 @@
 package com.epicgames.ue4;
 
-import com.TeamSosweet.Saucewich.OBBDownloaderService;
-import com.TeamSosweet.Saucewich.DownloaderActivity;
+import com.SoSweet.Saucewich.OBBDownloaderService;
+import com.SoSweet.Saucewich.DownloaderActivity;
 import android.app.Activity;
 import com.google.android.vending.expansion.downloader.Helpers;
-import com.TeamSosweet.Saucewich.OBBData;
+import com.SoSweet.Saucewich.OBBData;
 
 
 public class DownloadShim
