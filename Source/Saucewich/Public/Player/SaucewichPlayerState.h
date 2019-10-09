@@ -41,6 +41,9 @@ public:
 	uint8 GetObjective() const { return Objective; }
 	void SetObjective(uint8 NewObjective);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
+	void RequestSetPlayerName(const FString& NewPlayerName);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
 
