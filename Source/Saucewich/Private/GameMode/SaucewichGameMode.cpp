@@ -237,6 +237,12 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 	return false;
 }
 
+void ASaucewichGameMode::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+	ExtUpdatePlyCnt();
+}
+
 void ASaucewichGameMode::HandleMatchHasStarted()
 {
 	GameSession->HandleMatchHasStarted();
@@ -260,8 +266,15 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
 	
-	if (NumPlayers == 0) StartNextGame();
-	else GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+	if (NumPlayers == 0)
+	{
+		StartNextGame();
+	}
+	else
+	{
+		ExtUpdatePlyCnt(MaxPlayers);
+		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+	}
 }
 
 void ASaucewichGameMode::UpdateMatchState()
@@ -315,22 +328,25 @@ void ASaucewichGameMode::StartNextGame() const
 	GetWorld()->ServerTravel(URL);
 }
 
-void ASaucewichGameMode::ExtUpdatePlyCnt() const
+void ASaucewichGameMode::ExtUpdatePlyCnt(const int32 Override) const
 {
 	if (!IsRunningDedicatedServer()) return;
+	if (Override == -1 && MatchState == MatchState::WaitingPostMatch) return;
 	
 	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
 	{
-		GI->GetGameCode([this, GI](const FString& GameCode)
+		GI->GetGameCode([this, GI, Override](const FString& GameCode)
 		{
+			const auto Num = Override != -1 ? Override : NumPlayers;
+			
 			FJson Body;
-			Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(NumPlayers));
+			Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(Num));
 
 			FOnResponded OnResponded;
 			OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
 
 			GI->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
-			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NumPlayers);
+			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), Num);
 		});
 	}
 }
@@ -346,7 +362,7 @@ void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int
 	if (Code == 429)
 	{
 		constexpr float RetryRate = 1;
-		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, RetryRate);
+		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, [this]{ExtUpdatePlyCnt();}, RetryRate, false);
 		UE_LOG(LogExternalServer, Warning, TEXT("Requested player count update too frequently! Retrying in %f seconds..."), RetryRate);
 	}
 	else
