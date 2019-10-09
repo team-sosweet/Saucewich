@@ -18,7 +18,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void ShowError(FText Message);
+	void ShowError(FText Message, bool bCritical) const;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))

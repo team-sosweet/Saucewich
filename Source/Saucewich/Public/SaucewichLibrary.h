@@ -6,6 +6,8 @@
 #include "Engine/EngineTypes.h"
 #include "SaucewichLibrary.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
+
 UCLASS()
 class SAUCEWICH_API USaucewichLibrary final : public UBlueprintFunctionLibrary
 {
@@ -25,9 +27,21 @@ public:
 		float LifeSpan = 10
 	);
 
-	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
+	UFUNCTION(BlueprintPure, meta=(WorldContext=WorldContextObject))
 	static class AActorPool* GetActorPool(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
 	static void CleanupGame(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure)
+	static bool IsValidPlayerName(const FString& PlayerName);
+
+	UFUNCTION(BlueprintPure)
+	static int32 GetPlayerNameMinLen();
+
+	UFUNCTION(BlueprintPure)
+	static int32 GetPlayerNameMaxLen();
+
+	UFUNCTION(BlueprintPure)
+	static class UUserSettings* GetUserSettings();
 };

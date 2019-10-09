@@ -4,6 +4,8 @@
 
 #include "Widget/ErrorWidget.h"
 
+#include "SaucewichLibrary.h"
+
 void ABaseHUD::BeginPlay()
 {
 	Super::BeginPlay();
@@ -11,7 +13,14 @@ void ABaseHUD::BeginPlay()
 	ErrorWidget = CreateWidget<UErrorWidget>(GetOwningPlayerController(), ErrorWidgetClass);
 }
 
-void ABaseHUD::ShowError(const FText Message)
+void ABaseHUD::ShowError(const FText Message, const bool bCritical) const
 {
-	ErrorWidget->Activate(Message);
+	if (ErrorWidget)
+	{
+		ErrorWidget->Activate(Message, bCritical);
+	}
+	else
+	{
+		UE_LOG(LogSaucewich, Error, TEXT("ABaseHUD::ShowError called before BeginPlay. It'll be ignored."));
+	}
 }

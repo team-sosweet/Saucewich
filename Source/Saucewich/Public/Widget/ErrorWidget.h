@@ -14,15 +14,17 @@ class SAUCEWICH_API UErrorWidget final : public UUserWidget
 	void NativeOnInitialized() override;
 	
 public:
-	void Activate(const FText& Message);
+	void Activate(const FText& Message, bool bCritical);
 
 private:
 	UFUNCTION()
 	void OnClicked();
-
+	
 	UPROPERTY(Transient)
 	class UTextBlock* DescriptionText;
 
 	UPROPERTY(Transient)
 	class UButton* BackgroundButton;
+
+	uint8 bCriticalError : 1;
 };
