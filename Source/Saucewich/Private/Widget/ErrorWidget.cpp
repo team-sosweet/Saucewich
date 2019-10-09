@@ -15,13 +15,15 @@ void UErrorWidget::NativeOnInitialized()
 	BackgroundButton->OnClicked.AddDynamic(this, &UErrorWidget::OnClicked);
 }
 
-void UErrorWidget::Activate(const FText& Message)
+void UErrorWidget::Activate(const FText& Message, const bool bCritical)
 {
+	bCriticalError = bCritical;
 	DescriptionText->SetText(Message);
 	AddToViewport(10);
 }
 
 void UErrorWidget::OnClicked()
 {
+	if (bCriticalError) FPlatformMisc::RequestExit(false);
 	RemoveFromParent();
 }

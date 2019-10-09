@@ -95,7 +95,9 @@ public:
 
 	bool IsAutoFire() const { return bAutoFire; }
 
-	// void Callback(const FString&)
+	/**
+	 * @param Callback (const FString&) -> void
+	 */
 	template <class Fn>
 	void GetGameCode(Fn&& Callback)
 	{

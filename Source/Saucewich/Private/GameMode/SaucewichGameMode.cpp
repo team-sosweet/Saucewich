@@ -2,9 +2,10 @@
 
 #include "SaucewichGameMode.h"
 
+#include <iterator>
+
 #include "Engine/Engine.h"
 #include "Engine/PlayerStartPIE.h"
-#include "GameFramework/CheatManager.h"
 #include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,6 +18,7 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
+#include "SaucewichLibrary.h"
 #include "JsonData.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -50,40 +52,48 @@ void ASaucewichGameMode::BeginPlay()
 	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
 }
 
-APlayerController* ASaucewichGameMode::Login(UPlayer* const NewPlayer, const ENetRole InRemoteRole, const FString& Portal,
-	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+FString ASaucewichGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId,
+	const FString& Options, const FString& Portal)
 {
-	const auto PC = Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
-	if (!PC || !ErrorMessage.IsEmpty()) return nullptr;
+	check(NewPlayerController);
 
-	if (const auto Spc = Cast<ASaucewichPlayerController>(PC))
+	if (!NewPlayerController->PlayerState)
+		return "PlayerState is null";
+
+	GameSession->RegisterPlayer(NewPlayerController, UniqueId.GetUniqueNetId(), false);
+
+	
+	auto InName = UGameplayStatics::ParseOption(Options, "Name");
+	
+	if (!USaucewichLibrary::IsValidPlayerName(InName))
+		InName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), NewPlayerController->PlayerState->PlayerId);
+	
+	ChangeName(NewPlayerController, InName, false);
+
+	
+	return {};
+}
+
+void ASaucewichGameMode::ChangeName(AController* const Controller, const FString& NewName, const bool bNameChange)
+{
+	for (const auto Player : TActorRange<APlayerState>{GetWorld()})
 	{
-		const auto ID = UGameplayStatics::ParseOption(Options, "Id");
-		const auto Token = UGameplayStatics::ParseOption(Options, "AccessToken");
-
-#if UE_BUILD_SHIPPING
-		if (ID.IsEmpty())
+		if (Player == Controller->PlayerState || Player->IsPendingKill()) continue;
+		
+		auto Name = Player->GetPlayerName();
+		if (Name == NewName)
 		{
-			ErrorMessage = TEXT("No ID provided");
-			return nullptr;
-		}
-		if (Token.IsEmpty())
-		{
-			ErrorMessage = TEXT("No token provided");
-			return nullptr;
-		}
-#else
-		if (!ID.IsEmpty() && !Token.IsEmpty())
-#endif 
-		{
-			UE_LOG(LogGameMode, Log, TEXT("New player login. ID: %s, Token: %s"), *ID, *Token);
-			
-			Spc->SetID(ID, Token);
-			ChangeName(Spc, ID, true);
+			auto Cnt = 0;
+			for (auto i = Name.Len() - 1; i >= 0 && isdigit(Name[i]); --i, ++Cnt);
+			const auto Num = FCString::Atoi(*Name + Name.Len() - Cnt) + 1;
+			Name.RemoveAt(Name.Len() - Cnt, Cnt, false);
+			Name.AppendInt(Num);
+			return ChangeName(Controller, Name, bNameChange);
 		}
 	}
 	
-	return PC;
+	Controller->PlayerState->SetPlayerName(NewName);
+	K2_OnChangeName(Controller, NewName, bNameChange);
 }
 
 void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
@@ -206,7 +216,7 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 
 bool ASaucewichGameMode::ReadyToStartMatch_Implementation()
 {
-	return NumPlayers + NumBots >= MinPlayerToStart;
+	return NumPlayers >= MinPlayerToStart;
 }
 
 bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
@@ -218,7 +228,7 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 			return true;
 		}
 
-		if (GS->GetEmptyTeam() != 0)
+		if (NumPlayers == 0)
 		{
 			return true;
 		}
@@ -235,25 +245,6 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	GetWorldSettings()->NotifyBeginPlay();
 	GetWorldSettings()->NotifyMatchStarted();
 
-	const auto BugLocString = UGameplayStatics::ParseOption(OptionsString, TEXT("BugLoc"));
-	const auto BugRotString = UGameplayStatics::ParseOption(OptionsString, TEXT("BugRot"));
-	if (!BugLocString.IsEmpty() || !BugRotString.IsEmpty())
-	{
-		for (auto Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-		{
-			const auto PlayerController = Iterator->Get();
-			if (PlayerController && PlayerController->CheatManager)
-			{
-				PlayerController->CheatManager->BugItGoString(BugLocString, BugRotString);
-			}
-		}
-	}
-
-	if (IsHandlingReplays() && GetGameInstance() != nullptr)
-	{
-		GetGameInstance()->StartRecordingReplay(GetWorld()->GetMapName(), GetWorld()->GetMapName());
-	}
-
 	for (const auto Character : TActorRange<ATpsCharacter>{GetWorld()})
 	{
 		Character->KillSilent();
@@ -268,7 +259,9 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+	
+	if (NumPlayers == 0) StartNextGame();
+	else GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 }
 
 void ASaucewichGameMode::UpdateMatchState()

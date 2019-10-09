@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.SoSweet.Saucewich;
+package com.TeamSosweet.Saucewich;
 
 import com.android.vending.expansion.zipfile.ZipResourceFile;
 import com.android.vending.expansion.zipfile.ZipResourceFile.ZipEntryRO;

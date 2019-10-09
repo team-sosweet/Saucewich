@@ -10,6 +10,9 @@
 #include "Entity/ActorPool.h"
 #include "Entity/DecalPoolActor.h"
 #include "SaucewichGameInstance.h"
+#include "UserSettings.h"
+
+DEFINE_LOG_CATEGORY(LogSaucewich)
 
 USkeletalMesh* USaucewichLibrary::MergeMeshes(const TArray<USkeletalMesh*>& Meshes)
 {
@@ -73,4 +76,31 @@ void USaucewichLibrary::CleanupGame(const UObject* WorldContextObject)
 	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, APoolActor::StaticClass(), Actors);
 	for (const auto Actor : Actors)
 		CastChecked<APoolActor>(Actor)->Release();
+}
+
+bool USaucewichLibrary::IsValidPlayerName(const FString& PlayerName)
+{
+	const auto Len = PlayerName.Len();
+	if (Len < GetPlayerNameMinLen() || Len > GetPlayerNameMaxLen()) return false;
+
+	for (const auto C : PlayerName)
+		if (!isalnum(C)) return false;
+
+	return true;
+}
+
+int32 USaucewichLibrary::GetPlayerNameMinLen()
+{
+	return 1;
+}
+
+int32 USaucewichLibrary::GetPlayerNameMaxLen()
+{
+	return 20;
+}
+
+UUserSettings* USaucewichLibrary::GetUserSettings()
+{
+	static const auto UserSettings = NewObject<UUserSettings>(GetTransientPackage(), NAME_None, RF_MarkAsRootSet);
+	return UserSettings;
 }

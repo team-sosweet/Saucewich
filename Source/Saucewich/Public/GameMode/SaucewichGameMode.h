@@ -25,12 +25,14 @@ public:
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 	auto& GetAvailableMaps() const { return Maps; }
+	
+	void ChangeName(AController* Controller, const FString& NewName, bool bNameChange) override;
 
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
 
-	APlayerController* Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	FString InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId, const FString& Options, const FString& Portal) override;	
 	void PostLogin(APlayerController* NewPlayer) override;
 	void Logout(AController* Exiting) override;
 	
@@ -86,7 +88,7 @@ private:
 	uint8 MinPlayerToStart = 2;
 
 	UPROPERTY(EditDefaultsOnly)
-	uint8 MaxPlayers = 8;
+	uint8 MaxPlayers = 6;
 
 	uint8 bAboutToStartMatch : 1;
 };
