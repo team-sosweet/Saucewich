@@ -13,11 +13,12 @@ void ABaseHUD::BeginPlay()
 	ErrorWidget = CreateWidget<UErrorWidget>(GetOwningPlayerController(), ErrorWidgetClass);
 }
 
-void ABaseHUD::ShowError(const FText Message, const bool bCritical) const
+void ABaseHUD::ShowError(const FText Message, const bool bCritical)
 {
 	if (ErrorWidget)
 	{
 		ErrorWidget->Activate(Message, bCritical);
+		OnShowError();
 	}
 	else
 	{
