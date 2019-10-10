@@ -3,6 +3,7 @@
 #include "SaucewichPlayerState.h"
 
 #include "Engine/World.h"
+#include "EngineUtils.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
@@ -174,6 +175,27 @@ void ASaucewichPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 	NotifySpawnToController();
+}
+
+void ASaucewichPlayerState::SetPlayerName(const FString& S)
+{
+	for (const auto Player : TActorRange<APlayerState>{GetWorld()})
+	{
+		if (Player == this || Player->IsPendingKill()) continue;
+		
+		auto Name = Player->GetPlayerName();
+		if (Name == S)
+		{
+			auto Cnt = 0;
+			for (auto i = Name.Len() - 1; i >= 0 && isdigit(Name[i]); --i, ++Cnt) {}
+			const auto Num = FCString::Atoi(*Name + Name.Len() - Cnt) + 1;
+			Name.RemoveAt(Name.Len() - Cnt, Cnt, false);
+			Name.AppendInt(Num);
+			return SetPlayerName(Name);
+		}
+	}
+
+	Super::SetPlayerName(S);
 }
 
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

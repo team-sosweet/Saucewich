@@ -2,8 +2,6 @@
 
 #include "SaucewichGameMode.h"
 
-#include <iterator>
-
 #include "Engine/Engine.h"
 #include "Engine/PlayerStartPIE.h"
 #include "GameFramework/GameSession.h"
@@ -72,28 +70,6 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* NewPlayerController
 
 	
 	return {};
-}
-
-void ASaucewichGameMode::ChangeName(AController* const Controller, const FString& NewName, const bool bNameChange)
-{
-	for (const auto Player : TActorRange<APlayerState>{GetWorld()})
-	{
-		if (Player == Controller->PlayerState || Player->IsPendingKill()) continue;
-		
-		auto Name = Player->GetPlayerName();
-		if (Name == NewName)
-		{
-			auto Cnt = 0;
-			for (auto i = Name.Len() - 1; i >= 0 && isdigit(Name[i]); --i, ++Cnt);
-			const auto Num = FCString::Atoi(*Name + Name.Len() - Cnt) + 1;
-			Name.RemoveAt(Name.Len() - Cnt, Cnt, false);
-			Name.AppendInt(Num);
-			return ChangeName(Controller, Name, bNameChange);
-		}
-	}
-	
-	Controller->PlayerState->SetPlayerName(NewName);
-	K2_OnChangeName(Controller, NewName, bNameChange);
 }
 
 void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
@@ -272,7 +248,9 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	}
 	else
 	{
-		ExtUpdatePlyCnt(MaxPlayers);
+		if (const auto GI = GetGameInstance<USaucewichGameInstance>())
+			GI->GetGameCode([this](const FString& GameCode){ExtUpdatePlyCnt(GameCode, MaxPlayers);});
+
 		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 	}
 }
@@ -328,27 +306,34 @@ void ASaucewichGameMode::StartNextGame() const
 	GetWorld()->ServerTravel(URL);
 }
 
-void ASaucewichGameMode::ExtUpdatePlyCnt(const int32 Override) const
+void ASaucewichGameMode::ExtUpdatePlyCnt() const
 {
+#if !WITH_EDITOR
+	if (!IsValidLowLevel()) return;
 	if (!IsRunningDedicatedServer()) return;
-	if (Override == -1 && MatchState == MatchState::WaitingPostMatch) return;
-	
+
 	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
 	{
-		GI->GetGameCode([this, GI, Override](const FString& GameCode)
-		{
-			const auto Num = Override != -1 ? Override : NumPlayers;
-			
-			FJson Body;
-			Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(Num));
-
-			FOnResponded OnResponded;
-			OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
-
-			GI->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
-			UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), Num);
-		});
+		GI->GetGameCode([this](const FString& GameCode){ExtUpdatePlyCnt(GameCode, NumPlayers);});
 	}
+#endif
+}
+
+void ASaucewichGameMode::ExtUpdatePlyCnt(const FString& GameCode, const int32 NewCnt) const
+{
+#if !WITH_EDITOR
+	if (!IsValidLowLevel()) return;
+	if (!IsRunningDedicatedServer()) return;
+
+	FJson Body;
+	Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(NewCnt));
+
+	FOnResponded OnResponded;
+	OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
+
+	GetGameInstance<UHttpGameInstance>()->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
+	UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NewCnt);
+#endif
 }
 
 void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)
@@ -362,7 +347,7 @@ void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int
 	if (Code == 429)
 	{
 		constexpr float RetryRate = 1;
-		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, [this]{ExtUpdatePlyCnt();}, RetryRate, false);
+		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, RetryRate);
 		UE_LOG(LogExternalServer, Warning, TEXT("Requested player count update too frequently! Retrying in %f seconds..."), RetryRate);
 	}
 	else

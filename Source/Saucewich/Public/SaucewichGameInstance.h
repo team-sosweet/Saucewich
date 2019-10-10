@@ -101,6 +101,7 @@ public:
 	template <class Fn>
 	void GetGameCode(Fn&& Callback)
 	{
+#if !WITH_EDITOR
 		if (!GameCode.IsEmpty())
 		{
 			Callback(GameCode);
@@ -113,6 +114,7 @@ public:
 			GetRequest(FString::Printf(TEXT("room/game/%d"), PortForServer), {}, OnResponded);
 			UE_LOG(LogExternalServer, Log, TEXT("Requesting get game code..."));
 		}
+#endif
 	}
 
 	struct BroadcastGameStateSpawned;

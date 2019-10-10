@@ -10,29 +10,32 @@
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
-	if (const auto GI = GetGameInstance<UHttpGameInstance>())
+#if !WITH_EDITOR
+	const auto GI = GetGameInstance<UHttpGameInstance>();
+	const auto Port = GetWorld()->URL.Port;
+	const auto MaxPort = GI->GetMaxPort();
+	
+	if (Port <= MaxPort)
 	{
-		const auto Port = GetWorld()->URL.Port;
-		const auto MaxPort = GI->GetMaxPort();
-		if (Port <= MaxPort)
-		{
-			GI->PortForServer = GetWorld()->URL.Port;
+		GI->PortForServer = GetWorld()->URL.Port;
 
-			FJson Json;
-			Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(Port)));
-			
-			FOnResponded OnResponded;
-			OnResponded.BindDynamic(this, &ADedicatedServerDefaultGameMode::OnServerRegistered);
-			
-			GI->PostRequest(TEXT("room/port"), Json, OnResponded);
-			UE_LOG(LogExternalServer, Log, TEXT("Requesting server registration with port %d..."), Port);
-		}
-		else
-		{
-			UE_LOG(LogExternalServer, Error, TEXT("Port is out of maximum range! (Current: %d, Max: %d) Unable to register server."), Port, MaxPort);
-			StartServer();
-		}
+		FJson Json;
+		Json.Data.Add(TEXT("port"), UJsonData::MakeStringData(FString::FromInt(Port)));
+		
+		FOnResponded OnResponded;
+		OnResponded.BindDynamic(this, &ADedicatedServerDefaultGameMode::OnServerRegistered);
+		
+		GI->PostRequest(TEXT("room/port"), Json, OnResponded);
+		UE_LOG(LogExternalServer, Log, TEXT("Requesting server registration with port %d..."), Port);
 	}
+	else
+	{
+		UE_LOG(LogExternalServer, Error, TEXT("Port is out of maximum range! (Current: %d, Max: %d) Unable to register server."), Port, MaxPort);
+		StartServer();
+	}
+#else
+	StartServer();
+#endif
 }
 
 void ADedicatedServerDefaultGameMode::OnServerRegistered(const bool bIsSuccess, const int32 Code, FJson Json)

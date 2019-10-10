@@ -58,6 +58,7 @@ public:
 
 protected:
 	void BeginPlay() override;
+	void SetPlayerName(const FString& S) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
