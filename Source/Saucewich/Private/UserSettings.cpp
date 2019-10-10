@@ -3,23 +3,24 @@
 #include "UserSettings.h"
 #include "SaucewichLibrary.h"
 
-bool UUserSettings::SetPlayerName(const FString& NewPlayerName)
+ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 {
-	if (!USaucewichLibrary::IsValidPlayerName(NewPlayerName))
-		return false;
-	
-	PlayerName = NewPlayerName;
-	SaveConfig();
-	return true;
+	const auto Validity = USaucewichLibrary::IsValidPlayerName(NewPlayerName);
+	if (Validity == ENameValidity::Valid)
+	{
+		PlayerName = NewPlayerName;
+		SaveConfig();
+	}
+	return Validity;
 }
 
 void UUserSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
 
-	if (!USaucewichLibrary::IsValidPlayerName(PlayerName))
+	if (USaucewichLibrary::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 	{
-		PlayerName = "Player";
+		PlayerName = TEXT("유저");
 		SaveConfig();
 	}
 }

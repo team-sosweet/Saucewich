@@ -8,6 +8,12 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
 
+UENUM(BlueprintType)
+enum class ENameValidity : uint8
+{
+	Valid, Character, Length
+};
+
 UCLASS()
 class SAUCEWICH_API USaucewichLibrary final : public UBlueprintFunctionLibrary
 {
@@ -34,7 +40,7 @@ public:
 	static void CleanupGame(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure)
-	static bool IsValidPlayerName(const FString& PlayerName);
+	static ENameValidity IsValidPlayerName(const FString& PlayerName);
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMinLen();

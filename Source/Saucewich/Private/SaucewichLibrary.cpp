@@ -78,15 +78,17 @@ void USaucewichLibrary::CleanupGame(const UObject* WorldContextObject)
 		CastChecked<APoolActor>(Actor)->Release();
 }
 
-bool USaucewichLibrary::IsValidPlayerName(const FString& PlayerName)
+ENameValidity USaucewichLibrary::IsValidPlayerName(const FString& PlayerName)
 {
-	const auto Len = PlayerName.Len();
-	if (Len < GetPlayerNameMinLen() || Len > GetPlayerNameMaxLen()) return false;
-
+	auto Len = 0;
 	for (const auto C : PlayerName)
-		if (!isalnum(C)) return false;
-
-	return true;
+	{
+		if (isalnum(C) || C == '_') Len += 1;
+		else if (TEXT('가') <= C && C <= TEXT('힣')) Len += 2;
+		else return ENameValidity::Character;
+		if (Len > GetPlayerNameMaxLen()) return ENameValidity::Length;
+	}
+	return Len >= GetPlayerNameMinLen() ? ENameValidity::Valid : ENameValidity::Length;
 }
 
 int32 USaucewichLibrary::GetPlayerNameMinLen()
@@ -96,7 +98,7 @@ int32 USaucewichLibrary::GetPlayerNameMinLen()
 
 int32 USaucewichLibrary::GetPlayerNameMaxLen()
 {
-	return 10;
+	return 20;
 }
 
 UUserSettings* USaucewichLibrary::GetUserSettings()

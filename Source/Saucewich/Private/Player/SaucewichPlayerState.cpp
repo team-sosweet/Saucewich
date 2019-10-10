@@ -160,7 +160,7 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 
 void ASaucewichPlayerState::RequestSetPlayerName_Implementation(const FString& NewPlayerName)
 {
-	if (USaucewichLibrary::IsValidPlayerName(NewPlayerName))
+	if (USaucewichLibrary::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
 	{
 		SetPlayerName(NewPlayerName);
 	}

@@ -5,6 +5,8 @@
 #include "UObject/NoExportTypes.h"
 #include "UserSettings.generated.h"
 
+enum class ENameValidity : uint8;
+
 UCLASS(Config=UserSettings)
 class SAUCEWICH_API UUserSettings : public UObject
 {
@@ -12,7 +14,7 @@ class SAUCEWICH_API UUserSettings : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable)
-	bool SetPlayerName(const FString& NewPlayerName);
+	ENameValidity SetPlayerName(const FString& NewPlayerName);
 	const FString& GetPlayerName() const { return PlayerName; }
 	
 protected:
