@@ -198,6 +198,12 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 	Super::SetPlayerName(S);
 }
 
+void ASaucewichPlayerState::OnRep_PlayerName()
+{
+	Super::OnRep_PlayerName();
+	OnNameChanged.Broadcast(GetPlayerName());
+}
+
 void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

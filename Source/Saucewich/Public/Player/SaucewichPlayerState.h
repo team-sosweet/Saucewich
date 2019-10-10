@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreID, int32, ActualScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNameChanged, const FString&, NewName);
 
 UCLASS()
 class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
@@ -58,8 +59,10 @@ public:
 
 protected:
 	void BeginPlay() override;
-	void SetPlayerName(const FString& S) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SetPlayerName(const FString& S) override;
+	void OnRep_PlayerName() override;
 
 	UFUNCTION()
 	void OnTeamChanged(uint8 OldTeam);
@@ -76,6 +79,9 @@ private:
 	void LoadWeaponLoadout(class ATpsCharacter* Char);
 
 	void NotifySpawnToController();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnNameChanged OnNameChanged;
 
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
