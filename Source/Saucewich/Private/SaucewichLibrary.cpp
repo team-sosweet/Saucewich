@@ -98,7 +98,7 @@ int32 USaucewichLibrary::GetPlayerNameMinLen()
 
 int32 USaucewichLibrary::GetPlayerNameMaxLen()
 {
-	return 20;
+	return 16;
 }
 
 UUserSettings* USaucewichLibrary::GetUserSettings()
