@@ -61,12 +61,12 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* NewPlayerController
 	GameSession->RegisterPlayer(NewPlayerController, UniqueId.GetUniqueNetId(), false);
 
 	
-	auto InName = UGameplayStatics::ParseOption(Options, "Name");
+	auto PlayerName = UGameplayStatics::ParseOption(Options, "PlayerName");
 	
-	if (USaucewichLibrary::IsValidPlayerName(InName) != ENameValidity::Valid)
-		InName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), NewPlayerController->PlayerState->PlayerId);
+	if (USaucewichLibrary::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
+		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), NewPlayerController->PlayerState->PlayerId);
 	
-	ChangeName(NewPlayerController, InName, false);
+	ChangeName(NewPlayerController, PlayerName, false);
 
 	
 	return {};
