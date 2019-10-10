@@ -25,8 +25,6 @@ public:
 	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 	auto& GetAvailableMaps() const { return Maps; }
-	
-	void ChangeName(AController* Controller, const FString& NewName, bool bNameChange) override;
 
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -56,7 +54,8 @@ private:
 	void UpdateMatchState();
 	void StartNextGame() const;
 
-	void ExtUpdatePlyCnt(int32 Override = -1) const;
+	void ExtUpdatePlyCnt() const;
+	void ExtUpdatePlyCnt(const FString& GameCode, int32 NewCnt) const;
 
 	UFUNCTION()
 	void RespondExtUpdatePlyCnt(bool bIsSuccess, int32 Code, FJson Json);
