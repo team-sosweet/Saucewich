@@ -6,7 +6,6 @@
 #include "Json.h"
 #include "Names.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogMatchmaker, Log, All)
 
 namespace Matchmaker
 {
