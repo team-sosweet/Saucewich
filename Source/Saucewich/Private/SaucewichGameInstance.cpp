@@ -2,6 +2,7 @@
 
 #include "SaucewichGameInstance.h"
 
+#include "CoreDelegates.h"
 #include "Engine/World.h"
 
 #include "Entity/ActorPool.h"

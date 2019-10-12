@@ -7,7 +7,11 @@
 
 DECLARE_DELEGATE(FOnExpiration);
 
-struct FFeedContent {};
+USTRUCT()
+struct FFeedContent
+{
+	GENERATED_BODY()
+};
 
 UCLASS()
 class SAUCEWICH_API UFeed : public UUserWidget
@@ -19,7 +23,7 @@ protected:
 	
 public:
 	virtual void GetContent(FFeedContent& OutContent) const {}
-	virtual void SetContent(const FFeedContent& InContent){}
+	virtual void SetContent(const FFeedContent& InContent) { OnSetContent(); }
 	
 	void ViewFeed(float LifeTime);
 

@@ -2,7 +2,12 @@
 
 #include "Player/SaucewichPlayerController.h"
 
+#include "CoreDelegates.h"
+#include "Engine/Engine.h"
+#include "Engine/NetConnection.h"
+#include "Engine/NetDriver.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
 #include "GameMode/SaucewichGameMode.h"
@@ -33,16 +38,50 @@ void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSing
 	else OnPlayerStateSpawned.AddUnique(Delegate);
 }
 
-void ASaucewichPlayerController::InitMessage()
+void ASaucewichPlayerController::BeginPlay()
 {
-	if (!GetWorldTimerManager().TimerExists(MessageTimer))
-		ClearMessage();
+	Super::BeginPlay();
+
+	if (!HasAuthority())
+	{
+		FCoreDelegates::ApplicationHasReactivatedDelegate.AddUObject(this, &ThisClass::Ping);
+		FCoreDelegates::ApplicationHasEnteredForegroundDelegate.AddUObject(this, &ThisClass::Ping);
+	}
 }
 
 bool ASaucewichPlayerController::CanRespawn() const
 {
 	const auto Char = Cast<ATpsCharacter>(GetPawn());
 	return !Char || !Char->IsAlive() && GetRemainingRespawnTime() <= 0.f;
+}
+
+void ASaucewichPlayerController::Ping()
+{
+	GetWorldTimerManager().SetTimer(PingTimer, this, &ASaucewichPlayerController::OnPingFailed, PingTimeout);
+	ServerPing();
+}
+
+void ASaucewichPlayerController::OnPingFailed_Implementation()
+{
+	const auto World = GetWorld();
+	const auto NetDriver = World->GetNetDriver();
+	GEngine->BroadcastNetworkFailure(World, NetDriver, ENetworkFailure::ConnectionTimeout);
+	if (NetDriver->ServerConnection) NetDriver->ServerConnection->Close();
+}
+
+void ASaucewichPlayerController::ServerPing_Implementation()
+{
+	ClientPing();
+}
+
+bool ASaucewichPlayerController::ServerPing_Validate()
+{
+	return true;
+}
+
+void ASaucewichPlayerController::ClientPing_Implementation()
+{
+	GetWorldTimerManager().ClearTimer(PingTimer);
 }
 
 void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)
@@ -58,7 +97,7 @@ void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& 
 	}
 }
 
-void ASaucewichPlayerController::PrintMessage_Implementation(const FName MessageID, const float Duration)
+void ASaucewichPlayerController::PrintMessage_Implementation(const FName MessageID, const float Duration, const EMsgType Type)
 {
 	const auto GS = GetWorld()->GetGameState();
 	if (!GS) return;
@@ -68,8 +107,7 @@ void ASaucewichPlayerController::PrintMessage_Implementation(const FName Message
 
 	if (const auto Found = DefGm->GetMessage(MessageID))
 	{
-		Message = *Found;
-		GetWorldTimerManager().SetTimer(MessageTimer, this, &ASaucewichPlayerController::ClearMessage, Duration);
+		OnReceiveMessage.Broadcast(*Found, Duration, Type);
 	}
 }
 

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "FeedBox.generated.h"
 
@@ -17,7 +16,7 @@ public:
 	void MakeNewFeed(const struct FFeedContent& NewFeedContent);
 
 protected:
-	virtual void CopyContent(class UFeed* Dest, UFeed* Src);
+	virtual void CopyContent(class UFeed* Dest, const UFeed * Src);
 	
 private:	
 	UPROPERTY(Transient)

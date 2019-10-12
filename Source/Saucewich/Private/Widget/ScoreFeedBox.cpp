@@ -4,7 +4,7 @@
 
 #include "Widget/ScoreFeed.h"
 
-void UScoreFeedBox::CopyContent(UFeed* Dest, UFeed* Src)
+void UScoreFeedBox::CopyContent(UFeed* Dest, const UFeed* Src)
 {
 	FScoreFeedContent Content;
 	Src->GetContent(Content);

@@ -30,11 +30,11 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
 
-void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duration) const
+void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duration, const EMsgType Type) const
 {
 	for (const auto PC : TActorRange<ASaucewichPlayerController>{GetWorld()})
 	{
-		PC->PrintMessage(MessageID, Duration);
+		PC->PrintMessage(MessageID, Duration, Type);
 	}
 }
 
@@ -271,7 +271,7 @@ void ASaucewichGameMode::UpdateMatchState()
 			{
 				bAboutToStartMatch = true;
 				GetWorldTimerManager().SetTimer(MatchStateTimer, MatchStartingTime, false);
-				PrintMessage("StartingMatch", MatchStartingTime);
+				PrintMessage("StartingMatch", MatchStartingTime, EMsgType::Center);
 			}
 		}
 		else

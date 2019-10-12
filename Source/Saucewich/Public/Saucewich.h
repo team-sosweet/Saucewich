@@ -2,10 +2,14 @@
 
 #pragma once
 
-#include "ObjectMacros.h"
-
 UENUM(BlueprintType)
 enum class EGunTraceHit : uint8
 {
 	None, Pawn, Other
+};
+
+UENUM(BlueprintType)
+enum class EMsgType : uint8
+{
+	Center, Left
 };

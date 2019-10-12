@@ -17,5 +17,5 @@ void UScoreFeed::SetContent(const FFeedContent& InContent)
 	DisplayName = Content.DisplayName;
 	Score = Content.Score;
 
-	OnSetContent();
+	Super::SetContent(InContent);
 }
