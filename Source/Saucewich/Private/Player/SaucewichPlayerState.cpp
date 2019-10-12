@@ -8,6 +8,7 @@
 #include "UnrealNetwork.h"
 
 #include "SaucewichGameInstance.h"
+#include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerController.h"
@@ -160,7 +161,7 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 
 void ASaucewichPlayerState::RequestSetPlayerName_Implementation(const FString& NewPlayerName)
 {
-	if (USaucewichLibrary::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
+	if (GetPlayerName() != NewPlayerName && USaucewichLibrary::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
 	{
 		SetPlayerName(NewPlayerName);
 	}
@@ -195,7 +196,11 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 		}
 	}
 
+	auto Old = GetPlayerName();
 	Super::SetPlayerName(S);
+	
+	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+		GameMode->OnPlayerChangedName(this, MoveTemp(Old));
 }
 
 void ASaucewichPlayerState::OnRep_PlayerName()

@@ -17,7 +17,10 @@
 #include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
 #include "SaucewichLibrary.h"
-#include "JsonData.h"
+
+#if !WITH_EDITOR
+	#include "JsonData.h"
+#endif
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
@@ -30,12 +33,23 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
 
-void ASaucewichGameMode::PrintMessage(const FName MessageID, const float Duration, const EMsgType Type) const
+void ASaucewichGameMode::PrintMessage(const FText& Message, const EMsgType Type, const float Duration) const
 {
 	for (const auto PC : TActorRange<ASaucewichPlayerController>{GetWorld()})
 	{
-		PC->PrintMessage(MessageID, Duration, Type);
+		PC->PrintMessage(Message, Duration, Type);
 	}
+}
+
+const FText& ASaucewichGameMode::GetMessage(const FName ID) const
+{
+	const auto Found = Messages.Find(ID);
+	return Found ? *Found : FText::GetEmpty();
+}
+
+void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
+{
+	PrintMessage(FText::FormatOrdered(GetMessage("NameChange"), FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())), EMsgType::Left);
 }
 
 void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -271,7 +285,7 @@ void ASaucewichGameMode::UpdateMatchState()
 			{
 				bAboutToStartMatch = true;
 				GetWorldTimerManager().SetTimer(MatchStateTimer, MatchStartingTime, false);
-				PrintMessage("StartingMatch", MatchStartingTime, EMsgType::Center);
+				PrintMessage(GetMessage("StartingMatch"), EMsgType::Center, MatchStartingTime);
 			}
 		}
 		else
