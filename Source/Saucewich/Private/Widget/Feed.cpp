@@ -7,26 +7,22 @@
 void UFeed::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
 	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UFeed::ViewFeed(const float LifeTime)
 {
-	CurLifeTime = LifeTime;
-	
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	GetWorld()->GetTimerManager().SetTimer(LifeTimerHandle, this, &UFeed::LifetimeExpired, LifeTime);
+}
 
-	GetWorld()->GetTimerManager().ClearTimer(LifeTimerHandle);
-	GetWorld()->GetTimerManager().SetTimer(LifeTimerHandle, [this]
-		{
-			CurLifeTime -= 0.1f;
+float UFeed::GetCurLifeTime() const
+{
+	return GetWorld()->GetTimerManager().GetTimerRemaining(LifeTimerHandle);
+}
 
-			if (CurLifeTime <= 0.0f)
-			{
-				GetWorld()->GetTimerManager().ClearTimer(LifeTimerHandle);
-				SetVisibility(ESlateVisibility::Hidden);
-				OnExpiration.ExecuteIfBound();
-			}
-		}, 0.1f, true);
+void UFeed::LifetimeExpired()
+{
+	SetVisibility(ESlateVisibility::Hidden);
+	OnExpiration.ExecuteIfBound();
 }

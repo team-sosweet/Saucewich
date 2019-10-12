@@ -32,7 +32,7 @@ void UFeedBox::NativeOnInitialized()
 
 void UFeedBox::MakeNewFeed(const FFeedContent& NewFeedContent)
 {
-	for (auto Index = CurFeedNum++; Index > 0u; Index--)
+	for (auto Index = FMath::Min<int32>(CurFeedNum, FeedNum-1); Index > 0; --Index)
 	{
 		CopyContent(Feeds[Index], Feeds[Index - 1]);
 		Feeds[Index]->ViewFeed(Feeds[Index - 1]->GetCurLifeTime());
@@ -40,6 +40,8 @@ void UFeedBox::MakeNewFeed(const FFeedContent& NewFeedContent)
 	
 	Feeds[0]->SetContent(NewFeedContent);
 	Feeds[0]->ViewFeed(FeedLifeTime);
+
+	CurFeedNum = FMath::Min<uint8>(CurFeedNum+1, FeedNum);
 }
 
 void UFeedBox::CopyContent(UFeed* Dest, const UFeed * Src)

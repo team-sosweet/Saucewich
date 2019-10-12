@@ -27,7 +27,7 @@ public:
 	
 	void ViewFeed(float LifeTime);
 
-	float GetCurLifeTime() const { return CurLifeTime; };
+	float GetCurLifeTime() const;
 	
 	FOnExpiration OnExpiration;
 
@@ -36,7 +36,7 @@ protected:
 	void OnSetContent();
 	
 private:
+	void LifetimeExpired();
+	
 	FTimerHandle LifeTimerHandle;
-
-	float CurLifeTime;
 };
