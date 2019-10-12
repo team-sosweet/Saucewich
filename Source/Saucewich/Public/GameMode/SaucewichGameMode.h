@@ -22,10 +22,12 @@ public:
 	float GetPickupSpawnInterval() const { return PickupSpawnInterval; }
 
 	UFUNCTION(BlueprintCallable)
-	void PrintMessage(FName MessageID, float Duration, EMsgType Type) const;
-	const FText* GetMessage(const FName ID) const { return Messages.Find(ID); }
+	void PrintMessage(const FText& Message, EMsgType Type, float Duration = 3) const;
+	const FText& GetMessage(FName ID) const;
 
 	auto& GetAvailableMaps() const { return Maps; }
+
+	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
 
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;

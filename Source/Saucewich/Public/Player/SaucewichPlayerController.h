@@ -38,7 +38,7 @@ public:
 	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void PrintMessage(FName MessageID, float Duration, EMsgType Type);
+	void PrintMessage(const FText& Message, float Duration, EMsgType Type);
 
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;

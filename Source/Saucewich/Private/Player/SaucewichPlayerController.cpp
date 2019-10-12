@@ -97,18 +97,9 @@ void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& 
 	}
 }
 
-void ASaucewichPlayerController::PrintMessage_Implementation(const FName MessageID, const float Duration, const EMsgType Type)
+void ASaucewichPlayerController::PrintMessage_Implementation(const FText& Message, const float Duration, const EMsgType Type)
 {
-	const auto GS = GetWorld()->GetGameState();
-	if (!GS) return;
-
-	const auto DefGm = GS->GetDefaultGameMode<ASaucewichGameMode>();
-	if (!DefGm) return;
-
-	if (const auto Found = DefGm->GetMessage(MessageID))
-	{
-		OnReceiveMessage.Broadcast(*Found, Duration, Type);
-	}
+	OnReceiveMessage.Broadcast(Message, Duration, Type);
 }
 
 void ASaucewichPlayerController::ServerRespawn_Implementation()
