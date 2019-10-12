@@ -29,6 +29,7 @@ void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapo
 {
 	SetWeapon_Internal(Slot, Weapon);
 	if (!HasAuthority()) ServerSetWeapon(Slot, Weapon);
+	if (CastChecked<AController>(GetOwner())->IsLocalController()) SaveWeaponLoadout();
 }
 
 void ASaucewichPlayerState::SaveWeaponLoadout() const
@@ -106,29 +107,26 @@ void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclass
 	WeaponLoadout[Slot] = Weapon;
 }
 
-void ASaucewichPlayerState::LoadWeaponLoadout(ATpsCharacter* const Char)
+void ASaucewichPlayerState::ServerSetWeaponLoadout_Implementation(const TArray<TSubclassOf<AWeapon>>& Loadout)
 {
-	if (Char->IsLocallyControlled())
-	{
-		if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		{
-			auto& Loadout = GI->GetWeaponLoadout();
-			for (auto i = 0; i < Loadout.Num(); ++i)
-			{
-				SetWeapon(i, Loadout[i]);
-			}
-		}
-	}
+	WeaponLoadout = Loadout;
 }
 
-void ASaucewichPlayerState::NotifySpawnToController()
+bool ASaucewichPlayerState::ServerSetWeaponLoadout_Validate(const TArray<TSubclassOf<AWeapon>>& Loadout)
 {
-	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
+	return true;
+}
+
+void ASaucewichPlayerState::LoadWeaponLoadout()
+{
+	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
 	{
-		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
-		FOnCharacterSpawnedSingle OnCharacterSpawned;
-		OnCharacterSpawned.BindDynamic(this, &ASaucewichPlayerState::LoadWeaponLoadout);
-		PC->SafeCharacter(OnCharacterSpawned);
+		auto& Saved = GI->GetWeaponLoadout();
+		
+		for (auto i = 0; i < Saved.Num(); ++i)
+			if (Saved[i]) SetWeapon_Internal(i, Saved[i]);
+		
+		if (!HasAuthority()) ServerSetWeaponLoadout(WeaponLoadout);
 	}
 }
 
@@ -175,7 +173,16 @@ bool ASaucewichPlayerState::RequestSetPlayerName_Validate(const FString& NewPlay
 void ASaucewichPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-	NotifySpawnToController();
+	
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
+	{
+		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
+
+		if (PC->IsLocalController())
+		{
+			LoadWeaponLoadout();
+		}
+	}
 }
 
 void ASaucewichPlayerState::SetPlayerName(const FString& S)

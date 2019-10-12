@@ -18,6 +18,7 @@ public:
 	void SetTeam(uint8 NewTeam);
 	uint8 GetTeam() const { return Team; }
 
+	UFUNCTION(BlueprintCallable)
 	void SetWeapon(uint8 Slot, TSubclassOf<class AWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable)
@@ -68,17 +69,17 @@ protected:
 	void OnTeamChanged(uint8 OldTeam);
 
 private:
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetWeapon(uint8 Slot, TSubclassOf<AWeapon> Weapon);
 	void SetWeapon_Internal(uint8 Slot, TSubclassOf<AWeapon> Weapon);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetWeaponLoadout(const TArray<TSubclassOf<AWeapon>>& Loadout);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreID, int32 ActualScore);
 
-	UFUNCTION()
-	void LoadWeaponLoadout(class ATpsCharacter* Char);
-
-	void NotifySpawnToController();
+	void LoadWeaponLoadout();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnNameChanged OnNameChanged;
