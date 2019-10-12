@@ -51,6 +51,7 @@ public:
 
 protected:
 	void BeginPlay() override;
+	void InitPlayerState() override;
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnPingFailed();

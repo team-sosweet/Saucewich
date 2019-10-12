@@ -198,9 +198,10 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 
 	auto Old = GetPlayerName();
 	Super::SetPlayerName(S);
-	
-	if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
-		GameMode->OnPlayerChangedName(this, MoveTemp(Old));
+
+	if (!Old.IsEmpty())
+		if (const auto GameMode = GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+			GameMode->OnPlayerChangedName(this, MoveTemp(Old));
 }
 
 void ASaucewichPlayerState::OnRep_PlayerName()

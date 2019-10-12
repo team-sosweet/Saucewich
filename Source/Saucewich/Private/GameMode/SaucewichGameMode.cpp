@@ -49,7 +49,7 @@ const FText& ASaucewichGameMode::GetMessage(const FName ID) const
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
 {
-	PrintMessage(FText::FormatOrdered(GetMessage("NameChange"), FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())), EMsgType::Left);
+	PrintMessage(FText::Format(GetMessage("NameChange"), FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())), EMsgType::Left);
 }
 
 void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -90,12 +90,14 @@ void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 	ExtUpdatePlyCnt();
+	PrintMessage(FText::Format(GetMessage("Login"), FText::FromString(NewPlayer->PlayerState->GetPlayerName())), EMsgType::Left);
 }
 
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
 	ExtUpdatePlyCnt();
+	PrintMessage(FText::Format(GetMessage("Logout"), FText::FromString(Exiting->PlayerState->GetPlayerName())), EMsgType::Left);
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)

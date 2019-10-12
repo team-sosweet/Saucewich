@@ -49,6 +49,35 @@ void ASaucewichPlayerController::BeginPlay()
 	}
 }
 
+void ASaucewichPlayerController::InitPlayerState()
+{
+	if (GetNetMode() != NM_Client)
+	{
+		const auto World = GetWorld();
+		const AGameModeBase* GameMode = World ? World->GetAuthGameMode() : nullptr;
+
+		if (!GameMode)
+		{
+			const AGameStateBase* const GameState = World ? World->GetGameState() : nullptr;
+			GameMode = GameState ? GameState->GetDefaultGameMode() : nullptr;
+		}
+
+		if (GameMode)
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.Owner = this;
+			SpawnInfo.Instigator = Instigator;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnInfo.ObjectFlags |= RF_Transient;
+
+			auto PlayerStateClassToSpawn = GameMode->PlayerStateClass;
+			if (!PlayerStateClassToSpawn) PlayerStateClassToSpawn = ASaucewichPlayerState::StaticClass();
+
+			PlayerState = World->SpawnActor<APlayerState>(PlayerStateClassToSpawn, SpawnInfo);
+		}
+	}
+}
+
 bool ASaucewichPlayerController::CanRespawn() const
 {
 	const auto Char = Cast<ATpsCharacter>(GetPawn());
