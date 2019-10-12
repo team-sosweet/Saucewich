@@ -62,13 +62,28 @@ private:
 
 	UFUNCTION()
 	void RespondExtUpdatePlyCnt(bool bIsSuccess, int32 Code, FJson Json);
-	
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSoftObjectPtr<UWorld>> Maps;
+
+	template <class... Ts>
+	void PrintAndLogFmtMsg(const FName MsgID, Ts&&... Args)
+	{
+		static_assert(TAnd<TIsConstructible<FFormatArgumentValue, Ts>...>::Value, "Invalid argument type passed");
+		static_assert(sizeof...(Args) > 0, "Expected at least 1 argument");
+
+		auto Fmt = CompiledMsgFmt.Find(MsgID);
+		if (!Fmt) Fmt = &CompiledMsgFmt.Add(MsgID, GetMessage(MsgID));
+		
+		const auto Msg = FText::FormatOrdered(*Fmt, Forward<Ts>(Args)...);
+		PrintMessage(Msg, EMsgType::Left);
+		UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
+	}
 	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FText> Messages;
+	TMap<FName, FTextFormat> CompiledMsgFmt;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSoftObjectPtr<UWorld>> Maps;
+	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
 	FTimerHandle ExtPlyCntUpdateTimer;
