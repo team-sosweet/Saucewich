@@ -4,7 +4,7 @@
 
 #include "Widget/KillFeed.h"
 
-void UKillFeedBox::CopyContent(UFeed* Dest, UFeed* Src)
+void UKillFeedBox::CopyContent(UFeed* Dest, const UFeed* Src)
 {
 	FKillFeedContent Content;
 	Src->GetContent(Content);

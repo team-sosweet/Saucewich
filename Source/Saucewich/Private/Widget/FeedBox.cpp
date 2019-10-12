@@ -42,7 +42,7 @@ void UFeedBox::MakeNewFeed(const FFeedContent& NewFeedContent)
 	Feeds[0]->ViewFeed(FeedLifeTime);
 }
 
-void UFeedBox::CopyContent(UFeed* Dest, UFeed* Src)
+void UFeedBox::CopyContent(UFeed* Dest, const UFeed * Src)
 {
 	check(0);
 }

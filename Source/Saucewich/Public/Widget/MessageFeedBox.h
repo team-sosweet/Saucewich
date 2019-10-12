@@ -3,12 +3,13 @@
 #pragma once
 
 #include "Widget/FeedBox.h"
-#include "ScoreFeedBox.generated.h"
+#include "MessageFeedBox.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UScoreFeedBox final : public UFeedBox
+class SAUCEWICH_API UMessageFeedBox : public UFeedBox
 {
 	GENERATED_BODY()
-
+	
+protected:
 	void CopyContent(UFeed* Dest, const UFeed* Src) override;
 };

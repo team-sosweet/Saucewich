@@ -28,13 +28,13 @@ public:
 	UHttpGameInstance();
 	
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GET"))
-	void GetRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded, const FString Base = TEXT(""));
+	void GetRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded, FString Base = TEXT(""));
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "POST"))
-	void PostRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded, const FString Base = TEXT(""));
+	void PostRequest(const FString& Url, FJson Json, const FOnResponded& OnResponded, FString Base = TEXT(""));
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PUT"))
-	void PutRequest(const FString& Url, FJson HeaderJson, FJson BodyJson, const FOnResponded& OnResponded, const FString Base = TEXT(""));
+	void PutRequest(const FString& Url, FJson HeaderJson, FJson BodyJson, const FOnResponded& OnResponded, FString Base = TEXT(""));
 
 	int32 GetMaxPort() const { return MaxPort; }
 	int32 PortForServer;

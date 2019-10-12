@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/PlayerController.h"
+#include "Saucewich.h"
 #include "SaucewichPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateSpawned, class ASaucewichPlayerState*, PlayerState);
@@ -10,6 +11,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, ASaucewichPlayerS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsCharacter*, Character);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharRespawn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveMessage, const FText&, Message, float, Duration, EMsgType, Type);
 
 UCLASS()
 class SAUCEWICH_API ASaucewichPlayerController final : public APlayerController
@@ -36,28 +38,42 @@ public:
 	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void PrintMessage(FName MessageID, float Duration);
-
-	void InitMessage();
+	void PrintMessage(FName MessageID, float Duration, EMsgType Type);
 
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCharRespawn OnCharRespawn;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnReceiveMessage OnReceiveMessage;
+
+protected:
+	void BeginPlay() override;
 	
+	UFUNCTION(BlueprintNativeEvent)
+	void OnPingFailed();
+
 private:
 	bool CanRespawn() const;
-	void ClearMessage() { Message = FText::GetEmpty(); }
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FText Message;
 
+	void Ping();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPing();
+
+	UFUNCTION(Client, Reliable)
+	void ClientPing();
+	
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
 	FOnCharacterSpawned OnCharacterSpawned;
 
 	FTimerHandle RespawnTimer;
-	FTimerHandle MessageTimer;
+	FTimerHandle PingTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PingTimeout = 1;
 };
 
 struct ASaucewichPlayerController::BroadcastPlayerStateSpawned

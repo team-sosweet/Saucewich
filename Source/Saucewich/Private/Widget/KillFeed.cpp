@@ -19,5 +19,5 @@ void UKillFeed::SetContent(const FFeedContent& InContent)
 	Attacker = Content.Attacker;
 	Inflictor = Content.Inflictor;
 
-	OnSetContent();
+	Super::SetContent(InContent);
 }

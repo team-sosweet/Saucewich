@@ -10,5 +10,5 @@ class SAUCEWICH_API UKillFeedBox final : public UFeedBox
 {
 	GENERATED_BODY()
 
-	void CopyContent(UFeed* Dest, UFeed* Src) override;
+	void CopyContent(UFeed* Dest, const UFeed* Src) override;
 };

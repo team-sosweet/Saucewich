@@ -142,10 +142,6 @@ void ASaucewichGameState::HandleMatchHasStarted()
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
 
-	const auto PC = GetWorld()->GetFirstPlayerController<ASaucewichPlayerController>();
-	if (PC && PC->IsLocalController())
-		PC->InitMessage();
-
 	USaucewichLibrary::CleanupGame(this);
 }
 

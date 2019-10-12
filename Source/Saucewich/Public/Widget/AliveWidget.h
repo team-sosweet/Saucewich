@@ -5,28 +5,37 @@
 #include "Widget/BaseWidget.h"
 #include "AliveWidget.generated.h"
 
+enum class EMsgType : uint8;
+class UFeedBox;
+
 UCLASS()
 class SAUCEWICH_API UAliveWidget final : public UBaseWidget
 {
 	GENERATED_BODY()
 
+protected:
 	void NativeOnInitialized() override;
 
+private:
 	UFUNCTION()
 	void OnPlayerStateSpawned(class ASaucewichPlayerState* PlayerState);
 	
 	UFUNCTION()
-	void OnPlayerDeath(class ASaucewichPlayerState* Victim,
-		ASaucewichPlayerState* Attacker, AActor* Inflictor);
+	void OnPlayerDeath(class ASaucewichPlayerState* Victim, ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
 	UFUNCTION()
 	void OnScoreAdded(FName ScoreID, int32 ActualScore);
 
-	UPROPERTY(Transient)
-	class UFeedBox* KillFeedBox;
+	UFUNCTION()
+	void PrintMessage(const FText& Message, float Duration, EMsgType Type);
+	void ClearCenterMessage() const;
 
-	UPROPERTY(Transient)
-	class UFeedBox* ScoreFeedBox;
+	UFeedBox* KillFeedBox;
+	UFeedBox* ScoreFeedBox;
+	UFeedBox* MessageFeedBox;
+	class UTextBlock* CenterText;
 
 	class ASaucewichGameState* GameState;
+
+	FTimerHandle CenterTextTimer;
 };

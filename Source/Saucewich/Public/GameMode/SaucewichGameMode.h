@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
+#include "Saucewich.h"
 #include "HttpGameInstance.h"
 #include "SaucewichGameMode.generated.h"
 
@@ -21,8 +22,8 @@ public:
 	float GetPickupSpawnInterval() const { return PickupSpawnInterval; }
 
 	UFUNCTION(BlueprintCallable)
-	void PrintMessage(FName MessageID, float Duration = 3) const;
-	auto GetMessage(const FName ID) const { return Messages.Find(ID); }
+	void PrintMessage(FName MessageID, float Duration, EMsgType Type) const;
+	const FText* GetMessage(const FName ID) const { return Messages.Find(ID); }
 
 	auto& GetAvailableMaps() const { return Maps; }
 
