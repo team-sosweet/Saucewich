@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, ASaucewichPlayerS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsCharacter*, Character);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharRespawn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveMessage, const FText&, Message, float, Duration, EMsgType, Type);
 
 UCLASS()
@@ -45,6 +46,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCharRespawn OnCharRespawn;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharDied OnCharDied;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnReceiveMessage OnReceiveMessage;

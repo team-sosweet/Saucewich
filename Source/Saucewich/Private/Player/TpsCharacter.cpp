@@ -294,6 +294,11 @@ void ATpsCharacter::KillSilent()
 
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
+
+	if (const auto PC = GetController<ASaucewichPlayerController>())
+	{
+		PC->OnCharDied.Broadcast();
+	}
 }
 
 void ATpsCharacter::MoveForward(const float AxisValue)
@@ -377,6 +382,11 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
+	
+	if (const auto PC = GetController<ASaucewichPlayerController>())
+	{
+		PC->OnCharDied.Broadcast();
+	}
 	
 	if (HasAuthority())
 	{
