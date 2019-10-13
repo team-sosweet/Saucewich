@@ -121,10 +121,8 @@ void ASaucewichPlayerState::LoadWeaponLoadout()
 {
 	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
 	{
-		auto& Saved = GI->GetWeaponLoadout();
-		
-		for (auto i = 0; i < Saved.Num(); ++i)
-			if (Saved[i]) SetWeapon_Internal(i, Saved[i]);
+		for (const auto Wep : GI->GetWeaponLoadout())
+			if (Wep) SetWeapon_Internal(Wep.GetDefaultObject()->GetWeaponData().Slot, Wep);
 		
 		if (!HasAuthority()) ServerSetWeaponLoadout(WeaponLoadout);
 	}
