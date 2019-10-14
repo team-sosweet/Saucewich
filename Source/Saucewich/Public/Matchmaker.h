@@ -34,7 +34,6 @@ private:
 	void Error(EMMResponse Code);
 	void Reset();
 	
-	FString TicketID;
 	TSharedPtr<class IHttpRequest> Handle;
 	FOnStartMatchmakingResponse OnResponse;
 };
