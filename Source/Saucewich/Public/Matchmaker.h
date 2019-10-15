@@ -29,7 +29,6 @@ public:
 	void BindCallback(const FOnStartMatchmakingResponse& Callback);
 
 private:
-	void OnPingComplete(int32 LatencyInMs);
 	void OnMatchmakingComplete(const class FJsonObject& Content);
 	void ProcessRequest();
 	void Error(EMMResponse Code);
