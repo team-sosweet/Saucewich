@@ -6,7 +6,7 @@
 #include "ExplosiveProjectile.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AExplosiveProjectile final : public AProjectile
+class SAUCEWICH_API AExplosiveProjectile : public AProjectile
 {
 	GENERATED_BODY()
 

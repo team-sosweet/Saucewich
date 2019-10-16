@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveMessage, const FText&, Message, float, Duration, EMsgType, Type);
 
 UCLASS()
-class SAUCEWICH_API ASaucewichPlayerController final : public APlayerController
+class SAUCEWICH_API ASaucewichPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 

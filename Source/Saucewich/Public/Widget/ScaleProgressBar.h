@@ -6,7 +6,7 @@
 #include "ScaleProgressBar.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UScaleProgressBar final : public UUserWidget
+class SAUCEWICH_API UScaleProgressBar : public UUserWidget
 {
 	GENERATED_BODY()
 

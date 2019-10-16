@@ -7,7 +7,7 @@
 #include "DedicatedServerDefaultGameMode.generated.h"
 
 UCLASS()
-class SAUCEWICH_API ADedicatedServerDefaultGameMode final : public AGameModeBase
+class SAUCEWICH_API ADedicatedServerDefaultGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

@@ -6,7 +6,7 @@
 #include "UserInfo.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UUserInfo final : public UUserWidget
+class SAUCEWICH_API UUserInfo : public UUserWidget
 {
 	GENERATED_BODY()
 

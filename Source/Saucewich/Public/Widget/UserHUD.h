@@ -8,7 +8,7 @@
 #include "UserHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UUserHUD final : public UBaseWidget
+class SAUCEWICH_API UUserHUD : public UBaseWidget
 {
 	GENERATED_BODY()
 

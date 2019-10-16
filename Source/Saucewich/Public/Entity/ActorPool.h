@@ -6,7 +6,7 @@
 #include "ActorPool.generated.h"
 
 UCLASS(NotBlueprintable)
-class SAUCEWICH_API AActorPool final : public AActor
+class SAUCEWICH_API AActorPool : public AActor
 {
 	GENERATED_BODY()
 	

@@ -9,7 +9,7 @@
 DECLARE_DELEGATE_OneParam(FOnRemove, class UCombatText*);
 
 UCLASS()
-class SAUCEWICH_API UCombatText final : public UUserWidget
+class SAUCEWICH_API UCombatText : public UUserWidget
 {
 	GENERATED_BODY()
 

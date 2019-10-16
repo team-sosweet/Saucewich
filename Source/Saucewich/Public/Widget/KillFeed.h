@@ -5,7 +5,7 @@
 #include "Widget/Feed.h"
 #include "KillFeed.generated.h"
 
-struct FKillFeedContent final : FFeedContent
+struct FKillFeedContent : FFeedContent
 {
 	FKillFeedContent() = default;
 	
@@ -19,7 +19,7 @@ struct FKillFeedContent final : FFeedContent
 };
 
 UCLASS()
-class SAUCEWICH_API UKillFeed final : public UFeed
+class SAUCEWICH_API UKillFeed : public UFeed
 {
 	GENERATED_BODY()
 

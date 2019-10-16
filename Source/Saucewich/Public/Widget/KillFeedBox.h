@@ -6,7 +6,7 @@
 #include "KillFeedBox.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UKillFeedBox final : public UFeedBox
+class SAUCEWICH_API UKillFeedBox : public UFeedBox
 {
 	GENERATED_BODY()
 

@@ -6,7 +6,7 @@
 #include "DeathWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UDeathWidget final : public UBaseWidget
+class SAUCEWICH_API UDeathWidget : public UBaseWidget
 {
 	GENERATED_BODY()
 	

@@ -63,11 +63,12 @@ private:
 	UFUNCTION()
 	void RespondExtUpdatePlyCnt(bool bIsSuccess, int32 Code, FJson Json);
 
+	void PrintAndLogFmtMsg(FName MsgID) const;
+
 	template <class... Ts>
-	void PrintAndLogFmtMsg(const FName MsgID, Ts&&... Args)
+	auto PrintAndLogFmtMsg(const FName MsgID, Ts&&... Args) -> typename TEnableIf<(sizeof...(Args) > 0)>::Type
 	{
 		static_assert(TAnd<TIsConstructible<FFormatArgumentValue, Ts>...>::Value, "Invalid argument type passed");
-		static_assert(sizeof...(Args) > 0, "Expected at least 1 argument");
 
 		auto Fmt = CompiledMsgFmt.Find(MsgID);
 		if (!Fmt) Fmt = &CompiledMsgFmt.Add(MsgID, GetMessage(MsgID));

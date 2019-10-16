@@ -6,7 +6,7 @@
 #include "TpsAnimInstance.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UTpsAnimInstance final : public UAnimInstance
+class SAUCEWICH_API UTpsAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 

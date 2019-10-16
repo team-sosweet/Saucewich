@@ -9,7 +9,7 @@ enum class EMsgType : uint8;
 class UFeedBox;
 
 UCLASS()
-class SAUCEWICH_API UAliveWidget final : public UBaseWidget
+class SAUCEWICH_API UAliveWidget : public UBaseWidget
 {
 	GENERATED_BODY()
 

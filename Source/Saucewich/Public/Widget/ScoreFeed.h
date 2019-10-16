@@ -5,7 +5,7 @@
 #include "Widget/Feed.h"
 #include "ScoreFeed.generated.h"
 
-struct FScoreFeedContent final : FFeedContent
+struct FScoreFeedContent : FFeedContent
 {
 	FScoreFeedContent() = default;
 	
@@ -17,7 +17,7 @@ struct FScoreFeedContent final : FFeedContent
 };
 
 UCLASS()
-class SAUCEWICH_API UScoreFeed final : public UFeed
+class SAUCEWICH_API UScoreFeed : public UFeed
 {
 	GENERATED_BODY()
 	

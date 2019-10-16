@@ -7,7 +7,7 @@
 #include "ResultWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UResultWidget final : public UBaseWidget
+class SAUCEWICH_API UResultWidget : public UBaseWidget
 {
 	GENERATED_BODY()
 	

@@ -43,8 +43,11 @@ void ASaucewichGameMode::PrintMessage(const FText& Message, const EMsgType Type,
 
 const FText& ASaucewichGameMode::GetMessage(const FName ID) const
 {
-	const auto Found = Messages.Find(ID);
-	return Found ? *Found : FText::GetEmpty();
+	if (const auto Found = Messages.Find(ID))
+		return *Found;
+
+	UE_LOG(LogGameMode, Error, TEXT("메시지 ID '%s'에 대한 메시지 텍스트가 없습니다!"), *ID.ToString());
+	return FText::GetEmpty();
 }
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
@@ -252,6 +255,8 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	{
 		Spawner->SetSpawnTimer();
 	}
+
+	PrintAndLogFmtMsg("MatchStart");
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()
@@ -370,4 +375,11 @@ void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int
 	{
 		UE_LOG(LogExternalServer, Error, TEXT("Failed to update player count of external server. Error code: %d"), Code);
 	}
+}
+
+void ASaucewichGameMode::PrintAndLogFmtMsg(const FName MsgID) const
+{
+	auto&& Msg = GetMessage(MsgID);
+	PrintMessage(Msg, EMsgType::Center);
+	UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
 }

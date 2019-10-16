@@ -7,7 +7,7 @@
 #include "JsonData.generated.h"
 
 UCLASS(Blueprintable)
-class SAUCEWICH_API UJsonData final : public UObject
+class SAUCEWICH_API UJsonData : public UObject
 {
 	GENERATED_BODY()
 

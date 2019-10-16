@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangedColor, const FLinearColor&
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangedColorSingle, const FLinearColor&, MyTeamColor);
 
 UCLASS()
-class SAUCEWICH_API ASaucewichHUD final : public ABaseHUD
+class SAUCEWICH_API ASaucewichHUD : public ABaseHUD
 {
 	GENERATED_BODY()
 

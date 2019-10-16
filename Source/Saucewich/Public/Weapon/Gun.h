@@ -96,7 +96,7 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API AGun final : public AWeapon
+class SAUCEWICH_API AGun : public AWeapon
 {
 	GENERATED_BODY()
 

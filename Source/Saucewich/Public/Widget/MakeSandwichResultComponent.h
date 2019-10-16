@@ -9,7 +9,7 @@ class UTextBlock;
 class UImage;
 
 UCLASS()
-class SAUCEWICH_API UMakeSandwichResultComponent final : public UComponentWidget
+class SAUCEWICH_API UMakeSandwichResultComponent : public UComponentWidget
 {
 	GENERATED_BODY()
 

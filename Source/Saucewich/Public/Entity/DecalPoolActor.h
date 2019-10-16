@@ -7,7 +7,7 @@
 #include "DecalPoolActor.generated.h"
 
 UCLASS()
-class SAUCEWICH_API ADecalPoolActor final : public APoolActor, public IColorable
+class SAUCEWICH_API ADecalPoolActor : public APoolActor, public IColorable
 {
 	GENERATED_BODY()
 

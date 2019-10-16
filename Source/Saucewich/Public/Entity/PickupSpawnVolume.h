@@ -6,7 +6,7 @@
 #include "PickupSpawnVolume.generated.h"
 
 UCLASS()
-class SAUCEWICH_API APickupSpawnVolume final : public AGameModeDependentLevelActor
+class SAUCEWICH_API APickupSpawnVolume : public AGameModeDependentLevelActor
 {
 	GENERATED_BODY()
 

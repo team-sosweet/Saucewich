@@ -6,7 +6,7 @@
 #include "TpsCharacterMovementComponent.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UTpsCharacterMovementComponent final : public UCharacterMovementComponent
+class SAUCEWICH_API UTpsCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 
