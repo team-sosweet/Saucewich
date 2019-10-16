@@ -67,6 +67,19 @@ void ASaucewichGameMode::BeginPlay()
 	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
 }
 
+void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	FString& ErrorMessage)
+{
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	if (!ErrorMessage.IsEmpty()) return;
+
+#if !WITH_EDITOR
+	const auto ClVer = FCString::Atoi(*UGameplayStatics::ParseOption(Options, "ServerVersion"));
+	const auto SvVer = USaucewichLibrary::GetServerVersion();
+	if (ClVer != SvVer) ErrorMessage = FString::Printf(TEXT("Version mismatch. Client: %d, Server: %d"), ClVer, SvVer);
+#endif
+}
+
 FString ASaucewichGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId,
 	const FString& Options, const FString& Portal)
 {
