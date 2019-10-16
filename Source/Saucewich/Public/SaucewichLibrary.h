@@ -50,4 +50,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static class UUserSettings* GetUserSettings();
+
+	UFUNCTION(BlueprintPure)
+	static int32 GetServerVersion();
 };

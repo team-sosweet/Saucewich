@@ -106,3 +106,8 @@ UUserSettings* USaucewichLibrary::GetUserSettings()
 	static const auto UserSettings = NewObject<UUserSettings>(GetTransientPackage(), NAME_None, RF_MarkAsRootSet);
 	return UserSettings;
 }
+
+int32 USaucewichLibrary::GetServerVersion()
+{
+	return 1;
+}
