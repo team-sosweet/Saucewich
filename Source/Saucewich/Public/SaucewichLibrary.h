@@ -15,7 +15,7 @@ enum class ENameValidity : uint8
 };
 
 UCLASS()
-class SAUCEWICH_API USaucewichLibrary final : public UBlueprintFunctionLibrary
+class SAUCEWICH_API USaucewichLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

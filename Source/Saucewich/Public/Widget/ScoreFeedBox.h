@@ -6,7 +6,7 @@
 #include "ScoreFeedBox.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UScoreFeedBox final : public UFeedBox
+class SAUCEWICH_API UScoreFeedBox : public UFeedBox
 {
 	GENERATED_BODY()
 

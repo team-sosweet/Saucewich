@@ -6,7 +6,7 @@
 #include "Fridge.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AFridge final : public AGameModeDependentLevelActor
+class SAUCEWICH_API AFridge : public AGameModeDependentLevelActor
 {
 	GENERATED_BODY()
 

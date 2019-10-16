@@ -60,6 +60,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate, bool bCallbackWithCurrentWeapons = true);
 
+	UFUNCTION(BlueprintCallable) void SlotP(uint8 Slot);
+	UFUNCTION(BlueprintCallable) void SlotR(uint8 Slot);
+	UFUNCTION(BlueprintCallable) void FireP();
+	UFUNCTION(BlueprintCallable) void FireR();
+
 	struct FBroadcastEquipWeapon
 	{
 	private:
@@ -84,8 +89,6 @@ protected:
 	virtual void OnRep_Weapons();
 
 private:
-	UFUNCTION(BlueprintCallable) void FireP();
-	UFUNCTION(BlueprintCallable) void FireR();
 	void StartFire();
 	void StopFire();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireP();
@@ -93,8 +96,6 @@ private:
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireP();
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireR();
 
-	UFUNCTION(BlueprintCallable) void SlotP(uint8 Slot);
-	UFUNCTION(BlueprintCallable) void SlotR(uint8 Slot);
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotP(uint8 Slot);
 	UFUNCTION(Server, Reliable, WithValidation) void ServerSlotR(uint8 Slot);
 	UFUNCTION(NetMulticast, Reliable) void MulticastSlotP(uint8 Slot);

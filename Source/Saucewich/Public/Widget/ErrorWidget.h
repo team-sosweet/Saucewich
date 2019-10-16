@@ -7,7 +7,7 @@
 #include "ErrorWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UErrorWidget final : public UUserWidget
+class SAUCEWICH_API UErrorWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

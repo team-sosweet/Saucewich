@@ -9,7 +9,7 @@
 DECLARE_DYNAMIC_DELEGATE_RetVal(TArray<uint8>, FGetIngredientNums);
 
 UCLASS()
-class SAUCEWICH_API UIngredientWidget final : public UUserWidget
+class SAUCEWICH_API UIngredientWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

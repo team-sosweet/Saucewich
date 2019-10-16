@@ -8,7 +8,7 @@
 #include "CombatTextPool.generated.h"
 
 UCLASS(Blueprintable)
-class SAUCEWICH_API UCombatTextPool final : public UObject
+class SAUCEWICH_API UCombatTextPool : public UObject
 {
 	GENERATED_BODY()
 

@@ -10,7 +10,7 @@
  * 아래에 동그란 그림자를 띄우는 컴포넌트 입니다.
  */
 UCLASS(meta=(BlueprintSpawnableComponent))
-class SAUCEWICH_API UShadowComponent final : public UStaticMeshComponent, public ITranslucentable
+class SAUCEWICH_API UShadowComponent : public UStaticMeshComponent, public ITranslucentable
 {
 	GENERATED_BODY()
 

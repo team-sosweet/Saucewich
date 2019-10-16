@@ -8,7 +8,7 @@
 class ASandwichIngredient;
 
 UCLASS()
-class SAUCEWICH_API AMakeSandwichPlayerState final : public ASaucewichPlayerState
+class SAUCEWICH_API AMakeSandwichPlayerState : public ASaucewichPlayerState
 {
 	GENERATED_BODY()
 

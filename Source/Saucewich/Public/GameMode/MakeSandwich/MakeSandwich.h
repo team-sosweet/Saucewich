@@ -6,7 +6,7 @@
 #include "MakeSandwich.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AMakeSandwich final : public ASaucewichGameMode
+class SAUCEWICH_API AMakeSandwich : public ASaucewichGameMode
 {
 	GENERATED_BODY()
 

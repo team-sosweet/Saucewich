@@ -40,7 +40,7 @@ struct FAccount
 };
 
 UCLASS(Config=Game)
-class SAUCEWICH_API USaucewichGameInstance final : public UHttpGameInstance
+class SAUCEWICH_API USaucewichGameInstance : public UHttpGameInstance
 {
 	GENERATED_BODY()
 

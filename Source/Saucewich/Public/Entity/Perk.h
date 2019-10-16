@@ -6,7 +6,7 @@
 #include "Perk.generated.h"
 
 UCLASS()
-class SAUCEWICH_API APerk final : public APickup
+class SAUCEWICH_API APerk : public APickup
 {
 	GENERATED_BODY()
 
