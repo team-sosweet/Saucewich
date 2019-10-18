@@ -25,7 +25,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartMatchmaking();
 	
-	void CancelMatchmaking(bool bError = false);
 
 	UFUNCTION(BlueprintCallable)
 	void BindCallback(const FOnStartMatchmakingResponse& Callback);
