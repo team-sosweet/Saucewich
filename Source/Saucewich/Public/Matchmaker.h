@@ -25,7 +25,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartMatchmaking();
 	
-	UFUNCTION(BlueprintCallable, meta=(AdvancedDisplay=bError))
 	void CancelMatchmaking(bool bError = false);
 
 	UFUNCTION(BlueprintCallable)
