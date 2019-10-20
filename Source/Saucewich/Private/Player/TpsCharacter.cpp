@@ -470,13 +470,13 @@ void ATpsCharacter::MulticastAddPerk_Implementation(UClass* const PerkClass)
 		);
 	}
 
-	auto&& ErasePerk = [this, PerkClass]
+	GetWorldTimerManager().SetTimer(Perk.Timer, [this, PerkClass]
 	{
+		if (!IsValidLowLevel()) return;
+		
 		if (const auto Found = Perks.Find(PerkClass))
 			if (Found->PSC) Found->PSC->ReleaseToPool();
 		
 		Perks.Remove(PerkClass);
-	};
-
-	GetWorldTimerManager().SetTimer(Perk.Timer, ErasePerk, Def->GetDuration(),	false);
+	}, Def->GetDuration(),	false);
 }
