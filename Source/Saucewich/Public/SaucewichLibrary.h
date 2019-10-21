@@ -8,6 +8,10 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
 
+#if WITH_GAMELIFT
+	DECLARE_LOG_CATEGORY_EXTERN(LogGameLift, Log, All)
+#endif
+
 UENUM(BlueprintType)
 enum class ENameValidity : uint8
 {
