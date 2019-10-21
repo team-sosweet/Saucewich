@@ -57,4 +57,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetServerVersion();
+
+	static class FGameLiftServerSDKModule& GetGameLiftServerSDKModule();
 };

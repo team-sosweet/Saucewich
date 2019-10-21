@@ -41,6 +41,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void PrintMessage(const FText& Message, float Duration, EMsgType Type);
 
+	void SetSessionID(FString&& ID);
+	const FString& GetSessionID() const;
+
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
@@ -73,6 +76,8 @@ private:
 	
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
 	FOnCharacterSpawned OnCharacterSpawned;
+
+	FString SessionID;
 
 	FTimerHandle RespawnTimer;
 	FTimerHandle PingTimer;

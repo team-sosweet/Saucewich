@@ -2,6 +2,7 @@
 
 #include "SaucewichLibrary.h"
 
+
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -15,7 +16,16 @@
 DEFINE_LOG_CATEGORY(LogSaucewich)
 
 #if WITH_GAMELIFT
+
+	#include "GameLiftServerSDK.h"
 	DEFINE_LOG_CATEGORY(LogGameLift)
+
+	FGameLiftServerSDKModule& USaucewichLibrary::GetGameLiftServerSDKModule()
+	{
+		static auto& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>("GameLiftServerSDK");
+		return Module;
+	}
+
 #endif
 
 USkeletalMesh* USaucewichLibrary::MergeMeshes(const TArray<USkeletalMesh*>& Meshes)
