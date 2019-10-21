@@ -1,6 +1,8 @@
 # Saucewich
 
-UE4로 개발중인 캐주얼 멀티플레이어 TPS 게임
+UE4로 개발된 모바일 멀티플레이어 캐주얼 슈팅 게임
+
+Board: https://app.gitkraken.com/glo/board/XUFuD1F53AAP0CB4
 
 ![Logo](Saucewich.png)
 
