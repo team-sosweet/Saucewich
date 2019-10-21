@@ -3,16 +3,17 @@
 #include "GameMode/DedicatedServerDefaultGameMode.h"
 
 #include "Engine/World.h"
-#include "OutputDeviceFile.h"
-#include "Paths.h"
-#include "PlatformOutputDevices.h"
 
-#include "GameLiftServerSDK.h"
+#if WITH_GAMELIFT
+	#include "OutputDeviceFile.h"
+	#include "Paths.h"
+	#include "PlatformOutputDevices.h"
+	#include "GameLiftServerSDK.h"
+#endif
 
 #include "GameMode/SaucewichGameMode.h"
 #include "SaucewichGameInstance.h"
 #include "SaucewichLibrary.h"
-#include "JsonData.h"
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
@@ -24,14 +25,13 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 		checkf(Result.IsSuccess(), TEXT("ERROR: %s: %s"), *Error.m_errorName, *Error.m_errorMessage);
 	};
 	
-	auto& GameLiftSdkModule = FModuleManager::LoadModuleChecked<FGameLiftServerSDKModule>("GameLiftServerSDK");
+	auto& GameLiftSdkModule = USaucewichLibrary::GetGameLiftServerSDKModule();
 	Check(GameLiftSdkModule.InitSDK());
 	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
 
 	FProcessParameters Params;
 	Params.OnStartGameSession.BindWeakLambda(
-		this, 
-		[this, &GameLiftSdkModule](Aws::GameLift::Server::Model::GameSession GameSession)
+		this, [this, &GameLiftSdkModule](Aws::GameLift::Server::Model::GameSession GameSession)
 		{
 			GameLiftSdkModule.ActivateGameSession();
 			StartServer();

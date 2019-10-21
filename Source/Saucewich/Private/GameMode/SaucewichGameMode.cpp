@@ -2,6 +2,8 @@
 
 #include "SaucewichGameMode.h"
 
+#include "GameLiftServerSDK.h"
+
 #include "Engine/Engine.h"
 #include "Engine/PlayerStartPIE.h"
 #include "GameFramework/GameSession.h"
@@ -17,10 +19,6 @@
 #include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
 #include "SaucewichLibrary.h"
-
-#if !WITH_EDITOR
-	#include "JsonData.h"
-#endif
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
@@ -76,28 +74,45 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 #if !WITH_EDITOR
 	const auto ClVer = FCString::Atoi(*UGameplayStatics::ParseOption(Options, "ServerVersion"));
 	const auto SvVer = USaucewichLibrary::GetServerVersion();
-	if (ClVer != SvVer) ErrorMessage = FString::Printf(TEXT("Version mismatch. Client: %d, Server: %d"), ClVer, SvVer);
+	if (ClVer != SvVer)
+	{
+		ErrorMessage = FString::Printf(TEXT("Version mismatch. Client: %d, Server: %d"), ClVer, SvVer);
+		return;
+	}
+#endif
+
+#if WITH_GAMELIFT
+	auto& GameLiftSdkModule = USaucewichLibrary::GetGameLiftServerSDKModule();
+	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
+	if (!Result.IsSuccess())
+	{
+		ErrorMessage = Result.GetError().m_errorMessage;
+		return;
+	}
 #endif
 }
 
-FString ASaucewichGameMode::InitNewPlayer(APlayerController* NewPlayerController, const FUniqueNetIdRepl& UniqueId,
+FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerController, const FUniqueNetIdRepl& UniqueId,
 	const FString& Options, const FString& Portal)
 {
-	check(NewPlayerController);
+	const auto PC = CastChecked<ASaucewichPlayerController>(NewPlayerController);
 
-	if (!NewPlayerController->PlayerState)
+	if (!PC->PlayerState)
 		return "PlayerState is null";
 
-	GameSession->RegisterPlayer(NewPlayerController, UniqueId.GetUniqueNetId(), false);
+	GameSession->RegisterPlayer(PC, UniqueId.GetUniqueNetId(), false);
 
 	
 	auto PlayerName = UGameplayStatics::ParseOption(Options, "PlayerName");
 	
 	if (USaucewichLibrary::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
-		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), NewPlayerController->PlayerState->PlayerId);
+		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), PC->PlayerState->PlayerId);
 	
-	ChangeName(NewPlayerController, PlayerName, false);
+	ChangeName(PC, PlayerName, false);
 
+
+	PC->SetSessionID(UGameplayStatics::ParseOption(Options, "SessionID"));
+	
 	
 	return {};
 }
@@ -112,8 +127,17 @@ void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
+	
 	ExtUpdatePlyCnt();
 	PrintAndLogFmtMsg("Logout", FText::FromString(Exiting->PlayerState->GetPlayerName()));
+
+#if WITH_GAMELIFT
+	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
+	{
+		auto& Module = USaucewichLibrary::GetGameLiftServerSDKModule();
+		Module.RemovePlayerSession(PC->GetSessionID());
+	}
+#endif
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -357,6 +381,7 @@ void ASaucewichGameMode::ExtUpdatePlyCnt(const FString& GameCode, const int32 Ne
 {
 #if !WITH_EDITOR
 	if (!IsValidLowLevel()) return;
+	
 	if (!IsRunningDedicatedServer()) return;
 
 	FJson Body;
