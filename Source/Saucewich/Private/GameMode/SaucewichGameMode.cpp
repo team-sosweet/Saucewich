@@ -120,15 +120,12 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	ExtUpdatePlyCnt();
 	PrintAndLogFmtMsg("Login", FText::FromString(NewPlayer->PlayerState->GetPlayerName()));
 }
 
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
-	
-	ExtUpdatePlyCnt();
 	PrintAndLogFmtMsg("Logout", FText::FromString(Exiting->PlayerState->GetPlayerName()));
 
 #if WITH_GAMELIFT
@@ -269,12 +266,6 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 	return false;
 }
 
-void ASaucewichGameMode::HandleMatchIsWaitingToStart()
-{
-	Super::HandleMatchIsWaitingToStart();
-	ExtUpdatePlyCnt();
-}
-
 void ASaucewichGameMode::HandleMatchHasStarted()
 {
 	GameSession->HandleMatchHasStarted();
@@ -306,9 +297,6 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	}
 	else
 	{
-		if (const auto GI = GetGameInstance<USaucewichGameInstance>())
-			GI->GetGameCode([this](const FString& GameCode){ExtUpdatePlyCnt(GameCode, MaxPlayers);});
-
 		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
 	}
 }
@@ -362,57 +350,6 @@ void ASaucewichGameMode::StartNextGame() const
 
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
-}
-
-void ASaucewichGameMode::ExtUpdatePlyCnt() const
-{
-#if !WITH_EDITOR
-	if (!IsValidLowLevel()) return;
-	if (!IsRunningDedicatedServer()) return;
-
-	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
-	{
-		GI->GetGameCode([this](const FString& GameCode){ExtUpdatePlyCnt(GameCode, NumPlayers);});
-	}
-#endif
-}
-
-void ASaucewichGameMode::ExtUpdatePlyCnt(const FString& GameCode, const int32 NewCnt) const
-{
-#if !WITH_EDITOR
-	if (!IsValidLowLevel()) return;
-	
-	if (!IsRunningDedicatedServer()) return;
-
-	FJson Body;
-	Body.Data.Add(TEXT("people"), UJsonData::MakeIntegerData(NewCnt));
-
-	FOnResponded OnResponded;
-	OnResponded.BindDynamic(this, &ASaucewichGameMode::RespondExtUpdatePlyCnt);
-
-	GetGameInstance<UHttpGameInstance>()->PutRequest("room/people/" + GameCode, {}, Body, OnResponded);
-	UE_LOG(LogExternalServer, Log, TEXT("Updating player count to %d..."), NewCnt);
-#endif
-}
-
-void ASaucewichGameMode::RespondExtUpdatePlyCnt(const bool bIsSuccess, const int32 Code, FJson Json)
-{
-	if (bIsSuccess)
-	{
-		UE_LOG(LogExternalServer, Log, TEXT("Player count update successful"));
-		return;
-	}
-	
-	if (Code == 429)
-	{
-		constexpr float RetryRate = 1;
-		GetWorldTimerManager().SetTimer(ExtPlyCntUpdateTimer, this, &ASaucewichGameMode::ExtUpdatePlyCnt, RetryRate);
-		UE_LOG(LogExternalServer, Warning, TEXT("Requested player count update too frequently! Retrying in %f seconds..."), RetryRate);
-	}
-	else
-	{
-		UE_LOG(LogExternalServer, Error, TEXT("Failed to update player count of external server. Error code: %d"), Code);
-	}
 }
 
 void ASaucewichGameMode::PrintAndLogFmtMsg(const FName MsgID) const

@@ -50,19 +50,12 @@ protected:
 
 	bool ReadyToStartMatch_Implementation() override;
 	bool ReadyToEndMatch_Implementation() override;
-	void HandleMatchIsWaitingToStart() override;
 	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
 
 private:
 	void UpdateMatchState();
 	void StartNextGame() const;
-
-	void ExtUpdatePlyCnt() const;
-	void ExtUpdatePlyCnt(const FString& GameCode, int32 NewCnt) const;
-
-	UFUNCTION()
-	void RespondExtUpdatePlyCnt(bool bIsSuccess, int32 Code, FJson Json);
 
 	void PrintAndLogFmtMsg(FName MsgID) const;
 
