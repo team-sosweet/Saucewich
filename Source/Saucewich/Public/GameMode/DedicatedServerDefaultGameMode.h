@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
-#include "HttpGameInstance.h"
 #include "DedicatedServerDefaultGameMode.generated.h"
 
 UCLASS()
@@ -15,8 +14,5 @@ protected:
 	void BeginPlay() override;
 
 private:
-	UFUNCTION()
-	void OnServerRegistered(bool bIsSuccess, int32 Code, FJson Json);
-
 	void StartServer() const;
 };

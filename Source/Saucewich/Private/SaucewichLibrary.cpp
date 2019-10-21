@@ -14,6 +14,10 @@
 
 DEFINE_LOG_CATEGORY(LogSaucewich)
 
+#if WITH_GAMELIFT
+	DEFINE_LOG_CATEGORY(LogGameLift)
+#endif
+
 USkeletalMesh* USaucewichLibrary::MergeMeshes(const TArray<USkeletalMesh*>& Meshes)
 {
 	const auto BaseMesh = NewObject<USkeletalMesh>();
