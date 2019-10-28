@@ -2,12 +2,10 @@
 
 #include "SaucewichGameInstance.h"
 
-#include "CoreDelegates.h"
 #include "Engine/World.h"
 
 #include "Entity/ActorPool.h"
 #include "GameMode/SaucewichGameState.h"
-#include "JsonData.h"
 
 AActorPool* USaucewichGameInstance::GetActorPool()
 {
@@ -23,35 +21,4 @@ ASaucewichGameState* USaucewichGameInstance::GetGameState() const
 float USaucewichGameInstance::GetSensitivity() const
 {
 	return CorrectionValue * Sensitivity + CorrectionValue * .5f;
-}
-
-void USaucewichGameInstance::ShutdownAfterError()
-{
-	Super::ShutdownAfterError();
-
-#if !WITH_EDITOR
-	if (IsRunningDedicatedServer())
-	{
-		GetRequest(FString::Printf(TEXT("room/crash/%d"), PortForServer), {}, {});
-	}
-#endif
-}
-
-void USaucewichGameInstance::RespondGetGameCode(const bool bIsSuccess, const int32 Code, const FJson Json)
-{
-	if (!bIsSuccess)
-	{
-		UE_LOG(LogExternalServer, Error, TEXT("Failed to get game code! Error code: %d"), Code);
-		return;
-	}
-
-	const auto JsonData = Json.Data.FindRef("roomCode");
-	if (!JsonData || !JsonData->AsString(GameCode) || GameCode.IsEmpty())
-	{
-		UE_LOG(LogExternalServer, Error, TEXT("Failed to get game code: Invalid Json format"));
-		return;
-	}
-
-	OnRespondGetGameCode.Broadcast(GameCode);
-	UE_LOG(LogExternalServer, Log, TEXT("Get game code successful! Game code: %s"), *GameCode);
 }
