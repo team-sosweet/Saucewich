@@ -18,7 +18,7 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "SaucewichGameInstance.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
@@ -73,7 +73,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 
 #if !WITH_EDITOR
 	const auto ClVer = FCString::Atoi(*UGameplayStatics::ParseOption(Options, "ServerVersion"));
-	const auto SvVer = USaucewichLibrary::GetServerVersion();
+	const auto SvVer = USaucewich::GetServerVersion();
 	if (ClVer != SvVer)
 	{
 		ErrorMessage = FString::Printf(TEXT("Version mismatch. Client: %d, Server: %d"), ClVer, SvVer);
@@ -82,7 +82,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 #endif
 
 #if WITH_GAMELIFT
-	auto& GameLiftSdkModule = USaucewichLibrary::GetGameLiftServerSDKModule();
+	auto& GameLiftSdkModule = USaucewich::GetGameLiftServerSDKModule();
 	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
 	if (!Result.IsSuccess())
 	{
@@ -105,7 +105,7 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 	
 	auto PlayerName = UGameplayStatics::ParseOption(Options, "PlayerName");
 	
-	if (USaucewichLibrary::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
+	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), PC->PlayerState->PlayerId);
 	
 	ChangeName(PC, PlayerName, false);
@@ -131,7 +131,7 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 #if WITH_GAMELIFT
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
 	{
-		auto& Module = USaucewichLibrary::GetGameLiftServerSDKModule();
+		auto& Module = USaucewich::GetGameLiftServerSDKModule();
 		Module.RemovePlayerSession(PC->GetSessionID());
 	}
 #endif

@@ -14,7 +14,7 @@
 #include "Player/SaucewichPlayerController.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
 
@@ -157,7 +157,7 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 
 void ASaucewichPlayerState::RequestSetPlayerName_Implementation(const FString& NewPlayerName)
 {
-	if (GetPlayerName() != NewPlayerName && USaucewichLibrary::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
+	if (GetPlayerName() != NewPlayerName && USaucewich::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
 	{
 		SetPlayerName(NewPlayerName);
 	}
