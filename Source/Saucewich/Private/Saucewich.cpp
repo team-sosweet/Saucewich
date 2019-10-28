@@ -5,12 +5,15 @@
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 
-#include "DecalPoolActor.h"
-#include "ActorPool.h"
 #include "SaucewichGameInstance.h"
 #include "UserSettings.h"
 
+// 이 두 header의 include 순서는 상당히 중요하다.
+// 컴파일러의 버그인지 모르겠지만, 순서가 서로 바뀌면 아래 static_assert가 실패하는 경우가 있기 때문이다.
+#include "DecalPoolActor.h"
+#include "ActorPool.h"
 static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* is not convertible to AActor*");
+
 
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
