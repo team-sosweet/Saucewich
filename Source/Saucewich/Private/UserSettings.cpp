@@ -1,11 +1,11 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
 #include "UserSettings.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 
 ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 {
-	const auto Validity = USaucewichLibrary::IsValidPlayerName(NewPlayerName);
+	const auto Validity = USaucewich::IsValidPlayerName(NewPlayerName);
 	if (Validity == ENameValidity::Valid)
 	{
 		PlayerName = NewPlayerName;
@@ -18,7 +18,7 @@ void UUserSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
 
-	if (USaucewichLibrary::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
+	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 	{
 		PlayerName = TEXT("유저");
 		SaveConfig();

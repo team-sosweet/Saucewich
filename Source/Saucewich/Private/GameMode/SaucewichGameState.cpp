@@ -12,7 +12,7 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 #include "SaucewichGameInstance.h"
 
 template <class Fn>
@@ -142,7 +142,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
 
-	USaucewichLibrary::CleanupGame(this);
+	USaucewich::CleanupGame(this);
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -169,7 +169,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	USaucewichLibrary::CleanupGame(this);
+	USaucewich::CleanupGame(this);
 }
 
 void ASaucewichGameState::HandleLeavingMap()

@@ -13,7 +13,7 @@
 
 #include "GameMode/SaucewichGameMode.h"
 #include "SaucewichGameInstance.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
@@ -25,7 +25,7 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 		checkf(Result.IsSuccess(), TEXT("ERROR: %s: %s"), *Error.m_errorName, *Error.m_errorMessage);
 	};
 	
-	auto& GameLiftSdkModule = USaucewichLibrary::GetGameLiftServerSDKModule();
+	auto& GameLiftSdkModule = USaucewich::GetGameLiftServerSDKModule();
 	Check(GameLiftSdkModule.InitSDK());
 	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
 
