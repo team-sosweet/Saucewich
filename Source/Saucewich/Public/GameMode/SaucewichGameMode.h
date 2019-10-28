@@ -4,7 +4,6 @@
 
 #include "GameFramework/GameMode.h"
 #include "Saucewich.h"
-#include "HttpGameInstance.h"
 #include "SaucewichGameMode.generated.h"
 
 class ASaucewichPlayerController;

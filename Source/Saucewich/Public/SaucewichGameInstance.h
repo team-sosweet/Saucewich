@@ -2,45 +2,13 @@
 
 #pragma once
 
-#include "HttpGameInstance.h"
+#include "Engine/GameInstance.h"
 #include "SaucewichGameInstance.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameStateSpawned, class ASaucewichGameState*);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnChangeAccount);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnRespondGetGameCode, const FString&)
-
-USTRUCT(Atomic, BlueprintType)
-struct FAccount
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Id;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Level;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Exp;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float KillDeath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float WinLose;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString PlayTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString AccessToken;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString RefreshToken;
-};
 
 UCLASS(Config=Game)
-class SAUCEWICH_API USaucewichGameInstance : public UHttpGameInstance
+class SAUCEWICH_API USaucewichGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
@@ -67,23 +35,6 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName="Save Config")
 	void BP_SaveConfig() { SaveConfig(); }
 
-	UFUNCTION(BlueprintCallable)
-	void SetAccount(const FAccount& InAccount)
-	{
-		Account = InAccount;
-		bHaveAccount = true;
-		SaveConfig();
-		OnChangeAccount.Broadcast();
-	}
-
-	UFUNCTION(BlueprintCallable)
-	void ClearAccount()
-	{
-		bHaveAccount = false;
-		SaveConfig();
-		OnChangeAccount.Broadcast();
-	}
-	
 	void SaveWeaponLoadout(const TArray<TSubclassOf<class AWeapon>>& Loadout)
 	{
 		WeaponLoadout = Loadout;
@@ -95,40 +46,9 @@ public:
 
 	bool IsAutoFire() const { return bAutoFire; }
 
-	/**
-	 * @param Callback (const FString&) -> void
-	 */
-	template <class Fn>
-	void GetGameCode(Fn&& Callback)
-	{
-#if !WITH_EDITOR
-		if (!GameCode.IsEmpty())
-		{
-			Callback(GameCode);
-		}
-		else
-		{
-			OnRespondGetGameCode.AddLambda(Forward<Fn>(Callback));
-			FOnResponded OnResponded;
-			OnResponded.BindDynamic(this, &USaucewichGameInstance::RespondGetGameCode);
-			GetRequest(FString::Printf(TEXT("room/game/%d"), PortForServer), {}, OnResponded);
-			UE_LOG(LogExternalServer, Log, TEXT("Requesting get game code..."));
-		}
-#endif
-	}
-
 	struct BroadcastGameStateSpawned;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnChangeAccount OnChangeAccount;
-
-protected:
-	void ShutdownAfterError() override;
-
 private:
-	UFUNCTION()
-	void RespondGetGameCode(bool bIsSuccess, int32 Code, FJson Json);
-
 	UPROPERTY(Config)
 	TArray<TSubclassOf<class ASaucewichGameMode>> GameModes;
 	
@@ -136,20 +56,7 @@ private:
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 	
 	FOnGameStateSpawned OnGameStateSpawned;
-	FOnRespondGetGameCode OnRespondGetGameCode;
 
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FAccount Account;
-
-	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
-	FString GameCode;
-
-	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess=true))
-	FString PortForClient;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	FString GameServerAddress;
-	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActorPool> ActorPoolClass;
 	
@@ -164,9 +71,6 @@ private:
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bAutoFire : 1;
-
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 bHaveAccount : 1;
 };
 
 struct USaucewichGameInstance::BroadcastGameStateSpawned
