@@ -4,16 +4,14 @@
 
 #include "Engine/World.h"
 
+#include "GameMode/SaucewichGameMode.h"
+
 #if WITH_GAMELIFT
 	#include "OutputDeviceFile.h"
 	#include "Paths.h"
 	#include "PlatformOutputDevices.h"
 	#include "GameLiftServerSDK.h"
 #endif
-
-#include "GameMode/SaucewichGameMode.h"
-#include "SaucewichGameInstance.h"
-#include "Saucewich.h"
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
@@ -64,13 +62,5 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 
 void ADedicatedServerDefaultGameMode::StartServer() const
 {
-	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
-	const auto GmClass = GameModes[FMath::RandHelper(GameModes.Num())];
-	const auto DefGm = GmClass.GetDefaultObject();
-
-	auto& AvailableMaps = DefGm->GetAvailableMaps();
-	const auto NewMap = AvailableMaps[FMath::RandHelper(AvailableMaps.Num())].GetAssetName();
-
-	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
-	GetWorld()->ServerTravel(URL);
+	GetDefault<ASaucewichGameMode>(ASaucewichGameMode::StaticClass())->StartNextGame();
 }

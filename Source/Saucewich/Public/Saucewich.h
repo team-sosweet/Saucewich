@@ -46,9 +46,6 @@ public:
 		float LifeSpan = 10
 	);
 
-	UFUNCTION(BlueprintPure, meta=(WorldContext=WorldContextObject))
-	static class AActorPool* GetActorPool(const UObject* WorldContextObject);
-
 	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
 	static void CleanupGame(const UObject* WorldContextObject);
 
@@ -60,9 +57,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMaxLen();
-
-	UFUNCTION(BlueprintPure)
-	static class UUserSettings* GetUserSettings();
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetServerVersion();

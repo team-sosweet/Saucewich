@@ -7,16 +7,32 @@
 
 enum class ENameValidity : uint8;
 
-UCLASS(Config=UserSettings)
+UCLASS(Config=GameUserSettings)
 class SAUCEWICH_API UUserSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, DisplayName="Get User Settings")
+	static UUserSettings* Get();
+	
+	UFUNCTION(BlueprintCallable)
+	void Save() { SaveConfig(); }
+	
 	UFUNCTION(BlueprintCallable)
 	ENameValidity SetPlayerName(const FString& NewPlayerName);
 	const FString& GetPlayerName() const { return PlayerName; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetSensitivity() const;
+
 	
+	UPROPERTY(Config, BlueprintReadWrite)
+	float Sensitivity = .5;
+
+	UPROPERTY(Config, BlueprintReadWrite)
+	uint8 bAutoFire : 1;
+
 protected:
 	void PostInitProperties() override;
 

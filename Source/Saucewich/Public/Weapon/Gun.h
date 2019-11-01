@@ -103,12 +103,9 @@ class SAUCEWICH_API AGun : public AWeapon
 public:
 	AGun();
 	
-	// 이 총으로 target을 찾는 trace를 수행합니다.
 	UFUNCTION(BlueprintCallable)
 	EGunTraceHit GunTrace(FHitResult& OutHit);
 
-	// 총기 데이터에 대한 레퍼런스를 반환합니다.
-	// 만약 총기 클래스에 데이터가 바인드 되어있지 않거나 하는 이유로 데이터를 구할 수 없을 경우 기본값을 반환합니다.
 	UFUNCTION(BlueprintCallable)
 	const FGunData& GetGunData() const;
 

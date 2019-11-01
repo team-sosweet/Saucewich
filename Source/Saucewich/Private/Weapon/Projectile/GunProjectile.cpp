@@ -9,12 +9,9 @@ void AGunProjectile::OnActivated()
 	Super::OnActivated();
 
 	const auto Gun = Cast<AGun>(GetOwner());
-	if (!Gun) return;
+	if (!ensure(Gun)) return;
 	
-	if (const auto Data = Gun->GetData<FGunData>(TEXT("AGunProjectile::OnActivated()")))
-	{
-		SetSpeed(Data->ProjectileSpeed);
-	}
+	SetSpeed(Gun->GetGunData().ProjectileSpeed);
 }
 
 void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,

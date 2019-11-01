@@ -7,7 +7,6 @@
 
 #include "Entity/ActorPool.h"
 #include "Entity/Pickup.h"
-#include "SaucewichGameInstance.h"
 
 APickupSpawnVolume::APickupSpawnVolume()
 	:Volume{CreateDefaultSubobject<UBoxComponent>("Volume")}
@@ -20,5 +19,5 @@ void APickupSpawnVolume::Spawn(const TSubclassOf<class APickup> Class) const
 {
 	const auto Extent = Volume->GetScaledBoxExtent();
 	const FTransform Transform{GetActorLocation() + FMath::RandPointInBox({-Extent, Extent})};
-	GetGameInstance<USaucewichGameInstance>()->GetActorPool()->Spawn(Class, Transform);
+	AActorPool::Get(this)->Spawn(Class, Transform);
 }

@@ -14,11 +14,6 @@
 #include "ActorPool.h"
 static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* is not convertible to AActor*");
 
-
-IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
-
-DEFINE_LOG_CATEGORY(LogSaucewich)
-
 #if WITH_GAMELIFT
 
 	#include "GameLiftServerSDK.h"
@@ -32,6 +27,10 @@ DEFINE_LOG_CATEGORY(LogSaucewich)
 
 #endif
 
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
+
+DEFINE_LOG_CATEGORY(LogSaucewich)
+
 ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMaterialInterface* const Material, const FLinearColor& Color,
 	const FVector SizeMin, const FVector SizeMax, const float LifeSpan)
 {
@@ -39,10 +38,7 @@ ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMateria
 	if (!Comp || Comp->Mobility != EComponentMobility::Static) return nullptr;
 	
 	const auto World = Comp->GetWorld();
-	if (!World) return nullptr;
-
-	const auto Pool = GetActorPool(World);
-	if (!Pool) return nullptr;
+	const auto Pool = AActorPool::Get(World);
 
 	FHitResult ComplexHit;
 	const auto bHitComplex = World->LineTraceSingleByChannel(ComplexHit, HitInfo.ImpactPoint + HitInfo.ImpactNormal * .1, HitInfo.ImpactPoint - HitInfo.ImpactNormal * 10, ECC_Visibility, {NAME_None, true});
@@ -65,15 +61,6 @@ ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMateria
 	}
 
 	return Decal;
-}
-
-AActorPool* USaucewich::GetActorPool(const UObject* const WorldContextObject)
-{
-	if (WorldContextObject)
-		if (const auto World = WorldContextObject->GetWorld())
-			if (const auto GI = World->GetGameInstance<USaucewichGameInstance>())
-				return GI->GetActorPool();
-	return nullptr;
 }
 
 void USaucewich::CleanupGame(const UObject* WorldContextObject)
@@ -107,12 +94,6 @@ int32 USaucewich::GetPlayerNameMinLen()
 int32 USaucewich::GetPlayerNameMaxLen()
 {
 	return 16;
-}
-
-UUserSettings* USaucewich::GetUserSettings()
-{
-	static const auto UserSettings = NewObject<UUserSettings>(GetTransientPackage(), NAME_None, RF_MarkAsRootSet);
-	return UserSettings;
 }
 
 int32 USaucewich::GetServerVersion()
