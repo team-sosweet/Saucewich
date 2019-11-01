@@ -6,7 +6,6 @@
 #include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
-#include "SaucewichGameInstance.h"
 
 void APoolActor::Release(const bool bForce)
 {
@@ -22,7 +21,7 @@ void APoolActor::Release(const bool bForce)
 	Activation = EActivation::Released;
 
 	if (!bReplicates || HasAuthority())
-		GetPool()->Release(this);
+		AActorPool::Get(this)->Release(this);
 	
 	OnReleased();
 	BP_OnReleased();
@@ -38,13 +37,6 @@ void APoolActor::Activate(const bool bForce)
 	Activation = EActivation::Activated;
 	OnActivated();
 	BP_OnActivated();
-}
-
-AActorPool* APoolActor::GetPool() const
-{
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		return GI->GetActorPool();
-	return nullptr;
 }
 
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

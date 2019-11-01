@@ -25,7 +25,6 @@ public:
 	void Activate(bool bForce = false);
 	bool IsActive() const { return Activation == EActivation::Activated; }
 	void LifeSpanExpired() override { Release(); }
-	class AActorPool* GetPool() const;
 
 protected:
 	virtual void OnReleased() {}

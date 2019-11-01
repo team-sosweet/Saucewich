@@ -72,8 +72,8 @@ void APickupSpawner::Spawn()
 	FActorSpawnParameters Parameters;
 	Parameters.Owner = this;
 
-	const auto Pool = GetGameInstance<USaucewichGameInstance>()->GetActorPool();
-	if (const auto Pickup = static_cast<APickup*>(Pool->Spawn(*Class, Transform, Parameters)))
+	const auto Pool = AActorPool::Get(this);
+	if (const auto Pickup = Pool->Spawn<APickup>(*Class, Transform, Parameters))
 	{
 		Pickup->bSpawnedFromSpawner = true;
 	}

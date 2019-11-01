@@ -10,6 +10,7 @@
 #include "Player/TpsCharacter.h"
 #include "Weapon/Gun.h"
 #include "SaucewichGameInstance.h"
+#include "UserSettings.h"
 
 UWeaponComponent::UWeaponComponent()
 {
@@ -41,8 +42,7 @@ void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	const auto Owner = Cast<APawn>(GetOwner());
 	if (Owner && Owner->IsLocallyControlled())
 	{
-		const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
-		if (GI && GI->IsAutoFire())
+		if (UUserSettings::Get()->bAutoFire)
 		{
 			FHitResult Hit;
 			bShouldAutoFire = GunTrace(Hit) == EGunTraceHit::Pawn;
@@ -173,22 +173,15 @@ void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 
 AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
-	if (!WeaponClass) return nullptr;
+	if (!ensure(WeaponClass)) return nullptr;
 
 	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner) return nullptr;
+	check(Owner);
 
-	const auto Data = GetDefault<AWeapon>(WeaponClass)->GetData(TEXT("UWeaponComponent::Give()"));
-	if (!Data) return nullptr;
-	
-	const auto Slot = Data->Slot;
-	if (Slot >= Weapons.Num()) return nullptr;
+	const auto Slot = GetDefault<AWeapon>(WeaponClass)->GetData().Slot;
+	if (!ensure(Slot < Weapons.Num())) return nullptr;
 
-	const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>();
-	if (!GI) return nullptr;
-
-	const auto Pool = GI->GetActorPool();
-	if (!Pool) return nullptr;
+	const auto Pool = AActorPool::Get(this);
 
 	if (Weapons[Slot])
 	{

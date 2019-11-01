@@ -9,7 +9,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreID, int3
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNameChanged, const FString&, NewName);
 
-UCLASS()
+UCLASS(Config=GameUserSettings)
 class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
 {
 	GENERATED_BODY()
@@ -22,7 +22,7 @@ public:
 	void SetWeapon(uint8 Slot, TSubclassOf<class AWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable)
-	void SaveWeaponLoadout() const;
+	void SaveWeaponLoadout();
 
 	void GiveWeapons();
 
@@ -79,15 +79,13 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreID, int32 ActualScore);
 
-	void LoadWeaponLoadout();
-
 	UPROPERTY(BlueprintAssignable)
 	FOnNameChanged OnNameChanged;
 
 	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
 	// 배열 인덱스는 무기 슬롯을 의미합니다.
 	// 기본값을 설정해두면 저장된 로드아웃이 없을 경우 기본값을 사용합니다.
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Replicated, EditAnywhere, Config, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 
 	// 플레이어의 팀을 나타냅니다. 팀 번호는 1부터 시작합니다.

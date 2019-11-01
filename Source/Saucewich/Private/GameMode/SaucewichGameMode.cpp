@@ -17,7 +17,6 @@
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
-#include "SaucewichGameInstance.h"
 #include "Saucewich.h"
 
 ASaucewichGameMode::ASaucewichGameMode()
@@ -46,6 +45,19 @@ const FText& ASaucewichGameMode::GetMessage(const FName ID) const
 
 	UE_LOG(LogGameMode, Error, TEXT("메시지 ID '%s'에 대한 메시지 텍스트가 없습니다!"), *ID.ToString());
 	return FText::GetEmpty();
+}
+
+TSubclassOf<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
+{
+	return GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
+}
+
+TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
+{
+	const TSoftObjectPtr<UWorld> CurMap = GetWorld();
+	auto NextMaps = Maps;
+	NextMaps.RemoveSingleSwap(CurMap, false);
+	return NextMaps.Num() > 0 ? NextMaps[FMath::RandHelper(NextMaps.Num())] : CurMap;
 }
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
@@ -80,7 +92,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 		return;
 	}
 #endif
-
+	
 #if WITH_GAMELIFT
 	auto& GameLiftSdkModule = USaucewich::GetGameLiftServerSDKModule();
 	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
@@ -338,17 +350,11 @@ void ASaucewichGameMode::UpdateMatchState()
 
 void ASaucewichGameMode::StartNextGame() const
 {
-	auto& GameModes = GetGameInstance<USaucewichGameInstance>()->GetGameModes();
-	
-	const auto GmClass = GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : TSubclassOf<ASaucewichGameMode>{GetClass()};
+	const auto GmClass = ChooseNextGameMode();
 	const auto DefGm = GmClass.GetDefaultObject();
+	const auto NewMap = DefGm->ChooseNextMap();
 
-	const TSoftObjectPtr<UWorld> CurMap{GetWorld()->GetPathName()};
-	auto AvailableMaps = DefGm->Maps;
-	AvailableMaps.RemoveSingleSwap(CurMap, false);
-	const auto NewMap = AvailableMaps.Num() > 0 ? AvailableMaps[FMath::RandHelper(AvailableMaps.Num())].GetAssetName() : CurMap.GetAssetName();
-
-	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap, *GmClass->GetPathName());
+	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
 }
 

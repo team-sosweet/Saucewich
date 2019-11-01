@@ -11,6 +11,9 @@ class SAUCEWICH_API AActorPool : public AActor
 	GENERATED_BODY()
 	
 public:
+	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Actor Pool", WorldContext="WorldContext"))
+	static AActorPool* Get(const UObject* WorldContext);
+	
 	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform = FTransform::Identity, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
 
 	template <class T>

@@ -8,7 +8,7 @@
 
 class ASaucewichPlayerController;
 
-UCLASS()
+UCLASS(Config=Server)
 class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 {
 	GENERATED_BODY()
@@ -24,7 +24,9 @@ public:
 	void PrintMessage(const FText& Message, EMsgType Type, float Duration = 3) const;
 	const FText& GetMessage(FName ID) const;
 
-	auto& GetAvailableMaps() const { return Maps; }
+	TSubclassOf<ASaucewichGameMode> ChooseNextGameMode() const;
+	virtual TSoftObjectPtr<UWorld> ChooseNextMap() const;
+	void StartNextGame() const;
 
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
 
@@ -54,8 +56,7 @@ protected:
 
 private:
 	void UpdateMatchState();
-	void StartNextGame() const;
-
+	
 	void PrintAndLogFmtMsg(FName MsgID) const;
 
 	template <class... Ts>
@@ -75,7 +76,10 @@ private:
 	TMap<FName, FText> Messages;
 	TMap<FName, FTextFormat> CompiledMsgFmt;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(GlobalConfig, VisibleAnywhere)
+	TArray<TSubclassOf<ASaucewichGameMode>> GameModes;
+	
+	UPROPERTY(Config, VisibleAnywhere)
 	TArray<TSoftObjectPtr<UWorld>> Maps;
 	
 	FTimerHandle MatchStateTimer;
