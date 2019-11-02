@@ -19,7 +19,6 @@ class SAUCEWICH_API UMatchmaker : public UObject
 	GENERATED_BODY()
 
 public:
-	UMatchmaker();
 	~UMatchmaker();
 	
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Matchmaker"))
