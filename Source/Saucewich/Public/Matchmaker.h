@@ -8,7 +8,7 @@
 UENUM(BlueprintType)
 enum class EMMResponse : uint8
 {
-	OK, ConnFail, Error, Timeout, Canceled
+	OK, ConnFail, Error
 };
 
 DECLARE_DYNAMIC_DELEGATE_FourParams(FOnStartMatchmakingResponse, EMMResponse, Response, const FString&, URL, const FString&, PlayerID, const FString&, SessionID);
