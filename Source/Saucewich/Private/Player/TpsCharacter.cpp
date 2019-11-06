@@ -470,13 +470,13 @@ void ATpsCharacter::MulticastAddPerk_Implementation(UClass* const PerkClass)
 		);
 	}
 
-	GetWorldTimerManager().SetTimer(Perk.Timer, [this, PerkClass]
+	FTimerDelegate Delegate;
+	Delegate.BindWeakLambda(this, [this, PerkClass]
 	{
-		if (!IsValidLowLevel()) return;
-		
 		if (const auto Found = Perks.Find(PerkClass))
 			if (Found->PSC) Found->PSC->ReleaseToPool();
 		
 		Perks.Remove(PerkClass);
-	}, Def->GetDuration(),	false);
+	});
+	GetWorldTimerManager().SetTimer(Perk.Timer, Delegate, Def->GetDuration(), false);
 }

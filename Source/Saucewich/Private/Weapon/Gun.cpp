@@ -159,7 +159,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	auto&& ShDat = GetSharedData<UGunSharedData>();
 
 	const auto Character = Cast<ATpsCharacter>(GetOwner());
-	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
+	check(Character->IsValidLowLevel());
 
 	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
 	if (!GS) return EGunTraceHit::None;

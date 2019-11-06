@@ -49,19 +49,16 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 
 	WaitTime = GameMode->GetNextGameWaitTime();
 
-	GetWorld()->GetTimerManager().SetTimer(WaitTimer, [this]
-	{
-		if (!IsValidLowLevel()) return;
-		if (--WaitTime <= 0)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(WaitTimer);
-		}
-	}, 1.0f, true);
+	FTimerDelegate Delegate;
+	Delegate.BindWeakLambda(this, [this] {
+		if (--WaitTime <= 0) GetWorld()->GetTimerManager().ClearTimer(WaitTimer);
+	});
+	GetWorld()->GetTimerManager().SetTimer(WaitTimer, Delegate, 1, true);
 
 	UsersInfo->UpdateInfo();
 }
 
-void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam)
+void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 {
 	const auto MyTeam = PlayerState->GetTeam();
 	const uint8 EnemyTeam = MyTeam == 1 ? 2 : 1;
