@@ -20,10 +20,10 @@ ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 	return Validity;
 }
 
-float UUserSettings::GetSensitivity() const
+float UUserSettings::GetCorrectedSensitivity() const
 {
 	constexpr auto Correction = 1.f;
-	return Correction * Sensitivity + Correction * .5f;
+	return Correction * RawSensitivity + Correction * .5f;
 }
 
 void UUserSettings::PostInitProperties()

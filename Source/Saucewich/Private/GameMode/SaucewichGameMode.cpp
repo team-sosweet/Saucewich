@@ -49,15 +49,23 @@ const FText& ASaucewichGameMode::GetMessage(const FName ID) const
 
 TSubclassOf<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
 {
-	return GameModes.Num() > 0 ? GameModes[FMath::RandHelper(GameModes.Num())] : GetClass();
+	if (GameModes.Num() == 0) return GetClass();
+
+	auto It = GameModes.CreateConstIterator();
+	for (auto n = FMath::RandHelper(GameModes.Num()); n > 0; --n) ++It;
+	return *It;
 }
 
 TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
 {
 	const TSoftObjectPtr<UWorld> CurMap = GetWorld();
 	auto NextMaps = Maps;
-	NextMaps.RemoveSingleSwap(CurMap, false);
-	return NextMaps.Num() > 0 ? NextMaps[FMath::RandHelper(NextMaps.Num())] : CurMap;
+	NextMaps.Remove(CurMap);
+	if (NextMaps.Num() == 0) return CurMap;
+	
+	auto It = Maps.CreateConstIterator();
+	for (auto n = FMath::RandHelper(Maps.Num()); n > 0; --n) ++It;
+	return *It;
 }
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)

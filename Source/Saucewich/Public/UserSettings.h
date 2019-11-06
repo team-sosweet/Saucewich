@@ -24,11 +24,11 @@ public:
 	const FString& GetPlayerName() const { return PlayerName; }
 
 	UFUNCTION(BlueprintCallable)
-	float GetSensitivity() const;
+	float GetCorrectedSensitivity() const;
 
 	
 	UPROPERTY(Config, BlueprintReadWrite)
-	float Sensitivity = .5;
+	float RawSensitivity = .5;
 
 	UPROPERTY(Config, BlueprintReadWrite)
 	uint8 bAutoFire : 1;

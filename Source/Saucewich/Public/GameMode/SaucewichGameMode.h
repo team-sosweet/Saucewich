@@ -8,7 +8,7 @@
 
 class ASaucewichPlayerController;
 
-UCLASS(Config=Server)
+UCLASS(Config=Game)
 class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 {
 	GENERATED_BODY()
@@ -76,11 +76,11 @@ private:
 	TMap<FName, FText> Messages;
 	TMap<FName, FTextFormat> CompiledMsgFmt;
 
-	UPROPERTY(GlobalConfig, VisibleAnywhere)
-	TArray<TSubclassOf<ASaucewichGameMode>> GameModes;
+	UPROPERTY(GlobalConfig, VisibleDefaultsOnly)
+	TSet<TSubclassOf<ASaucewichGameMode>> GameModes;
 	
-	UPROPERTY(Config, VisibleAnywhere)
-	TArray<TSoftObjectPtr<UWorld>> Maps;
+	UPROPERTY(EditDefaultsOnly)
+	TSet<TSoftObjectPtr<UWorld>> Maps;
 	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
