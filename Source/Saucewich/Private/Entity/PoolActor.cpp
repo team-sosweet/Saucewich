@@ -9,7 +9,8 @@
 
 void APoolActor::Release(const bool bForce)
 {
-	if (!IsValidLowLevel() || Activation == EActivation::Released && !bForce) return;
+	check(IsValidLowLevel());
+	if (Activation == EActivation::Released && !bForce) return;
 	
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);

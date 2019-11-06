@@ -17,7 +17,7 @@ class SAUCEWICH_API UMakeSandwichResultComponent : public UComponentWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetWidget(uint8 WinningTeam);
+	void SetWidget(uint8 WinningTeam) const;
 	
 private:
 	UFUNCTION()

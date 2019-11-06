@@ -76,7 +76,7 @@ void UWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	for (auto Wep : Weapons)
+	for (auto& Wep : Weapons)
 	{
 		if (Wep) 
 		{
