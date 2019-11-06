@@ -47,26 +47,24 @@ const FText& ASaucewichGameMode::GetMessage(const FName ID) const
 	return FText::GetEmpty();
 }
 
+
+template <class T, class Alloc>
+static T RandomDistinct(TArray<T, Alloc> Arr, const T& Elem)
+{
+	Arr.RemoveSingleSwap(Elem, false);
+	return Arr[FMath::RandHelper(Arr.Num())];
+}
+
 TSubclassOf<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
 {
-	if (GameModes.Num() == 0) return GetClass();
-
-	auto It = GameModes.CreateConstIterator();
-	for (auto n = FMath::RandHelper(GameModes.Num()); n > 0; --n) ++It;
-	return *It;
+	return RandomDistinct<TSubclassOf<ASaucewichGameMode>>(GameModes, GetClass());
 }
 
 TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
 {
-	const TSoftObjectPtr<UWorld> CurMap = GetWorld();
-	auto NextMaps = Maps;
-	NextMaps.Remove(CurMap);
-	if (NextMaps.Num() == 0) return CurMap;
-	
-	auto It = Maps.CreateConstIterator();
-	for (auto n = FMath::RandHelper(Maps.Num()); n > 0; --n) ++It;
-	return *It;
+	return RandomDistinct<TSoftObjectPtr<UWorld>>(Maps, GetWorld());
 }
+
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
 {
@@ -102,7 +100,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 #endif
 	
 #if WITH_GAMELIFT
-	auto& GameLiftSdkModule = USaucewich::GetGameLiftServerSDKModule();
+	auto& GameLiftSdkModule = USaucewich::GetGameLift();
 	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
 	if (!Result.IsSuccess())
 	{
@@ -151,7 +149,7 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 #if WITH_GAMELIFT
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
 	{
-		auto& Module = USaucewich::GetGameLiftServerSDKModule();
+		auto& Module = USaucewich::GetGameLift();
 		Module.RemovePlayerSession(PC->GetSessionID());
 	}
 #endif

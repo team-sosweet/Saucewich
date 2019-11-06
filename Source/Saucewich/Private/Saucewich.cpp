@@ -5,11 +5,9 @@
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 
-#include "SaucewichGameInstance.h"
 #include "UserSettings.h"
 
-// 이 두 header의 include 순서는 상당히 중요하다.
-// 컴파일러의 버그인지 모르겠지만, 순서가 서로 바뀌면 아래 static_assert가 실패하는 경우가 있기 때문이다.
+// 컴파일러의 버그인지 모르겠지만 가끔 아래 static_assert가 실패하는 말도 안되는 일이 발생한다
 #include "DecalPoolActor.h"
 #include "ActorPool.h"
 static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* is not convertible to AActor*");
@@ -19,7 +17,7 @@ static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActo
 	#include "GameLiftServerSDK.h"
 	DEFINE_LOG_CATEGORY(LogGameLift)
 
-	FGameLiftServerSDKModule& USaucewich::GetGameLiftServerSDKModule()
+	FGameLiftServerSDKModule& USaucewich::GetGameLift()
 	{
 		static auto& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>("GameLiftServerSDK");
 		return Module;
@@ -75,28 +73,22 @@ void USaucewich::CleanupGame(const UObject* WorldContextObject)
 
 ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
 {
-	auto Len = 0;
-	for (const auto C : PlayerName)
-	{
-		if (isalnum(C) || C == '_') Len += 1;
-		else if (TEXT('가') <= C && C <= TEXT('힣')) Len += 2;
-		else return ENameValidity::Character;
-		if (Len > GetPlayerNameMaxLen()) return ENameValidity::Length;
-	}
-	return Len >= GetPlayerNameMinLen() ? ENameValidity::Valid : ENameValidity::Length;
+	if (PlayerName.Len() < GetPlayerNameMinLen() || PlayerName.Len() > GetPlayerNameMaxLen())
+		return ENameValidity::Length;
+
+	for (const auto c : PlayerName)
+		if (!FChar::IsIdentifier(c))
+			return ENameValidity::Character;
+
+	return ENameValidity::Valid;
 }
 
 int32 USaucewich::GetPlayerNameMinLen()
 {
-	return 1;
+	return 2;
 }
 
 int32 USaucewich::GetPlayerNameMaxLen()
 {
 	return 16;
-}
-
-int32 USaucewich::GetServerVersion()
-{
-	return 1;
 }
