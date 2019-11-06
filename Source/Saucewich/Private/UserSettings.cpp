@@ -33,6 +33,7 @@ void UUserSettings::PostInitProperties()
 	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 	{
 		PlayerName = TEXT("User");
+		PlayerName.AppendInt(FMath::RandRange(100, 999));
 		Save();
 	}
 }
