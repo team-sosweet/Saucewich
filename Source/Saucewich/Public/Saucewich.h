@@ -58,8 +58,5 @@ public:
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMaxLen();
 
-	UFUNCTION(BlueprintPure)
-	static int32 GetServerVersion();
-
-	static class FGameLiftServerSDKModule& GetGameLiftServerSDKModule();
+	static class FGameLiftServerSDKModule& GetGameLift();
 };

@@ -23,7 +23,7 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 		checkf(Result.IsSuccess(), TEXT("ERROR: %s: %s"), *Error.m_errorName, *Error.m_errorMessage);
 	};
 	
-	auto& GameLiftSdkModule = USaucewich::GetGameLiftServerSDKModule();
+	auto& GameLiftSdkModule = USaucewich::GetGameLift();
 	Check(GameLiftSdkModule.InitSDK());
 	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
 

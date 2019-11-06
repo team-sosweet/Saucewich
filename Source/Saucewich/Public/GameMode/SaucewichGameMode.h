@@ -25,7 +25,7 @@ public:
 	const FText& GetMessage(FName ID) const;
 
 	TSubclassOf<ASaucewichGameMode> ChooseNextGameMode() const;
-	virtual TSoftObjectPtr<UWorld> ChooseNextMap() const;
+	TSoftObjectPtr<UWorld> ChooseNextMap() const;
 	void StartNextGame() const;
 
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
@@ -77,10 +77,10 @@ private:
 	TMap<FName, FTextFormat> CompiledMsgFmt;
 
 	UPROPERTY(GlobalConfig, VisibleDefaultsOnly)
-	TSet<TSubclassOf<ASaucewichGameMode>> GameModes;
+	TArray<TSubclassOf<ASaucewichGameMode>> GameModes;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSet<TSoftObjectPtr<UWorld>> Maps;
+	TArray<TSoftObjectPtr<UWorld>> Maps;
 	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
