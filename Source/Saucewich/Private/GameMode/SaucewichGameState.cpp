@@ -147,7 +147,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 
 	auto LevelName = GetWorld()->GetName();
 	LevelName += '_';
-	LevelName += CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetID();
+	LevelName += CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetStreamLevelSuffix();
 	UGameplayStatics::LoadStreamLevel(this, *LevelName, true, false, {});
 }
 
