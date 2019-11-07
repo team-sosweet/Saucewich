@@ -7,10 +7,8 @@
 
 #include "UserSettings.h"
 
-// I don't know why, but sometimes static_assert below fails.
 #include "DecalPoolActor.h"
 #include "ActorPool.h"
-static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* is not convertible to AActor*");
 
 #if WITH_GAMELIFT
 

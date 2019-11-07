@@ -30,6 +30,8 @@ public:
 
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
 
+	const FString& GetID() const { return ID; }
+
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
@@ -81,6 +83,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UWorld>> Maps;
+
+	UPROPERTY(EditDefaultsOnly)
+	FString ID;
 	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
