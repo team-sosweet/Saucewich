@@ -19,7 +19,6 @@ AFridge::AFridge()
 void AFridge::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsPendingKill()) return;
 	
 	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
 	{

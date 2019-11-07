@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "Entity/GameModeDependentLevelActor.h"
+#include "GameFramework/Actor.h"
 #include "PickupSpawner.generated.h"
 
 UCLASS()
-class SAUCEWICH_API APickupSpawner : public AGameModeDependentLevelActor
+class SAUCEWICH_API APickupSpawner : public AActor
 {
 	GENERATED_BODY()
 	
