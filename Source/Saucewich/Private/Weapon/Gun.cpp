@@ -156,13 +156,10 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
+	check(IsValidLowLevel());
+
 	auto&& ShDat = GetSharedData<UGunSharedData>();
-
-	const auto Character = Cast<ATpsCharacter>(GetOwner());
-	check(Character->IsValidLowLevel());
-
-	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
-	if (!GS) return EGunTraceHit::None;
+	const auto Character = CastChecked<ATpsCharacter>(GetOwner());
 
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
@@ -170,7 +167,10 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	const auto End = Start + AimDir * Data.MaxDistance;
 
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActors(TArray<AActor*>{GS->GetCharactersByTeam(Character->GetTeam())});
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		Params.AddIgnoredActors(TArray<AActor*>{GS->GetCharactersByTeam(Character->GetTeam())});
+	}
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
