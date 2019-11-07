@@ -39,7 +39,7 @@ ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMateria
 	const auto Pool = AActorPool::Get(World);
 
 	FHitResult ComplexHit;
-	const auto bHitComplex = World->LineTraceSingleByChannel(ComplexHit, HitInfo.ImpactPoint + HitInfo.ImpactNormal * .1, HitInfo.ImpactPoint - HitInfo.ImpactNormal * 10, ECC_Visibility, {NAME_None, true});
+	const auto bHitComplex = World->LineTraceSingleByChannel(ComplexHit, HitInfo.ImpactPoint + HitInfo.ImpactNormal * .1f, HitInfo.ImpactPoint - HitInfo.ImpactNormal * 10, ECC_Visibility, {NAME_None, true});
 	auto& ActualHit = bHitComplex ? ComplexHit : HitInfo;
 
 	auto Rot = ActualHit.ImpactNormal.Rotation();
