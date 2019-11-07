@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "ActorPool.generated.h"
 
+class APoolActor;
+
 UCLASS(NotBlueprintable)
 class SAUCEWICH_API AActorPool : public AActor
 {
@@ -14,7 +16,7 @@ public:
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Actor Pool", WorldContext="WorldContext"))
 	static AActorPool* Get(const UObject* WorldContext);
 	
-	class APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform = FTransform::Identity, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
+	APoolActor* Spawn(TSubclassOf<APoolActor> Class, const FTransform& Transform = FTransform::Identity, const struct FActorSpawnParameters& SpawnParameters = DefaultParameters);
 
 	template <class T>
 	T* Spawn(const TSubclassOf<T> Class, const FTransform& Transform = FTransform::Identity, const FActorSpawnParameters& SpawnParameters = DefaultParameters)

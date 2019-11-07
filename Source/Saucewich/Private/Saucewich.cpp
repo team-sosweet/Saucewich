@@ -62,9 +62,9 @@ ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMateria
 
 void USaucewich::CleanupGame(const UObject* WorldContextObject)
 {
-	if (!WorldContextObject) return;
+	check(WorldContextObject);
 	const auto World = WorldContextObject->GetWorld();
-	if (!World) return;
+	check(World);
 
 	for (const auto Actor : TActorRange<APoolActor>{World})
 		Actor->Release();
