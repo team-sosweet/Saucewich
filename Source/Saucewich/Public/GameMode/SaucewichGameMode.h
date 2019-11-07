@@ -30,7 +30,7 @@ public:
 
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
 
-	const FString& GetID() const { return ID; }
+	const FString& GetStreamLevelSuffix() const { return StreamLevelSuffix; }
 
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -85,7 +85,7 @@ private:
 	TArray<TSoftObjectPtr<UWorld>> Maps;
 
 	UPROPERTY(EditDefaultsOnly)
-	FString ID;
+	FString StreamLevelSuffix;
 	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;

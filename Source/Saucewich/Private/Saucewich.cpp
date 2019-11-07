@@ -9,6 +9,7 @@
 
 #include "DecalPoolActor.h"
 #include "ActorPool.h"
+static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* should be convertible to AActor*");
 
 #if WITH_GAMELIFT
 
