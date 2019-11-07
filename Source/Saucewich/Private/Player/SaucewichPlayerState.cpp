@@ -173,7 +173,7 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 		if (Player == this || Player->IsPendingKill()) continue;
 		
 		auto Name = Player->GetPlayerName();
-		if (Name == S)
+		if (Name.Equals(S, ESearchCase::IgnoreCase))
 		{
 			auto Cnt = 0;
 			for (auto i = Name.Len() - 1; i >= 0 && isdigit(Name[i]); --i, ++Cnt) {}
