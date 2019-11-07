@@ -14,6 +14,8 @@
 #include "Weapon/Weapon.h"
 #include "Saucewich.h"
 #include "SaucewichGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "SaucewichGameMode.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -142,6 +144,11 @@ void ASaucewichGameState::HandleMatchHasStarted()
 	}
 
 	USaucewich::CleanupGame(this);
+
+	auto LevelName = GetWorld()->GetName();
+	LevelName += '_';
+	LevelName += CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetID();
+	UGameplayStatics::LoadStreamLevel(this, *LevelName, true, false, {});
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
