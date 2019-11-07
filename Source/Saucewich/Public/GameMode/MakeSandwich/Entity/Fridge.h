@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "Entity/GameModeDependentLevelActor.h"
+#include "GameFramework/Actor.h"
 #include "Fridge.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AFridge : public AGameModeDependentLevelActor
+class SAUCEWICH_API AFridge : public AActor
 {
 	GENERATED_BODY()
 
