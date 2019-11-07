@@ -10,7 +10,7 @@
 // 컴파일러의 버그인지 모르겠지만 가끔 아래 static_assert가 실패하는 말도 안되는 일이 발생한다
 #include "DecalPoolActor.h"
 #include "ActorPool.h"
-static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* is not convertible to AActor*");
+static_assert(std::is_convertible_v<APoolActor*, AActor*>, "APoolActor* is not convertible to AActor*");
 
 #if WITH_GAMELIFT
 
