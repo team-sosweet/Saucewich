@@ -175,13 +175,8 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 {
 	if (!ensure(WeaponClass)) return nullptr;
 
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	check(Owner);
-
 	const auto Slot = GetDefault<AWeapon>(WeaponClass)->GetData().Slot;
 	if (!ensure(Slot < Weapons.Num())) return nullptr;
-
-	const auto Pool = AActorPool::Get(this);
 
 	if (Weapons[Slot])
 	{
@@ -190,11 +185,11 @@ AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
 	}
 
 	FActorSpawnParameters Parameters;
-	Parameters.Owner = Owner;
-	Parameters.Instigator = Owner;
+	Parameters.Instigator = CastChecked<ATpsCharacter>(GetOwner());
+	Parameters.Owner = Parameters.Instigator;
 
-	const auto Weapon = Pool->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
-	if (!Weapon) return nullptr;
+	const auto Weapon = AActorPool::Get(this)->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
+	if (!ensure(Weapon)) return nullptr;
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
 

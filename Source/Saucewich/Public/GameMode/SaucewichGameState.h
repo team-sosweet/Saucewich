@@ -5,6 +5,11 @@
 #include "GameFramework/GameState.h"
 #include "SaucewichGameState.generated.h"
 
+class AWeapon;
+class ASauceMarker;
+class ATpsCharacter;
+class ASaucewichPlayerState;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchEnd, uint8, WonTeam);
@@ -40,6 +45,8 @@ class SAUCEWICH_API ASaucewichGameState : public AGameState
 	GENERATED_BODY()
 
 public:
+	class GetSauceMarker;
+
 	UFUNCTION(BlueprintCallable)
 	const FTeam& GetTeamData(const uint8 Team) const { return Teams[Team]; }
 
@@ -55,10 +62,10 @@ public:
 
 	
 	UFUNCTION(BlueprintCallable)
-	TArray<class ASaucewichPlayerState*> GetPlayersByTeam(uint8 Team) const;
+	TArray<ASaucewichPlayerState*> GetPlayersByTeam(uint8 Team) const;
 
 	UFUNCTION(BlueprintCallable)
-	TArray<class ATpsCharacter*> GetCharactersByTeam(uint8 Team) const;
+	TArray<ATpsCharacter*> GetCharactersByTeam(uint8 Team) const;
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetNumPlayers(uint8 Team) const;
@@ -80,7 +87,7 @@ public:
 
 	// 무기 목록에서 특정 슬롯의 무기들만 반환합니다
 	UFUNCTION(BlueprintCallable)
-	TArray<TSubclassOf<class AWeapon>> GetAvailableWeapons(uint8 Slot) const;
+	TArray<TSubclassOf<AWeapon>> GetAvailableWeapons(uint8 Slot) const;
 	auto& GetAvailableWeapons() const { return AvailableWeapons; }
 	
 
@@ -94,7 +101,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
 
-	
+
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerChangedTeam OnPlayerChangedTeam;
 
@@ -140,11 +147,15 @@ private:
 	// 플레이어는 무기 선택창에서 이 무기들중 하나를 선택하여 사용할 수 있습니다.
 	// 특정 슬롯의 무기만을 구하고 싶으면 GetAvailableWeapons 함수를 사용하세요.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TArray<TSubclassOf<AWeapon>> AvailableWeapons;
+	TArray<TSoftClassPtr<AWeapon>> AvailableWeapons;
 
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	TArray<int32> TeamScore;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSoftObjectPtr<UMaterialInterface>> SauceMarkMaterials;
+	TArray<TArray<const ASauceMarker*>> SauceMarkers;
+	
 
 	FTimerHandle RoundTimer;
 	
@@ -157,4 +168,12 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_WonTeam, Transient)
 	uint8 WonTeam = InvalidTeam;
+};
+
+class ASaucewichGameState::GetSauceMarker
+{
+	friend ASauceMarker;
+	GetSauceMarker(uint8 Team, const UWorld* World);
+	const ASauceMarker* operator->() const { return Marker; }
+	const ASauceMarker* Marker;
 };

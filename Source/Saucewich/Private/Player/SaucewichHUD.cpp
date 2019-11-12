@@ -14,10 +14,12 @@ void ASaucewichHUD::BeginPlay()
 
 	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
 	
-	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController());
-	FOnPlayerStateSpawnedSingle PSDelegate;
-	PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
-	PC->SafePlayerState(PSDelegate);
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController()))
+	{
+		FOnPlayerStateSpawnedSingle PSDelegate;
+		PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
+		PC->SafePlayerState(PSDelegate);
+	}
 }
 
 void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)

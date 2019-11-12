@@ -25,13 +25,14 @@ void UAliveWidget::NativeOnInitialized()
 	GameState = Cast<ASaucewichGameState>(GetWorld()->GetGameState());
 	GameState->OnPlayerDeath.AddDynamic(this, &UAliveWidget::OnPlayerDeath);
 
-	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer());
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer()))
+	{
+		FOnPlayerStateSpawnedSingle PSSpawned;
+		PSSpawned.BindDynamic(this, &UAliveWidget::OnPlayerStateSpawned);
+		PC->SafePlayerState(PSSpawned);
 
-	FOnPlayerStateSpawnedSingle PSSpawned;
-	PSSpawned.BindDynamic(this, &UAliveWidget::OnPlayerStateSpawned);
-	PC->SafePlayerState(PSSpawned);
-
-	PC->OnReceiveMessage.AddDynamic(this, &UAliveWidget::PrintMessage);
+		PC->OnReceiveMessage.AddDynamic(this, &UAliveWidget::PrintMessage);
+	}
 }
 
 void UAliveWidget::OnPlayerStateSpawned(ASaucewichPlayerState* PlayerState)

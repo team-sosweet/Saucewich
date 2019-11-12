@@ -52,12 +52,12 @@ template <class T, class Alloc>
 static T RandomDistinct(TArray<T, Alloc> Arr, const T& Elem)
 {
 	Arr.RemoveSingleSwap(Elem, false);
-	return Arr[FMath::RandHelper(Arr.Num())];
+	return Arr.Num() > 0 ? Arr[FMath::RandHelper(Arr.Num())] : Elem;
 }
 
-TSubclassOf<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
+TSoftClassPtr<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
 {
-	return RandomDistinct<TSubclassOf<ASaucewichGameMode>>(GameModes, GetClass());
+	return RandomDistinct<TSoftClassPtr<ASaucewichGameMode>>(GameModes, GetClass());
 }
 
 TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
@@ -89,16 +89,6 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 	if (!ErrorMessage.IsEmpty()) return;
 
-#if !WITH_EDITOR
-	const auto ClVer = FCString::Atoi(*UGameplayStatics::ParseOption(Options, "ServerVersion"));
-	const auto SvVer = USaucewich::GetServerVersion();
-	if (ClVer != SvVer)
-	{
-		ErrorMessage = FString::Printf(TEXT("Version mismatch. Client: %d, Server: %d"), ClVer, SvVer);
-		return;
-	}
-#endif
-	
 #if WITH_GAMELIFT
 	auto& GameLiftSdkModule = USaucewich::GetGameLift();
 	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
@@ -113,7 +103,10 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerController, const FUniqueNetIdRepl& UniqueId,
 	const FString& Options, const FString& Portal)
 {
-	const auto PC = CastChecked<ASaucewichPlayerController>(NewPlayerController);
+	check(NewPlayerController);
+	
+	const auto PC = Cast<ASaucewichPlayerController>(NewPlayerController);
+	if (!PC) return {};
 
 	if (!PC->PlayerState)
 		return "PlayerState is null";
@@ -357,7 +350,7 @@ void ASaucewichGameMode::UpdateMatchState()
 void ASaucewichGameMode::StartNextGame() const
 {
 	const auto GmClass = ChooseNextGameMode();
-	const auto DefGm = GmClass.GetDefaultObject();
+	const auto DefGm = GetDefault<ASaucewichGameMode>(GmClass.LoadSynchronous());
 	const auto NewMap = DefGm->ChooseNextMap();
 
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());

@@ -12,9 +12,9 @@ public class DownloadShim
 	public static OBBDownloaderService DownloaderService;
 	public static DownloaderActivity DownloadActivity;
 	public static Class<DownloaderActivity> GetDownloaderType() { return DownloaderActivity.class; }
-	public static boolean expansionFilesDelivered(Activity activity) {
+	public static boolean expansionFilesDelivered(Activity activity, int version) {
 		for (OBBData.XAPKFile xf : OBBData.xAPKS) {
-			String fileName = Helpers.getExpansionAPKFileName(activity, xf.mIsMain, xf.mFileVersion, OBBData.AppType);
+			String fileName = Helpers.getExpansionAPKFileName(activity, xf.mIsMain, Integer.toString(version), OBBData.AppType);
 			GameActivity.Log.debug("Checking for file : " + fileName);
 			String fileForNewFile = Helpers.generateSaveFileName(activity, fileName);
 			String fileForDevFile = Helpers.generateSaveFileNameDevelopment(activity, fileName);

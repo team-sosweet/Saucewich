@@ -6,10 +6,7 @@
 #include "Modules/ModuleManager.h"
 
 #include "UserSettings.h"
-
-#include "DecalPoolActor.h"
-#include "ActorPool.h"
-static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActor* should be convertible to AActor*");
+#include "PoolActor.h"
 
 #if WITH_GAMELIFT
 
@@ -27,38 +24,6 @@ static_assert(TPointerIsConvertibleFromTo<APoolActor, AActor>::Value, "APoolActo
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
 DEFINE_LOG_CATEGORY(LogSaucewich)
-
-ADecalPoolActor* USaucewich::SpawnSauceDecal(const FHitResult& HitInfo, UMaterialInterface* const Material, const FLinearColor& Color,
-	const FVector SizeMin, const FVector SizeMax, const float LifeSpan)
-{
-	const auto Comp = HitInfo.GetComponent();
-	if (!Comp || Comp->Mobility != EComponentMobility::Static) return nullptr;
-	
-	const auto World = Comp->GetWorld();
-	const auto Pool = AActorPool::Get(World);
-
-	FHitResult ComplexHit;
-	const auto bHitComplex = World->LineTraceSingleByChannel(ComplexHit, HitInfo.ImpactPoint + HitInfo.ImpactNormal * .1f, HitInfo.ImpactPoint - HitInfo.ImpactNormal * 10, ECC_Visibility, {NAME_None, true});
-	auto& ActualHit = bHitComplex ? ComplexHit : HitInfo;
-
-	auto Rot = ActualHit.ImpactNormal.Rotation();
-	Rot.Roll = FMath::FRandRange(0, 360);
-	
-	const auto Decal = Pool->Spawn<ADecalPoolActor>({Rot, ActualHit.ImpactPoint});
-	if (Decal)
-	{
-		Decal->SetDecalMaterial(Material);
-		Decal->SetColor(Color);
-		Decal->SetDecalSize({
-			FMath::RandRange(SizeMin.X, SizeMax.X),
-			FMath::RandRange(SizeMin.Y, SizeMax.Y),
-			FMath::RandRange(SizeMin.Z, SizeMax.Z)
-		});
-		Decal->SetLifeSpan(LifeSpan);
-	}
-
-	return Decal;
-}
 
 void USaucewich::CleanupGame(const UObject* WorldContextObject)
 {
