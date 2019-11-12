@@ -207,7 +207,7 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 				PS->AddScore("Heal", FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
 
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
-		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
+		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
 	}
 	
 	return DamageAmount;

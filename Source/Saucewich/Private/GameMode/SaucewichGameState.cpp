@@ -3,19 +3,18 @@
 #include "GameMode/SaucewichGameState.h"
 
 #include "Engine/World.h"
-#include "GameFramework/GameMode.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Weapon.h"
 #include "Saucewich.h"
 #include "SaucewichGameInstance.h"
-#include "Kismet/GameplayStatics.h"
 #include "SaucewichGameMode.h"
+#include "SauceMarker.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -104,12 +103,10 @@ TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint
 	TArray<TSubclassOf<AWeapon>> SlotWep;
 	for (const auto Class : AvailableWeapons)
 	{
-		if (const auto Def = Class.GetDefaultObject())
+		const auto Cls = Class.LoadSynchronous();
+		if (GetDefault<AWeapon>(Cls)->GetData().Slot == Slot)
 		{
-			if (Def->GetData().Slot == Slot)
-			{
-				SlotWep.Add(Class);
-			}
+			SlotWep.Emplace(Cls);
 		}
 	}
 	return SlotWep;
@@ -130,8 +127,22 @@ void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
-		USaucewichGameInstance::BroadcastGameStateSpawned(GI, this);
+	USaucewichGameInstance::BroadcastGameStateSpawned(GetGameInstance<USaucewichGameInstance>(), this);
+
+	ensure(SauceMarkers.Num() == 0);
+	const auto NumTeam = Teams.Num() - 1;
+	SauceMarkers.SetNum(NumTeam);
+	for (auto i = 0; i < NumTeam; ++i)
+	{
+		SauceMarkers[i].Reserve(SauceMarkMaterials.Num());
+		for (const auto Mat : SauceMarkMaterials)
+		{
+			auto Marker = GetWorld()->SpawnActor<ASauceMarker>();
+			Marker->SetMaterial(Mat.LoadSynchronous());
+			Marker->SetColor(GetTeamData(i+1).Color);
+			SauceMarkers[i].Add(Marker);
+		}
+	}
 }
 
 void ASaucewichGameState::HandleMatchHasStarted()
@@ -236,4 +247,10 @@ uint8 ASaucewichGameState::GetEmptyTeam() const
 void ASaucewichGameState::OnRep_WonTeam()
 {
 	OnMatchEnd.Broadcast(WonTeam);
+}
+
+ASaucewichGameState::GetSauceMarker::GetSauceMarker(const uint8 Team, const UWorld* const World)
+{
+	auto&& Markers = World->GetGameState<ASaucewichGameState>()->SauceMarkers[Team-1];
+	Marker = Markers[FMath::RandHelper(Markers.Num())];
 }

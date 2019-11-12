@@ -24,7 +24,7 @@ public:
 	void PrintMessage(const FText& Message, EMsgType Type, float Duration = 3) const;
 	const FText& GetMessage(FName ID) const;
 
-	TSubclassOf<ASaucewichGameMode> ChooseNextGameMode() const;
+	TSoftClassPtr<ASaucewichGameMode> ChooseNextGameMode() const;
 	TSoftObjectPtr<UWorld> ChooseNextMap() const;
 	void StartNextGame() const;
 
@@ -79,7 +79,7 @@ private:
 	TMap<FName, FTextFormat> CompiledMsgFmt;
 
 	UPROPERTY(GlobalConfig, VisibleDefaultsOnly)
-	TArray<TSubclassOf<ASaucewichGameMode>> GameModes;
+	TArray<TSoftClassPtr<ASaucewichGameMode>> GameModes;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UWorld>> Maps;

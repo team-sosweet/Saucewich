@@ -156,10 +156,10 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
-	check(IsValidLowLevel());
-
+	const auto Character = Cast<ATpsCharacter>(GetOwner());
+	if (!IsValid(Character)) return EGunTraceHit::None;
+	
 	auto&& ShDat = GetSharedData<UGunSharedData>();
-	const auto Character = CastChecked<ATpsCharacter>(GetOwner());
 
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
