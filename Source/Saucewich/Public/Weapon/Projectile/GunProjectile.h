@@ -13,6 +13,9 @@ class SAUCEWICH_API AGunProjectile : public AProjectile
 public:
 	uint8 bCosmetic : 1;
 
+protected:
+	float GetSauceMarkScale() const override;
+
 private:
 	void OnActivated() override;
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;

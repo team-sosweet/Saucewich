@@ -125,7 +125,6 @@ void AGun::Shoot()
 		if (const auto Projectile = AActorPool::Get(this)->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
 		{
 			Projectile->bCosmetic = HitPawn[i];
-			Projectile->SetColor(GetColor());
 		}
 	}
 

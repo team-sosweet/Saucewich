@@ -11,8 +11,8 @@ class SAUCEWICH_API AExplosiveProjectile : public AProjectile
 	GENERATED_BODY()
 
 protected:
-	UFUNCTION(BlueprintCallable)
-	void ApplyDamage() const;
+	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	float GetSauceMarkScale() const override;
 	
 private:
 	UPROPERTY(EditAnywhere)
