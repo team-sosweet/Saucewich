@@ -1,6 +1,6 @@
 # Saucewich
 
-UE4로 개발중인 캐주얼 멀티플레이어 TPS 게임
+### 이 프로젝트는 이전되었습니다: https://github.com/Othereum/Saucewich
 
 ![Logo](Saucewich.png)
 
