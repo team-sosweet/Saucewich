@@ -24,6 +24,8 @@ public:
 	void LifeSpanExpired() override { Release(); }
 
 protected:
+	void BeginPlay() override;
+	
 	virtual void OnReleased() {}
 	virtual void OnActivated() {}
 

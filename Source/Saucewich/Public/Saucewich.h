@@ -6,9 +6,6 @@
 #include "Engine/EngineTypes.h"
 #include "Saucewich.generated.h"
 
-#undef WITH_GAMELIFT
-#define WITH_GAMELIFT 0
-
 UENUM(BlueprintType)
 enum class EGunTraceHit : uint8
 {
@@ -39,9 +36,6 @@ class SAUCEWICH_API USaucewich : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContextObject))
-	static void CleanupGame(const UObject* WorldContextObject);
-
 	UFUNCTION(BlueprintPure)
 	static ENameValidity IsValidPlayerName(const FString& PlayerName);
 
