@@ -4,6 +4,12 @@
 #include "GameFramework/Pawn.h"
 #include "Gun.h"
 
+float AGunProjectile::GetSauceMarkScale() const
+{
+	auto&& S = GetMesh()->RelativeScale3D;
+	return (S.X + S.Y + S.Z) / 6.f;
+}
+
 void AGunProjectile::OnActivated()
 {
 	Super::OnActivated();
@@ -33,6 +39,4 @@ void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const 
 			);
 		}
 	}
-
-	Release();
 }

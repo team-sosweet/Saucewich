@@ -27,11 +27,7 @@ DEFINE_LOG_CATEGORY(LogSaucewich)
 
 void USaucewich::CleanupGame(const UObject* WorldContextObject)
 {
-	check(WorldContextObject);
-	const auto World = WorldContextObject->GetWorld();
-	check(World);
-
-	for (const auto Actor : TActorRange<APoolActor>{World})
+	for (const auto Actor : TActorRange<APoolActor>{WorldContextObject->GetWorld()})
 		Actor->Release();
 }
 
