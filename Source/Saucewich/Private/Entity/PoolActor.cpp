@@ -6,6 +6,7 @@
 #include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
+#include "SaucewichGameState.h"
 
 void APoolActor::Release(const bool bForce)
 {
@@ -38,6 +39,12 @@ void APoolActor::Activate(const bool bForce)
 	Activation = EActivation::Activated;
 	OnActivated();
 	BP_OnActivated();
+}
+
+void APoolActor::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorld()->GetGameState<ASaucewichGameState>()->OnCleanup.AddUObject(this, &APoolActor::Release, false);
 }
 
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

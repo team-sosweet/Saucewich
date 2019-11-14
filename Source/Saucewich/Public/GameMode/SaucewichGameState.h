@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichP
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchEnd, uint8, WonTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeavingMap);
+DECLARE_EVENT(ASaucewichGameState, FOnCleanupGame)
 
 USTRUCT(BlueprintType)
 struct FTeam
@@ -119,6 +120,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnLeavingMap OnLeavingMap;
+
+	FOnCleanupGame OnCleanup;
 
 protected:
 	void BeginPlay() override;

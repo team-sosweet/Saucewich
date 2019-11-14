@@ -6,7 +6,6 @@
 #include "Modules/ModuleManager.h"
 
 #include "UserSettings.h"
-#include "PoolActor.h"
 
 #if WITH_GAMELIFT
 
@@ -24,12 +23,6 @@
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
 DEFINE_LOG_CATEGORY(LogSaucewich)
-
-void USaucewich::CleanupGame(const UObject* WorldContextObject)
-{
-	for (const auto Actor : TActorRange<APoolActor>{WorldContextObject->GetWorld()})
-		Actor->Release();
-}
 
 ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
 {

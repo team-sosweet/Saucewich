@@ -154,7 +154,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
 
-	USaucewich::CleanupGame(this);
+	OnCleanup.Broadcast();
 
 	auto LevelName = GetWorld()->GetName();
 	LevelName += '_';
@@ -186,7 +186,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	USaucewich::CleanupGame(this);
+	OnCleanup.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
