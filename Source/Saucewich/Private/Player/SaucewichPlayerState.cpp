@@ -7,7 +7,6 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "SaucewichGameInstance.h"
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
@@ -15,15 +14,9 @@
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
 #include "Saucewich.h"
+#include "SaucewichInstance.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
-
-template <class Fn>
-void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
-{
-	if (const auto GI = PlayerState->GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		GI->SafeGameState(Func);
-}
 
 void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
@@ -48,11 +41,11 @@ void ASaucewichPlayerState::OnKill()
 {
 	if (!HasAuthority()) return;
 
-	const auto GS = GetWorld()->GetGameState<AGameState>();
-	if (!GS || !GS->IsMatchInProgress()) return;
+	const auto GS = CastChecked<AGameState>(GetWorld()->GetGameState());
+	if (!GS->IsMatchInProgress()) return;
 
 	++Kill;
-	AddScore("Kill");
+	AddScore(TEXT("Kill"));
 }
 
 void ASaucewichPlayerState::OnDeath()
@@ -65,15 +58,19 @@ void ASaucewichPlayerState::OnDeath()
 	++Death;
 }
 
-void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
+void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore, const bool bForce)
 {
 	if (!HasAuthority()) return;
 
-	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
-	if (!GS || !GS->CanAddPersonalScore()) return;
+	if (!bForce)
+	{
+		const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+		if (!GS->CanAddPersonalScore()) return;
+	}
 
+	const auto GI = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 	if (ActualScore == 0)
-		ActualScore = GS->GetScoreData(ScoreID).Score;
+		ActualScore = GI->GetScoreData(ScoreID).Score;
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
@@ -94,10 +91,7 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
-	SafeGameState(this, [this, OldTeam](ASaucewichGameState* const GameState)
-	{
-		GameState->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
-	});
+	GetWorld()->GetGameState<ASaucewichGameState>()->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
 }
 
 void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)

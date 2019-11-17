@@ -7,13 +7,12 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
+#include "SaucewichGameMode.h"
 
 void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-	
 	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController()))
 	{
 		FOnPlayerStateSpawnedSingle PSDelegate;
@@ -24,11 +23,15 @@ void ASaucewichHUD::BeginPlay()
 
 void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
+	check(InDelegate.IsBound());
 	OnChangedColor.AddUnique(InDelegate);
-	InDelegate.ExecuteIfBound(MyTeamColor);
+
+	auto&& Data = ASaucewichGameMode::GetData(this);
+	const auto PlayerState = CastChecked<ASaucewichPlayerState>(GetOwningPlayerController()->PlayerState);
+	(void)InDelegate.Execute(Data.Teams[PlayerState->GetTeam()].Color);
 }
 
-void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
+void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* const PS)
 {
 	PS->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangedColor);
 	ChangedColor(PS->GetTeam());
@@ -36,6 +39,5 @@ void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
 
 void ASaucewichHUD::ChangedColor(const uint8 NewTeam)
 {
-	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
-	OnChangedColor.Broadcast(MyTeamColor);
+	OnChangedColor.Broadcast(ASaucewichGameMode::GetData(this).Teams[NewTeam].Color);
 }

@@ -7,13 +7,13 @@
 #include "Entity/ActorPool.h"
 #include "GameMode/MakeSandwich/MakeSandwichState.h"
 #include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
-#include "SaucewichGameInstance.h"
+#include "SaucewichInstance.h"
 
 void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngredient> Class)
 {
 	if (HasAuthority())
 	{
-		AddScore("PickupIngredient");
+		AddScore(TEXT("PickupIngredient"));
 		MulticastPickupIngredient(Class);
 	}
 }
@@ -28,14 +28,16 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 {
 	if (Ingredients.Num() <= 0) return;
 
-	if (const auto GS = GetWorld()->GetGameState<AMakeSandwichState>())
-	{
-		static const FName ScoreName = "PutIngredients";
-		const auto NumIngredients = GetNumIngredients();
-		AddScore(ScoreName, NumIngredients * GS->GetScoreData(ScoreName).Score);
-		SetObjective(GetObjective() + NumIngredients);
-		GS->StoreIngredients(this);
-	}
+	const auto GameInstance = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
+	const auto GameState = CastChecked<AMakeSandwichState>(GetWorld()->GetGameState());
+
+	const FName ScoreName{TEXT("PutIngredients")};
+	const auto NumIngredients = GetNumIngredients();
+	const auto ScorePer = GameInstance->GetScoreData(ScoreName).Score;
+	
+	AddScore(ScoreName, NumIngredients * ScorePer);
+	SetObjective(GetObjective() + NumIngredients);
+	GameState->StoreIngredients(this);
 
 	MulticastResetIngredients();
 }

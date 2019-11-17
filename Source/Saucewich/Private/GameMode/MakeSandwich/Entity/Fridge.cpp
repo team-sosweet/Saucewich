@@ -7,11 +7,11 @@
 #include "GameFramework/Pawn.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
-#include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
-#include "GameMode/SaucewichGameState.h"
+#include "MakeSandwichPlayerState.h"
+#include "SaucewichGameMode.h"
 
 AFridge::AFridge()
-	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")}
+	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))}
 {
 	RootComponent = Mesh;
 }
@@ -20,13 +20,10 @@ void AFridge::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-	{
-		const auto Idx = Mesh->GetMaterialIndex("TeamColor");
-		const auto Mat = Mesh->CreateDynamicMaterialInstance(Idx);
-		const auto& Color = GS->GetTeamData(Team).Color;
-		Mat->SetVectorParameterValue("Color", Color);
-	}
+	const auto Idx = Mesh->GetMaterialIndex(TEXT("TeamColor"));
+	const auto Mat = Mesh->CreateDynamicMaterialInstance(Idx);
+	auto&& Color = ASaucewichGameMode::GetData(this).Teams[Team].Color;
+	Mat->SetVectorParameterValue(TEXT("Color"), Color);
 }
 
 void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,

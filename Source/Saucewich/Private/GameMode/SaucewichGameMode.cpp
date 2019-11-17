@@ -2,7 +2,9 @@
 
 #include "SaucewichGameMode.h"
 
-#include "GameLiftServerSDK.h"
+#if WITH_GAMELIFT
+	#include "GameLiftServerSDK.h"
+#endif
 
 #include "Engine/Engine.h"
 #include "Engine/PlayerStartPIE.h"
@@ -18,6 +20,14 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "Saucewich.h"
+#include "SaucewichInstance.h"
+
+#define LOCTEXT_NAMESPACE ""
+
+const FGameData& ASaucewichGameMode::GetData(const UObject* WorldContextObj)
+{
+	return CastChecked<ASaucewichGameMode>(WorldContextObj->GetWorld()->GetGameState()->GetDefaultGameMode())->Data;
+}
 
 ASaucewichGameMode::ASaucewichGameMode()
 {
@@ -36,17 +46,8 @@ void ASaucewichGameMode::PrintMessage(const FText& Message, const EMsgType Type,
 	{
 		PC->PrintMessage(Message, Duration, Type);
 	}
+	UE_LOG(LogGameMode, Log, TEXT("%s"), *Message.ToString());
 }
-
-const FText& ASaucewichGameMode::GetMessage(const FName ID) const
-{
-	if (const auto Found = Messages.Find(ID))
-		return *Found;
-
-	UE_LOG(LogGameMode, Error, TEXT("메시지 ID '%s'에 대한 메시지 텍스트가 없습니다!"), *ID.ToString());
-	return FText::GetEmpty();
-}
-
 
 template <class T, class Alloc>
 static T RandomDistinct(TArray<T, Alloc> Arr, const T& Elem)
@@ -57,30 +58,44 @@ static T RandomDistinct(TArray<T, Alloc> Arr, const T& Elem)
 
 TSoftClassPtr<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
 {
-	return RandomDistinct<TSoftClassPtr<ASaucewichGameMode>>(GameModes, GetClass());
+	return RandomDistinct<TSoftClassPtr<ASaucewichGameMode>>(GetSaucewichInstance()->GetGameModes(), GetClass());
 }
 
 TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
 {
-	return RandomDistinct<TSoftObjectPtr<UWorld>>(Maps, GetWorld());
+	return RandomDistinct<TSoftObjectPtr<UWorld>>(Data.Maps, GetWorld());
 }
 
-
-void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
+void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName) const
 {
-	PrintAndLogFmtMsg("NameChange", FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName()));
+	PrintMessage(
+		FMT_MSG(
+			LOCTEXT("NameChange", "{0}님이 이름을 {1}|hpp(으로,로) 변경했습니다."),
+			FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())
+		),
+		EMsgType::Left
+	);
 }
 
 void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	if (GameSession) GameSession->MaxPlayers = MaxPlayers;
+	if (GameSession) GameSession->MaxPlayers = Data.MaxPlayers;
 }
 
 void ASaucewichGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, MatchStateUpdateInterval, true);
+	
+	GetWorldTimerManager().SetTimer(
+		MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, Data.MatchStateUpdateInterval, true
+	);
+
+	TeamStarts.SetNumZeroed(Data.Teams.Num());
+	for (const auto Start : TActorRange<APlayerStart>{GetWorld()})
+	{
+		TeamStarts[Start->PlayerStartTag.ToString()[0] - TEXT('0')].Add(Start);
+	}
 }
 
 void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
@@ -91,7 +106,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 
 #if WITH_GAMELIFT
 	auto& GameLiftSdkModule = USaucewich::GetGameLift();
-	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, "SessionID"));
+	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, TEXT("SessionID")));
 	if (!Result.IsSuccess())
 	{
 		ErrorMessage = Result.GetError().m_errorMessage;
@@ -109,21 +124,18 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 	if (!PC) return {};
 
 	if (!PC->PlayerState)
-		return "PlayerState is null";
+		return TEXT("PlayerState is null");
 
 	GameSession->RegisterPlayer(PC, UniqueId.GetUniqueNetId(), false);
-
 	
-	auto PlayerName = UGameplayStatics::ParseOption(Options, "PlayerName");
+	auto PlayerName = UGameplayStatics::ParseOption(Options, TEXT("PlayerName"));
 	
 	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), PC->PlayerState->PlayerId);
 	
 	ChangeName(PC, PlayerName, false);
 
-
-	PC->SetSessionID(UGameplayStatics::ParseOption(Options, "SessionID"));
-	
+	PC->SetSessionID(UGameplayStatics::ParseOption(Options, TEXT("SessionID")));
 	
 	return {};
 }
@@ -131,13 +143,21 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	PrintAndLogFmtMsg("Login", FText::FromString(NewPlayer->PlayerState->GetPlayerName()));
+	
+	PrintMessage(
+		FMT_MSG(LOCTEXT("Login", "{0}님이 게임에 참여했습니다."), FText::FromString(NewPlayer->PlayerState->GetPlayerName())),
+		EMsgType::Left
+	);
 }
 
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
-	PrintAndLogFmtMsg("Logout", FText::FromString(Exiting->PlayerState->GetPlayerName()));
+	
+	PrintMessage(
+		FMT_MSG(LOCTEXT("Logout", "{0}님이 게임에서 나갔습니다."), FText::FromString(Exiting->PlayerState->GetPlayerName())),
+		EMsgType::Left
+	);
 
 #if WITH_GAMELIFT
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
@@ -156,17 +176,15 @@ void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 {
 	Super::GenericPlayerInitialization(C);
 	
-	if (const auto GS = GetGameState<ASaucewichGameState>())
+	const auto GS = CastChecked<ASaucewichGameState>(GameState);
+	const auto PS = CastChecked<ASaucewichPlayerState>(C->PlayerState);
+	
+	const auto MinTeamNum = GS->GetNumPlayers(GS->GetMinPlayerTeam());
+	const auto MyTeamNum = GS->GetNumPlayers(PS->GetTeam());
+	
+	if (PS->GetTeam() == 0 || MyTeamNum - MinTeamNum > 1)
 	{
-		if (const auto PS = C->GetPlayerState<ASaucewichPlayerState>())
-		{
-			const auto MinTeamNum = GS->GetNumPlayers(GS->GetMinPlayerTeam());
-			const auto MyTeamNum = GS->GetNumPlayers(PS->GetTeam());
-			if (PS->GetTeam() == 0 || MyTeamNum - MinTeamNum > 1)
-			{
-				PS->SetTeam(GS->GetMinPlayerTeam());
-			}
-		}
+		PS->SetTeam(GS->GetMinPlayerTeam());
 	}
 }
 
@@ -177,39 +195,40 @@ bool ASaucewichGameMode::ShouldSpawnAtStartSpot(AController* Player)
 
 AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const Player)
 {
-	const auto PawnClass = GetDefaultPawnClassForController(Player);
-	const auto PawnToFit = PawnClass ? PawnClass->GetDefaultObject<APawn>() : nullptr;
 	const auto World = GetWorld();
-
-	TCHAR Tag[] = TEXT("0");
-	Tag[0] = TEXT('0') + Player->GetPlayerState<ASaucewichPlayerState>()->GetTeam();
-
-	// 4개의 TArray는 우선순위를 나타내며 0번이 가장 높다.
-	TArray<APlayerStart*> StartPoints[4];
-
-	for (const auto PlayerStart : TActorRange<APlayerStart>{GetWorld()})
-	{
+	
 #if WITH_EDITOR
-		if (PlayerStart->IsA<APlayerStartPIE>())
-		{
-			return PlayerStart;
-		}
+	for (const auto Start : TActorRange<APlayerStartPIE>{World}) return Start;
 #endif
+	
+	const auto PawnClass = GetDefaultPawnClassForController(Player);
+	const auto PawnToFit = PawnClass ? GetDefault<APawn>(PawnClass) : nullptr;
+	const auto Team = CastChecked<ASaucewichPlayerState>(Player->PlayerState)->GetTeam();
 
-		const auto bMyTeam = PlayerStart->PlayerStartTag == Tag;
-		auto ActorLocation = PlayerStart->GetActorLocation();
-		const auto ActorRotation = PlayerStart->GetActorRotation();
+	TArray<APlayerStart*> StartsPriority[3];
+
+	for (const auto Start : TeamStarts[Team])
+	{
+		auto ActorLocation = Start->GetActorLocation();
+		const auto ActorRotation = Start->GetActorRotation();
 		if (!World->EncroachingBlockingGeometry(PawnToFit, ActorLocation, ActorRotation))
 		{
-			(bMyTeam ? StartPoints[0] : StartPoints[2]).Add(PlayerStart);
+			StartsPriority[0].Add(Start);
 		}
-		else if (World->FindTeleportSpot(PawnToFit, ActorLocation, ActorRotation))
+		else if (StartsPriority[0].Num() == 0)
 		{
-			(bMyTeam ? StartPoints[1] : StartPoints[3]).Add(PlayerStart);
+			if (World->FindTeleportSpot(PawnToFit, ActorLocation, ActorRotation))
+			{
+				StartsPriority[1].Add(Start);
+			}
+			else if (StartsPriority[1].Num() == 0)
+			{
+				StartsPriority[2].Add(Start);
+			}
 		}
 	}
 
-	for (const auto& Starts : StartPoints)
+	for (auto&& Starts : StartsPriority)
 	{
 		if (Starts.Num() > 0)
 		{
@@ -222,11 +241,7 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 
 void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer, AActor* const StartSpot)
 {
-	if (!IsValid(NewPlayer)) return;
-	if (!StartSpot) return;
-	if (MustSpectate(Cast<APlayerController>(NewPlayer))) return;
-
-	if (!NewPlayer->GetPawn() && GetDefaultPawnClassForController(NewPlayer))
+	if (!NewPlayer->GetPawn())
 	{
 		NewPlayer->SetPawn(SpawnDefaultPawnFor(NewPlayer, StartSpot));
 	}
@@ -238,7 +253,7 @@ void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer
 	else
 	{
 		InitStartSpot(StartSpot, NewPlayer);
-		auto& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
+		auto&& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
 		NewPlayer->GetPawn()->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
 		FinishRestartPlayer(NewPlayer, StartSpot->GetActorRotation());
 	}
@@ -248,30 +263,24 @@ void ASaucewichGameMode::SetPlayerDefaults(APawn* const PlayerPawn)
 {
 	Super::SetPlayerDefaults(PlayerPawn);
 
-	if (const auto PS = PlayerPawn->GetPlayerState<ASaucewichPlayerState>())
-	{
-		PS->GiveWeapons();
-	}
+	PlayerPawn->GetPlayerStateChecked<ASaucewichPlayerState>()->GiveWeapons();
 }
 
 bool ASaucewichGameMode::ReadyToStartMatch_Implementation()
 {
-	return NumPlayers >= MinPlayerToStart;
+	return NumPlayers >= Data.MinPlayerToStart;
 }
 
 bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 {
-	if (const auto GS = GetGameState<ASaucewichGameState>())
+	if (CastChecked<ASaucewichGameState>(GameState)->GetRemainingRoundSeconds() <= 0.f)
 	{
-		if (GS->GetRemainingRoundSeconds() <= 0)
-		{
-			return true;
-		}
+		return true;
+	}
 
-		if (NumPlayers == 0)
-		{
-			return true;
-		}
+	if (NumPlayers <= 0)
+	{
+		return true;
 	}
 	
 	return false;
@@ -294,8 +303,6 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 	{
 		Spawner->SetSpawnTimer();
 	}
-
-	PrintAndLogFmtMsg("MatchStart");
 }
 
 void ASaucewichGameMode::HandleMatchHasEnded()
@@ -308,7 +315,7 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	}
 	else
 	{
-		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, NextGameWaitTime);
+		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
 	}
 }
 
@@ -321,14 +328,13 @@ void ASaucewichGameMode::UpdateMatchState()
 			const auto bTimerExists = GetWorldTimerManager().TimerExists(MatchStateTimer);
 			if (bAboutToStartMatch && !bTimerExists)
 			{
-				UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToStartMatch"));
 				StartMatch();
 			}
 			else if (!bAboutToStartMatch && !bTimerExists)
 			{
 				bAboutToStartMatch = true;
-				GetWorldTimerManager().SetTimer(MatchStateTimer, MatchStartingTime, false);
-				PrintMessage(GetMessage("StartingMatch"), EMsgType::Center, MatchStartingTime);
+				GetWorldTimerManager().SetTimer(MatchStateTimer, Data.MatchStartingTime, false);
+				PrintMessage(LOCTEXT("StartingMatch", "게임이 시작됩니다!"), EMsgType::Center, Data.MatchStartingTime);
 			}
 		}
 		else
@@ -341,10 +347,14 @@ void ASaucewichGameMode::UpdateMatchState()
 	{
 		if (ReadyToEndMatch())
 		{
-			UE_LOG(LogGameMode, Log, TEXT("GameMode returned ReadyToEndMatch"));
 			EndMatch();
 		}
 	}
+}
+
+USaucewichInstance* ASaucewichGameMode::GetSaucewichInstance() const
+{
+	return CastChecked<USaucewichInstance>(GetGameInstance());
 }
 
 void ASaucewichGameMode::StartNextGame() const
@@ -355,11 +365,4 @@ void ASaucewichGameMode::StartNextGame() const
 
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
-}
-
-void ASaucewichGameMode::PrintAndLogFmtMsg(const FName MsgID) const
-{
-	auto&& Msg = GetMessage(MsgID);
-	PrintMessage(Msg, EMsgType::Center);
-	UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
 }

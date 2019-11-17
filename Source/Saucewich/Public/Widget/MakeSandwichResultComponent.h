@@ -20,9 +20,6 @@ public:
 	void SetWidget(uint8 WinningTeam) const;
 	
 private:
-	UFUNCTION()
-	void GetPlayerState(class ASaucewichPlayerState* InPlayerState);
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TMap<FName, FText> ResultTexts;
 	
@@ -65,9 +62,5 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	int32 WaitTime;
 	
-	class ASaucewichGameState* GameState;
-	
-	ASaucewichPlayerState* PlayerState;
-
 	FTimerHandle WaitTimer;
 };

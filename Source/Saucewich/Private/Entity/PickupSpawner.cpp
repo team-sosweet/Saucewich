@@ -10,14 +10,13 @@
 #include "Entity/Pickup.h"
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
-#include "SaucewichGameInstance.h"
 
 APickupSpawner::APickupSpawner()
-	:Body{CreateDefaultSubobject<USphereComponent>("Body")}
+	:Body{CreateDefaultSubobject<USphereComponent>(TEXT("Body"))}
 {
 	bReplicates = true;
 	RootComponent = Body;
-	Body->BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
+	Body->BodyInstance.SetCollisionProfileNameDeferred(TEXT("NoCollision"));
 }
 
 void APickupSpawner::PickedUp()
@@ -30,8 +29,7 @@ float APickupSpawner::GetSpawnInterval() const
 	if (SpawnIntervalOverride > 0) return SpawnIntervalOverride;
 
 	if (const auto GS = GetWorld()->GetGameState())
-		if (const auto DefGm = GS->GetDefaultGameMode<ASaucewichGameMode>())
-			return DefGm->GetPickupSpawnInterval();
+		return CastChecked<ASaucewichGameMode>(GS->GetDefaultGameMode())->GetData().PickupSpawnInterval;
 
 	return 0;
 }
@@ -39,11 +37,7 @@ float APickupSpawner::GetSpawnInterval() const
 float APickupSpawner::GetSpawnInterval(const AGameStateBase* const GS) const
 {
 	if (SpawnIntervalOverride > 0) return SpawnIntervalOverride;
-
-	if (const auto DefGm = GS->GetDefaultGameMode<ASaucewichGameMode>())
-		return DefGm->GetPickupSpawnInterval();
-
-	return 0;
+	return CastChecked<ASaucewichGameMode>(GS->GetDefaultGameMode())->GetData().PickupSpawnInterval;
 }
 
 float APickupSpawner::GetRemainingSpawnTime() const
@@ -83,16 +77,11 @@ void APickupSpawner::SetSpawnTimer()
 {
 	if (!HasAuthority()) return;
 
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
+	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
+	TimerStartTime = GS->GetServerWorldTimeSeconds();
+	const auto Interval = GetSpawnInterval(GS);
+	if (Interval > 0)
 	{
-		GI->SafeGameState([this](ASaucewichGameState* const GS)
-		{
-			TimerStartTime = GS->GetServerWorldTimeSeconds();
-			const auto Interval = GetSpawnInterval(GS);
-			if (Interval > 0)
-			{
-				GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, Interval);
-			}
-		});
+		GetWorldTimerManager().SetTimer(SpawnTimer, this, &APickupSpawner::Spawn, Interval);
 	}
 }

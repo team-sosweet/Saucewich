@@ -4,25 +4,23 @@
 
 #include "Components/TextBlock.h"
 
-#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
+#include "SaucewichGameMode.h"
 
 void UUserInfo::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-
-	NameText = Cast<UTextBlock>(GetWidgetFromName("Text_Name"));
-	ScoreText = Cast<UTextBlock>(GetWidgetFromName("Text_Score"));
-	ObjectiveText = Cast<UTextBlock>(GetWidgetFromName("Text_Objective"));
-	KillText = Cast<UTextBlock>(GetWidgetFromName("Text_Kill"));
-	DeathText = Cast<UTextBlock>(GetWidgetFromName("Text_Death"));
+	NameText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Name"));
+	ScoreText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Score"));
+	ObjectiveText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Objective"));
+	KillText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Kill"));
+	DeathText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Death"));
 }
 
-void UUserInfo::UpdateInfo(ASaucewichPlayerState* PlayerState)
+void UUserInfo::UpdateInfo(ASaucewichPlayerState* PlayerState) const
 {
-	const auto Color = GameState->GetTeamData(PlayerState->GetTeam()).Color;
+	auto&& Color = ASaucewichGameMode::GetData(this).Teams[PlayerState->GetTeam()].Color;
 
 	const auto Name = PlayerState->GetPlayerName();
 	NameText->SetText(FText::FromString(Name));
