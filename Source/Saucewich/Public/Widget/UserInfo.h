@@ -5,19 +5,22 @@
 #include "Blueprint/UserWidget.h"
 #include "UserInfo.generated.h"
 
+class UTextBlock;
+
 UCLASS()
 class SAUCEWICH_API UUserInfo : public UUserWidget
 {
 	GENERATED_BODY()
-
-	void NativeOnInitialized() override;
 	
 public:
-	void UpdateInfo(class ASaucewichPlayerState* PlayerState);
+	void UpdateInfo(class ASaucewichPlayerState* PlayerState) const;
+
+protected:
+	void NativeOnInitialized() override;
 
 private:
 	UPROPERTY(Transient)
-	class UTextBlock* NameText;
+	UTextBlock* NameText;
 	
 	UPROPERTY(Transient)
 	UTextBlock* ScoreText;
@@ -30,6 +33,4 @@ private:
 	
 	UPROPERTY(Transient)
 	UTextBlock* DeathText;
-	
-	class ASaucewichGameState* GameState;
 };

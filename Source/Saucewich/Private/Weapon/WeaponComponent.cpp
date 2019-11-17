@@ -9,7 +9,6 @@
 #include "Entity/ActorPool.h"
 #include "Player/TpsCharacter.h"
 #include "Weapon/Gun.h"
-#include "SaucewichGameInstance.h"
 #include "UserSettings.h"
 
 UWeaponComponent::UWeaponComponent()

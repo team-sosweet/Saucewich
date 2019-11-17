@@ -10,18 +10,13 @@
 
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
-#include "Weapon/Weapon.h"
-#include "Saucewich.h"
-#include "SaucewichGameInstance.h"
 #include "SaucewichGameMode.h"
-#include "SauceMarker.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
 {
 	for (const auto PS : PlayerArray)
-		if (const auto P = Cast<ASaucewichPlayerState>(PS))
-			Do(P);
+		Do(CastChecked<ASaucewichPlayerState>(PS));
 }
 
 template <class Fn>
@@ -40,7 +35,7 @@ TArray<ASaucewichPlayerState*> ASaucewichGameState::GetPlayersByTeam(const uint8
 TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team) const
 {
 	TArray<ATpsCharacter*> Characters;
-	ForEachPlayer(PlayerArray, Team, [&Characters](ASaucewichPlayerState* const P) {
+	ForEachPlayer(PlayerArray, Team, [&](ASaucewichPlayerState* const P) {
 		if (const auto C = P->GetPawn<ATpsCharacter>()) Characters.Add(C);
 	});
 	return Characters;
@@ -48,21 +43,21 @@ TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team
 
 uint8 ASaucewichGameState::GetMinPlayerTeam() const
 {
-	TArray<uint8, TInlineAllocator<4>> Num;
-	Num.AddZeroed(Teams.Num() - 1);
-	ForEachEveryPlayer(PlayerArray, [&Num](auto P)
+	TArray<uint8> Num;
+	Num.AddZeroed(GetGmData().Teams.Num());
+	ForEachEveryPlayer(PlayerArray, [&](ASaucewichPlayerState* P)
 	{
-		const auto Team = P->GetTeam() - 1;
-		if (Num.IsValidIndex(Team)) ++Num[Team];
+		++Num[P->GetTeam()];
 	});
-	TArray<uint8, TInlineAllocator<4>> Min{0};
+	
+	TArray<uint8> Min{0};
 	for (auto i = 1; i < Num.Num(); ++i)
 	{
 		const auto This = Num[i];
 		const auto MinV = Num[Min[0]];
 		if (This < MinV)
 		{
-			Min.Empty();
+			Min.Reset();
 			Min.Add(i);
 		}
 		else if (This == MinV)
@@ -70,7 +65,7 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 			Min.Add(i);
 		}
 	}
-	return Min[FMath::RandHelper(Min.Num())] + 1;
+	return Min[FMath::RandHelper(Min.Num())];
 }
 
 void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
@@ -80,36 +75,14 @@ void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
 	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
 	
 	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
-		NewScore - TeamScore[Team], static_cast<int>(Team), *GetTeamData(Team).Name.ToString(), NewScore);
+		NewScore - TeamScore[Team], static_cast<int32>(Team), *GetGmData().Teams[Team].Name.ToString(), NewScore);
 	
 	TeamScore[Team] = NewScore;
-}
-
-const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
-{
-	static const FScoreData Default{};
-	const auto Found = ScoreData.Find(ForWhat);
-	return Found ? *Found : Default;
 }
 
 bool ASaucewichGameState::CanAddPersonalScore() const
 {
 	return IsMatchInProgress();
-}
-
-
-TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint8 Slot) const
-{
-	TArray<TSubclassOf<AWeapon>> SlotWep;
-	for (const auto Class : AvailableWeapons)
-	{
-		const auto Cls = Class.LoadSynchronous();
-		if (GetDefault<AWeapon>(Cls)->GetData().Slot == Slot)
-		{
-			SlotWep.Emplace(Cls);
-		}
-	}
-	return SlotWep;
 }
 
 bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
@@ -120,29 +93,13 @@ bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, fl
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return IsMatchInProgress() ? FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
+	return IsMatchInProgress() ? FMath::Max(0.f, GetGmData().RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
 }
 
 void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	USaucewichGameInstance::BroadcastGameStateSpawned(GetGameInstance<USaucewichGameInstance>(), this);
-
-	ensure(SauceMarkers.Num() == 0);
-	const auto NumTeam = Teams.Num() - 1;
-	SauceMarkers.SetNum(NumTeam);
-	for (auto i = 0; i < NumTeam; ++i)
-	{
-		SauceMarkers[i].Reserve(SauceMarkMaterials.Num());
-		for (const auto Mat : SauceMarkMaterials)
-		{
-			auto Marker = GetWorld()->SpawnActor<ASauceMarker>();
-			Marker->SetMaterial(Mat.LoadSynchronous());
-			Marker->SetColor(GetTeamData(i+1).Color);
-			SauceMarkers[i].Add(Marker);
-		}
-	}
+	TeamScore.AddZeroed(GetGmData().Teams.Num());
 }
 
 void ASaucewichGameState::HandleMatchHasStarted()
@@ -158,7 +115,7 @@ void ASaucewichGameState::HandleMatchHasStarted()
 
 	auto LevelName = GetWorld()->GetName();
 	LevelName += '_';
-	LevelName += CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetStreamLevelSuffix();
+	LevelName += GetGmData().StreamLevelSuffix;
 	UGameplayStatics::LoadStreamLevel(this, *LevelName, true, false, {});
 }
 
@@ -174,11 +131,11 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		{
 			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
 			{
-				Player->AddScore("Win");
+				Player->AddScore(TEXT("Win"), 0, true);
 			});
 
 			UE_LOG(LogGameState, Log, TEXT("Match result: The [%d] %s team won the game!"),
-			       static_cast<int>(WonTeam), *GetTeamData(WonTeam).Name.ToString());
+			       static_cast<int>(WonTeam), *GetGmData().Teams[WonTeam].Name.ToString());
 		}
 		else
 		{
@@ -244,13 +201,12 @@ uint8 ASaucewichGameState::GetEmptyTeam() const
 	return 0;
 }
 
+const FGameData& ASaucewichGameState::GetGmData() const
+{
+	return CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetData();
+}
+
 void ASaucewichGameState::OnRep_WonTeam()
 {
 	OnMatchEnd.Broadcast(WonTeam);
-}
-
-ASaucewichGameState::GetSauceMarker::GetSauceMarker(const uint8 Team, const UWorld* const World)
-{
-	auto&& Markers = World->GetGameState<ASaucewichGameState>()->SauceMarkers[Team-1];
-	Marker = Markers[FMath::RandHelper(Markers.Num())];
 }

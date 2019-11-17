@@ -1,31 +1,30 @@
 // Copyright 2019 Team Sosweet. All Rights Reserved.
 
-#include "Entity/ActorPool.h"
-
+#include "ActorPool.h"
 #include "Engine/World.h"
-
-#include "Entity/PoolActor.h"
+#include "PoolActor.h"
+#include "SaucewichInstance.h"
 
 const FActorSpawnParameters AActorPool::DefaultParameters;
 
-AActorPool* AActorPool::Get(const UObject* const WorldContext)
+AActorPool* AActorPool::Get(const UObject* const WorldContextObject)
 {
-	static TWeakObjectPtr<AActorPool> ActorPoolPtr;
-	auto ActorPool = ActorPoolPtr.Get();
-	if (ActorPool) return ActorPool;
-	
-	check(WorldContext);
-	const auto World = WorldContext->GetWorld();
-	check(World);
-	ActorPool = World->SpawnActor<AActorPool>();
-	check(ActorPool);
-	ActorPoolPtr = ActorPool;
-	return ActorPool;
+	return Get(WorldContextObject->GetWorld());
+}
+
+AActorPool* AActorPool::Get(const UWorld* const World)
+{
+	return Get(World->GetGameInstanceChecked<USaucewichInstance>());
+}
+
+AActorPool* AActorPool::Get(const USaucewichInstance* const SaucewichInstance)
+{
+	return SaucewichInstance->GetActorPool();
 }
 
 APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransform& Transform, const FActorSpawnParameters& SpawnParameters)
 {
-	if (!Class) return nullptr;
+	check(Class);
 
 	if (const auto PoolPtr = Pool.Find(Class))
 	{
@@ -42,7 +41,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 		}
 	}
 
-	if (const auto Actor = static_cast<APoolActor*>(GetWorld()->SpawnActor(Class, &Transform, SpawnParameters)))
+	if (const auto Actor = GetWorld()->SpawnActor<APoolActor>(Class, Transform, SpawnParameters))
 	{
 		Actor->Activate();
 		return Actor;
@@ -53,7 +52,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 
 void AActorPool::Release(APoolActor* const Actor)
 {
-	if (!IsValidLowLevelFast(false)) return;
+	check(IsValidLowLevel());
 	const auto Class = Actor->GetClass();
 	Pool.FindOrAdd(Class).Add(Actor);
 }

@@ -10,7 +10,6 @@
 
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
-#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Widget/UsersInfo.h"
 
@@ -27,14 +26,6 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 	EnemyTeamResultImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_EnemyTeamResult")));
 	UsersInfo = Cast<UUsersInfo>(GetWidgetFromName(TEXT("UserInfo")));
 	
-	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-
-	const auto PC = GetOwningPlayer<ASaucewichPlayerController>();
-	
-	FOnPlayerStateSpawnedSingle PSSpawned;
-	PSSpawned.BindDynamic(this, &UMakeSandwichResultComponent::GetPlayerState);
-	PC->SafePlayerState(PSSpawned);
-	
 	MyTeamSandwichMat =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), SandwichMaterialParent);
 
@@ -44,10 +35,7 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 	MyTeamSandwich->SetBrushFromMaterial(MyTeamSandwichMat);
 	EnemyTeamSandwich->SetBrushFromMaterial(EnemyTeamSandwichMat);
 
-	const auto GameModeClass = *GameState->GameModeClass;
-	const auto GameMode = GameModeClass->GetDefaultObject<ASaucewichGameMode>();
-
-	WaitTime = GameMode->GetNextGameWaitTime();
+	WaitTime = ASaucewichGameMode::GetData(this).NextGameWaitTime;
 
 	FTimerDelegate Delegate;
 	Delegate.BindWeakLambda(this, [this] {
@@ -60,21 +48,24 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 
 void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 {
-	const auto MyTeam = PlayerState->GetTeam();
-	const uint8 EnemyTeam = MyTeam == 1 ? 2 : 1;
+	const auto MyTeam = GetOwningPlayerState<ASaucewichPlayerState>(true)->GetTeam();
+	const uint8 EnemyTeam = 1 - MyTeam;
 
+	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	auto&& TeamData = ASaucewichGameMode::GetData(this).Teams;
+	
 	const auto MyTeamScore = GameState->GetTeamScore(MyTeam);
 	const auto EnemyTeamScore = GameState->GetTeamScore(EnemyTeam);
 	
-	const auto MyTeamColor = GameState->GetTeamData(MyTeam).Color;
-	const auto EnemyTeamColor = GameState->GetTeamData(EnemyTeam).Color;
+	auto&& MyTeamColor = TeamData[MyTeam].Color;
+	auto&& EnemyTeamColor = TeamData[EnemyTeam].Color;
 
-	const auto ResultName = WinningTeam == MyTeam ? "Win" : WinningTeam == 0 ? "Draw" : "Lose";
-	const auto EnemyResultName = WinningTeam == MyTeam ? "Lose" : WinningTeam == 0 ? "Draw" : "Win";
+	const auto ResultName = WinningTeam == MyTeam ? TEXT("Win") : WinningTeam == 0 ? TEXT("Draw") : TEXT("Lose");
+	const auto EnemyResultName = WinningTeam == MyTeam ? TEXT("Lose") : WinningTeam == 0 ? TEXT("Draw") : TEXT("Win");
 	ResultText->SetText(ResultTexts.FindRef(ResultName));
 
 	const auto ResultColor = WinningTeam == 0 ? (MyTeamColor + EnemyTeamColor) * 0.5f : MyTeamColor;
-	ResultText->SetColorAndOpacity(FSlateColor(ResultColor));
+	ResultText->SetColorAndOpacity(ResultColor);
 
 	MyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
 	EnemyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), EnemyTeamColor);
@@ -87,9 +78,4 @@ void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 
 	MyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(ResultName));
 	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(EnemyResultName));
-}
-
-void UMakeSandwichResultComponent::GetPlayerState(ASaucewichPlayerState* InPlayerState)
-{
-	PlayerState = InPlayerState;
 }

@@ -24,6 +24,8 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
 	DECLARE_LOG_CATEGORY_EXTERN(LogGameLift, Log, All)
 #endif
 
+#define FMT_MSG(Fmt, ...) [&]{static const FTextFormat Compiled{Fmt};return FText::FormatOrdered(Compiled,__VA_ARGS__);}()
+
 UENUM(BlueprintType)
 enum class ENameValidity : uint8
 {

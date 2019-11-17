@@ -13,6 +13,7 @@
 #include "SauceMarker.h"
 #include "SaucewichGameState.h"
 #include "TpsCharacter.h"
+#include "SaucewichGameMode.h"
 
 AProjectile::AProjectile()
 	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
@@ -35,9 +36,9 @@ void AProjectile::SetSpeed(const float Speed) const
 void AProjectile::OnActivated()
 {
 	static TArray<TWeakObjectPtr<UMaterialInstanceDynamic>> Materials;
-	Materials.SetNum(GetWorld()->GetGameState<ASaucewichGameState>()->GetNumTeam());
+	Materials.SetNum(ASaucewichGameMode::GetData(this).Teams.Num());
 
-	auto& MatPtr = Materials[GetTeam()-1];
+	auto& MatPtr = Materials[GetTeam()];
 	if (auto Mat = MatPtr.Get())
 	{
 		Mesh->SetMaterial(GetMatIdx(), Mat);
@@ -101,5 +102,5 @@ FName AProjectile::GetCollisionProfile() const
 
 FLinearColor AProjectile::GetColor() const
 {
-	return GetWorld()->GetGameState<ASaucewichGameState>()->GetTeamData(GetTeam()).Color;
+	return ASaucewichGameMode::GetData(this).Teams[GetTeam()].Color;
 }
