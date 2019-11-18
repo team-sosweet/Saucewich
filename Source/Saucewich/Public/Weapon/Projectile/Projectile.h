@@ -22,7 +22,9 @@ public:
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
+	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
+	
 	FLinearColor GetColor() const;
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 
