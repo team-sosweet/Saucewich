@@ -42,26 +42,24 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	if (!LineTraceTest(Scale3D.Y, FVector::RightVector, FVector::LeftVector)) return;
 
 	World->GetGameInstanceChecked<USaucewichInstance>()->GetSauceMarker()
-	->TeamMarkers[Team - 1].Pick()->AddInstanceWorldSpace({Rot, Loc, Scale3D});
+	->TeamMarkers[Team].Pick()->AddInstanceWorldSpace({Rot, Loc, Scale3D});
 }
 
 void ASauceMarker::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("/Engine/BasicShapes/Plane")}}.LoadSynchronous();
 	auto&& Teams = CastChecked<ASaucewichGameMode>(GetWorld()->GetGameState()->GetDefaultGameMode())->GetData().Teams;
 	TeamMarkers.AddDefaulted(Teams.Num());
 	for (auto i = 0; i < Teams.Num(); ++i)
 	{
 		for (auto&& Mat : Materials)
 		{
-			const auto Comp = NewObject<UInstancedStaticMeshComponent>(this);
-			Comp->SetStaticMesh(Mesh);
+			const auto Comp = CreateComp();
+			TeamMarkers[i].Comps.Add(Comp);
+			
 			Comp->CreateDynamicMaterialInstance(0, Mat.LoadSynchronous())
 			->SetVectorParameterValue(TEXT("Color"), Teams[i].Color);
-			Comp->RegisterComponentWithWorld(GetWorld());
-			TeamMarkers[i].Comps.Add(Comp);
 		}
 	}
 }

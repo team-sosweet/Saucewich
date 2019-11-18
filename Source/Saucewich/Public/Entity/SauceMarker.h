@@ -30,6 +30,9 @@ public:
 protected:
 	void BeginPlay() override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	UInstancedStaticMeshComponent* CreateComp();
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UMaterialInterface>> Materials;
