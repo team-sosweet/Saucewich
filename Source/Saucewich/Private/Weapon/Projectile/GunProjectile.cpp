@@ -6,8 +6,6 @@
 
 void AGunProjectile::Explode(const FHitResult& Hit)
 {
-	Super::Explode(Hit);
-	
 	if (!bCosmetic)
 	{
 		if (const auto Other = Hit.GetActor())
@@ -22,6 +20,8 @@ void AGunProjectile::Explode(const FHitResult& Hit)
 			);
 		}
 	}
+	
+	Super::Explode(Hit);
 }
 
 float AGunProjectile::GetSauceMarkScale() const
