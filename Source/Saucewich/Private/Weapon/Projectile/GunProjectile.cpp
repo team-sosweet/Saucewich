@@ -4,6 +4,26 @@
 #include "GameFramework/Pawn.h"
 #include "Gun.h"
 
+void AGunProjectile::Explode(const FHitResult& Hit)
+{
+	Super::Explode(Hit);
+	
+	if (!bCosmetic)
+	{
+		if (const auto Other = Hit.GetActor())
+		{
+			auto&& Data = CastChecked<AGun>(GetOwner())->GetGunData();
+			const auto Damage = Data.Damage;
+			Other->TakeDamage(
+				Damage,
+				FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType},
+				Instigator ? Instigator->GetController() : nullptr,
+				GetOwner()
+			);
+		}
+	}
+}
+
 float AGunProjectile::GetSauceMarkScale() const
 {
 	auto&& S = GetMesh()->RelativeScale3D;
@@ -24,19 +44,5 @@ void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const 
 	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	if (!bCosmetic && Other)
-	{
-		if (const auto Gun = Cast<AGun>(GetOwner()))
-		{
-			auto& Data = Gun->GetGunData();
-			const auto Damage = Data.Damage;
-			Other->TakeDamage(
-				Damage,
-				FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType},
-				Instigator ? Instigator->GetController() : nullptr,
-				GetOwner()
-			);
-		}
-	}
+	Explode(Hit);
 }

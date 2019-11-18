@@ -17,6 +17,7 @@ class AProjectile : public APoolActor
 
 public:
 	AProjectile();
+	
 	void ResetSpeed() const;
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
@@ -25,11 +26,12 @@ public:
 	FLinearColor GetColor() const;
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Explode(const FHitResult& Hit);
+
 protected:
 	void OnActivated() override;
 	void OnReleased() override;
-
-	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	virtual float GetSauceMarkScale() const { return 1.f; }
 

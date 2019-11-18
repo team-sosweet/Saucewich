@@ -10,8 +10,10 @@ class SAUCEWICH_API AExplosiveProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
+public:
+	void Explode(const FHitResult& Hit) override;
+	
 protected:
-	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	float GetSauceMarkScale() const override;
 	
 private:

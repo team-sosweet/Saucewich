@@ -33,6 +33,30 @@ void AProjectile::SetSpeed(const float Speed) const
 	Movement->SetVelocityInLocalSpace(FVector::ForwardVector * Speed);
 }
 
+void AProjectile::Explode(const FHitResult& Hit)
+{
+	const auto World = GetWorld();
+
+	if (ImpactSounds.Num() > 0)
+		UGameplayStatics::PlaySoundAtLocation(
+			World, ImpactSounds[FMath::RandHelper(ImpactSounds.Num())].LoadSynchronous(), Hit.Location
+		);
+
+	UGameplayStatics::SpawnEmitterAtLocation(
+		World, ImpactFX.LoadSynchronous(), Hit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease
+	)->SetColorParameter(TEXT("Color"), GetColor());
+
+	UGameplayStatics::SpawnForceFeedbackAtLocation(
+		World, ForceFeedbackEffect.LoadSynchronous(), Hit.Location,
+		FRotator::ZeroRotator, false, 1.f, 0.f,
+		ForceFeedbackAttenuation.LoadSynchronous()
+	);
+
+	ASauceMarker::Add(GetTeam(), GetSauceMarkScale(), Hit, this);
+	
+	Release();
+}
+
 void AProjectile::OnActivated()
 {
 	static TArray<TWeakObjectPtr<UMaterialInstanceDynamic>> Materials;
@@ -56,33 +80,6 @@ void AProjectile::OnActivated()
 void AProjectile::OnReleased()
 {
 	Movement->SetUpdatedComponent(nullptr);
-}
-
-void AProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const bool bSelfMoved,
-	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	const auto World = GetWorld();
-
-	if (ImpactSounds.Num() > 0)
-		UGameplayStatics::PlaySoundAtLocation(
-			World, ImpactSounds[FMath::RandHelper(ImpactSounds.Num())].LoadSynchronous(), HitLocation
-		);
-
-	UGameplayStatics::SpawnEmitterAtLocation(
-		World, ImpactFX.LoadSynchronous(), HitLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease
-	)->SetColorParameter(TEXT("Color"), GetColor());
-
-	UGameplayStatics::SpawnForceFeedbackAtLocation(
-		World, ForceFeedbackEffect.LoadSynchronous(), HitLocation,
-		FRotator::ZeroRotator, false, 1.f, 0.f,
-		ForceFeedbackAttenuation.LoadSynchronous()
-	);
-
-	ASauceMarker::Add(GetTeam(), GetSauceMarkScale(), Hit, this);
-	
-	Release();
 }
 
 uint8 AProjectile::GetTeam() const
