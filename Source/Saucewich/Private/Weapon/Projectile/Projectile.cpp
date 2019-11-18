@@ -22,6 +22,7 @@ AProjectile::AProjectile()
 {
 	RootComponent = Mesh;
 	InitialLifeSpan = 5;
+	Mesh->SetCollisionProfileName(TEXT("Projectile"));
 }
 
 void AProjectile::ResetSpeed() const
@@ -36,17 +37,20 @@ void AProjectile::SetSpeed(const float Speed) const
 
 void AProjectile::Explode(const FHitResult& Hit)
 {
-	if (CanExplode(Hit)) OnExplode(Hit);
+	if (HasAuthority() && CanExplode(Hit))
+	{
+		MulticastExplode(Hit);
+	}
 }
 
 bool AProjectile::CanExplode(const FHitResult& Hit) const
 {
-	return Team != static_cast<uint8>(-1);
+	return IsTeamValid();
 }
 
 void AProjectile::OnActivated()
 {
-	if (!bReplicates || HasAuthority())
+	if (HasAuthority())
 	{
 		Team = CastChecked<ATpsCharacter>(GetInstigator())->GetTeam();
 		OnRep_Team();
@@ -103,27 +107,18 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 
 void AProjectile::OnRep_Team() const
 {
-	if (Team == static_cast<uint8>(-1)) return;
-	
-	static TArray<TWeakObjectPtr<UMaterialInstanceDynamic>> Materials;
-	Materials.SetNum(ASaucewichGameMode::GetData(this).Teams.Num());
-
-	auto& MatPtr = Materials[Team];
-	if (auto Mat = MatPtr.Get())
+	if (IsTeamValid())
 	{
-		Mesh->SetMaterial(GetMatIdx(), Mat);
-	}
-	else
-	{
-		Mat = Mesh->CreateDynamicMaterialInstance(GetMatIdx());
+		const auto Idx = Mesh->GetMaterialIndex(TEXT("TeamColor"));
+		auto Mat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(Idx));
+		if (!Mat) Mat = Mesh->CreateDynamicMaterialInstance(Idx);
 		Mat->SetVectorParameterValue(TEXT("Color"), GetColor());
-		MatPtr = Mat;
 	}
 }
 
-int32 AProjectile::GetMatIdx() const
+void AProjectile::MulticastExplode_Implementation(const FHitResult& Hit)
 {
-	return Mesh->GetMaterialIndex(TEXT("TeamColor"));
+	OnExplode(Hit);
 }
 
 FName AProjectile::GetCollisionProfile() const

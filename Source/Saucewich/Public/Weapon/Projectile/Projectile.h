@@ -3,7 +3,6 @@
 #pragma once
 
 #include "PoolActor.h"
-#include "Engine/DataAsset.h"
 #include "Projectile.generated.h"
 
 class UStaticMeshComponent;
@@ -25,6 +24,7 @@ public:
 
 	FLinearColor GetColor() const;
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
+	bool IsTeamValid() const { return Team != static_cast<decltype(Team)>(-1); }
 
 	UFUNCTION(BlueprintCallable)
 	void Explode(const FHitResult& Hit);
@@ -43,7 +43,8 @@ protected:
 	void OnRep_Team() const;
 
 private:
-	int32 GetMatIdx() const;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastExplode(const FHitResult& Hit);
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UStaticMeshComponent* Mesh;
