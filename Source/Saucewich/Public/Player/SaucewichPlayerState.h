@@ -17,6 +17,7 @@ class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
 public:
 	void SetTeam(uint8 NewTeam);
 	uint8 GetTeam() const { return Team; }
+	bool IsValidTeam() const { return Team != static_cast<uint8>(-1); }
 
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(uint8 Slot, TSubclassOf<class AWeapon> Weapon);
@@ -89,10 +90,8 @@ private:
 	UPROPERTY(Replicated, EditAnywhere, Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
 
-	// 플레이어의 팀을 나타냅니다. 팀 번호는 1부터 시작합니다.
-	// 팀 관련 함수들은 SaucewichGameState를 확인하세요.
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 Team;
+	uint8 Team = -1;
 	
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Objective;

@@ -10,11 +10,9 @@ class SAUCEWICH_API AExplosiveProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
-public:
-	void Explode(const FHitResult& Hit) override;
-	
 protected:
 	float GetSauceMarkScale() const override;
+	void OnExplode(const FHitResult& Hit) override;
 	
 private:
 	UPROPERTY(EditAnywhere)

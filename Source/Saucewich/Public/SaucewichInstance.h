@@ -42,7 +42,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftClassPtr<ASauceMarker> SauceMarkerClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSoftClassPtr<ASaucewichGameMode>> GameModes;
 	

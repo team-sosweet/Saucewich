@@ -182,7 +182,7 @@ void ASaucewichGameMode::GenericPlayerInitialization(AController* const C)
 	const auto MinTeamNum = GS->GetNumPlayers(GS->GetMinPlayerTeam());
 	const auto MyTeamNum = GS->GetNumPlayers(PS->GetTeam());
 	
-	if (PS->GetTeam() == 0 || MyTeamNum - MinTeamNum > 1)
+	if (!PS->IsValidTeam() || MyTeamNum - MinTeamNum > 1)
 	{
 		PS->SetTeam(GS->GetMinPlayerTeam());
 	}

@@ -4,7 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "Gun.h"
 
-void AGunProjectile::Explode(const FHitResult& Hit)
+void AGunProjectile::OnExplode(const FHitResult& Hit)
 {
 	if (!bCosmetic)
 	{
@@ -21,7 +21,7 @@ void AGunProjectile::Explode(const FHitResult& Hit)
 		}
 	}
 	
-	Super::Explode(Hit);
+	Super::OnExplode(Hit);
 }
 
 float AGunProjectile::GetSauceMarkScale() const
