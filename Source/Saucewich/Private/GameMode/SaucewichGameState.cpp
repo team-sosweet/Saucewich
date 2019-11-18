@@ -47,7 +47,7 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 	Num.AddZeroed(GetGmData().Teams.Num());
 	ForEachEveryPlayer(PlayerArray, [&](ASaucewichPlayerState* P)
 	{
-		++Num[P->GetTeam()];
+		if (P->IsValidTeam()) ++Num[P->GetTeam()];
 	});
 	
 	TArray<uint8> Min{0};
@@ -177,7 +177,7 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
-	if (WonTeam != InvalidTeam) return WonTeam;
+	if (WonTeam != static_cast<uint8>(-1)) return WonTeam;
 
 	const auto Empty = GetEmptyTeam();
 	if (Empty) return 3 - Empty;

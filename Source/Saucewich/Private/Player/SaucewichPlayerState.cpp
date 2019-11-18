@@ -91,7 +91,9 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
-	GetWorld()->GetGameState<ASaucewichGameState>()->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
+
+	if (const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed))
+		GS->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
 }
 
 void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)

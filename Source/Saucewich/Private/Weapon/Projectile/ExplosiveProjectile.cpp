@@ -4,14 +4,12 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AExplosiveProjectile::Explode(const FHitResult& Hit)
+void AExplosiveProjectile::OnExplode(const FHitResult& Hit)
 {
-	Super::Explode(Hit);
-	
 	UGameplayStatics::ApplyRadialDamage(
 		this,
 		Damage,
-		Hit.Location,
+		GetActorLocation(),
 		Radius,
 		DamageType,
 		{},
@@ -20,6 +18,8 @@ void AExplosiveProjectile::Explode(const FHitResult& Hit)
 		false,
 		DamagePreventionChannel
 	);
+	
+	Super::OnExplode(Hit);
 }
 
 float AExplosiveProjectile::GetSauceMarkScale() const
