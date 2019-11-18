@@ -4,15 +4,14 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AExplosiveProjectile::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp,
-	const bool bSelfMoved, const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
+void AExplosiveProjectile::Explode(const FHitResult& Hit)
 {
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
+	Super::Explode(Hit);
+	
 	UGameplayStatics::ApplyRadialDamage(
 		this,
 		Damage,
-		GetActorLocation(),
+		Hit.Location,
 		Radius,
 		DamageType,
 		{},
