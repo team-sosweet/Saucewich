@@ -28,6 +28,9 @@ class SAUCEWICH_API USaucewichInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Saucewich Instance", WorldContext=WorldContextObj))
+	static USaucewichInstance* Get(const UObject* WorldContextObj);
+	
 	AActorPool* GetActorPool() const;
 	ASauceMarker* GetSauceMarker() const;
 	auto&& GetGameModes() const { return GameModes; }

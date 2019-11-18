@@ -6,24 +6,29 @@
 #include "SauceMarker.h"
 
 template <class T>
-static T* Get(T*& Ptr, UClass* const Class, UWorld* const World)
+static T* GetOrSpawn(T*& Ptr, UClass* const Class, UWorld* const World)
 {
 	if (!IsValid(Ptr)) Ptr = World->SpawnActor<T>(Class);
 	return Ptr;
 }
 
 template <class T>
-static T* Get(T*& Ptr, UWorld* const World)
+static T* GetOrSpawn(T*& Ptr, UWorld* const World)
 {
-	return Get(Ptr, T::StaticClass(), World);
+	return GetOrSpawn(Ptr, T::StaticClass(), World);
+}
+
+USaucewichInstance* USaucewichInstance::Get(const UObject* const WorldContextObj)
+{
+	return WorldContextObj->GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 }
 
 AActorPool* USaucewichInstance::GetActorPool() const
 {
-	return Get(ActorPool, GetWorld());
+	return GetOrSpawn(ActorPool, GetWorld());
 }
 
 ASauceMarker* USaucewichInstance::GetSauceMarker() const
 {
-	return Get(SauceMarker, SauceMarkerClass.LoadSynchronous(), GetWorld());
+	return GetOrSpawn(SauceMarker, SauceMarkerClass.LoadSynchronous(), GetWorld());
 }
