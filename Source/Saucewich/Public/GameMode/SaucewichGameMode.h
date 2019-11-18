@@ -65,7 +65,7 @@ class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, meta=(DisplayName="Get Game Data", WorldContext=WorldContextObj))
+	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Game Data", WorldContext=WorldContextObj))
 	static const FGameData& GetData(const UObject* WorldContextObj);
 	
 	ASaucewichGameMode();
