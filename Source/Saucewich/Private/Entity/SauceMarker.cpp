@@ -11,6 +11,11 @@
 #include "SaucewichGameMode.h"
 #include "SaucewichInstance.h"
 
+UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const
+{
+	return Comps[FMath::RandHelper(Comps.Num())];
+}
+
 void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hit, const UObject* const WorldContextObj)
 {
 	const auto World = WorldContextObj->GetWorld();
@@ -18,15 +23,11 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	auto Rot = Hit.ImpactNormal.ToOrientationQuat();
 	Rot *= FRotator{-90.f, 0.f, 0.f}.Quaternion();
 	Rot *= FRotator{0.f, 360.f * FMath::FRand(), 0.f}.Quaternion();
-	
-	auto Loc = Hit.ImpactNormal;
-	Loc *= .01f;
-	Loc += Hit.ImpactPoint;
 
-	FVector Scale3D{Scale, Scale, 1.f};
-	const auto Rand = []{constexpr auto Factor = .15f; return 1.f + FMath::FRandRange(-Factor, Factor);};
-	Scale3D.X *= Rand();
-	Scale3D.Y *= Rand();
+	const auto Loc = Hit.ImpactPoint + Hit.ImpactNormal * .01f;
+
+	const auto RandScale = [&]{return Scale * FMath::RandRange(.85f, 1.15f);};
+	const FVector Scale3D{RandScale(), RandScale(), 1.f};
 
 	const auto LineTraceTest = [&](const float AxisScale, auto&&... Dirs)
 	{
@@ -40,16 +41,17 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 
 	if (!LineTraceTest(Scale3D.X, FVector::ForwardVector, FVector::BackwardVector)) return;
 	if (!LineTraceTest(Scale3D.Y, FVector::RightVector, FVector::LeftVector)) return;
-
-	World->GetGameInstanceChecked<USaucewichInstance>()->GetSauceMarker()
-	->TeamMarkers[Team].Pick()->AddInstanceWorldSpace({Rot, Loc, Scale3D});
+	
+	const auto Marker = USaucewichInstance::Get(World)->GetSauceMarker();
+	const auto Comp = Marker->TeamMarkers[Team].PickRand();
+	Comp->AddInstanceWorldSpace({Rot, Loc, Scale3D});
 }
 
 void ASauceMarker::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	auto&& Teams = CastChecked<ASaucewichGameMode>(GetWorld()->GetGameState()->GetDefaultGameMode())->GetData().Teams;
+	auto&& Teams = ASaucewichGameMode::GetData(this).Teams;
 	TeamMarkers.AddDefaulted(Teams.Num());
 	for (auto i = 0; i < Teams.Num(); ++i)
 	{
