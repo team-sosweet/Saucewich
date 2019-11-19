@@ -24,8 +24,7 @@ class SAUCEWICH_API ASauceMarker : public AActor
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable, meta=(DisplayName="Add Sauce Mark", WorldContext=WorldContextObj))
-	static void Add(uint8 Team, float Scale, const FHitResult& Hit, const UObject* WorldContextObj);
+	static void Add(uint8 Team, float Scale, const FHitResult& Hit, const AActor* Ignore);
 
 protected:
 	void BeginPlay() override;
