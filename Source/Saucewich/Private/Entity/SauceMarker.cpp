@@ -18,6 +18,7 @@ UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const
 
 void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hit, const UObject* const WorldContextObj)
 {
+#if !UE_SERVER
 	const auto World = WorldContextObj->GetWorld();
 
 	auto Rot = Hit.ImpactNormal.ToOrientationQuat();
@@ -45,12 +46,14 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	const auto Marker = USaucewichInstance::Get(World)->GetSauceMarker();
 	const auto Comp = Marker->TeamMarkers[Team].PickRand();
 	Comp->AddInstanceWorldSpace({Rot, Loc, Scale3D});
+#endif
 }
 
 void ASauceMarker::BeginPlay()
 {
 	Super::BeginPlay();
 	
+#if !UE_SERVER
 	auto&& Teams = ASaucewichGameMode::GetData(this).Teams;
 	TeamMarkers.AddDefaulted(Teams.Num());
 	for (auto i = 0; i < Teams.Num(); ++i)
@@ -64,4 +67,5 @@ void ASauceMarker::BeginPlay()
 			->SetVectorParameterValue(TEXT("Color"), Teams[i].Color);
 		}
 	}
+#endif 
 }

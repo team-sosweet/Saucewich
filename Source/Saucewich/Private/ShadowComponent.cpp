@@ -5,19 +5,29 @@
 
 UShadowComponent::UShadowComponent()
 {
+#if !UE_SERVER
 	PrimaryComponentTick.bCanEverTick = true;
-	BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
-	bVisible = false;
+	BodyInstance.SetCollisionProfileNameDeferred(TEXT("NoCollision"));
+#endif 
 }
 
-float UShadowComponent::GetMaxDist() const
+#if !UE_SERVER
+
+void UShadowComponent::BeTranslucent()
 {
-	return RelativeScale3D.X * 200;
+	bTranslucent = true;
+	SetVisibility(false);
+}
+
+void UShadowComponent::BeOpaque()
+{
+	bTranslucent = false;
 }
 
 void UShadowComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	Offset.SetLocation(RelativeLocation);
 	CreateDynamicMaterialInstance(0);
 }
@@ -26,28 +36,52 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const auto* const Owner = GetOwner();
-	const auto StartTransform = Offset * GetAttachParent()->GetComponentTransform();
-	const auto Start = StartTransform.GetLocation();
+	if (bTranslucent) return;
+
+	auto bShouldDraw = false;
+
+	const auto World = GetWorld();
+	const auto Transform = Offset * GetAttachParent()->GetComponentTransform();
+	const auto MaxDist = RelativeScale3D.X * 256.f;
+	
+	const auto Start = Transform.GetLocation();
 	auto End = Start;
-	End.Z -= GetMaxDist();
+	End.Z -= MaxDist;
 
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Owner);
+	Params.AddIgnoredActor(GetOwner());
 
 	FHitResult Hit;
-	const auto bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
-	SetVisibility(bHit);
-	if (bHit)
+	if (World->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
 	{
-		Hit.ImpactPoint.Z += .1f;
-		SetWorldLocationAndRotation(
-			Hit.ImpactPoint,
-			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
-		);
+		const auto Rot = Hit.ImpactNormal.ToOrientationQuat() * FQuat{{-90.f, 0.f, 0.f}};
+		auto MinDist = Hit.Distance;
+		auto Num = 0;
 
-		auto Dist = Hit.Distance / GetMaxDist();
-		if (bTranslucent) Dist = (Dist + 1.f) / 2.f;
-		CastChecked<UMaterialInstanceDynamic>(GetMaterial(0))->SetScalarParameterValue(TEXT("Distance"), Dist);
+		auto Offsets = {FVector::ForwardVector, FVector::BackwardVector, FVector::RightVector, FVector::LeftVector};
+		for (auto&& Dir : Offsets)
+		{
+			const auto St = Start + Rot.RotateVector(Dir) * (RelativeScale3D.X * 50.f);
+			FHitResult H;
+			if (World->LineTraceSingleByChannel(H, St, St - Hit.ImpactNormal * (Hit.Distance + 1.f), ECC_Visibility, Params)
+				&& FMath::Abs(Hit.Distance - H.Distance) <= 1.f)
+			{
+				++Num;
+				if (H.Distance < MinDist) MinDist = H.Distance;
+			}
+		}
+
+		if (Num > 0)
+		{
+			const auto Mat = CastChecked<UMaterialInstanceDynamic>(GetMaterial(0));
+			Mat->SetScalarParameterValue(TEXT("Dist"), MinDist / MaxDist);
+			Mat->SetScalarParameterValue(TEXT("Opacity"), static_cast<float>(Num) / Offsets.size());
+			SetWorldLocationAndRotation(Hit.ImpactPoint + Hit.ImpactNormal * (Hit.Distance - MinDist + .01f), Rot);
+			bShouldDraw = true;
+		}
 	}
+
+	SetVisibility(bShouldDraw);
 }
+
+#endif 
