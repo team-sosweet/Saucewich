@@ -40,14 +40,14 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	SetVisibility(bHit);
 	if (bHit)
 	{
-		Hit.Location.Z += .1f;
+		Hit.ImpactPoint.Z += .1f;
 		SetWorldLocationAndRotation(
-			Hit.Location,
+			Hit.ImpactPoint,
 			Hit.Normal.RotateAngleAxis(90.f, FVector::RightVector).Rotation()
 		);
 
-		auto Dist = (Start.Z - Hit.Location.Z) / GetMaxDist();
-		if (bTranslucent) Dist = (Dist + 1) / 2;
-		static_cast<UMaterialInstanceDynamic*>(GetMaterial(0))->SetScalarParameterValue("Distance", Dist);
+		auto Dist = Hit.Distance / GetMaxDist();
+		if (bTranslucent) Dist = (Dist + 1.f) / 2.f;
+		CastChecked<UMaterialInstanceDynamic>(GetMaterial(0))->SetScalarParameterValue(TEXT("Distance"), Dist);
 	}
 }

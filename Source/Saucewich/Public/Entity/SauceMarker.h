@@ -15,7 +15,7 @@ struct FSauceMarkers
 	UPROPERTY(Transient)
 	TArray<UInstancedStaticMeshComponent*> Comps;
 
-	UInstancedStaticMeshComponent* Pick() const { return Comps[FMath::RandHelper(Comps.Num())]; }
+	UInstancedStaticMeshComponent* PickRand() const;
 };
 
 UCLASS(NotPlaceable)
