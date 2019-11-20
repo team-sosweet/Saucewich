@@ -46,12 +46,23 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 		return true;
 	};
 
+	if (!LineTraceTest(0.f, FVector::ZeroVector)) return;
 	if (!LineTraceTest(Scale3D.X, FVector::ForwardVector, FVector::BackwardVector)) return;
 	if (!LineTraceTest(Scale3D.Y, FVector::RightVector, FVector::LeftVector)) return;
-	if (!LineTraceTest(0.f, FVector::ZeroVector)) return;
-	
+
 	const auto Marker = USaucewichInstance::Get(World)->GetSauceMarker();
 	const auto Comp = Marker->TeamMarkers[Team].PickRand();
+
+	FHitResult H;
+	if (World->SweepSingleByObjectType(
+		H,
+		Hit.ImpactPoint + Hit.ImpactNormal,
+		Hit.ImpactPoint - Hit.ImpactNormal,
+		Rot,
+		{Comp->GetCollisionObjectType()},
+		FCollisionShape::MakeBox({Scale3D.X * 50.f, Scale3D.Y * 50.f, 0.f})
+	)) MaxOffset = FMath::Max(1.f - H.Distance, MaxOffset);
+
 	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (MaxOffset + .01f), Scale3D});
 #endif
 }

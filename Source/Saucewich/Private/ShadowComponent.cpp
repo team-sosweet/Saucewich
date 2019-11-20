@@ -7,6 +7,8 @@ UShadowComponent::UShadowComponent()
 {
 #if !UE_SERVER
 	PrimaryComponentTick.bCanEverTick = true;
+	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("/Engine/BasicShapes/Plane")}}.LoadSynchronous();
+	UStaticMeshComponent::SetStaticMesh(Mesh);
 	BodyInstance.SetCollisionProfileNameDeferred(TEXT("NoCollision"));
 #endif 
 }

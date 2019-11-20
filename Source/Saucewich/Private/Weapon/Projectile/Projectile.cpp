@@ -17,8 +17,8 @@
 #include "SaucewichGameMode.h"
 
 AProjectile::AProjectile()
-	: Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
-	  Movement{CreateDefaultSubobject<UProjectileMovementComponent>("Movement")}
+	: Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))},
+	  Movement{CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"))}
 {
 	RootComponent = Mesh;
 	InitialLifeSpan = 5;
@@ -73,6 +73,7 @@ void AProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 void AProjectile::OnExplode(const FHitResult& Hit)
 {
+#if !UE_SERVER
 	const auto World = GetWorld();
 	const auto Location = GetActorLocation();
 
@@ -101,6 +102,7 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 	);
 
 	ASauceMarker::Add(Team, GetSauceMarkScale(), Hit, this);
+#endif
 
 	Release();
 }
@@ -118,7 +120,7 @@ void AProjectile::OnRep_Team() const
 
 void AProjectile::MulticastExplode_Implementation(const FHitResult& Hit)
 {
-	OnExplode(Hit);
+	if (CanExplode(Hit)) OnExplode(Hit);
 }
 
 FName AProjectile::GetCollisionProfile() const
