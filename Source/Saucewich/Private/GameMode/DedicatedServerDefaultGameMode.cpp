@@ -31,8 +31,8 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 	Params.OnStartGameSession.BindWeakLambda(
 		this, [this, &GameLiftSdkModule](Aws::GameLift::Server::Model::GameSession GameSession)
 		{
-			GameLiftSdkModule.ActivateGameSession();
 			StartServer();
+			GameLiftSdkModule.ActivateGameSession();
 		}
 	);
 
