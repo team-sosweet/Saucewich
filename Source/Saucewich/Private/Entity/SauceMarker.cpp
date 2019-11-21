@@ -31,39 +31,37 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Ignore);
 
-	auto MaxOffset = 0.f;
-
 	const auto LineTraceTest = [&](const float AxisScale, auto&&... Dirs)
 	{
 		for (auto&& Dir : {Forward<decltype(Dirs)>(Dirs)...})
 		{
 			const auto Offset = Rot.RotateVector(Dir) * (AxisScale * 50.f);
 			const auto Loc = Hit.ImpactPoint + Offset;
-			FHitResult H;
-			if (!World->LineTraceSingleByChannel(H, Loc + Hit.ImpactNormal, Loc - Hit.ImpactNormal, ECC_Visibility, Params)) return false;
-			MaxOffset = FMath::Max(1.f - H.Distance, MaxOffset);
+			if (!World->LineTraceTestByChannel(Loc + Hit.ImpactNormal, Loc - Hit.ImpactNormal, ECC_Visibility, Params))
+				return false;
 		}
 		return true;
 	};
 
-	if (!LineTraceTest(0.f, FVector::ZeroVector)) return;
 	if (!LineTraceTest(Scale3D.X, FVector::ForwardVector, FVector::BackwardVector)) return;
 	if (!LineTraceTest(Scale3D.Y, FVector::RightVector, FVector::LeftVector)) return;
 
-	const auto Marker = USaucewichInstance::Get(World)->GetSauceMarker();
-	const auto Comp = Marker->TeamMarkers[Team].PickRand();
+	const auto GI = USaucewichInstance::Get(World);
+	const auto Marker = GI->GetSauceMarker();
 
 	FHitResult H;
-	if (World->SweepSingleByObjectType(
+	const auto bOverlapped = World->SweepSingleByChannel(
 		H,
 		Hit.ImpactPoint + Hit.ImpactNormal,
 		Hit.ImpactPoint - Hit.ImpactNormal,
 		Rot,
-		{Comp->GetCollisionObjectType()},
+		GI->GetDecalTraceChannel(),
 		FCollisionShape::MakeBox({Scale3D.X * 50.f, Scale3D.Y * 50.f, 0.f})
-	)) MaxOffset = FMath::Max(1.f - H.Distance, MaxOffset);
+	);
+	const auto Offset = bOverlapped ? 1.01f - H.Distance : .01f;
 
-	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (MaxOffset + .01f), Scale3D});
+	const auto Comp = Marker->TeamMarkers[Team].PickRand();
+	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * Offset, Scale3D});
 #endif
 }
 

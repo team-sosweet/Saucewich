@@ -15,6 +15,7 @@ public:
 	UShadowComponent();
 
 #if !UE_SERVER
+	
 	void BeTranslucent() override;
 	void BeOpaque() override;
 	
@@ -25,5 +26,6 @@ protected:
 private:
 	FTransform Offset;
 	uint8 bTranslucent : 1;
+	
 #endif
 };

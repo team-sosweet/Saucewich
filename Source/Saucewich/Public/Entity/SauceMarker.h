@@ -33,6 +33,8 @@ protected:
 	UInstancedStaticMeshComponent* CreateComp();
 
 private:
+	void Cleanup();
+	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UMaterialInterface>> Materials;
 
