@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "ShadowComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
