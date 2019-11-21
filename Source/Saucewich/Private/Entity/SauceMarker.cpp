@@ -10,6 +10,7 @@
 
 #include "SaucewichGameMode.h"
 #include "SaucewichInstance.h"
+#include "SaucewichGameState.h"
 
 UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const
 {
@@ -83,5 +84,14 @@ void ASauceMarker::BeginPlay()
 			->SetVectorParameterValue(TEXT("Color"), Teams[i].Color);
 		}
 	}
+
+	CastChecked<ASaucewichGameState>(GetWorld()->GetGameState())->OnCleanup.AddUObject(this, &ASauceMarker::Cleanup);
 #endif 
+}
+
+void ASauceMarker::Cleanup()
+{
+	for (auto&& Markers : TeamMarkers)
+		for (auto&& Comp : Markers.Comps)
+			Comp->ClearInstances();
 }
