@@ -10,6 +10,8 @@ class AActorPool;
 class ASauceMarker;
 class ASaucewichGameMode;
 
+enum ECollisionChannel;
+
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FScoreData
 {
@@ -35,6 +37,7 @@ public:
 	ASauceMarker* GetSauceMarker() const;
 	auto&& GetGameModes() const { return GameModes; }
 	auto&& GetScoreData(const FName& ID) const { return ScoreData[ID]; }
+	ECollisionChannel GetDecalTraceChannel() const { return DecalTraceChannel; }
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -57,4 +60,7 @@ private:
 
 	UPROPERTY(Transient)
 	mutable ASauceMarker* SauceMarker;
+
+	UPROPERTY(EditDefaultsOnly)
+	TEnumAsByte<ECollisionChannel> DecalTraceChannel;
 };

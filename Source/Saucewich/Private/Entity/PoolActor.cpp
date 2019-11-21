@@ -44,7 +44,7 @@ void APoolActor::Activate(const bool bForce)
 void APoolActor::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorld()->GetGameState<ASaucewichGameState>()->OnCleanup.AddUObject(this, &APoolActor::Release, false);
+	CastChecked<ASaucewichGameState>(GetWorld()->GetGameState())->OnCleanup.AddUObject(this, &APoolActor::Release, false);
 }
 
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

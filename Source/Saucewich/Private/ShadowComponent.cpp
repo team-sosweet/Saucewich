@@ -2,12 +2,13 @@
 
 #include "ShadowComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "SaucewichInstance.h"
 
 UShadowComponent::UShadowComponent()
 {
 #if !UE_SERVER
 	PrimaryComponentTick.bCanEverTick = true;
-	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("/Engine/BasicShapes/Plane")}}.LoadSynchronous();
+	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")}}.LoadSynchronous();
 	UStaticMeshComponent::SetStaticMesh(Mesh);
 	BodyInstance.SetCollisionProfileNameDeferred(TEXT("NoCollision"));
 #endif 
@@ -75,6 +76,15 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 
 		if (Num > 0)
 		{
+			const auto Size = RelativeScale3D.X * 50.f;
+			FHitResult H;
+			const auto bOverlapped = World->SweepSingleByChannel(
+				H, Start, Start - Hit.ImpactNormal * (Hit.Distance + 1.f), Rot,
+				USaucewichInstance::Get(World)->GetDecalTraceChannel(),
+				FCollisionShape::MakeBox({Size, Size, 0.f})
+			);
+			if (bOverlapped && H.Distance < MinDist) MinDist = H.Distance;
+
 			const auto Mat = CastChecked<UMaterialInstanceDynamic>(GetMaterial(0));
 			Mat->SetScalarParameterValue(TEXT("Dist"), MinDist / MaxDist);
 			Mat->SetScalarParameterValue(TEXT("Opacity"), static_cast<float>(Num) / Offsets.size());
