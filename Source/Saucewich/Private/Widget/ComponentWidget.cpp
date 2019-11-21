@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Widget/ComponentWidget.h"
 
