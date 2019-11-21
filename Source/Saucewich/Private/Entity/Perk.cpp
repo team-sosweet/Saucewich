@@ -1,3 +1,3 @@
-// Copyright 2019 Seokjin Lee. All Rights Reserved.
+// Copyright 2019 Othereum. All Rights Reserved.
 
 #include "Perk.h"
