@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "SaucewichPlayerState.h"
 
@@ -7,23 +7,16 @@
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "SaucewichGameInstance.h"
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Weapon/Weapon.h"
 #include "Weapon/WeaponComponent.h"
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
+#include "SaucewichInstance.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
-
-template <class Fn>
-void SafeGameState(ASaucewichPlayerState* const PlayerState, Fn&& Func)
-{
-	if (const auto GI = PlayerState->GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		GI->SafeGameState(Func);
-}
 
 void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
 {
@@ -32,10 +25,9 @@ void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapo
 	if (CastChecked<AController>(GetOwner())->IsLocalController()) SaveWeaponLoadout();
 }
 
-void ASaucewichPlayerState::SaveWeaponLoadout() const
+void ASaucewichPlayerState::SaveWeaponLoadout()
 {
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		GI->SaveWeaponLoadout(WeaponLoadout);
+	SaveConfig();
 }
 
 void ASaucewichPlayerState::GiveWeapons()
@@ -49,11 +41,11 @@ void ASaucewichPlayerState::OnKill()
 {
 	if (!HasAuthority()) return;
 
-	const auto GS = GetWorld()->GetGameState<AGameState>();
-	if (!GS || !GS->IsMatchInProgress()) return;
+	const auto GS = CastChecked<AGameState>(GetWorld()->GetGameState());
+	if (!GS->IsMatchInProgress()) return;
 
 	++Kill;
-	AddScore("Kill");
+	AddScore(TEXT("Kill"));
 }
 
 void ASaucewichPlayerState::OnDeath()
@@ -66,15 +58,19 @@ void ASaucewichPlayerState::OnDeath()
 	++Death;
 }
 
-void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore)
+void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore, const bool bForce)
 {
 	if (!HasAuthority()) return;
 
-	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
-	if (!GS || !GS->CanAddPersonalScore()) return;
+	if (!bForce)
+	{
+		const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+		if (!GS->CanAddPersonalScore()) return;
+	}
 
+	const auto GI = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 	if (ActualScore == 0)
-		ActualScore = GS->GetScoreData(ScoreID).Score;
+		ActualScore = GI->GetScoreData(ScoreID).Score;
 	
 	Score += ActualScore;
 	MulticastAddScore(ScoreID, ActualScore);
@@ -95,10 +91,9 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
-	SafeGameState(this, [this, OldTeam](ASaucewichGameState* const GameState)
-	{
-		GameState->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
-	});
+
+	if (const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed))
+		GS->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
 }
 
 void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
@@ -115,17 +110,6 @@ void ASaucewichPlayerState::ServerSetWeaponLoadout_Implementation(const TArray<T
 bool ASaucewichPlayerState::ServerSetWeaponLoadout_Validate(const TArray<TSubclassOf<AWeapon>>& Loadout)
 {
 	return true;
-}
-
-void ASaucewichPlayerState::LoadWeaponLoadout()
-{
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-	{
-		for (const auto Wep : GI->GetWeaponLoadout())
-			if (Wep) SetWeapon_Internal(Wep.GetDefaultObject()->GetWeaponData().Slot, Wep);
-		
-		if (!HasAuthority()) ServerSetWeaponLoadout(WeaponLoadout);
-	}
 }
 
 void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore)
@@ -157,7 +141,7 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 
 void ASaucewichPlayerState::RequestSetPlayerName_Implementation(const FString& NewPlayerName)
 {
-	if (GetPlayerName() != NewPlayerName && USaucewichLibrary::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
+	if (GetPlayerName() != NewPlayerName && USaucewich::IsValidPlayerName(NewPlayerName) == ENameValidity::Valid)
 	{
 		SetPlayerName(NewPlayerName);
 	}
@@ -175,11 +159,6 @@ void ASaucewichPlayerState::BeginPlay()
 	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
 	{
 		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
-
-		if (PC->IsLocalController())
-		{
-			LoadWeaponLoadout();
-		}
 	}
 }
 
@@ -190,7 +169,7 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 		if (Player == this || Player->IsPendingKill()) continue;
 		
 		auto Name = Player->GetPlayerName();
-		if (Name == S)
+		if (Name.Equals(S, ESearchCase::IgnoreCase))
 		{
 			auto Cnt = 0;
 			for (auto i = Name.Len() - 1; i >= 0 && isdigit(Name[i]); --i, ++Cnt) {}

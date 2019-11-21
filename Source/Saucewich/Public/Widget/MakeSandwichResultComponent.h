@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
@@ -17,12 +17,9 @@ class SAUCEWICH_API UMakeSandwichResultComponent : public UComponentWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetWidget(uint8 WinningTeam);
+	void SetWidget(uint8 WinningTeam) const;
 	
 private:
-	UFUNCTION()
-	void GetPlayerState(class ASaucewichPlayerState* InPlayerState);
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TMap<FName, FText> ResultTexts;
 	
@@ -65,9 +62,5 @@ private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	int32 WaitTime;
 	
-	class ASaucewichGameState* GameState;
-	
-	ASaucewichPlayerState* PlayerState;
-
 	FTimerHandle WaitTimer;
 };

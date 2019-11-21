@@ -1,12 +1,12 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
-#include "Entity/GameModeDependentLevelActor.h"
+#include "GameFramework/Actor.h"
 #include "PickupSpawner.generated.h"
 
 UCLASS()
-class SAUCEWICH_API APickupSpawner : public AGameModeDependentLevelActor
+class SAUCEWICH_API APickupSpawner : public AActor
 {
 	GENERATED_BODY()
 	

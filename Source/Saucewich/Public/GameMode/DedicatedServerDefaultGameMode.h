@@ -1,9 +1,8 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
-#include "HttpGameInstance.h"
 #include "DedicatedServerDefaultGameMode.generated.h"
 
 UCLASS()
@@ -15,8 +14,5 @@ protected:
 	void BeginPlay() override;
 
 private:
-	UFUNCTION()
-	void OnServerRegistered(bool bIsSuccess, int32 Code, FJson Json);
-
 	void StartServer() const;
 };

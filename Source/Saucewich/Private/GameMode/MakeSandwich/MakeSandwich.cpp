@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "MakeSandwich.h"
 
@@ -6,6 +6,8 @@
 #include "TimerManager.h"
 
 #include "Entity/PickupSpawnVolume.h"
+
+#define LOCTEXT_NAMESPACE ""
 
 void AMakeSandwich::HandleMatchHasStarted()
 {
@@ -23,6 +25,6 @@ void AMakeSandwich::HandleMatchHasStarted()
 
 void AMakeSandwich::SpawnPerk() const
 {
-	PrintMessage(GetMessage("SpecialIngredientSpawned"), EMsgType::Center);
+	PrintMessage(LOCTEXT("SpecialIngredientSpawned", "특별재료가 어딘가에 나타났어요!"), EMsgType::Center);
 	PerkSpawnVolumes[FMath::RandHelper(PerkSpawnVolumes.Num())]->Spawn(PerkClasses[FMath::RandHelper(PerkClasses.Num())]);
 }

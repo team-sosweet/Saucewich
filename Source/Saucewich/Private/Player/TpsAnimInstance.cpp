@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "TpsAnimInstance.h"
 #include "Gun.h"
@@ -7,12 +7,13 @@
 void UTpsAnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 {
 	const auto Pawn = Cast<ATpsCharacter>(TryGetPawnOwner());
-	if (!Pawn) return;
+	if (!IsValid(Pawn)) return;
 
 	const auto Velocity = Pawn->GetVelocity();
 	Speed = Velocity.Size2D();
 
-	if (const auto Gun = Cast<AGun>(Pawn->GetActiveWeapon()))
+	const auto Gun = Cast<AGun>(Pawn->GetActiveWeapon());
+	if (IsValid(Gun))
 	{
 		FHitResult Hit;
 		if (Gun->GunTrace(Hit) != EGunTraceHit::None)

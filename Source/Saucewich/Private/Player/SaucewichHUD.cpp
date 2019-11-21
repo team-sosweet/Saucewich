@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Player/SaucewichHUD.h"
 
@@ -7,26 +7,31 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
+#include "SaucewichGameMode.h"
 
 void ASaucewichHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GameState = GetWorld()->GetGameState<ASaucewichGameState>();
-	
-	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController());
-	FOnPlayerStateSpawnedSingle PSDelegate;
-	PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
-	PC->SafePlayerState(PSDelegate);
+	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayerController()))
+	{
+		FOnPlayerStateSpawnedSingle PSDelegate;
+		PSDelegate.BindDynamic(this, &ASaucewichHUD::OnGetPlayerState);
+		PC->SafePlayerState(PSDelegate);
+	}
 }
 
 void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
 	OnChangedColor.AddUnique(InDelegate);
-	InDelegate.ExecuteIfBound(MyTeamColor);
+
+	auto&& Data = ASaucewichGameMode::GetData(this);
+	
+	if (const auto PlayerState = CastChecked<ASaucewichPlayerState>(GetOwningPlayerController()->PlayerState, ECastCheckedType::NullAllowed))
+		(void)InDelegate.Execute(Data.Teams[PlayerState->GetTeam()].Color);
 }
 
-void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
+void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* const PS)
 {
 	PS->OnTeamChangedDelegate.AddDynamic(this, &ASaucewichHUD::ChangedColor);
 	ChangedColor(PS->GetTeam());
@@ -34,6 +39,5 @@ void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* PS)
 
 void ASaucewichHUD::ChangedColor(const uint8 NewTeam)
 {
-	MyTeamColor = GameState->GetTeamData(NewTeam).Color;
-	OnChangedColor.Broadcast(MyTeamColor);
+	OnChangedColor.Broadcast(ASaucewichGameMode::GetData(this).Teams[NewTeam].Color);
 }

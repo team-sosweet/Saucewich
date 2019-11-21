@@ -1,13 +1,63 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
 #include "GameFramework/GameMode.h"
 #include "Saucewich.h"
-#include "HttpGameInstance.h"
 #include "SaucewichGameMode.generated.h"
 
+class AWeapon;
+class APlayerStart;
+class USaucewichInstance;
 class ASaucewichPlayerController;
+
+USTRUCT(BlueprintType)
+struct SAUCEWICH_API FTeam
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FLinearColor Color;
+};
+
+USTRUCT(BlueprintType)
+struct FGameData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<TSoftObjectPtr<UWorld>> Maps;
+
+	UPROPERTY(EditDefaultsOnly)
+	FString StreamLevelSuffix;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FTeam> Teams;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float RoundMinutes = 3;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(UIMin=0))
+	float NextGameWaitTime = 10;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(UIMin=0))
+	float MatchStartingTime = 2;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(UIMin=0))
+	float PickupSpawnInterval = 20;
+
+	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
+	float MatchStateUpdateInterval = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	uint8 MinPlayerToStart = 2;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	uint8 MaxPlayers = 6;
+};
 
 UCLASS()
 class SAUCEWICH_API ASaucewichGameMode : public AGameMode
@@ -15,19 +65,22 @@ class SAUCEWICH_API ASaucewichGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Game Data", WorldContext=WorldContextObj))
+	static const FGameData& GetData(const UObject* WorldContextObj);
+	
 	ASaucewichGameMode();
-
-	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
-	float GetNextGameWaitTime() const { return NextGameWaitTime; }
-	float GetPickupSpawnInterval() const { return PickupSpawnInterval; }
+	
+	auto&& GetData() const { return Data; }
+	void StartNextGame() const;
 
 	UFUNCTION(BlueprintCallable)
-	void PrintMessage(const FText& Message, EMsgType Type, float Duration = 3) const;
-	const FText& GetMessage(FName ID) const;
+	void PrintMessage(const FText& Msg, EMsgType Type, float Duration = 3) const;
 
-	auto& GetAvailableMaps() const { return Maps; }
+	TSoftClassPtr<ASaucewichGameMode> ChooseNextGameMode() const;
+	TSoftObjectPtr<UWorld> ChooseNextMap() const;
 
-	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
+	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
+	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName) const;
 
 protected:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -50,65 +103,21 @@ protected:
 
 	bool ReadyToStartMatch_Implementation() override;
 	bool ReadyToEndMatch_Implementation() override;
-	void HandleMatchIsWaitingToStart() override;
 	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
 
 private:
 	void UpdateMatchState();
-	void StartNextGame() const;
-
-	void ExtUpdatePlyCnt() const;
-	void ExtUpdatePlyCnt(const FString& GameCode, int32 NewCnt) const;
-
-	UFUNCTION()
-	void RespondExtUpdatePlyCnt(bool bIsSuccess, int32 Code, FJson Json);
-
-	void PrintAndLogFmtMsg(FName MsgID) const;
-
-	template <class... Ts>
-	auto PrintAndLogFmtMsg(const FName MsgID, Ts&&... Args) -> typename TEnableIf<(sizeof...(Args) > 0)>::Type
-	{
-		static_assert(TAnd<TIsConstructible<FFormatArgumentValue, Ts>...>::Value, "Invalid argument type passed");
-
-		auto Fmt = CompiledMsgFmt.Find(MsgID);
-		if (!Fmt) Fmt = &CompiledMsgFmt.Add(MsgID, GetMessage(MsgID));
-		
-		const auto Msg = FText::FormatOrdered(*Fmt, Forward<Ts>(Args)...);
-		PrintMessage(Msg, EMsgType::Left);
-		UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
-	}
+	USaucewichInstance* GetSaucewichInstance() const;
 	
-	UPROPERTY(EditDefaultsOnly)
-	TMap<FName, FText> Messages;
-	TMap<FName, FTextFormat> CompiledMsgFmt;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	FGameData Data;
 
-	UPROPERTY(EditDefaultsOnly)
-	TArray<TSoftObjectPtr<UWorld>> Maps;
+	TArray<TArray<APlayerStart*>> TeamStarts;
 	
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
 	FTimerHandle ExtPlyCntUpdateTimer;
-
-	// 게임이 끝나고 다음 게임을 시작하기까지 기다리는 시간 (초)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
-	float NextGameWaitTime = 10;
-	
-	// 게임 시작 대기하다가 게임을 시작하려고 하기까지의 시간 (초)
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true, UIMin=0))
-	float MatchStartingTime = 2;
-	
-	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
-	float PickupSpawnInterval = 20;
-
-	UPROPERTY(EditDefaultsOnly, meta=(UIMin=0))
-	float MatchStateUpdateInterval = 1;
-
-	UPROPERTY(EditDefaultsOnly)
-	uint8 MinPlayerToStart = 2;
-
-	UPROPERTY(EditDefaultsOnly)
-	uint8 MaxPlayers = 6;
 
 	uint8 bAboutToStartMatch : 1;
 };

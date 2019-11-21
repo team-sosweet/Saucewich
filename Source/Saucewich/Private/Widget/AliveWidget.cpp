@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Widget/AliveWidget.h"
 
@@ -12,21 +12,22 @@
 #include "Widget/KillFeed.h"
 #include "Widget/ScoreFeed.h"
 #include "Widget/MessageFeed.h"
+#include "SaucewichInstance.h"
 
 void UAliveWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	KillFeedBox = Cast<UFeedBox>(GetWidgetFromName("FeedBox_Kill"));
-	ScoreFeedBox = Cast<UFeedBox>(GetWidgetFromName("FeedBox_Score"));
-	MessageFeedBox = Cast<UFeedBox>(GetWidgetFromName("FeedBox_Message"));
-	CenterText = Cast<UTextBlock>(GetWidgetFromName("CenterText"));
+	KillFeedBox = CastChecked<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Kill")));
+	ScoreFeedBox = CastChecked<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Score")));
+	MessageFeedBox = CastChecked<UFeedBox>(GetWidgetFromName(TEXT("FeedBox_Message")));
+	CenterText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("CenterText")));
 
-	GameState = Cast<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
 	GameState->OnPlayerDeath.AddDynamic(this, &UAliveWidget::OnPlayerDeath);
 
-	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer());
-
+	const auto PC = CastChecked<ASaucewichPlayerController>(GetOwningPlayer());
+	
 	FOnPlayerStateSpawnedSingle PSSpawned;
 	PSSpawned.BindDynamic(this, &UAliveWidget::OnPlayerStateSpawned);
 	PC->SafePlayerState(PSSpawned);
@@ -46,7 +47,8 @@ void UAliveWidget::OnPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayer
 
 void UAliveWidget::OnScoreAdded(const FName ScoreID, const int32 ActualScore)
 {
-	const auto& DisplayName = GameState->GetScoreData(ScoreID).DisplayName;
+	const auto GI = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
+	const auto& DisplayName = GI->GetScoreData(ScoreID).DisplayName;
 	ScoreFeedBox->MakeNewFeed(FScoreFeedContent(DisplayName, ActualScore));
 }
 

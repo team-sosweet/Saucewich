@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Weapon.h"
 
@@ -61,23 +61,14 @@ void AWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (SharedData != nullptr)
+	const auto ColMatIdx = GetColIdx();
+	if (ColMatIdx != INDEX_NONE)
 	{
-		if (const auto Data = GetData(TEXT("AWeapon::PostInitializeComponents()")))
-		{
-			const auto ColMatIdx = GetColIdx();
-			if (ColMatIdx != INDEX_NONE)
-			{
-				const auto Transl = SharedData->GetTranslMat(GetMesh()->GetMaterial(ColMatIdx));
-				if (Transl != nullptr)
-				{
-					ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
-				}
-				ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
+		if (const auto Transl = GetSharedData().GetTranslMat(GetMesh()->GetMaterial(ColMatIdx)))
+			ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
 
-				OnColMatCreated.Broadcast();
-			}
-		}
+		ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
+		OnColMatCreated.Broadcast();
 	}
 }
 
@@ -99,9 +90,12 @@ void AWeapon::OnReleased()
 
 const FWeaponData& AWeapon::GetWeaponData() const
 {
-	static const FWeaponData Default{};
-	const auto Data = GetData(TEXT("AWeapon::GetWeaponData()"));
-	return Data ? *Data : Default;
+	return GetData<FWeaponData>();
+}
+
+const UWeaponSharedData& AWeapon::GetSharedData() const
+{
+	return ensure(SharedData) ? *SharedData : *GetDefault<UWeaponSharedData>(UWeaponSharedData::StaticClass());
 }
 
 bool AWeapon::IsVisible() const
@@ -130,10 +124,6 @@ void AWeapon::SetColor(const FLinearColor& NewColor)
 void AWeapon::BeTranslucent()
 {
 	if (bTransl) return;
-	if (!SharedData) return;
-
-	const auto Data = GetData(TEXT("AWeapon::BeTranslucent()"));
-	if (!Data) return;
 
 	const auto ColMatIdx = GetColIdx();
 	const auto NumMat = GetMesh()->GetNumMaterials();
@@ -142,7 +132,7 @@ void AWeapon::BeTranslucent()
 		if (i == ColMatIdx)
 			GetMesh()->SetMaterial(i, ColTranslMat);
 		
-		else if (const auto Transl = SharedData->GetTranslMat(GetMesh()->GetMaterial(i)))
+		else if (const auto Transl = GetSharedData().GetTranslMat(GetMesh()->GetMaterial(i)))
 			GetMesh()->SetMaterial(i, Transl);
 	}
 

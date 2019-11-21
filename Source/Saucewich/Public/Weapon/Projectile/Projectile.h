@@ -1,42 +1,69 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
 #include "PoolActor.h"
-#include "Colorable.h"
 #include "Projectile.generated.h"
 
-/*
- * 발사체는 pooling 가능하여 대량으로 생산할 수 있으며, ProjectileMovementComponent를 가진 클래스입니다.
- */
+class UStaticMeshComponent;
+class UForceFeedbackEffect;
+class UForceFeedbackAttenuation;
+class UProjectileMovementComponent;
+
 UCLASS(Abstract)
-class AProjectile : public APoolActor, public IColorable
+class AProjectile : public APoolActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UStaticMeshComponent* Mesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UProjectileMovementComponent* Movement;
-
 public:
 	AProjectile();
+	
 	void ResetSpeed() const;
 	void SetSpeed(float Speed) const;
 	FName GetCollisionProfile() const;
 
-	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
+	UStaticMeshComponent* GetMesh() const { return Mesh; }
+	bool IsTeamValid() const { return Team != static_cast<decltype(Team)>(-1); }
 
 	UFUNCTION(BlueprintCallable)
-	void SetColor(const FLinearColor& NewColor) override;
+	void Explode(const FHitResult& Hit);
+	virtual bool CanExplode(const FHitResult& Hit) const;
 
 protected:
-	void PostInitializeComponents() override;
 	void OnActivated() override;
 	void OnReleased() override;
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual float GetSauceMarkScale() const { return 1.f; }
+	virtual void OnExplode(const FHitResult& Hit);
+
+	UFUNCTION()
+	void OnRep_Team() const;
+
 private:
-	UMaterialInstanceDynamic* Material;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastExplode(const FHitResult& Hit);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UProjectileMovementComponent* Movement;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSoftObjectPtr<USoundBase>> ImpactSounds;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UParticleSystem> ImpactFX;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UForceFeedbackEffect> ForceFeedbackEffect;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UForceFeedbackAttenuation> ForceFeedbackAttenuation;
+
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_Team, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 Team = -1;
 };

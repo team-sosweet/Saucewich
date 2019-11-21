@@ -1,10 +1,10 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Weapon/Projectile/ExplosiveProjectile.h"
 
 #include "Kismet/GameplayStatics.h"
 
-void AExplosiveProjectile::ApplyDamage() const
+void AExplosiveProjectile::OnExplode(const FHitResult& Hit)
 {
 	UGameplayStatics::ApplyRadialDamage(
 		this,
@@ -18,4 +18,11 @@ void AExplosiveProjectile::ApplyDamage() const
 		false,
 		DamagePreventionChannel
 	);
+	
+	Super::OnExplode(Hit);
+}
+
+float AExplosiveProjectile::GetSauceMarkScale() const
+{
+	return Radius / 75.f;
 }

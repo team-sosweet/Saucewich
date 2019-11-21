@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Widget/FeedBox.h"
 
@@ -15,10 +15,7 @@ void UFeedBox::NativeOnInitialized()
 	for (uint8 Num = 0; Num < FeedNum; Num++)
 	{
 		const auto Feed = CreateWidget<UFeed>(Player, FeedClass);
-		Feed->OnExpiration.BindLambda([this]
-			{
-				CurFeedNum--;
-			});
+		Feed->OnExpiration.BindWeakLambda(this, [this]{CurFeedNum--;});
 		
 		const auto FeedSlot = FeedBox->AddChildToVerticalBox(Feed);
 		FeedSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));

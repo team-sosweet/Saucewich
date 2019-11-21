@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "TpsCharacter.h"
 
@@ -28,12 +28,12 @@ DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
 
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
-	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>("WeaponComponent")},
-	SpringArm{CreateDefaultSubobject<USpringArmComponent>("SpringArm")},
-	Camera{CreateDefaultSubobject<UCameraComponent>("Camera")},
-	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
+	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"))},
+	SpringArm{CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"))},
+	Camera{CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"))},
+	Shadow{CreateDefaultSubobject<UShadowComponent>(TEXT("Shadow"))}
 {
-	WeaponComponent->SetupAttachment(GetMesh(), "Weapon");
+	WeaponComponent->SetupAttachment(GetMesh(), TEXT("Weapon"));
 	SpringArm->SetupAttachment(RootComponent);
 	Camera->SetupAttachment(SpringArm);
 	Shadow->SetupAttachment(RootComponent);
@@ -58,23 +58,19 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	ColMat->GetVectorParameterValue({"Color"}, Color);
+	ColMat->GetVectorParameterValue({TEXT("Color")}, Color);
 	return Color;
 }
 
-FLinearColor ATpsCharacter::GetTeamColor() const
+const FLinearColor& ATpsCharacter::GetTeamColor() const
 {
-	if (const auto GameState = GetWorld()->GetGameState<ASaucewichGameState>())
-	{
-		return GetTeamColor(GameState);
-	}
-	return {};
+	return ASaucewichGameMode::GetData(this).Teams[GetTeam()].Color;
 }
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	ColMat->SetVectorParameterValue("Color", NewColor);
-	if (ColTranslMat) ColTranslMat->SetVectorParameterValue("Color", NewColor);
+	ColMat->SetVectorParameterValue(TEXT("Color"), NewColor);
+	ColTranslMat->SetVectorParameterValue(TEXT("Color"), NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -85,10 +81,8 @@ bool ATpsCharacter::IsInvincible() const
 
 void ATpsCharacter::AddPerk(const TSubclassOf<APerk> PerkClass)
 {
-	if (const auto Class = *PerkClass)
-	{
-		MulticastAddPerk(Class);
-	}
+	check(PerkClass);
+	MulticastAddPerk(PerkClass);
 }
 
 bool ATpsCharacter::HasPerk(const TSubclassOf<APerk> PerkClass) const
@@ -120,20 +114,11 @@ void ATpsCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (Data != nullptr)
-	{
-		const auto ColMatIdx = GetColIdx();
-		if (ColMatIdx != INDEX_NONE)
-		{
-			const auto Transl = Data->GetTranslMat(ColMatIdx, GetMesh()->GetMaterial(ColMatIdx));
-			if (Transl != nullptr)
-			{
-				ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
-			}
-
-			ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
-		}
-	}
+	const auto ColMatIdx = GetColIdx();
+	const auto Transl = Data->GetTranslMat(ColMatIdx, GetMesh()->GetMaterial(ColMatIdx));
+	
+	ColTranslMat = UMaterialInstanceDynamic::Create(Transl, GetMesh());
+	ColMat = GetMesh()->CreateDynamicMaterialInstance(ColMatIdx);
 }
 
 void ATpsCharacter::PossessedBy(AController* const NewController)
@@ -204,10 +189,10 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		const auto HealAmount = FMath::Min(-DamageAmount, Data->MaxHP - HP);
 		if (HealAmount >= 2 && EventInstigator && EventInstigator != GetController())
 			if (const auto PS = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
-				PS->AddScore("Heal", FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
+				PS->AddScore(TEXT("Heal"), FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
 
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
-		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator->GetPlayerState<ASaucewichPlayerState>(), DamageCauser);
+		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
 	}
 	
 	return DamageAmount;
@@ -321,18 +306,16 @@ void ATpsCharacter::SetActorActivated(const bool bActive)
 
 void ATpsCharacter::OnTeamChanged(const uint8 NewTeam)
 {
-	SetColorToTeamColor();
+	SetColor(GetTeamColor());
 }
 
 void ATpsCharacter::BindOnTeamChanged()
 {
 	if (const auto PS = GetPlayerState())
 	{
-		if (const auto Player = Cast<ASaucewichPlayerState>(PS))
-		{
-			Player->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-			OnTeamChanged(Player->GetTeam());
-		}
+		const auto Player = CastChecked<ASaucewichPlayerState>(PS);
+		Player->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
+		OnTeamChanged(Player->GetTeam());
 	}
 	else
 	{
@@ -340,27 +323,9 @@ void ATpsCharacter::BindOnTeamChanged()
 	}
 }
 
-void ATpsCharacter::SetColorToTeamColor()
-{
-	if (const auto GameState = GetWorld()->GetGameState())
-	{
-		if (const auto GS = Cast<ASaucewichGameState>(GameState))
-			SetColor(GetTeamColor(GS));
-	}
-	else
-	{
-		GetWorldTimerManager().SetTimerForNextTick(this, &ATpsCharacter::SetColorToTeamColor);
-	}
-}
-
-FLinearColor ATpsCharacter::GetTeamColor(ASaucewichGameState* const GameState) const
-{
-	return GameState->GetTeamData(GetTeam()).Color;
-}
-
 int32 ATpsCharacter::GetColIdx() const
 {
-	return Data ? GetMesh()->GetMaterialIndex(Data->ColMatName) : INDEX_NONE;
+	return GetMesh()->GetMaterialIndex(Data->ColMatName);
 }
 
 void ATpsCharacter::OnRep_Alive()
@@ -470,13 +435,13 @@ void ATpsCharacter::MulticastAddPerk_Implementation(UClass* const PerkClass)
 		);
 	}
 
-	auto&& ErasePerk = [this, PerkClass]
+	FTimerDelegate Delegate;
+	Delegate.BindWeakLambda(this, [this, PerkClass]
 	{
 		if (const auto Found = Perks.Find(PerkClass))
 			if (Found->PSC) Found->PSC->ReleaseToPool();
 		
 		Perks.Remove(PerkClass);
-	};
-
-	GetWorldTimerManager().SetTimer(Perk.Timer, ErasePerk, Def->GetDuration(),	false);
+	});
+	GetWorldTimerManager().SetTimer(Perk.Timer, Delegate, Def->GetDuration(), false);
 }

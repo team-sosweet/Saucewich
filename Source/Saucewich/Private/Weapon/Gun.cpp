@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Gun.h"
 
@@ -28,10 +28,7 @@ void AGun::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	const auto Data = GetData<FGunData>(TEXT("AGun::Tick()"));
-	if (!Data) return;
-
-	const auto Delay = 60 / Data->Rpm;
+	const auto Delay = 60 / GetGunData().Rpm;
 	if (bFiring)
 	{
 		for (; FireLag >= Delay; FireLag -= Delay)
@@ -60,10 +57,6 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 void AGun::Shoot()
 {
 	if (!CanFire()) return;
-	if (!GetPool()) return;
-
-	const auto Shared = GetSharedData<UGunSharedData>();
-	if (!Shared) return;
 
 	auto& Data = GetGunData();
 
@@ -129,10 +122,9 @@ void AGun::Shoot()
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
 		SpawnTransform.SetRotation(RDirs[i].ToOrientationQuat());
-		if (const auto Projectile = GetPool()->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
+		if (const auto Projectile = AActorPool::Get(this)->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
 		{
 			Projectile->bCosmetic = HitPawn[i];
-			Projectile->SetColor(GetColor());
 		}
 	}
 
@@ -163,26 +155,25 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
-	const auto Shared = GetSharedData<UGunSharedData>();
-	if (!Shared) return EGunTraceHit::None;
-
 	const auto Character = Cast<ATpsCharacter>(GetOwner());
-	if (!Character->IsValidLowLevel()) return EGunTraceHit::None;
-
-	const auto GS = GetWorld()->GetGameState<ASaucewichGameState>();
-	if (!GS) return EGunTraceHit::None;
+	if (!IsValid(Character)) return EGunTraceHit::None;
+	
+	auto&& ShDat = GetSharedData<UGunSharedData>();
 
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
-	const auto Start = Character->GetSpringArmLocation() + AimDir * Shared->TraceStartOffset;
+	const auto Start = Character->GetSpringArmLocation() + AimDir * ShDat.TraceStartOffset;
 	const auto End = Start + AimDir * Data.MaxDistance;
 
 	FCollisionQueryParams Params;
-	Params.AddIgnoredActors(TArray<AActor*>{GS->GetCharactersByTeam(Character->GetTeam())});
+	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	{
+		Params.AddIgnoredActors(TArray<AActor*>{GS->GetCharactersByTeam(Character->GetTeam())});
+	}
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
-		BoxHits, Start, End, AimRotation.Quaternion(), Shared->PawnOnly.Name,
+		BoxHits, Start, End, AimRotation.Quaternion(), ShDat.PawnOnly.Name,
 		FCollisionShape::MakeBox({ 0.f, Data.TraceBoxSize.X, Data.TraceBoxSize.Y }), Params
 	);
 
@@ -194,7 +185,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 			Data.Damage, BoxHits[i], (End-Start).GetSafeNormal(), Data.DamageType
 		}, GetInstigatorController(), this)) continue;
 
-		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, Shared->NoPawn.Name, Params))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, ShDat.NoPawn.Name, Params))
 		{
 			HitPawn = i;
 			break;
@@ -218,19 +209,13 @@ void AGun::OnRep_Dried() const
 
 const FGunData& AGun::GetGunData() const
 {
-	static const FGunData Default{};
-	const auto Data = GetData<FGunData>(TEXT("AGun::GetGunData()"));
-	return Data ? *Data : Default;
+	return GetData<FGunData>();
 }
 
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (const auto Data = GetData<FGunData>(TEXT("AGun::BeginPlay()")))
-	{
-		FirePSC->SetFloatParameter("RPM", Data->Rpm);
-	}
+	FirePSC->SetFloatParameter("RPM", GetData<FGunData>().Rpm);
 }
 
 void AGun::FireP()
@@ -252,22 +237,13 @@ void AGun::FireR()
 void AGun::SlotP()
 {
 	if (const auto Character = Cast<ATpsCharacter>(GetOwner()))
-		if (const auto Data = GetData(TEXT("AGun::SlotP()")))
-			Character->GetWeaponComponent()->TrySelectWeapon(Data->Slot);
+		Character->GetWeaponComponent()->TrySelectWeapon(GetData().Slot);
 }
 
 void AGun::OnActivated()
 {
 	Super::OnActivated();
-
-	if (const auto Data = GetData<FGunData>(TEXT("AGun::OnActivated()")))
-	{
-		Clip = Data->ClipSize;
-	}
-	else
-	{
-		SetActorTickEnabled(false);
-	}
+	Clip = GetGunData().ClipSize;
 }
 
 void AGun::OnReleased()
@@ -318,17 +294,16 @@ void AGun::Reload(const float DeltaSeconds)
 {
 	if (!HasAuthority()) return;
 
-	const auto Data = GetData<FGunData>(TEXT("AGun::Reload()"));
-	if (!Data) return;
+	auto&& Data = GetGunData();
 
-	if (Clip < Data->ClipSize)
+	if (Clip < Data.ClipSize)
 	{
-		if (ReloadWaitingTime >= (bDried ? Data->ReloadWaitTimeAfterDried : Data->ReloadWaitTime))
+		if (ReloadWaitingTime >= (bDried ? Data.ReloadWaitTimeAfterDried : Data.ReloadWaitTime))
 		{
-			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaSeconds / Data->ReloadTime, 0.f, 1.f);
-			Clip = FMath::CubicInterp<float>(LastClip, 0.f, Data->ClipSize, 0.f, ReloadAlpha);
+			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaSeconds / Data.ReloadTime, 0.f, 1.f);
+			Clip = FMath::CubicInterp<float>(LastClip, 0.f, Data.ClipSize, 0.f, ReloadAlpha);
 
-			if (bDried && Clip >= Data->MinClipToFireAfterDried)
+			if (bDried && Clip >= Data.MinClipToFireAfterDried)
 			{
 				bDried = false;
 				OnRep_Dried();

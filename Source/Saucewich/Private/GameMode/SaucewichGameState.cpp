@@ -1,26 +1,22 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "GameMode/SaucewichGameState.h"
 
 #include "Engine/World.h"
-#include "GameFramework/GameMode.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "UnrealNetwork.h"
 
-#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
-#include "Weapon/Weapon.h"
-#include "SaucewichLibrary.h"
-#include "SaucewichGameInstance.h"
+#include "SaucewichGameMode.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
 {
 	for (const auto PS : PlayerArray)
-		if (const auto P = Cast<ASaucewichPlayerState>(PS))
-			Do(P);
+		Do(CastChecked<ASaucewichPlayerState>(PS));
 }
 
 template <class Fn>
@@ -39,7 +35,7 @@ TArray<ASaucewichPlayerState*> ASaucewichGameState::GetPlayersByTeam(const uint8
 TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team) const
 {
 	TArray<ATpsCharacter*> Characters;
-	ForEachPlayer(PlayerArray, Team, [&Characters](ASaucewichPlayerState* const P) {
+	ForEachPlayer(PlayerArray, Team, [&](ASaucewichPlayerState* const P) {
 		if (const auto C = P->GetPawn<ATpsCharacter>()) Characters.Add(C);
 	});
 	return Characters;
@@ -47,21 +43,21 @@ TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team
 
 uint8 ASaucewichGameState::GetMinPlayerTeam() const
 {
-	TArray<uint8, TInlineAllocator<4>> Num;
-	Num.AddZeroed(Teams.Num() - 1);
-	ForEachEveryPlayer(PlayerArray, [&Num](auto P)
+	TArray<uint8> Num;
+	Num.AddZeroed(GetGmData().Teams.Num());
+	ForEachEveryPlayer(PlayerArray, [&](ASaucewichPlayerState* P)
 	{
-		const auto Team = P->GetTeam() - 1;
-		if (Num.IsValidIndex(Team)) ++Num[Team];
+		if (P->IsValidTeam()) ++Num[P->GetTeam()];
 	});
-	TArray<uint8, TInlineAllocator<4>> Min{0};
+	
+	TArray<uint8> Min{0};
 	for (auto i = 1; i < Num.Num(); ++i)
 	{
 		const auto This = Num[i];
 		const auto MinV = Num[Min[0]];
 		if (This < MinV)
 		{
-			Min.Empty();
+			Min.Reset();
 			Min.Add(i);
 		}
 		else if (This == MinV)
@@ -69,7 +65,7 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 			Min.Add(i);
 		}
 	}
-	return Min[FMath::RandHelper(Min.Num())] + 1;
+	return Min[FMath::RandHelper(Min.Num())];
 }
 
 void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
@@ -79,39 +75,14 @@ void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
 	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
 	
 	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
-		NewScore - TeamScore[Team], static_cast<int>(Team), *GetTeamData(Team).Name.ToString(), NewScore);
+		NewScore - TeamScore[Team], static_cast<int32>(Team), *GetGmData().Teams[Team].Name.ToString(), NewScore);
 	
 	TeamScore[Team] = NewScore;
-}
-
-const FScoreData& ASaucewichGameState::GetScoreData(const FName ForWhat) const
-{
-	static const FScoreData Default{};
-	const auto Found = ScoreData.Find(ForWhat);
-	return Found ? *Found : Default;
 }
 
 bool ASaucewichGameState::CanAddPersonalScore() const
 {
 	return IsMatchInProgress();
-}
-
-
-TArray<TSubclassOf<AWeapon>> ASaucewichGameState::GetAvailableWeapons(const uint8 Slot) const
-{
-	TArray<TSubclassOf<AWeapon>> SlotWep;
-	for (const auto Class : AvailableWeapons)
-	{
-		if (const auto Def = Class.GetDefaultObject())
-		{
-			const auto WepDat = Def->GetData(TEXT("ASaucewichGameState::GetAvailableWeapons()"));
-			if (WepDat && WepDat->Slot == Slot)
-			{
-				SlotWep.Add(Class);
-			}
-		}
-	}
-	return SlotWep;
 }
 
 bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
@@ -122,15 +93,13 @@ bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, fl
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
-	return IsMatchInProgress() ? FMath::Max(0.f, RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
+	return IsMatchInProgress() ? FMath::Max(0.f, GetGmData().RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
 }
 
 void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (const auto GI = GetGameInstance<USaucewichGameInstance>())
-		USaucewichGameInstance::BroadcastGameStateSpawned(GI, this);
+	TeamScore.AddZeroed(GetGmData().Teams.Num());
 }
 
 void ASaucewichGameState::HandleMatchHasStarted()
@@ -142,7 +111,12 @@ void ASaucewichGameState::HandleMatchHasStarted()
 		RoundStartTime = GetServerWorldTimeSeconds();
 	}
 
-	USaucewichLibrary::CleanupGame(this);
+	OnCleanup.Broadcast();
+
+	auto LevelName = GetWorld()->GetName();
+	LevelName += '_';
+	LevelName += GetGmData().StreamLevelSuffix;
+	UGameplayStatics::LoadStreamLevel(this, *LevelName, true, false, {});
 }
 
 void ASaucewichGameState::HandleMatchHasEnded()
@@ -157,11 +131,11 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		{
 			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
 			{
-				Player->AddScore("Win");
+				Player->AddScore(TEXT("Win"), 0, true);
 			});
 
 			UE_LOG(LogGameState, Log, TEXT("Match result: The [%d] %s team won the game!"),
-			       static_cast<int>(WonTeam), *GetTeamData(WonTeam).Name.ToString());
+			       static_cast<int>(WonTeam), *GetGmData().Teams[WonTeam].Name.ToString());
 		}
 		else
 		{
@@ -169,7 +143,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	USaucewichLibrary::CleanupGame(this);
+	OnCleanup.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
@@ -203,7 +177,7 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
-	if (WonTeam != InvalidTeam) return WonTeam;
+	if (WonTeam != static_cast<uint8>(-1)) return WonTeam;
 
 	const auto Empty = GetEmptyTeam();
 	if (Empty) return 3 - Empty;
@@ -225,6 +199,11 @@ uint8 ASaucewichGameState::GetEmptyTeam() const
 	if (T1 > 0 && T2 == 0) return 2;
 
 	return 0;
+}
+
+const FGameData& ASaucewichGameState::GetGmData() const
+{
+	return CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetData();
 }
 
 void ASaucewichGameState::OnRep_WonTeam()

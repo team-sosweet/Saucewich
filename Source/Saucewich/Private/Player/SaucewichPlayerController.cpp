@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "Player/SaucewichPlayerController.h"
 
@@ -124,6 +124,17 @@ void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& 
 	{
 		OnCharacterSpawned.AddUnique(Delegate);
 	}
+}
+
+void ASaucewichPlayerController::SetSessionID(FString&& ID)
+{
+	ensure(SessionID.IsEmpty());
+	SessionID = MoveTemp(ID);
+}
+
+const FString& ASaucewichPlayerController::GetSessionID() const
+{
+	return SessionID;
 }
 
 void ASaucewichPlayerController::PrintMessage_Implementation(const FText& Message, const float Duration, const EMsgType Type)

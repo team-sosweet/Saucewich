@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
@@ -61,7 +61,7 @@ public:
 	FLinearColor GetColor() const;
 
 	UFUNCTION(BlueprintCallable)
-	FLinearColor GetTeamColor() const;
+	const FLinearColor& GetTeamColor() const;
 
 	void SetColor(const FLinearColor& NewColor) override;
 
@@ -138,7 +138,6 @@ private:
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();
 	void SetColorToTeamColor();
-	FLinearColor GetTeamColor(class ASaucewichGameState* GameState) const;
 	int32 GetColIdx() const;
 
 	UFUNCTION()

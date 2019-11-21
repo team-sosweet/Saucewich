@@ -1,10 +1,10 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "BaseHUD.h"
 
 #include "Widget/ErrorWidget.h"
 
-#include "SaucewichLibrary.h"
+#include "Saucewich.h"
 
 void ABaseHUD::BeginPlay()
 {

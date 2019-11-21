@@ -1,12 +1,12 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
-#include "Entity/GameModeDependentLevelActor.h"
+#include "GameFramework/Actor.h"
 #include "Fridge.generated.h"
 
 UCLASS()
-class SAUCEWICH_API AFridge : public AGameModeDependentLevelActor
+class SAUCEWICH_API AFridge : public AActor
 {
 	GENERATED_BODY()
 

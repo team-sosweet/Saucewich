@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
@@ -11,8 +11,8 @@ class SAUCEWICH_API AExplosiveProjectile : public AProjectile
 	GENERATED_BODY()
 
 protected:
-	UFUNCTION(BlueprintCallable)
-	void ApplyDamage() const;
+	float GetSauceMarkScale() const override;
+	void OnExplode(const FHitResult& Hit) override;
 	
 private:
 	UPROPERTY(EditAnywhere)

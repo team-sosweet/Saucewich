@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "PoolActor.h"
 
@@ -6,11 +6,12 @@
 #include "UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
-#include "SaucewichGameInstance.h"
+#include "SaucewichGameState.h"
 
 void APoolActor::Release(const bool bForce)
 {
-	if (!IsValidLowLevel() || Activation == EActivation::Released && !bForce) return;
+	check(IsValidLowLevel());
+	if (Activation == EActivation::Released && !bForce) return;
 	
 	SetActorTickEnabled(false);
 	SetActorEnableCollision(false);
@@ -22,7 +23,7 @@ void APoolActor::Release(const bool bForce)
 	Activation = EActivation::Released;
 
 	if (!bReplicates || HasAuthority())
-		GetPool()->Release(this);
+		AActorPool::Get(this)->Release(this);
 	
 	OnReleased();
 	BP_OnReleased();
@@ -40,11 +41,10 @@ void APoolActor::Activate(const bool bForce)
 	BP_OnActivated();
 }
 
-AActorPool* APoolActor::GetPool() const
+void APoolActor::BeginPlay()
 {
-	if (const auto GI = GetWorld()->GetGameInstance<USaucewichGameInstance>())
-		return GI->GetActorPool();
-	return nullptr;
+	Super::BeginPlay();
+	CastChecked<ASaucewichGameState>(GetWorld()->GetGameState())->OnCleanup.AddUObject(this, &APoolActor::Release, false);
 }
 
 void APoolActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

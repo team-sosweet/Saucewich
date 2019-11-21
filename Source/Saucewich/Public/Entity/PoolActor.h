@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
@@ -11,9 +11,6 @@ enum class EActivation : uint8
 	Invalid, Released, Activated
 };
 
-/**
- * 재활용 가능한 액터입니다. 자주 생성/소멸되는 액터에 좋습니다.
- */
 UCLASS()
 class SAUCEWICH_API APoolActor : public AActor
 {
@@ -25,9 +22,10 @@ public:
 	void Activate(bool bForce = false);
 	bool IsActive() const { return Activation == EActivation::Activated; }
 	void LifeSpanExpired() override { Release(); }
-	class AActorPool* GetPool() const;
 
 protected:
+	void BeginPlay() override;
+	
 	virtual void OnReleased() {}
 	virtual void OnActivated() {}
 

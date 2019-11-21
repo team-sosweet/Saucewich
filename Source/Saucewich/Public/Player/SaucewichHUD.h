@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #pragma once
 
@@ -13,12 +13,13 @@ UCLASS()
 class SAUCEWICH_API ASaucewichHUD : public ABaseHUD
 {
 	GENERATED_BODY()
-
-	void BeginPlay() override;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	void BindChangedColor(const FOnChangedColorSingle& InDelegate);
+
+protected:
+	void BeginPlay() override;
 
 private:
 	UFUNCTION()
@@ -37,8 +38,4 @@ private:
 
 	UPROPERTY(Transient, BlueprintReadWrite, Category = Widgets, meta = (AllowPrivateAccess = true))
 	class UResultWidget* ResultWidget;
-
-	class ASaucewichGameState* GameState;
-
-	FLinearColor MyTeamColor;
 };

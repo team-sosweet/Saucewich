@@ -1,4 +1,4 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "ThrowingWeapon.h"
 
@@ -10,9 +10,7 @@
 
 const FThrowingWeaponData& AThrowingWeapon::GetThrowingWeaponData() const
 {
-	static const FThrowingWeaponData Default{};
-	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::GetThrowingWeaponData()"));
-	return Data ? *Data : Default;
+	return GetData<FThrowingWeaponData>();
 }
 
 float AThrowingWeapon::GetRemainingReloadTime() const
@@ -25,23 +23,22 @@ void AThrowingWeapon::SlotP()
 	auto& TimerManager = GetWorldTimerManager();
 	if (TimerManager.TimerExists(ReloadTimer)) return;
 
-	const auto Data = GetData<FThrowingWeaponData>(TEXT("AThrowingWeapon::SlotP()"));
-	if (!Data || !Data->ProjectileClass) return;
+	auto&& Data = GetThrowingWeaponData();
+	if (!ensure(Data.ProjectileClass)) return;
 
-	if (HasAuthority() || !Data->ProjectileClass.GetDefaultObject()->GetIsReplicated())
+	if (HasAuthority() || !Data.ProjectileClass.GetDefaultObject()->GetIsReplicated())
 	{
 		FActorSpawnParameters Parameters;
 		Parameters.Owner = this;
 		Parameters.Instigator = GetInstigator();
 
-		if (const auto Thrown = GetPool()->Spawn<AProjectile>(Data->ProjectileClass, Data->ThrowOffset * GetActorTransform(), Parameters))
+		if (const auto Thrown = AActorPool::Get(this)->Spawn<AProjectile>(Data.ProjectileClass, Data.ThrowOffset * GetActorTransform(), Parameters))
 		{
 			Thrown->ResetSpeed();
-			Thrown->SetColor(GetColor());
 		}
 	}
 	
-	TimerManager.SetTimer(ReloadTimer, Data->ReloadTime, false);
+	TimerManager.SetTimer(ReloadTimer, Data.ReloadTime, false);
 }
 
 void AThrowingWeapon::OnReleased()

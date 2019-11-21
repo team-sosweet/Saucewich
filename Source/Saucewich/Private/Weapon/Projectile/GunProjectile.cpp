@@ -1,32 +1,16 @@
-// Copyright 2019 Team Sosweet. All Rights Reserved.
+// Copyright 2019 Seokjin Lee. All Rights Reserved.
 
 #include "GunProjectile.h"
 #include "GameFramework/Pawn.h"
 #include "Gun.h"
 
-void AGunProjectile::OnActivated()
+void AGunProjectile::OnExplode(const FHitResult& Hit)
 {
-	Super::OnActivated();
-
-	const auto Gun = Cast<AGun>(GetOwner());
-	if (!Gun) return;
-	
-	if (const auto Data = Gun->GetData<FGunData>(TEXT("AGunProjectile::OnActivated()")))
+	if (!bCosmetic)
 	{
-		SetSpeed(Data->ProjectileSpeed);
-	}
-}
-
-void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
-	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	if (!bCosmetic && Other)
-	{
-		if (const auto Gun = Cast<AGun>(GetOwner()))
+		if (const auto Other = Hit.GetActor())
 		{
-			auto& Data = Gun->GetGunData();
+			auto&& Data = CastChecked<AGun>(GetOwner())->GetGunData();
 			const auto Damage = Data.Damage;
 			Other->TakeDamage(
 				Damage,
@@ -36,6 +20,29 @@ void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const 
 			);
 		}
 	}
+	
+	Super::OnExplode(Hit);
+}
 
-	Release();
+float AGunProjectile::GetSauceMarkScale() const
+{
+	auto&& S = GetMesh()->RelativeScale3D;
+	return (S.X + S.Y + S.Z) / 6.f;
+}
+
+void AGunProjectile::OnActivated()
+{
+	Super::OnActivated();
+
+	const auto Gun = Cast<AGun>(GetOwner());
+	if (!ensure(Gun)) return;
+	
+	SetSpeed(Gun->GetGunData().ProjectileSpeed);
+}
+
+void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
+	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	Explode(Hit);
 }
