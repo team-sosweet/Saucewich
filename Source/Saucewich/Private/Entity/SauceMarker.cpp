@@ -50,19 +50,27 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	const auto GI = USaucewichInstance::Get(World);
 	const auto Marker = GI->GetSauceMarker();
 
-	FHitResult H;
-	const auto bOverlapped = World->SweepSingleByChannel(
-		H,
+	TArray<FHitResult> Hits;
+	const auto bOverlapped = World->SweepMultiByChannel(
+		Hits,
 		Hit.ImpactPoint + Hit.ImpactNormal,
 		Hit.ImpactPoint - Hit.ImpactNormal,
 		Rot,
 		GI->GetDecalTraceChannel(),
 		FCollisionShape::MakeBox({Scale3D.X * 50.f, Scale3D.Y * 50.f, 0.f})
 	);
-	const auto Offset = bOverlapped ? 1.01f - H.Distance : .01f;
+	auto Offset = 0.f;
+	for (auto&& H : Hits)
+	{
+		if ((H.ImpactNormal | Hit.ImpactNormal) > .99f)
+		{
+			Offset = 1.f - H.Distance;
+			break;
+		}
+	}
 
 	const auto Comp = Marker->TeamMarkers[Team].PickRand();
-	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * Offset, Scale3D});
+	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (Offset + .01f), Scale3D});
 #endif
 }
 
