@@ -51,7 +51,7 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	const auto Marker = GI->GetSauceMarker();
 
 	TArray<FHitResult> Hits;
-	const auto bOverlapped = World->SweepMultiByChannel(
+	World->SweepMultiByChannel(
 		Hits,
 		Hit.ImpactPoint + Hit.ImpactNormal,
 		Hit.ImpactPoint - Hit.ImpactNormal,
