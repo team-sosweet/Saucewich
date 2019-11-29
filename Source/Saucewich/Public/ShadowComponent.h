@@ -14,11 +14,11 @@ class SAUCEWICH_API UShadowComponent : public UStaticMeshComponent, public ITran
 public:
 	UShadowComponent();
 
-#if !UE_SERVER
-	
 	void BeTranslucent() override;
 	void BeOpaque() override;
 	
+#if !UE_SERVER
+		
 protected:
 	void BeginPlay() override;
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -25,6 +25,6 @@ void AMakeSandwich::HandleMatchHasStarted()
 
 void AMakeSandwich::SpawnPerk() const
 {
-	PrintMessage(LOCTEXT("SpecialIngredientSpawned", "Æ¯º°Àç·á°¡ ¾îµò°¡¿¡ ³ªÅ¸³µ¾î¿ä!"), EMsgType::Center);
+	PrintMessage(LOCTEXT("SpecialIngredientSpawned", "íŠ¹ë³„ìž¬ë£Œê°€ ì–´ë”˜ê°€ì— ë‚˜íƒ€ë‚¬ì–´ìš”!"), EMsgType::Center);
 	PerkSpawnVolumes[FMath::RandHelper(PerkSpawnVolumes.Num())]->Spawn(PerkClasses[FMath::RandHelper(PerkClasses.Num())]);
 }

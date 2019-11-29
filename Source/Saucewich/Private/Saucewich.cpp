@@ -5,24 +5,18 @@
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 
-#include "UserSettings.h"
-
-#if WITH_GAMELIFT
-
-	#include "GameLiftServerSDK.h"
-	DEFINE_LOG_CATEGORY(LogGameLift)
-
-	FGameLiftServerSDKModule& USaucewich::GetGameLift()
-	{
-		static auto& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>("GameLiftServerSDK");
-		return Module;
-	}
-
-#endif
+#include "GameLiftServerSDK.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
+DEFINE_LOG_CATEGORY(LogGameLift)
 DEFINE_LOG_CATEGORY(LogSaucewich)
+
+FGameLiftServerSDKModule& USaucewich::GetGameLift()
+{
+	static auto& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
+	return Module;
+}
 
 ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
 {

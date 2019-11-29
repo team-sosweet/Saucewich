@@ -20,9 +20,7 @@ enum class EMsgType : uint8
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
 
-#if WITH_GAMELIFT
-	DECLARE_LOG_CATEGORY_EXTERN(LogGameLift, Log, All)
-#endif
+DECLARE_LOG_CATEGORY_EXTERN(LogGameLift, Log, All)
 
 #define FMT_MSG(Fmt, ...) [&]{static const FTextFormat Compiled{Fmt};return FText::FormatOrdered(Compiled,__VA_ARGS__);}()
 

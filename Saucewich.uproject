@@ -77,6 +77,10 @@
 		{
 			"Name": "ProceduralMeshComponent",
 			"Enabled": false
+		},
+		{
+			"Name": "AdCollection",
+			"Enabled": false
 		}
 	]
 }

@@ -80,8 +80,8 @@ void ASaucewichPlayerController::InitPlayerState()
 
 bool ASaucewichPlayerController::CanRespawn() const
 {
-	const auto Char = Cast<ATpsCharacter>(GetPawn());
-	return !Char || !Char->IsAlive() && GetRemainingRespawnTime() <= 0.f;
+	const auto Char = CastChecked<ATpsCharacter>(GetPawn(), ECastCheckedType::NullAllowed);
+	return !Char || (!Char->IsAlive() && GetRemainingRespawnTime() <= 0.f);
 }
 
 void ASaucewichPlayerController::Ping()

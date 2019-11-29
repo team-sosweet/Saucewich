@@ -3,15 +3,12 @@
 #include "GameMode/DedicatedServerDefaultGameMode.h"
 
 #include "Engine/World.h"
+#include "OutputDeviceFile.h"
+#include "PlatformOutputDevices.h"
+#include "GameLiftServerSDK.h"
 
-#include "GameMode/SaucewichGameMode.h"
-
-#if WITH_GAMELIFT
-	#include "OutputDeviceFile.h"
-	#include "Paths.h"
-	#include "PlatformOutputDevices.h"
-	#include "GameLiftServerSDK.h"
-#endif
+#include "SaucewichGameMode.h"
+#include "SaucewichInstance.h"
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
@@ -23,13 +20,16 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 		checkf(Result.IsSuccess(), TEXT("ERROR: %s: %s"), *Error.m_errorName, *Error.m_errorMessage);
 	};
 	
+	UE_LOG(LogGameLift, Log, TEXT("Starting GameLift SDK..."));
+
 	auto& GameLiftSdkModule = USaucewich::GetGameLift();
 	Check(GameLiftSdkModule.InitSDK());
+	
 	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
 
-	FProcessParameters Params;
+	static FProcessParameters Params;
 	Params.OnStartGameSession.BindWeakLambda(
-		this, [this, &GameLiftSdkModule](Aws::GameLift::Server::Model::GameSession GameSession)
+		this, [this, &GameLiftSdkModule](const Aws::GameLift::Server::Model::GameSession&)
 		{
 			StartServer();
 			GameLiftSdkModule.ActivateGameSession();
@@ -42,16 +42,11 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 	Params.port = GetWorld()->URL.Port;
 	UE_LOG(LogGameLift, Log, TEXT("Port: %d"), Params.port);
 
-	if (const auto File = static_cast<FOutputDeviceFile*>(FPlatformOutputDevices::GetLog()))
-	{
-		auto Log = FPaths::ProjectLogDir();
-		Log += File->GetFilename();
-		Params.logParameters.Add(MoveTemp(Log));
-		UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), *Log);
-	}
+	const auto LogFile = static_cast<FOutputDeviceFile*>(FPlatformOutputDevices::GetLog());
+	Params.logParameters.Emplace(LogFile->GetFilename());
 
 	Check(GameLiftSdkModule.ProcessReady(Params));
-	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
+	UE_LOG(LogGameLift, Log, TEXT("Ready for create game session"));
 
 #else
 
@@ -62,5 +57,13 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 
 void ADedicatedServerDefaultGameMode::StartServer() const
 {
-	GetDefault<ASaucewichGameMode>(ASaucewichGameMode::StaticClass())->StartNextGame();
+	auto&& GameModes = USaucewichInstance::Get(this)->GetGameModes();
+	const auto GmClass = GameModes[FMath::RandHelper(GameModes.Num())];
+	const auto DefGm = GetDefault<ASaucewichGameMode>(GmClass.LoadSynchronous());
+
+	auto&& Maps = DefGm->GetData().Maps;
+	const auto NewMap = Maps[FMath::RandHelper(Maps.Num())];
+
+	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
+	GetWorld()->ServerTravel(URL);
 }

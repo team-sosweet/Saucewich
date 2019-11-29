@@ -14,18 +14,23 @@ UShadowComponent::UShadowComponent()
 #endif 
 }
 
-#if !UE_SERVER
 
 void UShadowComponent::BeTranslucent()
 {
+#if !UE_SERVER
 	bTranslucent = true;
 	SetVisibility(false);
+#endif 
 }
 
 void UShadowComponent::BeOpaque()
 {
+#if !UE_SERVER
 	bTranslucent = false;
+#endif 
 }
+
+#if !UE_SERVER
 
 void UShadowComponent::BeginPlay()
 {
