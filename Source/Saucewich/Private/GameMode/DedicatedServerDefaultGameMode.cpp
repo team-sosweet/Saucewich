@@ -12,7 +12,7 @@
 
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
-#if WITH_GAMELIFT
+#if WITH_GAMELIFT || 1
 
 	const auto Check = [](const FGameLiftGenericOutcome& Result)
 	{
@@ -28,15 +28,20 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
 
 	static FProcessParameters Params;
-	Params.OnStartGameSession.BindWeakLambda(
-		this, [this, &GameLiftSdkModule](const Aws::GameLift::Server::Model::GameSession&)
+	Params.OnStartGameSession.BindWeakLambda(this, 
+		[&](const Aws::GameLift::Server::Model::GameSession&)
 		{
 			StartServer();
 			GameLiftSdkModule.ActivateGameSession();
 		}
 	);
 
-	Params.OnTerminate.BindLambda([&GameLiftSdkModule]{GameLiftSdkModule.ProcessEnding();});
+	Params.OnTerminate.BindLambda([&]
+	{
+		GameLiftSdkModule.ProcessEnding();
+		FPlatformMisc::RequestExit(false);
+	});
+	
 	Params.OnHealthCheck.BindLambda([]{return true;});
 	
 	Params.port = GetWorld()->URL.Port;
