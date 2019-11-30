@@ -91,10 +91,19 @@ void ASaucewichGameMode::BeginPlay()
 		MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, Data.MatchStateUpdateInterval, true
 	);
 
-	TeamStarts.SetNumZeroed(Data.Teams.Num());
+	TeamStarts.Reset();
+	TeamStarts.AddDefaulted(Data.Teams.Num());
 	for (const auto Start : TActorRange<APlayerStart>{GetWorld()})
 	{
-		TeamStarts[Start->PlayerStartTag.ToString()[0] - TEXT('0')].Add(Start);
+		const auto Tag = Start->PlayerStartTag.ToString();
+		if (!Tag.IsEmpty() && FChar::IsDigit(Tag[0]))
+		{
+			const auto Team = FCString::Atoi(*Tag);
+			if (TeamStarts.IsValidIndex(Team))
+			{
+				TeamStarts[Team].Add(Start);
+			}
+		}
 	}
 }
 
