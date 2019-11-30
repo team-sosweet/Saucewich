@@ -10,9 +10,14 @@
 #include "SaucewichGameMode.h"
 #include "SaucewichInstance.h"
 
+ADedicatedServerDefaultGameMode::ADedicatedServerDefaultGameMode()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 void ADedicatedServerDefaultGameMode::BeginPlay()
 {
-#if WITH_GAMELIFT || 1
+#if WITH_GAMELIFT
 
 	const auto Check = [](const FGameLiftGenericOutcome& Result)
 	{
@@ -31,7 +36,7 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 	Params.OnStartGameSession.BindWeakLambda(this, 
 		[&](const Aws::GameLift::Server::Model::GameSession&)
 		{
-			StartServer();
+			bStart = true;
 			GameLiftSdkModule.ActivateGameSession();
 		}
 	);
@@ -58,6 +63,12 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 	StartServer();
 
 #endif
+}
+
+void ADedicatedServerDefaultGameMode::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (bStart) StartServer();
 }
 
 void ADedicatedServerDefaultGameMode::StartServer() const
