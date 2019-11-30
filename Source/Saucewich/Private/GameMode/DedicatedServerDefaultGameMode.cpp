@@ -34,7 +34,7 @@ void ADedicatedServerDefaultGameMode::BeginPlay()
 
 	static FProcessParameters Params;
 	Params.OnStartGameSession.BindWeakLambda(this, 
-		[&](const Aws::GameLift::Server::Model::GameSession&)
+		[&](const Aws::GameLift::Server::Model::GameSession& Session)
 		{
 			bStart = true;
 			GameLiftSdkModule.ActivateGameSession();

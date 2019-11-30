@@ -18,7 +18,7 @@ DEFINE_LOG_CATEGORY(LogSaucewich)
 
 FGameLiftServerSDKModule& USaucewich::GetGameLift()
 {
-	static auto& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
+	static auto&& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
 	return Module;
 }
 
