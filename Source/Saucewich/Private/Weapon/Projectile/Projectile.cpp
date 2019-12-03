@@ -130,5 +130,6 @@ FName AProjectile::GetCollisionProfile() const
 
 FLinearColor AProjectile::GetColor() const
 {
-	return ASaucewichGameMode::GetData(this).Teams[Team].Color;
+	auto&& Teams = ASaucewichGameMode::GetData(this).Teams;
+	return ensure(Teams.IsValidIndex(Team)) ? Teams[Team].Color : FLinearColor{};
 }

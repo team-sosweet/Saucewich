@@ -213,6 +213,9 @@ AActor* ASaucewichGameMode::ChoosePlayerStart_Implementation(AController* const 
 
 	TArray<APlayerStart*> StartsPriority[3];
 
+	// TODO: 원래 팀이 invalid할 수가 없는데 새 게임으로 넘어갈 때 발생하는 듯. 근본적 해결 필요.
+	if (!TeamStarts.IsValidIndex(Team)) return nullptr;
+
 	for (const auto Start : TeamStarts[Team])
 	{
 		auto ActorLocation = Start->GetActorLocation();
