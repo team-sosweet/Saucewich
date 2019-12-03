@@ -3,9 +3,12 @@
 #include "GameMode/DedicatedServerDefaultGameMode.h"
 
 #include "Engine/World.h"
-#include "OutputDeviceFile.h"
-#include "PlatformOutputDevices.h"
-#include "GameLiftServerSDK.h"
+
+#if WITH_GAMELIFT
+	#include "GameLiftServerSDK.h"
+	#include "OutputDeviceFile.h"
+	#include "PlatformOutputDevices.h"
+#endif
 
 #include "SaucewichGameMode.h"
 #include "SaucewichInstance.h"
