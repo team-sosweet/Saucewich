@@ -22,7 +22,7 @@ ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 
 float UUserSettings::GetCorrectedSensitivity() const
 {
-	constexpr auto Correction = 1.f;
+	constexpr auto Correction = .5f;
 	return Correction * RawSensitivity + Correction * .5f;
 }
 
