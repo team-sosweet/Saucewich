@@ -80,7 +80,7 @@
 		},
 		{
 			"Name": "AdCollection",
-			"Enabled": false
+			"Enabled": true
 		}
 	]
 }
