@@ -193,7 +193,7 @@ uint8 ASaucewichGameState::GetWinningTeam() const
 	
 	const auto A = GetTeamScore(0), B = GetTeamScore(1);
 	const auto Ret = A > B ? 0 : A < B ? 1 : -1;
-	UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d as expected"), Ret);
+	UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d. Ketchup: %d, Mustard: %d"), Ret, A, B);
 	return Ret;
 }
 
@@ -203,8 +203,8 @@ uint8 ASaucewichGameState::GetEmptyTeam() const
 	ForEachEveryPlayer(PlayerArray, [&T0, &T1](ASaucewichPlayerState* const Ply)
 	{
 		const auto T = Ply->GetTeam();
-		if (T == 1) ++T0;
-		else if (T == 2) ++T1;
+		if (T == 0) ++T0;
+		else if (T == 1) ++T1;
 	});
 	if (T0 == 0 && T1 > 0) return 0;
 	if (T0 > 0 && T1 == 0) return 1;
