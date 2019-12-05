@@ -60,8 +60,9 @@ void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 	auto&& MyTeamColor = TeamData[MyTeam].Color;
 	auto&& EnemyTeamColor = TeamData[EnemyTeam].Color;
 
-	const auto ResultName = WinningTeam == MyTeam ? TEXT("Win") : WinningTeam == 0 ? TEXT("Draw") : TEXT("Lose");
-	const auto EnemyResultName = WinningTeam == MyTeam ? TEXT("Lose") : WinningTeam == 0 ? TEXT("Draw") : TEXT("Win");
+	constexpr uint8 Invalid = -1;
+	const auto ResultName = WinningTeam == MyTeam ? TEXT("Win") : WinningTeam == Invalid ? TEXT("Draw") : TEXT("Lose");
+	const auto EnemyResultName = WinningTeam == MyTeam ? TEXT("Lose") : WinningTeam == Invalid ? TEXT("Draw") : TEXT("Win");
 	ResultText->SetText(ResultTexts.FindRef(ResultName));
 
 	const auto ResultColor = WinningTeam == 0 ? (MyTeamColor + EnemyTeamColor) * 0.5f : MyTeamColor;

@@ -127,7 +127,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 	{
 		WonTeam = GetWinningTeam();
 		OnRep_WonTeam();
-		if (WonTeam != 0)
+		if (WonTeam != uint8(-1))
 		{
 			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
 			{
@@ -177,28 +177,39 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
-	if (WonTeam != static_cast<uint8>(-1)) return WonTeam;
+	constexpr auto Invalid = static_cast<uint8>(-1);
+	if (WonTeam != Invalid)
+	{
+		UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d because of WonTeam != Invalid"), WonTeam);
+		return WonTeam;
+	}
 
 	const auto Empty = GetEmptyTeam();
-	if (Empty) return 3 - Empty;
+	if (Empty != Invalid)
+	{
+		UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d because of Empty != Invalid"), 1 - Empty);
+		return 1 - Empty;
+	}
 	
-	const auto A = GetTeamScore(1), B = GetTeamScore(2);
-	return A > B ? 1 : A < B ? 2 : 0;
+	const auto A = GetTeamScore(0), B = GetTeamScore(1);
+	const auto Ret = A > B ? 0 : A < B ? 1 : -1;
+	UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d as expected"), Ret);
+	return Ret;
 }
 
 uint8 ASaucewichGameState::GetEmptyTeam() const
 {
-	auto T1 = 0, T2 = 0;
-	ForEachEveryPlayer(PlayerArray, [&T1, &T2](ASaucewichPlayerState* const Ply)
+	auto T0 = 0, T1 = 0;
+	ForEachEveryPlayer(PlayerArray, [&T0, &T1](ASaucewichPlayerState* const Ply)
 	{
 		const auto T = Ply->GetTeam();
-		if (T == 1) ++T1;
-		else if (T == 2) ++T2;
+		if (T == 1) ++T0;
+		else if (T == 2) ++T1;
 	});
-	if (T1 == 0 && T2 > 0) return 1;
-	if (T1 > 0 && T2 == 0) return 2;
+	if (T0 == 0 && T1 > 0) return 0;
+	if (T0 > 0 && T1 == 0) return 1;
 
-	return 0;
+	return -1;
 }
 
 const FGameData& ASaucewichGameState::GetGmData() const
