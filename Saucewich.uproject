@@ -14,5 +14,11 @@
 				"CoreUObject"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "AdCollection",
+			"Enabled": false
+		}
 	]
 }
