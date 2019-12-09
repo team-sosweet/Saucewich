@@ -4,8 +4,6 @@
 
 #include "Saucewich.h"
 #include "Components/SceneComponent.h"
-#include "Colorable.h"
-#include "Translucentable.h"
 #include "WeaponComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipWeapon, class AWeapon*, Weapon);
@@ -16,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGunDried, bool, bDried);
  * 캐릭터와 무기가 상호작용하는 중간다리입니다.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UWeaponComponent : public USceneComponent, public IColorable, public ITranslucentable
+class UWeaponComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
@@ -49,9 +47,9 @@ public:
 	void OnCharacterDeath();
 	virtual bool TrySelectWeapon(uint8 Slot);
 
-	void BeTranslucent() override;
-	void BeOpaque() override;
-	void SetColor(const FLinearColor& NewColor) override;
+	void BeTranslucent();
+	void BeOpaque();
+	void SetColor(const FLinearColor& NewColor);
 
 	float GetSpeedRatio() const;
 	float GetArmorRatio() const;

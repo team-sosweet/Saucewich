@@ -3,11 +3,6 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-
-#include "Saucewich.h"
-#include "Interface/Colorable.h"
-#include "Interface/Translucentable.h"
-
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
@@ -25,7 +20,7 @@ struct FPerkInstance
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API ATpsCharacter : public ACharacter, public IColorable, public ITranslucentable
+class SAUCEWICH_API ATpsCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -63,7 +58,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FLinearColor& GetTeamColor() const;
 
-	void SetColor(const FLinearColor& NewColor) override;
+	void SetColor(const FLinearColor& NewColor);
 
 	// 캐릭터를 죽입니다.
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
@@ -147,8 +142,8 @@ private:
 	void MulticastKill(ASaucewichPlayerState* Attacker, AActor* Inflictor);
 	void Kill_Internal(ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
-	void BeTranslucent() override;
-	void BeOpaque() override;
+	void BeTranslucent();
+	void BeOpaque();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddPerk(UClass* PerkClass);

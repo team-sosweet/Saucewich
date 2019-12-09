@@ -3,19 +3,18 @@
 #pragma once
 
 #include "Components/StaticMeshComponent.h"
-#include "Translucentable.h"
 #include "ShadowComponent.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UShadowComponent : public UStaticMeshComponent, public ITranslucentable
+class SAUCEWICH_API UShadowComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 	
 public:
 	UShadowComponent();
 
-	void BeTranslucent() override;
-	void BeOpaque() override;
+	void BeTranslucent();
+	void BeOpaque();
 	
 #if !UE_SERVER
 		

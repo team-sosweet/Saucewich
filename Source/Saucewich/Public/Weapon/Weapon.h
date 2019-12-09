@@ -3,12 +3,7 @@
 #pragma once
 
 #include "PoolActor.h"
-
 #include "Engine/DataTable.h"
-
-#include "Interface/Colorable.h"
-#include "Interface/Translucentable.h"
-
 #include "Weapon.generated.h"
 
 class UTexture;
@@ -48,7 +43,7 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
  * 이름과는 달리 '캐릭터가 지니고 있을 수 있으며 슬롯을 누르면 특정 행동을 할 수 있는' 그 어떤 것도 될 수 있습니다.
  */
 UCLASS(Abstract)
-class SAUCEWICH_API AWeapon : public APoolActor, public IColorable, public ITranslucentable
+class SAUCEWICH_API AWeapon : public APoolActor
 {
 	GENERATED_BODY()
 
@@ -93,10 +88,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
-	void SetColor(const FLinearColor& NewColor) override;
+	void SetColor(const FLinearColor& NewColor);
 
-	void BeTranslucent() override;
-	void BeOpaque() override;
+	void BeTranslucent();
+	void BeOpaque();
 
 	// [Shared] 키를 누르거나 뗄 때 호출됩니다.
 	virtual void FireP() {}
