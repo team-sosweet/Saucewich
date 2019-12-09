@@ -79,9 +79,10 @@ void ASauceMarker::Add(const AActor* const Owner, const uint8 Team, const FVecto
 {
 #if !UE_SERVER
 	const auto World = Owner->GetWorld();
+	const auto MaxDist = 100.f * Scale;
 
 	auto End = Location;
-	End.Z -= 1.f;
+	End.Z -= MaxDist;
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Owner);
@@ -89,7 +90,7 @@ void ASauceMarker::Add(const AActor* const Owner, const uint8 Team, const FVecto
 	FHitResult Hit;
 	if (World->LineTraceSingleByChannel(Hit, Location, End, ECC_Visibility, Params))
 	{
-		Add(Team, Scale, Hit, Owner);
+		Add(Team, Scale * (1 - Hit.Distance / MaxDist), Hit, Owner);
 	}
 #endif
 }

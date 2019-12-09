@@ -14,7 +14,7 @@ public:
 	class UMaterialInterface* GetTranslMat(uint8 Idx, const UMaterialInterface* Mat) const;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<class USoundBase> DeathSound;
+	TArray<TSoftObjectPtr<class USoundBase>> DeathSounds;
 	
 	UPROPERTY(EditAnywhere)
 	TSoftObjectPtr<class UParticleSystem> DeathFX;

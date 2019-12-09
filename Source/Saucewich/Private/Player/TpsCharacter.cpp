@@ -383,15 +383,15 @@ void ATpsCharacter::SpawnDeathEffects()
 #if !UE_SERVER
 	const auto World = GetWorld();
 	auto Location = GetActorLocation();
-	UGameplayStatics::PlaySoundAtLocation(World, Data->DeathSound.LoadSynchronous(), Location);
+	UGameplayStatics::PlaySoundAtLocation(World, Data->DeathSounds[FMath::RandHelper(Data->DeathSounds.Num())].LoadSynchronous(), Location);
 	UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(), FTransform{ Location }, true, EPSCPoolMethod::AutoRelease)
 		->SetColorParameter(Names::Color, GetColor());
 
 	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);
 
-	if (IsLocallyControlled())
-		if (const auto PC = Cast<APlayerController>(Controller))
+	if (const auto PC = Cast<APlayerController>(Controller))
+		if (PC->IsLocalController())
 			PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
 #endif
 }
