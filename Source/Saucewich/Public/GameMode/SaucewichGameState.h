@@ -98,5 +98,5 @@ private:
 	float RoundStartTime = -1;
 
 	UPROPERTY(ReplicatedUsing=OnRep_WonTeam, Transient)
-	uint8 WonTeam = -1;
+	uint8 WonTeam = -2;
 };

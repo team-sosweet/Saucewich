@@ -127,6 +127,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 	{
 		WonTeam = GetWinningTeam();
 		OnRep_WonTeam();
+		
 		if (WonTeam != uint8(-1))
 		{
 			ForEachPlayer(PlayerArray, WonTeam, [](ASaucewichPlayerState* const Player)
@@ -178,7 +179,7 @@ uint8 ASaucewichGameState::GetNumPlayers(const uint8 Team) const
 uint8 ASaucewichGameState::GetWinningTeam() const
 {
 	constexpr auto Invalid = static_cast<uint8>(-1);
-	if (WonTeam != Invalid)
+	if (WonTeam != uint8(-2))
 	{
 		UE_LOG(LogGameState, Log, TEXT("GetWinningTeam() returned %d because of WonTeam != Invalid"), WonTeam);
 		return WonTeam;
