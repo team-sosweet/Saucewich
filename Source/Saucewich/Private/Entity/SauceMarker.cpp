@@ -11,6 +11,7 @@
 #include "SaucewichGameMode.h"
 #include "SaucewichInstance.h"
 #include "SaucewichGameState.h"
+#include "Names.h"
 
 UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const
 {
@@ -74,6 +75,25 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 #endif
 }
 
+void ASauceMarker::Add(const AActor* const Owner, const uint8 Team, const FVector& Location, const float Scale)
+{
+#if !UE_SERVER
+	const auto World = Owner->GetWorld();
+
+	auto End = Location;
+	End.Z -= 1.f;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Owner);
+
+	FHitResult Hit;
+	if (World->LineTraceSingleByChannel(Hit, Location, End, ECC_Visibility, Params))
+	{
+		Add(Team, Scale, Hit, Owner);
+	}
+#endif
+}
+
 void ASauceMarker::BeginPlay()
 {
 	Super::BeginPlay();
@@ -89,7 +109,7 @@ void ASauceMarker::BeginPlay()
 			TeamMarkers[i].Comps.Add(Comp);
 			
 			Comp->CreateDynamicMaterialInstance(0, Mat.LoadSynchronous())
-			->SetVectorParameterValue(TEXT("Color"), Teams[i].Color);
+			->SetVectorParameterValue(Names::Color, Teams[i].Color);
 		}
 	}
 
