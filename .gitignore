@@ -1,4 +1,5 @@
 Binaries
+Build
 DerivedDataCache
 Intermediate
 Saved
@@ -17,5 +18,3 @@ ThirdParty
 *.user
 *.log
 *.lnk
-
-Run Server.bat
