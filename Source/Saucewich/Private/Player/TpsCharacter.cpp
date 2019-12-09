@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,6 +24,8 @@
 #include "Player/TpsCharacterMovementComponent.h"
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
+#include "Names.h"
+#include "SauceMarker.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
 
@@ -58,7 +61,7 @@ uint8 ATpsCharacter::GetTeam() const
 FLinearColor ATpsCharacter::GetColor() const
 {
 	FLinearColor Color;
-	ColMat->GetVectorParameterValue({TEXT("Color")}, Color);
+	ColMat->GetVectorParameterValue(Names::Color, Color);
 	return Color;
 }
 
@@ -69,8 +72,8 @@ const FLinearColor& ATpsCharacter::GetTeamColor() const
 
 void ATpsCharacter::SetColor(const FLinearColor& NewColor)
 {
-	ColMat->SetVectorParameterValue(TEXT("Color"), NewColor);
-	ColTranslMat->SetVectorParameterValue(TEXT("Color"), NewColor);
+	ColMat->SetVectorParameterValue(Names::Color, NewColor);
+	ColTranslMat->SetVectorParameterValue(Names::Color, NewColor);
 	WeaponComponent->SetColor(NewColor);
 }
 
@@ -161,10 +164,10 @@ void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 {
 	Super::SetupPlayerInputComponent(Input);
 
-	Input->BindAxis("MoveForward", this, &ATpsCharacter::MoveForward);
-	Input->BindAxis("MoveRight", this, &ATpsCharacter::MoveRight);
-	Input->BindAxis("Turn", this, &ATpsCharacter::AddControllerYawInput);
-	Input->BindAxis("LookUp", this, &ATpsCharacter::AddControllerPitchInput);
+	Input->BindAxis(TEXT("MoveForward"), this, &ATpsCharacter::MoveForward);
+	Input->BindAxis(TEXT("MoveRight"), this, &ATpsCharacter::MoveRight);
+	Input->BindAxis(TEXT("Turn"), this, &ATpsCharacter::AddControllerYawInput);
+	Input->BindAxis(TEXT("LookUp"), this, &ATpsCharacter::AddControllerPitchInput);
 
 	WeaponComponent->SetupPlayerInputComponent(Input);
 }
@@ -371,7 +374,26 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 		);
 	}
 
+	SpawnDeathEffects();
 	OnKilled();
+}
+
+void ATpsCharacter::SpawnDeathEffects()
+{
+#if !UE_SERVER
+	const auto World = GetWorld();
+	auto Location = GetActorLocation();
+	UGameplayStatics::PlaySoundAtLocation(World, Data->DeathSound.LoadSynchronous(), Location);
+	UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(), FTransform{ Location }, true, EPSCPoolMethod::AutoRelease)
+		->SetColorParameter(Names::Color, GetColor());
+
+	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);
+
+	if (IsLocallyControlled())
+		if (const auto PC = Cast<APlayerController>(Controller))
+			PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
+#endif
 }
 
 void ATpsCharacter::BeTranslucent()

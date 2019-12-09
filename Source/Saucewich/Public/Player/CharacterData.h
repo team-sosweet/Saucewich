@@ -12,7 +12,16 @@ class SAUCEWICH_API UCharacterData : public UDataAsset
 
 public:
 	class UMaterialInterface* GetTranslMat(uint8 Idx, const UMaterialInterface* Mat) const;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<class USoundBase> DeathSound;
 	
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<class UParticleSystem> DeathFX;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UForceFeedbackEffect> DeathFBB;
+
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;
 	
@@ -22,6 +31,9 @@ public:
 	// 스폰 무적 시간
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly)
 	float RespawnInvincibleTime;
+
+	UPROPERTY(EditAnywhere)
+	float DeathSauceMarkScale = 1.f;
 
 private:
 	UPROPERTY(EditAnywhere, AdvancedDisplay)

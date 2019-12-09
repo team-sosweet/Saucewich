@@ -141,6 +141,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastKill(ASaucewichPlayerState* Attacker, AActor* Inflictor);
 	void Kill_Internal(ASaucewichPlayerState* Attacker, AActor* Inflictor);
+	void SpawnDeathEffects();
 
 	void BeTranslucent();
 	void BeOpaque();

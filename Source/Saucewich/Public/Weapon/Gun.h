@@ -123,7 +123,7 @@ protected:
 	void OnActivated() override;
 	void OnReleased() override;
 
-	void SetColor(const FLinearColor& NewColor);
+	void SetColor(const FLinearColor& NewColor) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnShoot();

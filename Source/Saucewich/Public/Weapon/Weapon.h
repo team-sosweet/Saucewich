@@ -88,7 +88,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
-	void SetColor(const FLinearColor& NewColor);
+	virtual void SetColor(const FLinearColor& NewColor);
 
 	void BeTranslucent();
 	void BeOpaque();
