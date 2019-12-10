@@ -15,6 +15,7 @@
 #include "SaucewichGameState.h"
 #include "TpsCharacter.h"
 #include "SaucewichGameMode.h"
+#include "UserSettings.h"
 
 AProjectile::AProjectile()
 	: Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))},
@@ -95,11 +96,14 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 		PSC->SetColorParameter(TEXT("Color"), GetColor());
 	}
 
-	UGameplayStatics::SpawnForceFeedbackAtLocation(
-		World, ForceFeedbackEffect.LoadSynchronous(), Location,
-		FRotator::ZeroRotator, false, 1.f, 0.f,
-		ForceFeedbackAttenuation.LoadSynchronous()
-	);
+	if (UUserSettings::Get()->bVibration)
+	{
+		UGameplayStatics::SpawnForceFeedbackAtLocation(
+			World, ForceFeedbackEffect.LoadSynchronous(), Location,
+			FRotator::ZeroRotator, false, 1.f, 0.f,
+			ForceFeedbackAttenuation.LoadSynchronous()
+		);
+	}
 
 	ASauceMarker::Add(Team, GetSauceMarkScale(), Hit, this);
 #endif

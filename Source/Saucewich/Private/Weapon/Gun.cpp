@@ -14,6 +14,7 @@
 #include "Weapon/GunSharedData.h"
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/Projectile/GunProjectile.h"
+#include "UserSettings.h"
 
 AGun::AGun()
 	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
@@ -140,9 +141,9 @@ void AGun::Shoot()
 #if !UE_SERVER
 	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLocation);
 
-	if (const auto PC = Cast<APlayerController>(GetInstigatorController()))
-		if (PC->IsLocalController())
-			PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
+	const auto PC = Cast<APlayerController>(GetInstigatorController());
+	if (PC && PC->IsLocalController() && UUserSettings::Get()->bVibration)
+		PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
 #endif
 
 	OnShoot();

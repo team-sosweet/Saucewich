@@ -32,6 +32,9 @@ public:
 	UPROPERTY(Config, BlueprintReadWrite)
 	uint8 bAutoFire : 1;
 
+	UPROPERTY(Config, BlueprintReadWrite)
+	uint8 bVibration : 1;
+
 protected:
 	void PostInitProperties() override;
 

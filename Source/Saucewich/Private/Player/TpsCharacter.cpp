@@ -26,6 +26,7 @@
 #include "ShadowComponent.h"
 #include "Names.h"
 #include "SauceMarker.h"
+#include "UserSettings.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
 
@@ -390,9 +391,9 @@ void ATpsCharacter::SpawnDeathEffects()
 	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);
 
-	if (const auto PC = Cast<APlayerController>(Controller))
-		if (PC->IsLocalController())
-			PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
+	const auto PC = Cast<APlayerController>(Controller);
+	if (PC && PC->IsLocalController() && UUserSettings::Get()->bVibration)
+		PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
 #endif
 }
 
