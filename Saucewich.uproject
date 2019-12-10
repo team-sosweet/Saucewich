@@ -20,5 +20,11 @@
 			"Name": "AdCollection",
 			"Enabled": false
 		}
+	],
+	"TargetPlatforms": [
+		"Android",
+		"IOS",
+		"LinuxNoEditor",
+		"WindowsNoEditor"
 	]
 }
