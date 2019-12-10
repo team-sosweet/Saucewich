@@ -17,3 +17,5 @@ ThirdParty
 *.user
 *.log
 *.lnk
+
+*.bat
