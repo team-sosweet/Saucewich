@@ -13,7 +13,7 @@
 
 UWeaponComponent::UWeaponComponent()
 {
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 }

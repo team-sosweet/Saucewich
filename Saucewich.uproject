@@ -15,12 +15,6 @@
 			]
 		}
 	],
-	"Plugins": [
-		{
-			"Name": "AdCollection",
-			"Enabled": false
-		}
-	],
 	"TargetPlatforms": [
 		"Android",
 		"IOS",
