@@ -137,7 +137,13 @@ void AGun::Shoot()
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
 
+#if !UE_SERVER
 	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLocation);
+
+	if (const auto PC = Cast<APlayerController>(GetInstigatorController()))
+		if (PC->IsLocalController())
+			PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
+#endif
 
 	OnShoot();
 }

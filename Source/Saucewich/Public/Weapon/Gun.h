@@ -17,6 +17,9 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<class USoundBase> FireSound;
 
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<class UForceFeedbackEffect> FireFBB;
+
 	// 자동조준 상자 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector2D TraceBoxSize;
