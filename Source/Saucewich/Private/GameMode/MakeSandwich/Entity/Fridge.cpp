@@ -1,14 +1,14 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Fridge.h"
+#include "GameMode/MakeSandwich/Entity/Fridge.h"
 
 #include "Engine/World.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
-#include "MakeSandwichPlayerState.h"
-#include "SaucewichGameMode.h"
+#include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
+#include "GameMode/SaucewichGameMode.h"
 
 AFridge::AFridge()
 	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))}

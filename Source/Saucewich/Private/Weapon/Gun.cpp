@@ -1,11 +1,11 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Gun.h"
+#include "Weapon/Gun.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
 #include "Kismet/GameplayStatics.h"

@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "MessageFeed.h"
+#include "Widget/MessageFeed.h"
 
 FMessageFeedContent::FMessageFeedContent(const FText& Text)
 	:Text{Text}

@@ -1,5 +1,4 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-
-#include "ResultWidget.h"
+#include "Widget/ResultWidget.h"
 

@@ -10,7 +10,7 @@
 	#include "PlatformOutputDevices.h"
 #endif
 
-#include "SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
 #include "SaucewichInstance.h"
 
 ADedicatedServerDefaultGameMode::ADedicatedServerDefaultGameMode()

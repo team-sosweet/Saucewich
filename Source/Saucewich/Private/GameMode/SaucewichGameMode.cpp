@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
 
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"

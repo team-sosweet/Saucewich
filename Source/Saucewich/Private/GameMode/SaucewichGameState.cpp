@@ -6,11 +6,11 @@
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
-#include "SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)

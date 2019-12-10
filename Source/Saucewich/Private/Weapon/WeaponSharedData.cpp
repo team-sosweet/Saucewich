@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "WeaponSharedData.h"
+#include "Weapon/WeaponSharedData.h"
 
 #include "TranslMatData.h"
 

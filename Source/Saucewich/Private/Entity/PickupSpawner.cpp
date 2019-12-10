@@ -1,10 +1,10 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "PickupSpawner.h"
+#include "Entity/PickupSpawner.h"
 
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
 #include "Entity/Pickup.h"

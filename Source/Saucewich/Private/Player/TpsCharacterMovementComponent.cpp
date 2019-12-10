@@ -1,7 +1,7 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "TpsCharacterMovementComponent.h"
-#include "TpsCharacter.h"
+#include "Player/TpsCharacterMovementComponent.h"
+#include "Player/TpsCharacter.h"
 
 float UTpsCharacterMovementComponent::GetMaxSpeed() const
 {

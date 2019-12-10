@@ -1,8 +1,8 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "TpsAnimInstance.h"
-#include "Gun.h"
-#include "TpsCharacter.h"
+#include "Player/TpsAnimInstance.h"
+#include "Player/TpsCharacter.h"
+#include "Weapon/Gun.h"
 
 void UTpsAnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 {

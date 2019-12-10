@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Pickup.h"
+#include "Entity/Pickup.h"
 
 #include "Components/SphereComponent.h"
 
@@ -28,7 +28,7 @@ APickup::APickup()
 	Mesh->BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
 	
 	Shadow->SetupAttachment(Mesh);
-	Shadow->RelativeScale3D = FVector{Collision->GetScaledSphereRadius() / 50};
+	Shadow->SetRelativeScale3D(FVector{Collision->GetScaledSphereRadius() / 50});
 }
 
 void APickup::Tick(const float DeltaSeconds)
@@ -36,8 +36,13 @@ void APickup::Tick(const float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	
 	const auto Time = GetGameTimeSinceCreation();
-	Mesh->RelativeLocation.Z = FMath::Sin(Time * BounceSpeed) * BounceScale;
-	Mesh->RelativeRotation.Yaw += DeltaSeconds * RotateSpeed;
+
+	auto NewLocation = Mesh->GetRelativeLocation();
+	NewLocation.Z = FMath::Sin(Time * BounceSpeed) * BounceScale;
+
+	Mesh->SetRelativeLocation(NewLocation);
+	Mesh->AddRelativeRotation(FRotator{ 0.f, DeltaSeconds * RotateSpeed, 0.f });
+
 	Mesh->UpdateComponentToWorld();
 
 	for (auto&& OverlapInfo : Collision->GetOverlapInfos())

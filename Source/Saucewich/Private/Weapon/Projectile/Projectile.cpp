@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Projectile.h"
+#include "Weapon/Projectile/Projectile.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ForceFeedbackAttenuation.h"
@@ -9,12 +9,12 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
-#include "SauceMarker.h"
-#include "SaucewichGameState.h"
-#include "TpsCharacter.h"
-#include "SaucewichGameMode.h"
+#include "Entity/SauceMarker.h"
+#include "GameMode/SaucewichGameState.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "Player/TpsCharacter.h"
 #include "UserSettings.h"
 
 AProjectile::AProjectile()

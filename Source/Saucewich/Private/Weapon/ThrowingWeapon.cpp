@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "ThrowingWeapon.h"
+#include "Weapon/ThrowingWeapon.h"
 
 #include "Engine/World.h"
 #include "TimerManager.h"

@@ -1,11 +1,11 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "SaucewichPlayerState.h"
+#include "Player/SaucewichPlayerState.h"
 
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"

@@ -5,17 +5,17 @@
 #include "Components/TextBlock.h"
 
 #include "Player/SaucewichPlayerState.h"
-#include "SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
 
 void UUserInfo::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	NameText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Name"));
-	ScoreText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Score"));
-	ObjectiveText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Objective"));
-	KillText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Kill"));
-	DeathText = CastChecked<UTextBlock>(GetWidgetFromName("Text_Death"));
+	NameText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("Text_Name")));
+	ScoreText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("Text_Score")));
+	ObjectiveText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("Text_Objective")));
+	KillText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("Text_Kill")));
+	DeathText = CastChecked<UTextBlock>(GetWidgetFromName(TEXT("Text_Death")));
 }
 
 void UUserInfo::UpdateInfo(ASaucewichPlayerState* PlayerState) const

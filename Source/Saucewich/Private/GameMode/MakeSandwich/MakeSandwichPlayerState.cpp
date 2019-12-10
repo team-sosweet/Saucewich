@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "MakeSandwichPlayerState.h"
+#include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 
 #include "Engine/World.h"
 

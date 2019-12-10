@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "TpsCharacter.h"
+#include "Player/TpsCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -12,7 +12,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Saucewich.h"
 #include "Entity/Perk.h"
@@ -25,7 +25,7 @@
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
 #include "Names.h"
-#include "SauceMarker.h"
+#include "Entity/SauceMarker.h"
 #include "UserSettings.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
@@ -101,7 +101,7 @@ float ATpsCharacter::GetSpeedRatio_Implementation() const
 
 FVector ATpsCharacter::GetPawnViewLocation() const
 {
-	if (Role == ROLE_SimulatedProxy)
+	if (GetLocalRole() == ROLE_SimulatedProxy)
 	{
 		const auto ArmLocation = GetSpringArmLocation();
 		return ArmLocation - GetBaseAimRotation().Vector() * (ArmLocation - Camera->GetComponentLocation()).Size();
@@ -204,7 +204,7 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 
 bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
 {
-	if (!bCanBeDamaged)
+	if (!CanBeDamaged())
 		return false;
 
 	if (!IsAlive())

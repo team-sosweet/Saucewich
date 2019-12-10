@@ -2,8 +2,8 @@
 
 #include "SaucewichInstance.h"
 #include "Engine/World.h"
-#include "ActorPool.h"
-#include "SauceMarker.h"
+#include "Entity/ActorPool.h"
+#include "Entity/SauceMarker.h"
 
 template <class T>
 static T* GetOrSpawn(T*& Ptr, UClass* const Class, UWorld* const World)

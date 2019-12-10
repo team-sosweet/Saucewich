@@ -4,10 +4,10 @@
 
 #include "Engine/World.h"
 
+#include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
-#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
-#include "SaucewichGameMode.h"
+#include "Player/SaucewichPlayerController.h"
 
 void ASaucewichHUD::BeginPlay()
 {

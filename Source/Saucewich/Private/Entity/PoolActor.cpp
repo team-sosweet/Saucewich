@@ -1,12 +1,12 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "PoolActor.h"
+#include "Entity/PoolActor.h"
 
 #include "Engine/World.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
-#include "SaucewichGameState.h"
+#include "GameMode/SaucewichGameState.h"
 
 void APoolActor::Release(const bool bForce)
 {

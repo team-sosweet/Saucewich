@@ -2,7 +2,7 @@
 
 #include "Widget/AliveWidget.h"
 
-#include "TextBlock.h"
+#include "Components/TextBlock.h"
 #include "TimerManager.h"
 
 #include "GameMode/SaucewichGameState.h"

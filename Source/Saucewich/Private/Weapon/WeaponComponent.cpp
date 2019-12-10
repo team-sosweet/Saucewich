@@ -1,10 +1,10 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "WeaponComponent.h"
+#include "Weapon/WeaponComponent.h"
 
 #include "Components/InputComponent.h"
 #include "Engine/World.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Entity/ActorPool.h"
 #include "Player/TpsCharacter.h"
@@ -13,7 +13,7 @@
 
 UWeaponComponent::UWeaponComponent()
 {
-	bReplicates = true;
+	SetIsReplicated(true);
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 }

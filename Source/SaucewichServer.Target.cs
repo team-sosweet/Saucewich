@@ -9,6 +9,7 @@ public class SaucewichServerTarget : TargetRules
 	{
 		Type = TargetType.Server;
 		bUseLoggingInShipping = true;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.AddRange( new string[] { "Saucewich" } );
 	}
 }

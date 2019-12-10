@@ -2,7 +2,7 @@
 
 #include "Player/SaucewichPlayerController.h"
 
-#include "CoreDelegates.h"
+#include "Misc/CoreDelegates.h"
 #include "Engine/Engine.h"
 #include "Engine/NetConnection.h"
 #include "Engine/NetDriver.h"
@@ -66,7 +66,7 @@ void ASaucewichPlayerController::InitPlayerState()
 		{
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.Owner = this;
-			SpawnInfo.Instigator = Instigator;
+			SpawnInfo.Instigator = GetInstigator();
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			SpawnInfo.ObjectFlags |= RF_Transient;
 

@@ -1,11 +1,11 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Weapon.h"
+#include "Weapon/Weapon.h"
 
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "TimerManager.h"
-#include "UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Player/TpsCharacter.h"
 #include "Weapon/WeaponComponent.h"
@@ -32,7 +32,7 @@ void AWeapon::Init()
 	{
 		if (const auto Character = Cast<ATpsCharacter>(MyOwner))
 		{
-			Role = MyOwner->Role;
+			SetRole(MyOwner->GetLocalRole());
 			const auto WeaponComponent = Character->GetWeaponComponent();
 			UWeaponComponent::FBroadcastEquipWeapon(WeaponComponent, this);
 			WeaponComponent->GetActiveWeapon() == this ? Deploy() : Holster();
@@ -100,7 +100,7 @@ const UWeaponSharedData& AWeapon::GetSharedData() const
 
 bool AWeapon::IsVisible() const
 {
-	return Mesh->bVisible;
+	return Mesh->IsVisible();
 }
 
 void AWeapon::SetVisibility(const bool bNewVisibility) const

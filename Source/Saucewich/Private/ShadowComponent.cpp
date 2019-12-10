@@ -36,7 +36,7 @@ void UShadowComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Offset.SetLocation(RelativeLocation);
+	Offset.SetLocation(GetRelativeLocation());
 	CreateDynamicMaterialInstance(0);
 }
 
@@ -50,7 +50,8 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 
 	const auto World = GetWorld();
 	const auto Transform = Offset * GetAttachParent()->GetComponentTransform();
-	const auto MaxDist = RelativeScale3D.X * 256.f;
+	const auto Scale = GetRelativeScale3D();
+	const auto MaxDist = Scale.X * 256.f;
 	
 	const auto Start = Transform.GetLocation();
 	auto End = Start;
@@ -69,7 +70,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 		auto Offsets = {FVector::ForwardVector, FVector::BackwardVector, FVector::RightVector, FVector::LeftVector};
 		for (auto&& Dir : Offsets)
 		{
-			const auto St = Start + Rot.RotateVector(Dir) * (RelativeScale3D.X * 50.f);
+			const auto St = Start + Rot.RotateVector(Dir) * (Scale.X * 50.f);
 			FHitResult H;
 			if (World->LineTraceSingleByChannel(H, St, St - Hit.ImpactNormal * (Hit.Distance + 1.f), ECC_Visibility, Params)
 				&& FMath::Abs(Hit.Distance - H.Distance) <= 1.f)
@@ -81,7 +82,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 
 		if (Num > 0)
 		{
-			const auto Size = RelativeScale3D.X * 50.f;
+			const auto Size = Scale.X * 50.f;
 			FHitResult H;
 			const auto bOverlapped = World->SweepSingleByChannel(
 				H, Start, Start - Hit.ImpactNormal * (Hit.Distance + 1.f), Rot,

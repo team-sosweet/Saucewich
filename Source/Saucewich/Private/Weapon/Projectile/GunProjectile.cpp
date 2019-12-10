@@ -1,8 +1,8 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "GunProjectile.h"
+#include "Weapon/Projectile/GunProjectile.h"
 #include "GameFramework/Pawn.h"
-#include "Gun.h"
+#include "Weapon/Gun.h"
 
 void AGunProjectile::OnExplode(const FHitResult& Hit)
 {
@@ -15,7 +15,7 @@ void AGunProjectile::OnExplode(const FHitResult& Hit)
 			Other->TakeDamage(
 				Damage,
 				FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType},
-				Instigator ? Instigator->GetController() : nullptr,
+				GetInstigatorController(),
 				GetOwner()
 			);
 		}
@@ -26,7 +26,7 @@ void AGunProjectile::OnExplode(const FHitResult& Hit)
 
 float AGunProjectile::GetSauceMarkScale() const
 {
-	auto&& S = GetMesh()->RelativeScale3D;
+	auto&& S = GetMesh()->GetRelativeScale3D();
 	return (S.X + S.Y + S.Z) / 6.f;
 }
 

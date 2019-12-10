@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "PickupSpawnVolume.h"
+#include "Entity/PickupSpawnVolume.h"
 
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"

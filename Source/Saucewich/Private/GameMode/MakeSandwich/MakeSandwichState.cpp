@@ -1,9 +1,9 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "MakeSandwich/MakeSandwichState.h"
+#include "GameMode/MakeSandwich/MakeSandwichState.h"
 
-#include "MakeSandwich/MakeSandwichPlayerState.h"
-#include "MakeSandwich/Entity/SandwichIngredient.h"
+#include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
+#include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 
 void AMakeSandwichState::StoreIngredients(AMakeSandwichPlayerState* const Player)
 {

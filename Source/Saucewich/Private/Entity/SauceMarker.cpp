@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "SauceMarker.h"
+#include "Entity/SauceMarker.h"
 
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
@@ -8,9 +8,9 @@
 #include "GameFramework/GameStateBase.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
-#include "SaucewichGameMode.h"
+#include "GameMode/SaucewichGameMode.h"
+#include "GameMode/SaucewichGameState.h"
 #include "SaucewichInstance.h"
-#include "SaucewichGameState.h"
 #include "Names.h"
 
 UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "PoolActor.h"
+#include "Entity/PoolActor.h"
 #include "Engine/DataTable.h"
 #include "Weapon.generated.h"
 

@@ -1,8 +1,8 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "ActorPool.h"
+#include "Entity/ActorPool.h"
 #include "Engine/World.h"
-#include "PoolActor.h"
+#include "Entity/PoolActor.h"
 #include "SaucewichInstance.h"
 
 const FActorSpawnParameters AActorPool::DefaultParameters;
@@ -33,7 +33,7 @@ APoolActor* AActorPool::Spawn(const TSubclassOf<APoolActor> Class, const FTransf
 			if (const auto Actor = PoolPtr->Pop().Get())
 			{
 				Actor->SetOwner(SpawnParameters.Owner);
-				Actor->Instigator = SpawnParameters.Instigator;
+				Actor->SetInstigator(SpawnParameters.Instigator);
 				Actor->SetActorTransform(Transform);
 				Actor->Activate();
 				return Actor;

@@ -1,6 +1,6 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "MakeSandwich.h"
+#include "GameMode/MakeSandwich/MakeSandwich.h"
 
 #include "EngineUtils.h"
 #include "TimerManager.h"
