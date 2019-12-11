@@ -18,9 +18,6 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	TSoftObjectPtr<class USoundBase> FireSound;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<class UForceFeedbackEffect> FireFBB;
-
-	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<class UCameraShake> FireShake;
 
 	// 자동조준 상자 크기
@@ -90,6 +87,12 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
 	float Recoil = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (UIMin = 0, UIMax=1, ClampMin=0, ClampMax=1))
+	float FBBIntensity = .05f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (UIMin = 0, ClampMin = 0))
+	float FBBDuration = .2f;
 
 	// 탄창 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

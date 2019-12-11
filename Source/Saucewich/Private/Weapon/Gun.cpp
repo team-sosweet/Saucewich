@@ -145,7 +145,7 @@ void AGun::Shoot()
 	if (PC && PC->IsLocalController())
 	{
 		if (UUserSettings::Get()->bVibration)
-			PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
+			PC->PlayDynamicForceFeedback(Data.FBBIntensity, Data.FBBDuration, true, false, true, false);
 
 		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);
 	}
