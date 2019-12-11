@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<class UCameraShake> DeathShake;
 
+	UPROPERTY(EditAnywhere)
+	TSoftClassPtr<class UCameraShake> HitShake;
+
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;
 	

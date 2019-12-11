@@ -208,7 +208,7 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		if (UUserSettings::Get()->bVibration)
 			PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
 
-		PC->ClientPlayCameraShake(Data->DeathShake.LoadSynchronous(), Val);
+		PC->ClientPlayCameraShake(Data->HitShake.LoadSynchronous(), Val);
 	}
 #endif
 	
