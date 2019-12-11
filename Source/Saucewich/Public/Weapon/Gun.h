@@ -88,6 +88,9 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ReloadWaitTimeAfterDried;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
+	float Recoil = 1.f;
+
 	// 탄창 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 ClipSize;
