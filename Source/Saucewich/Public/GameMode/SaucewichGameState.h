@@ -77,7 +77,11 @@ public:
 	FOnCleanupGame OnCleanup;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleMatchEnding();
+
 	void BeginPlay() override;
+	void OnRep_MatchState() override;
 	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
 	void HandleLeavingMap() override;

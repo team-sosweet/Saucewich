@@ -11,6 +11,11 @@ class APlayerStart;
 class USaucewichInstance;
 class ASaucewichPlayerController;
 
+namespace MatchState
+{
+	extern const FName Ending;
+}
+
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FTeam
 {
@@ -83,6 +88,9 @@ public:
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName) const;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleMatchEnding();
+
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;
 
@@ -101,10 +109,12 @@ protected:
 	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	void SetPlayerDefaults(APawn* PlayerPawn) override;
 
+	void OnMatchStateSet() override;
 	bool ReadyToStartMatch_Implementation() override;
 	bool ReadyToEndMatch_Implementation() override;
 	void HandleMatchHasStarted() override;
 	void HandleMatchHasEnded() override;
+	void EndMatch() override;
 
 private:
 	void UpdateMatchState();

@@ -144,7 +144,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	OnCleanup.Broadcast();
+	// OnCleanup.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
@@ -159,6 +159,16 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
+}
+
+void ASaucewichGameState::OnRep_MatchState()
+{
+	Super::OnRep_MatchState();
+
+	if (GetMatchState() == MatchState::Ending)
+	{
+		HandleMatchEnding();
+	}
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(

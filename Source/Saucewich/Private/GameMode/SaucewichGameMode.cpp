@@ -24,6 +24,11 @@
 
 #define LOCTEXT_NAMESPACE ""
 
+namespace MatchState
+{
+	const FName Ending = TEXT("Ending");
+}
+
 const FGameData& ASaucewichGameMode::GetData(const UObject* WorldContextObj)
 {
 	return CastChecked<ASaucewichGameMode>(WorldContextObj->GetWorld()->GetGameState()->GetDefaultGameMode())->Data;
@@ -328,6 +333,21 @@ void ASaucewichGameMode::HandleMatchHasEnded()
 	}
 }
 
+void ASaucewichGameMode::EndMatch()
+{
+	if (GetMatchState() == MatchState::Ending)
+		SetMatchState(MatchState::WaitingPostMatch);
+}
+
+void ASaucewichGameMode::OnMatchStateSet()
+{
+	Super::OnMatchStateSet();
+	if (GetMatchState() == MatchState::Ending)
+	{
+		HandleMatchEnding();
+	}
+}
+
 void ASaucewichGameMode::UpdateMatchState()
 {
 	if (GetMatchState() == MatchState::WaitingToStart)
@@ -356,7 +376,7 @@ void ASaucewichGameMode::UpdateMatchState()
 	{
 		if (ReadyToEndMatch())
 		{
-			EndMatch();
+			SetMatchState(MatchState::Ending);
 		}
 	}
 }
