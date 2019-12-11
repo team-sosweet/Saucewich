@@ -198,6 +198,15 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
 		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
 	}
+
+	if (DamageAmount > 0.f && IsLocallyControlled())
+	{
+		if (const auto PC = GetController<APlayerController>())
+		{
+			const auto Val = DamageAmount / Data->MaxHP;
+			PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
+		}
+	}
 	
 	return DamageAmount;
 }
