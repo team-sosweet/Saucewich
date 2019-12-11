@@ -199,14 +199,14 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
 	}
 
-	if (DamageAmount > 0.f && IsLocallyControlled())
+#if !UE_SERVER
+	const auto PC = GetController<APlayerController>();
+	if (PC && PC->IsLocalController() && DamageAmount > 0.f && UUserSettings::Get()->bVibration)
 	{
-		if (const auto PC = GetController<APlayerController>())
-		{
-			const auto Val = DamageAmount / Data->MaxHP;
-			PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
-		}
+		const auto Val = FMath::Clamp(DamageAmount / Data->MaxHP, 0.f, 1.f);
+		PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
 	}
+#endif
 	
 	return DamageAmount;
 }
@@ -400,7 +400,7 @@ void ATpsCharacter::SpawnDeathEffects()
 	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);
 
-	const auto PC = Cast<APlayerController>(Controller);
+	const auto PC = GetController<APlayerController>();
 	if (PC && PC->IsLocalController() && UUserSettings::Get()->bVibration)
 		PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
 #endif
