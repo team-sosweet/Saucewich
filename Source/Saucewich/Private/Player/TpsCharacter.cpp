@@ -206,7 +206,7 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		const auto Val = FMath::Clamp(DamageAmount / Data->MaxHP, 0.f, 1.f);
 
 		if (UUserSettings::Get()->bVibration)
-			PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
+			PC->PlayDynamicForceFeedback(Val, Val, false, true, false, true);
 
 		PC->ClientPlayCameraShake(Data->HitShake.LoadSynchronous(), Val);
 	}
