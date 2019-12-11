@@ -19,6 +19,8 @@ void AExplosiveProjectile::OnExplode(const FHitResult& Hit)
 		DamagePreventionChannel
 	);
 	
+	UGameplayStatics::PlayWorldCameraShake(this, CameraShake.LoadSynchronous(), Hit.Location, 0.f, Radius);
+
 	Super::OnExplode(Hit);
 }
 

@@ -59,7 +59,7 @@ void AGun::Shoot()
 {
 	if (!CanFire()) return;
 
-	auto& Data = GetGunData();
+	auto&& Data = GetGunData();
 
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
@@ -142,8 +142,13 @@ void AGun::Shoot()
 	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLocation);
 
 	const auto PC = Cast<APlayerController>(GetInstigatorController());
-	if (PC && PC->IsLocalController() && UUserSettings::Get()->bVibration)
-		PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
+	if (PC && PC->IsLocalController())
+	{
+		if (UUserSettings::Get()->bVibration)
+			PC->ClientPlayForceFeedback(Data.FireFBB.LoadSynchronous());
+
+		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous());
+	}
 #endif
 
 	OnShoot();

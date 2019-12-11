@@ -201,10 +201,14 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 
 #if !UE_SERVER
 	const auto PC = GetController<APlayerController>();
-	if (PC && PC->IsLocalController() && DamageAmount > 0.f && UUserSettings::Get()->bVibration)
+	if (PC && PC->IsLocalController() && DamageAmount > 0.f)
 	{
 		const auto Val = FMath::Clamp(DamageAmount / Data->MaxHP, 0.f, 1.f);
-		PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
+
+		if (UUserSettings::Get()->bVibration)
+			PC->PlayDynamicForceFeedback(Val, Val, true, true, true, true);
+
+		PC->ClientPlayCameraShake(Data->DeathShake.LoadSynchronous(), Val);
 	}
 #endif
 	
@@ -401,8 +405,13 @@ void ATpsCharacter::SpawnDeathEffects()
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);
 
 	const auto PC = GetController<APlayerController>();
-	if (PC && PC->IsLocalController() && UUserSettings::Get()->bVibration)
-		PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
+	if (PC && PC->IsLocalController())
+	{
+		if (UUserSettings::Get()->bVibration)
+			PC->ClientPlayForceFeedback(Data->DeathFBB.LoadSynchronous());
+
+		PC->ClientPlayCameraShake(Data->DeathShake.LoadSynchronous());
+	}
 #endif
 }
 

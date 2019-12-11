@@ -20,7 +20,10 @@ public:
 	TSoftObjectPtr<class UParticleSystem> DeathFX;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UForceFeedbackEffect> DeathFBB;
+	TSoftObjectPtr<class UForceFeedbackEffect> DeathFBB;
+
+	UPROPERTY(EditAnywhere)
+	TSoftClassPtr<class UCameraShake> DeathShake;
 
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;
