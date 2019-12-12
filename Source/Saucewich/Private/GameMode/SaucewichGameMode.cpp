@@ -267,8 +267,12 @@ void ASaucewichGameMode::RestartPlayerAtPlayerStart(AController* const NewPlayer
 	else
 	{
 		InitStartSpot(StartSpot, NewPlayer);
-		auto&& Transform = StartSpot->GetRootComponent()->GetComponentTransform();
-		NewPlayer->GetPawn()->SetActorLocationAndRotation(Transform.GetLocation(), Transform.GetRotation());
+
+		NewPlayer->GetPawn()->SetActorLocationAndRotation(
+			StartSpot->GetActorLocation(),
+			FRotator{0.f, StartSpot->GetActorRotation().Yaw, 0.f}
+		);
+
 		FinishRestartPlayer(NewPlayer, StartSpot->GetActorRotation());
 	}
 }
