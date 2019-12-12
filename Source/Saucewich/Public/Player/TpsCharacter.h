@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/Character.h"
-#include "Interface/Freezable.h"
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
@@ -21,7 +20,7 @@ struct FPerkInstance
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API ATpsCharacter : public ACharacter, public IFreezable
+class SAUCEWICH_API ATpsCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -103,7 +102,6 @@ public:
 	FOnPickupCanceled OnPickupCanceled;
 
 protected:
-	void Freeze() override;
 	void BeginPlay() override;
 	void Destroyed() override;
 	void PostInitializeComponents() override;
@@ -127,6 +125,8 @@ protected:
 	float GetArmorRatio() const;
 
 private:
+	void Freeze();
+
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void SetActorActivated(bool bActive);

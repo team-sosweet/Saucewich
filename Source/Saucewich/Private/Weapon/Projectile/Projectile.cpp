@@ -49,6 +49,12 @@ bool AProjectile::CanExplode(const FHitResult& Hit) const
 	return IsTeamValid();
 }
 
+void AProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	// TODO: GameState OnFreeze µî·Ï
+}
+
 void AProjectile::OnActivated()
 {
 	if (HasAuthority())

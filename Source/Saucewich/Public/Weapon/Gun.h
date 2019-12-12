@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Weapon/Weapon.h"
-#include "Interface/Freezable.h"
 #include "Gun.generated.h"
 
 USTRUCT(BlueprintType)
@@ -105,7 +104,7 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API AGun : public AWeapon, public IFreezable
+class SAUCEWICH_API AGun : public AWeapon
 {
 	GENERATED_BODY()
 
@@ -119,7 +118,6 @@ public:
 	const FGunData& GetGunData() const;
 
 protected:
-	void Freeze() override;
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -139,6 +137,7 @@ protected:
 	void OnShoot();
 
 private:
+	void Freeze();
 	void Shoot();
 	void StartFire(int32 RandSeed);
 
