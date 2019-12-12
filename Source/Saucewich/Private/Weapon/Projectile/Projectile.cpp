@@ -66,6 +66,11 @@ void AProjectile::OnReleased()
 	Team = -1;
 }
 
+void AProjectile::Freeze()
+{
+	Movement->SetUpdatedComponent(nullptr);
+}
+
 void AProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

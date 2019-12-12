@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchEnd, uint8, WonTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeavingMap);
 DECLARE_EVENT(ASaucewichGameState, FOnCleanupGame)
+DECLARE_EVENT(ASaucewichGameState, FOnFreeze)
 
 UCLASS()
 class SAUCEWICH_API ASaucewichGameState : public AGameState
@@ -75,6 +76,7 @@ public:
 	FOnLeavingMap OnLeavingMap;
 
 	FOnCleanupGame OnCleanup;
+	FOnFreeze OnFreeze;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

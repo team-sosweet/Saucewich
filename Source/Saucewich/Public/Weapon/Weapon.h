@@ -38,10 +38,6 @@ struct SAUCEWICH_API FWeaponData : public FTableRowBase
 	uint8 Slot;
 };
 
-/**
- * 모든 무기의 기본이 되는 클래스입니다.
- * 이름과는 달리 '캐릭터가 지니고 있을 수 있으며 슬롯을 누르면 특정 행동을 할 수 있는' 그 어떤 것도 될 수 있습니다.
- */
 UCLASS(Abstract)
 class SAUCEWICH_API AWeapon : public APoolActor
 {

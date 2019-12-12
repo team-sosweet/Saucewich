@@ -53,6 +53,7 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 	DOREPLIFETIME(AGun, Clip);
 	DOREPLIFETIME(AGun, bDried);
 	DOREPLIFETIME(AGun, bFiring);
+	DOREPLIFETIME(AGun, bFreeze);
 }
 
 void AGun::Shoot()
@@ -224,6 +225,12 @@ const FGunData& AGun::GetGunData() const
 	return GetData<FGunData>();
 }
 
+void AGun::Freeze()
+{
+	bFreeze = true;
+	SetActorTickEnabled(false);
+}
+
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
@@ -299,7 +306,7 @@ bool AGun::ServerStartFire_Validate(int32)
 
 bool AGun::CanFire() const
 {
-	return IsActive() && Clip > 0 && !bDried;
+	return !bFreeze && IsActive() && Clip > 0 && !bDried;
 }
 
 void AGun::Reload(const float DeltaSeconds)

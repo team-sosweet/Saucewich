@@ -31,9 +31,9 @@ public:
 	virtual bool CanExplode(const FHitResult& Hit) const;
 
 protected:
+	void BeginPlay() override;
 	void OnActivated() override;
 	void OnReleased() override;
-
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual float GetSauceMarkScale() const { return 1.f; }
@@ -43,6 +43,8 @@ protected:
 	void OnRep_Team() const;
 
 private:
+	void Freeze();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastExplode(const FHitResult& Hit);
 	

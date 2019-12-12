@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Entity/PoolActor.h"
+#include "Interface/Freezable.h"
 #include "Pickup.generated.h"
 
 class ATpsCharacter;
@@ -19,7 +20,7 @@ struct FPickupIcon
 };
 
 UCLASS()
-class SAUCEWICH_API APickup : public APoolActor
+class SAUCEWICH_API APickup : public APoolActor, public IFreezable
 {
 	GENERATED_BODY()
 
@@ -31,6 +32,7 @@ public:
 	uint8 bSpawnedFromSpawner : 1;
 
 protected:
+	void Freeze() override;
 	void Tick(float DeltaSeconds) override;
 
 	void NotifyActorBeginOverlap(AActor* OtherActor) override;

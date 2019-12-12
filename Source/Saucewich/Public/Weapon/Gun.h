@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "Saucewich.h"
 #include "Weapon/Weapon.h"
-#include "Sound/SoundBase.h"
+#include "Interface/Freezable.h"
 #include "Gun.generated.h"
-
-class USoundBase;
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FGunData : public FWeaponData
@@ -108,7 +105,7 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 };
 
 UCLASS(Abstract)
-class SAUCEWICH_API AGun : public AWeapon
+class SAUCEWICH_API AGun : public AWeapon, public IFreezable
 {
 	GENERATED_BODY()
 
@@ -122,6 +119,7 @@ public:
 	const FGunData& GetGunData() const;
 
 protected:
+	void Freeze() override;
 	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -175,4 +173,7 @@ private:
 
 	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bFiring : 1;
+
+	UPROPERTY(Replicated, Transient)
+	uint8 bFreeze : 1;
 };

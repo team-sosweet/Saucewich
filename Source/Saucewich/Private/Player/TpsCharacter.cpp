@@ -133,6 +133,12 @@ void ATpsCharacter::PossessedBy(AController* const NewController)
 		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
 }
 
+void ATpsCharacter::Freeze()
+{
+	DisableInput(nullptr);
+	GetMovementComponent()->SetUpdatedComponent(nullptr);
+}
+
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();

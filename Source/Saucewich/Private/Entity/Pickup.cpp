@@ -31,6 +31,11 @@ APickup::APickup()
 	Shadow->SetRelativeScale3D(FVector{Collision->GetScaledSphereRadius() / 50});
 }
 
+void APickup::Freeze()
+{
+	SetActorTickEnabled(false);
+}
+
 void APickup::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

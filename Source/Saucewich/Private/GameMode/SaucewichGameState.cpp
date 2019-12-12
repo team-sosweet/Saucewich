@@ -11,6 +11,7 @@
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
 #include "GameMode/SaucewichGameMode.h"
+#include "Interface/Freezable.h"
 
 template <class Fn>
 void ForEachEveryPlayer(const TArray<APlayerState*>& PlayerArray, Fn&& Do)
@@ -144,7 +145,7 @@ void ASaucewichGameState::HandleMatchHasEnded()
 		}
 	}
 
-	// OnCleanup.Broadcast();
+	OnFreeze.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
