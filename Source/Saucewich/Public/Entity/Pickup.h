@@ -31,6 +31,7 @@ public:
 	uint8 bSpawnedFromSpawner : 1;
 
 protected:
+	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 
 	void NotifyActorBeginOverlap(AActor* OtherActor) override;

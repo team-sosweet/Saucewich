@@ -234,7 +234,11 @@ void AGun::Freeze()
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
+
 	FirePSC->SetFloatParameter("RPM", GetData<FGunData>().Rpm);
+
+	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState->OnFreeze.AddUObject(this, &AGun::Freeze);
 }
 
 void AGun::FireP()

@@ -7,6 +7,7 @@
 #include "Entity/PickupSpawner.h"
 #include "Player/TpsCharacter.h"
 #include "ShadowComponent.h"
+#include "GameMode/SaucewichGameState.h"
 
 APickup::APickup()
 	:Collision{CreateDefaultSubobject<USphereComponent>("Collision")},
@@ -34,6 +35,14 @@ APickup::APickup()
 void APickup::Freeze()
 {
 	SetActorTickEnabled(false);
+}
+
+void APickup::BeginPlay()
+{
+	Super::BeginPlay();
+
+	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState->OnFreeze.AddUObject(this, &APickup::Freeze);
 }
 
 void APickup::Tick(const float DeltaSeconds)

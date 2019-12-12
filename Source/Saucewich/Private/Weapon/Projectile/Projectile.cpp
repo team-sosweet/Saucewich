@@ -22,7 +22,6 @@ AProjectile::AProjectile()
 	  Movement{CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"))}
 {
 	RootComponent = Mesh;
-	InitialLifeSpan = 5;
 	Mesh->SetCollisionProfileName(TEXT("Projectile"));
 }
 
@@ -52,7 +51,9 @@ bool AProjectile::CanExplode(const FHitResult& Hit) const
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	// TODO: GameState OnFreeze µî·Ï
+
+	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState->OnFreeze.AddUObject(this, &AProjectile::Freeze);
 }
 
 void AProjectile::OnActivated()

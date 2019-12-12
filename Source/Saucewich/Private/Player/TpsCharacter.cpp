@@ -22,6 +22,7 @@
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacterMovementComponent.h"
+#include "Player/TpsAnimInstance.h"
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
 #include "Names.h"
@@ -137,6 +138,8 @@ void ATpsCharacter::Freeze()
 {
 	DisableInput(nullptr);
 	GetMovementComponent()->SetUpdatedComponent(nullptr);
+	const auto Anim = CastChecked<UTpsAnimInstance>(GetMesh()->GetAnimInstance());
+	Anim->Pause();
 }
 
 void ATpsCharacter::BeginPlay()
@@ -156,6 +159,9 @@ void ATpsCharacter::BeginPlay()
 			HP = Data->MaxHP;
 		}
 	}
+
+	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GameState->OnFreeze.AddUObject(this, &ATpsCharacter::Freeze);
 }
 
 void ATpsCharacter::Destroyed()
