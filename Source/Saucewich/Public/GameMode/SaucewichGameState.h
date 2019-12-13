@@ -54,6 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
 
+	UFUNCTION(BlueprintCallable)
 	void AddDilatableActor(AActor* Actor) { DilatableActors.Add(Actor); }
 	void AddDilatablePSC(class UParticleSystemComponent* PSC) { DilatablePSCs.Add(PSC); }
 
