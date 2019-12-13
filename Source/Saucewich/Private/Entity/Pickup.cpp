@@ -28,6 +28,7 @@ APickup::APickup()
 	
 	Mesh->SetupAttachment(Collision);
 	Mesh->BodyInstance.SetCollisionProfileNameDeferred(Names::NoCollision);
+	Mesh->SetGenerateOverlapEvents(true);
 	
 	Shadow->SetupAttachment(Mesh);
 	Shadow->SetRelativeScale3D(FVector{Collision->GetScaledSphereRadius() / 50.f});
