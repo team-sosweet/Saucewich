@@ -47,8 +47,6 @@ public:
 	void OnCharacterDeath();
 	virtual bool TrySelectWeapon(uint8 Slot);
 
-	void BeTranslucent();
-	void BeOpaque();
 	void SetColor(const FLinearColor& NewColor);
 
 	float GetSpeedRatio() const;

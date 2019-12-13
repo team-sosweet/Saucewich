@@ -11,7 +11,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
-#include "Weapon/GunSharedData.h"
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/Projectile/GunProjectile.h"
 #include "UserSettings.h"
@@ -172,11 +171,9 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	const auto Character = Cast<ATpsCharacter>(GetOwner());
 	if (!IsValid(Character)) return EGunTraceHit::None;
 	
-	auto&& ShDat = GetSharedData<UGunSharedData>();
-
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
-	const auto Start = Character->GetSpringArmLocation() + AimDir * ShDat.TraceStartOffset;
+	const auto Start = Character->GetSpringArmLocation() + AimDir * 10.f;
 	const auto End = Start + AimDir * Data.MaxDistance;
 
 	FCollisionQueryParams Params;
@@ -187,7 +184,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
-		BoxHits, Start, End, AimRotation.Quaternion(), ShDat.PawnOnly.Name,
+		BoxHits, Start, End, AimRotation.Quaternion(), NAME("PawnOnly"),
 		FCollisionShape::MakeBox({ 0.f, Data.TraceBoxSize.X, Data.TraceBoxSize.Y }), Params
 	);
 
@@ -199,7 +196,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 			Data.Damage, BoxHits[i], (End-Start).GetSafeNormal(), Data.DamageType
 		}, GetInstigatorController(), this)) continue;
 
-		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, ShDat.NoPawn.Name, Params))
+		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, NAME("NoPawn"), Params))
 		{
 			HitPawn = i;
 			break;

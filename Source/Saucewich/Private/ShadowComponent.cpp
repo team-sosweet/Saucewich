@@ -3,6 +3,7 @@
 #include "ShadowComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "SaucewichInstance.h"
+#include "Names.h"
 
 UShadowComponent::UShadowComponent()
 {
@@ -10,25 +11,10 @@ UShadowComponent::UShadowComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")}}.LoadSynchronous();
 	UStaticMeshComponent::SetStaticMesh(Mesh);
-	BodyInstance.SetCollisionProfileNameDeferred(TEXT("NoCollision"));
+	BodyInstance.SetCollisionProfileNameDeferred(Names::NoCollision);
 #endif 
 }
 
-
-void UShadowComponent::BeTranslucent()
-{
-#if !UE_SERVER
-	bTranslucent = true;
-	SetVisibility(false);
-#endif 
-}
-
-void UShadowComponent::BeOpaque()
-{
-#if !UE_SERVER
-	bTranslucent = false;
-#endif 
-}
 
 #if !UE_SERVER
 
@@ -43,8 +29,6 @@ void UShadowComponent::BeginPlay()
 void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* const ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bTranslucent) return;
 
 	auto bShouldDraw = false;
 
@@ -92,8 +76,8 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 			if (bOverlapped && H.Distance < MinDist) MinDist = H.Distance;
 
 			const auto Mat = CastChecked<UMaterialInstanceDynamic>(GetMaterial(0));
-			Mat->SetScalarParameterValue(TEXT("Dist"), MinDist / MaxDist);
-			Mat->SetScalarParameterValue(TEXT("Opacity"), static_cast<float>(Num) / Offsets.size());
+			Mat->SetScalarParameterValue(NAME("Dist"), MinDist / MaxDist);
+			Mat->SetScalarParameterValue(NAME("Opacity"), static_cast<float>(Num) / Offsets.size());
 			SetWorldLocationAndRotation(Hit.ImpactPoint + Hit.ImpactNormal * (Hit.Distance - MinDist + .01f), Rot);
 			bShouldDraw = true;
 		}

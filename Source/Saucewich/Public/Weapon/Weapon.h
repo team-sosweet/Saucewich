@@ -70,24 +70,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FWeaponData& GetWeaponData() const;
 
-	template <class T>
-	const T& GetSharedData() const
-	{
-		static_assert(TIsDerivedFrom<T, UWeaponSharedData>::IsDerived, "T must be derived from UWeaponSharedData");
-		const auto Data = Cast<T>(&GetSharedData());
-		return ensure(Data) ? *Data : *GetDefault<T>(T::StaticClass());
-	}
-	const UWeaponSharedData& GetSharedData() const;
-
 	bool IsVisible() const;
 	void SetVisibility(bool bNewVisibility) const;
 
 	UFUNCTION(BlueprintCallable)
 	FLinearColor GetColor() const;
 	virtual void SetColor(const FLinearColor& NewColor);
-
-	void BeTranslucent();
-	void BeOpaque();
 
 	// [Shared] 키를 누르거나 뗄 때 호출됩니다.
 	virtual void FireP() {}
@@ -113,27 +101,16 @@ protected:
 
 private:
 	void Init();
+	UMaterialInstanceDynamic* GetMaterial() const;
 
 	UFUNCTION()
 	virtual void OnRep_Equipped();
 
 	int32 GetColIdx() const;
 
-	FOnColMatCreated OnColMatCreated;
-
 	UPROPERTY(EditDefaultsOnly)
 	FDataTableRowHandle WeaponData;
 
-	UPROPERTY(EditAnywhere)
-	const class UWeaponSharedData* SharedData;
-
-	UPROPERTY(Transient)
-	UMaterialInstanceDynamic* ColMat;
-	
-	UPROPERTY(Transient)
-	UMaterialInstanceDynamic* ColTranslMat;
-
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipped, Transient, meta=(AllowPrivateAccess=true))
 	uint8 bEquipped : 1;
-	uint8 bTransl : 1;
 };

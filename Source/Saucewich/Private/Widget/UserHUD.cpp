@@ -21,8 +21,6 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 {
 	OwnerPawn = InOwnerPawn;
 
-	GameState = GetWorld()->GetGameState<AGameState>();
-	
 	FOnCharacterSpawnedSingle OnCharacterSpawned;
 	OnCharacterSpawned.BindDynamic(this, &UUserHUD::OnLocalCharacterSpawned);
 	
@@ -42,7 +40,8 @@ void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
 {
-	if (!GameState->IsMatchInProgress() || !OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
+	const auto GS = CastChecked<AGameState>(GetWorld()->GetGameState());
+	if (!GS->IsMatchInProgress() || !OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
 	{
 		return ESlateVisibility::Hidden;
 	}

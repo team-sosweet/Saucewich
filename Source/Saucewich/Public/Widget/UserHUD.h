@@ -68,14 +68,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float ShowAngle;
-
-	class AGameState* GameState;
 	
 	float ShowAngleRadian;
-
 	uint8 OwnerTeam;
-
 	uint8 LocalTeam;
-
-	bool IsDead;
+	uint8 IsDead : 1;
 };

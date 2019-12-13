@@ -13,9 +13,6 @@ class SAUCEWICH_API UShadowComponent : public UStaticMeshComponent
 public:
 	UShadowComponent();
 
-	void BeTranslucent();
-	void BeOpaque();
-	
 #if !UE_SERVER
 		
 protected:
@@ -24,7 +21,6 @@ protected:
 	
 private:
 	FTransform Offset;
-	uint8 bTranslucent : 1;
-	
+
 #endif
 };

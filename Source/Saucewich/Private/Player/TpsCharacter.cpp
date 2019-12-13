@@ -129,16 +129,19 @@ void ATpsCharacter::PossessedBy(AController* const NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (const auto PC = Cast<ASaucewichPlayerController>(NewController))
-		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+	const auto PC = CastChecked<ASaucewichPlayerController>(NewController);
+	ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
 }
 
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const auto PC = GetController<ASaucewichPlayerController>())
-		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+	if (const auto Ctrl = GetController())
+	{
+		ASaucewichPlayerController::BroadcastCharacterSpawned(CastChecked<ASaucewichPlayerController>(Ctrl), this);
+		if (Ctrl->IsLocalController()) BeTranslucent();
+	}
 	
 	BindOnTeamChanged();
 
@@ -250,7 +253,7 @@ void ATpsCharacter::SetPlayerDefaults()
 			HP = Data->MaxHP;
 			bAlive = true;
 		}
-		if (Data->RespawnInvincibleTime > 0)
+		if (Data->RespawnInvincibleTime > 0 && !IsLocallyControlled())
 		{
 			BeTranslucent();
 			GetWorldTimerManager().SetTimer(
@@ -432,9 +435,6 @@ void ATpsCharacter::BeTranslucent()
 			GetMesh()->SetMaterial(i, Transl);
 	}
 
-	WeaponComponent->BeTranslucent();
-	Shadow->BeTranslucent();
-	
 	bTranslucent = true;
 }
 
@@ -448,9 +448,6 @@ void ATpsCharacter::BeOpaque()
 	
 	for (auto i = 0; i < NumMat; ++i)
 		GetMesh()->SetMaterial(i, i == ColMatIdx ? ColMat : DefMesh->GetMaterial(i));
-
-	WeaponComponent->BeOpaque();
-	Shadow->BeOpaque();
 	
 	bTranslucent = false;
 }

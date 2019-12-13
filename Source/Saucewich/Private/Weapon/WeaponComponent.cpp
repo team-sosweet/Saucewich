@@ -123,18 +123,6 @@ bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)
 	return true;
 }
 
-void UWeaponComponent::BeOpaque()
-{
-	for (const auto Wep : Weapons)
-		if (Wep) Wep->BeOpaque();
-}
-
-void UWeaponComponent::BeTranslucent()
-{
-	for (const auto Wep : Weapons)
-		if (Wep) Wep->BeTranslucent();
-}
-
 float UWeaponComponent::GetSpeedRatio() const
 {
 	if (const auto Weapon = GetActiveWeapon())
