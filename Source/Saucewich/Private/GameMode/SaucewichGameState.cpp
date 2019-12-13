@@ -88,7 +88,7 @@ bool ASaucewichGameState::CanAddPersonalScore() const
 bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
 	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
 {
-	return !HasMatchEnded();
+	return !HasMatchEnded() && GetMatchState() != MatchState::Ending;
 }
 
 float ASaucewichGameState::GetRemainingRoundSeconds() const
