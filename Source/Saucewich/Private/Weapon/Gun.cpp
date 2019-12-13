@@ -6,6 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 
 #include "Entity/ActorPool.h"
 #include "Kismet/GameplayStatics.h"

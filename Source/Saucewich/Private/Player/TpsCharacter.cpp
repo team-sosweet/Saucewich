@@ -13,6 +13,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 
 #include "Saucewich.h"
 #include "Entity/Perk.h"
@@ -128,21 +129,31 @@ void ATpsCharacter::PostInitializeComponents()
 void ATpsCharacter::PossessedBy(AController* const NewController)
 {
 	Super::PossessedBy(NewController);
+	OnControllerChanged();
+}
 
-	const auto PC = CastChecked<ASaucewichPlayerController>(NewController);
-	ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+void ATpsCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	OnControllerChanged();
+}
+
+void ATpsCharacter::OnControllerChanged()
+{
+	if (const auto Ctrl = GetController())
+	{
+		const auto PC = CastChecked<ASaucewichPlayerController>(Ctrl);
+		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
+
+		if (Ctrl->IsLocalController()) BeTranslucent();
+		else BeOpaque();
+	}
 }
 
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const auto Ctrl = GetController())
-	{
-		ASaucewichPlayerController::BroadcastCharacterSpawned(CastChecked<ASaucewichPlayerController>(Ctrl), this);
-		if (Ctrl->IsLocalController()) BeTranslucent();
-	}
-	
 	BindOnTeamChanged();
 
 	if (HasAuthority())

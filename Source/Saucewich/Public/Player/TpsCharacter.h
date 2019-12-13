@@ -106,7 +106,11 @@ protected:
 	void BeginPlay() override;
 	void Destroyed() override;
 	void PostInitializeComponents() override;
+	
 	void PossessedBy(AController* NewController) override;
+	void OnRep_Controller() override;
+	virtual void OnControllerChanged();
+	
 	void SetupPlayerInputComponent(class UInputComponent* Input) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

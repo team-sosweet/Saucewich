@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
 
 #include "Entity/SauceMarker.h"
 #include "GameMode/SaucewichGameState.h"
