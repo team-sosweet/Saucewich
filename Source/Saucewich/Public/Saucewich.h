@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMaxLen();
 
+	UFUNCTION(BlueprintPure)
+	static bool ShouldShowAd() { return !UE_SERVER && (UE_BUILD_SHIPPING || UE_BUILD_TEST); }
+
 	static class FGameLiftServerSDKModule& GetGameLift();
 
 	static void Request(const FString& Verb, const FString& URL, const FOnHttpResponse& OnResponse);
