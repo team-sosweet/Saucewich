@@ -51,6 +51,9 @@ struct FGameData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(UIMin=0))
 	float MatchStartingTime = 2;
 	
+	UPROPERTY(EditDefaultsOnly)
+	float MatchEndingTime = 5.f;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(UIMin=0))
 	float PickupSpawnInterval = 20;
 
@@ -88,8 +91,7 @@ public:
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName) const;
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
-	void HandleMatchEnding();
+	virtual void HandleMatchEnding();
 
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	void BeginPlay() override;

@@ -15,13 +15,14 @@
 #include "Weapon/WeaponComponent.h"
 #include "Weapon/Projectile/GunProjectile.h"
 #include "UserSettings.h"
+#include "Names.h"
 
 AGun::AGun()
-	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>("FirePSC")}
+	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>(Names::FirePSC)}
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	FirePSC->SetupAttachment(GetMesh(), "Muzzle");
+	FirePSC->SetupAttachment(GetMesh(), Names::Muzzle);
 	FirePSC->bAutoActivate = false;
 }
 
@@ -62,7 +63,7 @@ void AGun::Shoot()
 
 	auto&& Data = GetGunData();
 
-	const auto MuzzleTransform = GetMesh()->GetSocketTransform("Muzzle");
+	const auto MuzzleTransform = GetMesh()->GetSocketTransform(Names::Muzzle);
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
 
 	const auto ProjColProf = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
@@ -79,8 +80,8 @@ void AGun::Shoot()
 		? (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal()
 		: MuzzleTransform.GetRotation().Vector();
 
-	const auto V = 45 * Data.VerticalSpread;
-	const auto H = 45 * Data.HorizontalSpread;
+	const auto V = 45.f * Data.VerticalSpread;
+	const auto H = 45.f * Data.HorizontalSpread;
 	
 	TArray<FVector> RDirs;
 	RDirs.Reserve(Data.NumProjectile);
@@ -225,20 +226,15 @@ const FGunData& AGun::GetGunData() const
 	return GetData<FGunData>();
 }
 
-void AGun::Freeze()
-{
-	bFreeze = true;
-	SetActorTickEnabled(false);
-}
-
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FirePSC->SetFloatParameter("RPM", GetData<FGunData>().Rpm);
+	FirePSC->SetFloatParameter(Names::RPM, GetData<FGunData>().Rpm);
 
-	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
-	GameState->OnFreeze.AddUObject(this, &AGun::Freeze);
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GS->AddDilatableActor(this);
+	GS->AddDilatablePSC(FirePSC);
 }
 
 void AGun::FireP()
@@ -282,7 +278,7 @@ void AGun::OnReleased()
 void AGun::SetColor(const FLinearColor& NewColor)
 {
 	Super::SetColor(NewColor);
-	FirePSC->SetColorParameter("Color", NewColor);
+	FirePSC->SetColorParameter(Names::Color, NewColor);
 }
 
 void AGun::StartFire(const int32 RandSeed)

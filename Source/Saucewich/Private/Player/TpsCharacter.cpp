@@ -22,7 +22,6 @@
 #include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacterMovementComponent.h"
-#include "Player/TpsAnimInstance.h"
 #include "Weapon/WeaponComponent.h"
 #include "ShadowComponent.h"
 #include "Names.h"
@@ -33,12 +32,12 @@ DEFINE_LOG_CATEGORY_STATIC(LogCharacter, Log, All)
 
 ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super{ObjectInitializer.SetDefaultSubobjectClass<UTpsCharacterMovementComponent>(CharacterMovementComponentName)},
-	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"))},
-	SpringArm{CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"))},
-	Camera{CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"))},
-	Shadow{CreateDefaultSubobject<UShadowComponent>(TEXT("Shadow"))}
+	WeaponComponent{CreateDefaultSubobject<UWeaponComponent>(Names::WeaponComponent)},
+	SpringArm{CreateDefaultSubobject<USpringArmComponent>(Names::SpringArm)},
+	Camera{CreateDefaultSubobject<UCameraComponent>(Names::Camera)},
+	Shadow{CreateDefaultSubobject<UShadowComponent>(Names::Shadow)}
 {
-	WeaponComponent->SetupAttachment(GetMesh(), TEXT("Weapon"));
+	WeaponComponent->SetupAttachment(GetMesh(), Names::Weapon);
 	SpringArm->SetupAttachment(RootComponent);
 	Camera->SetupAttachment(SpringArm);
 	Shadow->SetupAttachment(RootComponent);
@@ -72,7 +71,7 @@ const FLinearColor& ATpsCharacter::GetTeamColor() const
 	return ASaucewichGameMode::GetData(this).Teams[GetTeam()].Color;
 }
 
-void ATpsCharacter::SetColor(const FLinearColor& NewColor)
+void ATpsCharacter::SetColor(const FLinearColor& NewColor) const
 {
 	ColMat->SetVectorParameterValue(Names::Color, NewColor);
 	ColTranslMat->SetVectorParameterValue(Names::Color, NewColor);
@@ -134,14 +133,6 @@ void ATpsCharacter::PossessedBy(AController* const NewController)
 		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
 }
 
-void ATpsCharacter::Freeze()
-{
-	DisableInput(nullptr);
-	GetMovementComponent()->SetUpdatedComponent(nullptr);
-	const auto Anim = CastChecked<UTpsAnimInstance>(GetMesh()->GetAnimInstance());
-	Anim->Pause();
-}
-
 void ATpsCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -160,8 +151,8 @@ void ATpsCharacter::BeginPlay()
 		}
 	}
 
-	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
-	GameState->OnFreeze.AddUObject(this, &ATpsCharacter::Freeze);
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GS->AddDilatableActor(this);
 }
 
 void ATpsCharacter::Destroyed()
@@ -177,10 +168,10 @@ void ATpsCharacter::SetupPlayerInputComponent(UInputComponent* Input)
 {
 	Super::SetupPlayerInputComponent(Input);
 
-	Input->BindAxis(TEXT("MoveForward"), this, &ATpsCharacter::MoveForward);
-	Input->BindAxis(TEXT("MoveRight"), this, &ATpsCharacter::MoveRight);
-	Input->BindAxis(TEXT("Turn"), this, &ATpsCharacter::AddControllerYawInput);
-	Input->BindAxis(TEXT("LookUp"), this, &ATpsCharacter::AddControllerPitchInput);
+	Input->BindAxis(NAME("MoveForward"), this, &ATpsCharacter::MoveForward);
+	Input->BindAxis(NAME("MoveRight"), this, &ATpsCharacter::MoveRight);
+	Input->BindAxis(NAME("Turn"), this, &ATpsCharacter::AddControllerYawInput);
+	Input->BindAxis(NAME("LookUp"), this, &ATpsCharacter::AddControllerPitchInput);
 
 	WeaponComponent->SetupPlayerInputComponent(Input);
 }
@@ -195,7 +186,10 @@ void ATpsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser)
 {
-	if (!Data) return 0;
+	check(Data);
+
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	if (GS->GetMatchState() == MatchState::Ending) return 0.f;
 	
 	if (DamageAmount > 0) DamageAmount /= GetArmorRatio();
 	DamageAmount = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -205,7 +199,7 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 		const auto HealAmount = FMath::Min(-DamageAmount, Data->MaxHP - HP);
 		if (HealAmount >= 2 && EventInstigator && EventInstigator != GetController())
 			if (const auto PS = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
-				PS->AddScore(TEXT("Heal"), FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
+				PS->AddScore(NAME("Heal"), FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
 
 		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
 		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
@@ -229,24 +223,15 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 
 bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEvent& DamageEvent, AController* const EventInstigator, AActor* const DamageCauser) const
 {
-	if (!CanBeDamaged())
-		return false;
+	if (!CanBeDamaged()) return false;
+	if (!IsAlive()) return false;
+	if (IsInvincible()) return false;
+	if (FMath::IsNearlyZero(DamageAmount)) return false;
 
-	if (!IsAlive())
-		return false;
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	if (GS->HasMatchEnded()) return false;
 
-	if (IsInvincible())
-		return false;
-
-	if (FMath::IsNearlyZero(DamageAmount))
-		return false;
-
-	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
-		if (!GS->ShouldPlayerTakeDamage(this, DamageAmount, DamageEvent, EventInstigator, DamageCauser))
-			return false;
-
-	if (!EventInstigator)
-		return true;
+	if (!EventInstigator) return true;
 
 	if (const auto InstigatorState = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
 		return DamageAmount > 0 ? GetTeam() != InstigatorState->GetTeam() : GetTeam() == InstigatorState->GetTeam();
@@ -404,14 +389,18 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 	OnKilled();
 }
 
-void ATpsCharacter::SpawnDeathEffects()
+void ATpsCharacter::SpawnDeathEffects() const
 {
 #if !UE_SERVER
 	const auto World = GetWorld();
 	auto Location = GetActorLocation();
 	UGameplayStatics::PlaySoundAtLocation(World, Data->DeathSounds[FMath::RandHelper(Data->DeathSounds.Num())].LoadSynchronous(), Location);
-	UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(), FTransform{ Location }, true, EPSCPoolMethod::AutoRelease)
-		->SetColorParameter(Names::Color, GetColor());
+
+	const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(), FTransform{ Location }, true, EPSCPoolMethod::AutoRelease);
+	PSC->SetColorParameter(Names::Color, GetColor());
+
+	const auto GS = CastChecked<ASaucewichGameState>(World->GetGameState());
+	GS->AddDilatablePSC(PSC);
 
 	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);

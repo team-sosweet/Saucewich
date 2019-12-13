@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Weapon/Weapon.h"
+#include "Saucewich.h"
 #include "Gun.generated.h"
 
 USTRUCT(BlueprintType)
@@ -137,7 +138,6 @@ protected:
 	void OnShoot();
 
 private:
-	void Freeze();
 	void Shoot();
 	void StartFire(int32 RandSeed);
 

@@ -8,11 +8,12 @@
 #include "Player/TpsCharacter.h"
 #include "ShadowComponent.h"
 #include "GameMode/SaucewichGameState.h"
+#include "Names.h"
 
 APickup::APickup()
-	:Collision{CreateDefaultSubobject<USphereComponent>("Collision")},
-	Mesh{CreateDefaultSubobject<UStaticMeshComponent>("Mesh")},
-	Shadow{CreateDefaultSubobject<UShadowComponent>("Shadow")}
+	:Collision{CreateDefaultSubobject<USphereComponent>(Names::Collision)},
+	Mesh{CreateDefaultSubobject<UStaticMeshComponent>(Names::Mesh)},
+	Shadow{CreateDefaultSubobject<UShadowComponent>(Names::Shadow)}
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,13 +24,13 @@ APickup::APickup()
 	Collision->BodyInstance.bLockYRotation = true;
 	Collision->BodyInstance.bLockZRotation = true;
 	Collision->BodyInstance.bSimulatePhysics = true;
-	Collision->BodyInstance.SetCollisionProfileNameDeferred("Pickup");
+	Collision->BodyInstance.SetCollisionProfileNameDeferred(Names::Pickup);
 	
 	Mesh->SetupAttachment(Collision);
-	Mesh->BodyInstance.SetCollisionProfileNameDeferred("NoCollision");
+	Mesh->BodyInstance.SetCollisionProfileNameDeferred(Names::NoCollision);
 	
 	Shadow->SetupAttachment(Mesh);
-	Shadow->SetRelativeScale3D(FVector{Collision->GetScaledSphereRadius() / 50});
+	Shadow->SetRelativeScale3D(FVector{Collision->GetScaledSphereRadius() / 50.f});
 }
 
 void APickup::Freeze()
@@ -40,16 +41,15 @@ void APickup::Freeze()
 void APickup::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
-	GameState->OnFreeze.AddUObject(this, &APickup::Freeze);
+	
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GS->AddDilatableActor(this);
 }
 
 void APickup::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
-	const auto Time = GetGameTimeSinceCreation();
+	Time += DeltaSeconds;
 
 	auto NewLocation = Mesh->GetRelativeLocation();
 	NewLocation.Z = FMath::Sin(Time * BounceSpeed) * BounceScale;

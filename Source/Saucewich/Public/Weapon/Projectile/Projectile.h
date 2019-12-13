@@ -43,8 +43,6 @@ protected:
 	void OnRep_Team() const;
 
 private:
-	void Freeze();
-
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastExplode(const FHitResult& Hit);
 	

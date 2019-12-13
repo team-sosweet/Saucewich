@@ -2,9 +2,8 @@
 
 #include "GameMode/SaucewichGameState.h"
 
-#include "Engine/World.h"
-#include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
 
@@ -39,6 +38,11 @@ TArray<ATpsCharacter*> ASaucewichGameState::GetCharactersByTeam(const uint8 Team
 		if (const auto C = P->GetPawn<ATpsCharacter>()) Characters.Add(C);
 	});
 	return Characters;
+}
+
+ASaucewichGameState::ASaucewichGameState()
+{
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 uint8 ASaucewichGameState::GetMinPlayerTeam() const
@@ -85,12 +89,6 @@ bool ASaucewichGameState::CanAddPersonalScore() const
 	return IsMatchInProgress();
 }
 
-bool ASaucewichGameState::ShouldPlayerTakeDamage(const ATpsCharacter* Victim, float DamageAmount,
-	const FDamageEvent& DamageEvent, const AController* EventInstigator, const AActor* DamageCauser) const
-{
-	return !HasMatchEnded() && GetMatchState() != MatchState::Ending;
-}
-
 float ASaucewichGameState::GetRemainingRoundSeconds() const
 {
 	return IsMatchInProgress() ? FMath::Max(0.f, GetGmData().RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
@@ -100,6 +98,19 @@ void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	TeamScore.AddZeroed(GetGmData().Teams.Num());
+}
+
+void ASaucewichGameState::Tick(const float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (Dilation > KINDA_SMALL_NUMBER)
+	{
+		const auto Duration = ASaucewichGameMode::GetData(this).MatchEndingTime;
+		Dilation = FMath::Max(Dilation - DeltaTime / Duration, KINDA_SMALL_NUMBER);
+		for (const auto Actor : DilatableActors) if (IsValid(Actor)) Actor->CustomTimeDilation = Dilation;
+		for (const auto PSC : DilatablePSCs) if (IsValid(PSC)) PSC->CustomTimeDilation = Dilation;
+	}
 }
 
 void ASaucewichGameState::HandleMatchHasStarted()
@@ -143,8 +154,6 @@ void ASaucewichGameState::HandleMatchHasEnded()
 			UE_LOG(LogGameState, Log, TEXT("Match result: Draw!"));
 		}
 	}
-
-	OnFreeze.Broadcast();
 }
 
 void ASaucewichGameState::HandleLeavingMap()
@@ -159,6 +168,11 @@ void ASaucewichGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(ASaucewichGameState, RoundStartTime);
 	DOREPLIFETIME(ASaucewichGameState, TeamScore);
 	DOREPLIFETIME(ASaucewichGameState, WonTeam);
+}
+
+void ASaucewichGameState::HandleMatchEnding()
+{
+	Dilation = 1.f;
 }
 
 void ASaucewichGameState::OnRep_MatchState()
@@ -228,7 +242,7 @@ const FGameData& ASaucewichGameState::GetGmData() const
 	return CastChecked<ASaucewichGameMode>(GetDefaultGameMode())->GetData();
 }
 
-void ASaucewichGameState::OnRep_WonTeam()
+void ASaucewichGameState::OnRep_WonTeam() const
 {
 	OnMatchEnd.Broadcast(WonTeam);
 }

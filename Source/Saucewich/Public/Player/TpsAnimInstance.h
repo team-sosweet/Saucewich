@@ -10,9 +10,6 @@ class SAUCEWICH_API UTpsAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
-public:
-	void Pause() { PlayRate = 0.f; }
-
 protected:
 	void NativeUpdateAnimation(float DeltaSeconds) override;
 
@@ -24,7 +21,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float AimPitchMul = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float PlayRate = 1.f;
 };

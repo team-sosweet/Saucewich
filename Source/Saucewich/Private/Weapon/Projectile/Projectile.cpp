@@ -16,13 +16,14 @@
 #include "GameMode/SaucewichGameMode.h"
 #include "Player/TpsCharacter.h"
 #include "UserSettings.h"
+#include "Names.h"
 
 AProjectile::AProjectile()
-	: Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))},
-	  Movement{CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Movement"))}
+	: Mesh{CreateDefaultSubobject<UStaticMeshComponent>(Names::Mesh)},
+	  Movement{CreateDefaultSubobject<UProjectileMovementComponent>(Names::Movement)}
 {
 	RootComponent = Mesh;
-	Mesh->SetCollisionProfileName(TEXT("Projectile"));
+	Mesh->SetCollisionProfileName(Names::Projectile);
 }
 
 void AProjectile::ResetSpeed() const
@@ -51,9 +52,9 @@ bool AProjectile::CanExplode(const FHitResult& Hit) const
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const auto GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
-	GameState->OnFreeze.AddUObject(this, &AProjectile::Freeze);
+	
+	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
+	GS->AddDilatableActor(this);
 }
 
 void AProjectile::OnActivated()
@@ -71,11 +72,6 @@ void AProjectile::OnReleased()
 {
 	Movement->SetUpdatedComponent(nullptr);
 	Team = -1;
-}
-
-void AProjectile::Freeze()
-{
-	Movement->SetUpdatedComponent(nullptr);
 }
 
 void AProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -99,13 +95,14 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 		);
 	}
 
-	if (const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(
-		World, ImpactFX.LoadSynchronous(),
-		Location, FRotator::ZeroRotator,
-		true, EPSCPoolMethod::AutoRelease
-	))
+	if (const auto FX = ImpactFX.LoadSynchronous())
 	{
-		PSC->SetColorParameter(TEXT("Color"), GetColor());
+		const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(
+			World, FX, Location, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease
+		);
+		const auto GS = CastChecked<ASaucewichGameState>(World->GetGameState());
+		GS->AddDilatablePSC(PSC);
+		PSC->SetColorParameter(Names::Color, GetColor());
 	}
 
 	if (UUserSettings::Get()->bVibration)
@@ -127,10 +124,10 @@ void AProjectile::OnRep_Team() const
 {
 	if (IsTeamValid())
 	{
-		const auto Idx = Mesh->GetMaterialIndex(TEXT("TeamColor"));
+		const auto Idx = Mesh->GetMaterialIndex(Names::TeamColor);
 		auto Mat = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(Idx));
 		if (!Mat) Mat = Mesh->CreateDynamicMaterialInstance(Idx);
-		Mat->SetVectorParameterValue(TEXT("Color"), GetColor());
+		Mat->SetVectorParameterValue(Names::Color, GetColor());
 	}
 }
 

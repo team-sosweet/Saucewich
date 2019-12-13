@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Saucewich.h"
 #include "TpsCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterSpawn);
@@ -58,7 +59,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	const FLinearColor& GetTeamColor() const;
 
-	void SetColor(const FLinearColor& NewColor);
+	void SetColor(const FLinearColor& NewColor) const;
 
 	// 캐릭터를 죽입니다.
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly)
@@ -125,8 +126,6 @@ protected:
 	float GetArmorRatio() const;
 
 private:
-	void Freeze();
-
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void SetActorActivated(bool bActive);
@@ -134,7 +133,6 @@ private:
 	UFUNCTION()
 	void OnTeamChanged(uint8 NewTeam);
 	void BindOnTeamChanged();
-	void SetColorToTeamColor();
 	int32 GetColIdx() const;
 
 	UFUNCTION()
@@ -143,7 +141,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastKill(ASaucewichPlayerState* Attacker, AActor* Inflictor);
 	void Kill_Internal(ASaucewichPlayerState* Attacker, AActor* Inflictor);
-	void SpawnDeathEffects();
+	void SpawnDeathEffects() const;
 
 	void BeTranslucent();
 	void BeOpaque();

@@ -12,19 +12,20 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Widget/UsersInfo.h"
+#include "Names.h"
 
 void UMakeSandwichResultComponent::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	ResultText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_Result")));
-	MyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_MyTeamScore")));
-	EnemyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_EnemyTeamScore")));
-	MyTeamSandwich = Cast<UImage>(GetWidgetFromName(TEXT("Image_MyTeamSandwich")));
-	EnemyTeamSandwich = Cast<UImage>(GetWidgetFromName(TEXT("Image_EnemyTeamSandwich")));
-	MyTeamResultImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_MyTeamResult")));
-	EnemyTeamResultImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_EnemyTeamResult")));
-	UsersInfo = Cast<UUsersInfo>(GetWidgetFromName(TEXT("UserInfo")));
+	ResultText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_Result")));
+	MyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_MyTeamScore")));
+	EnemyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_EnemyTeamScore")));
+	MyTeamSandwich = Cast<UImage>(GetWidgetFromName(NAME("Image_MyTeamSandwich")));
+	EnemyTeamSandwich = Cast<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamSandwich")));
+	MyTeamResultImage = Cast<UImage>(GetWidgetFromName(NAME("Image_MyTeamResult")));
+	EnemyTeamResultImage = Cast<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamResult")));
+	UsersInfo = Cast<UUsersInfo>(GetWidgetFromName(NAME("UserInfo")));
 	
 	MyTeamSandwichMat =
 		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), SandwichMaterialParent);
@@ -61,15 +62,15 @@ void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 	auto&& EnemyTeamColor = TeamData[EnemyTeam].Color;
 
 	constexpr uint8 Invalid = -1;
-	const auto ResultName = WinningTeam == MyTeam ? TEXT("Win") : WinningTeam == Invalid ? TEXT("Draw") : TEXT("Lose");
-	const auto EnemyResultName = WinningTeam == MyTeam ? TEXT("Lose") : WinningTeam == Invalid ? TEXT("Draw") : TEXT("Win");
+	const auto ResultName = WinningTeam == MyTeam ? Names::Win : WinningTeam == Invalid ? Names::Draw : Names::Lose;
+	const auto EnemyResultName = WinningTeam == MyTeam ? Names::Lose : WinningTeam == Invalid ? Names::Draw : Names::Win;
 	ResultText->SetText(ResultTexts.FindRef(ResultName));
 
 	const auto ResultColor = WinningTeam == Invalid ? (MyTeamColor + EnemyTeamColor) * 0.5f : MyTeamColor;
 	ResultText->SetColorAndOpacity(ResultColor);
 
-	MyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), MyTeamColor);
-	EnemyTeamSandwichMat->SetVectorParameterValue(TEXT("Color"), EnemyTeamColor);
+	MyTeamSandwichMat->SetVectorParameterValue(Names::Color, MyTeamColor);
+	EnemyTeamSandwichMat->SetVectorParameterValue(Names::Color, EnemyTeamColor);
 
 	MyTeamScoreText->SetText(FText::FromString(FString::FromInt(MyTeamScore)));
 	EnemyTeamScoreText->SetText(FText::FromString(FString::FromInt(EnemyTeamScore)));

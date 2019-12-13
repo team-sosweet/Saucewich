@@ -82,6 +82,11 @@ void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player
 	);
 }
 
+void ASaucewichGameMode::HandleMatchEnding()
+{
+	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &AGameMode::EndMatch, Data.MatchEndingTime);
+}
+
 void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);

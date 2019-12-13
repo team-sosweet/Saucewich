@@ -94,4 +94,6 @@ private:
 	// Pickup끼리 겹쳐있을 때 서로 밀어내는 힘의 세기입니다.
 	UPROPERTY(EditAnywhere)
 	float PushStrength = 1000;
+
+	float Time;
 };

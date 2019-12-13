@@ -18,7 +18,7 @@ class SAUCEWICH_API UMakeSandwichResultComponent : public UComponentWidget
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidget(uint8 WinningTeam) const;
-	
+
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TMap<FName, FText> ResultTexts;
