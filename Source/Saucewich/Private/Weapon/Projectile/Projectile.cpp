@@ -24,6 +24,7 @@ AProjectile::AProjectile()
 {
 	RootComponent = Mesh;
 	Mesh->SetCollisionProfileName(Names::Projectile);
+	Mesh->SetGenerateOverlapEvents(true);
 }
 
 void AProjectile::ResetSpeed() const
