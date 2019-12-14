@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TimerManager.h"
 #include "Widget/BaseWidget.h"
 #include "UserHUD.generated.h"
 
@@ -24,11 +23,11 @@ protected:
 	
 private:
 	UFUNCTION()
+	void InitPlayerState(ASaucewichPlayerState* PlayerState);
+	
+	UFUNCTION()
 	ESlateVisibility GetHUDVisibility();
 
-	UFUNCTION()
-	void OnLocalCharacterSpawned(ATpsCharacter* Character);
-	
 	UFUNCTION()
 	void OnOwnerTeamChanged(uint8 NewTeam);
 
@@ -41,22 +40,6 @@ private:
 	UFUNCTION()
 	void OnDeath();
 	
-	template <class Fn>
-	void BindPlayerState(const APawn* InPawn, Fn&& Callback)
-	{
-		if (const auto PS = InPawn->GetPlayerState<ASaucewichPlayerState>())
-		{
-			Callback(PS);
-		}
-		else
-		{
-			GetWorld()->GetTimerManager().SetTimerForNextTick([this, InPawn, Callback]
-				{
-					BindPlayerState(InPawn, Callback);
-				});
-		}
-	}
-
 	UPROPERTY(Transient)
 	ATpsCharacter* OwnerPawn;
 

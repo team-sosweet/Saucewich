@@ -5,37 +5,37 @@
 #include "GameFramework/GameState.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Player/SaucewichPlayerController.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/TpsCharacter.h"
+#include "Player/SaucewichPlayerController.h"
 
 void UUserHUD::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
+
 	VisibilityDelegate.BindDynamic(this, &UUserHUD::GetHUDVisibility);
 	ShowAngleRadian = FMath::DegreesToRadians(ShowAngle * 0.5f);
 }
 
-void UUserHUD::Init(ATpsCharacter* InOwnerPawn)
+void UUserHUD::Init(ATpsCharacter* const InOwnerPawn)
 {
 	OwnerPawn = InOwnerPawn;
 
-	FOnCharacterSpawnedSingle OnCharacterSpawned;
-	OnCharacterSpawned.BindDynamic(this, &UUserHUD::OnLocalCharacterSpawned);
-	
-	const auto LocalPlayer = Cast<ASaucewichPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	LocalPlayer->SafeCharacter(OnCharacterSpawned);
-
 	OwnerPawn->OnCharacterSpawn.AddDynamic(this, &UUserHUD::OnSpawn);
 	OwnerPawn->OnCharacterDeath.AddDynamic(this, &UUserHUD::OnDeath);
-	
-	BindPlayerState(OwnerPawn, [this](ASaucewichPlayerState* PS)
-		{
-			OnInit(PS);
-			PS->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnOwnerTeamChanged);
-			OnOwnerTeamChanged(PS->GetTeam());
-		});
+
+	FOnPlayerStateSpawnedSingle WithPlayerState;
+	WithPlayerState.BindDynamic(this, &UUserHUD::InitPlayerState);
+
+	const auto PC = CastChecked<ASaucewichPlayerController>(GetOwningPlayer());
+	PC->SafePlayerState(WithPlayerState);
+}
+
+void UUserHUD::InitPlayerState(ASaucewichPlayerState* const PlayerState)
+{
+	OnInit(PlayerState);
+	PlayerState->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnOwnerTeamChanged);
+	OnOwnerTeamChanged(PlayerState->GetTeam());
 }
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
@@ -59,13 +59,13 @@ ESlateVisibility UUserHUD::GetHUDVisibility()
 	{
 		return ESlateVisibility::Hidden;
 	}
-	
+
 	const auto LocalDirection = LocalPawn->GetBaseAimRotation().Vector();
 
 	const auto AimAngle = FMath::Atan2(LocalDirection.Y, LocalDirection.X);
 	const auto PosAngle = FMath::Atan2(DistanceVec.Y, DistanceVec.X);
 	const auto Angle = FMath::Abs(AimAngle - PosAngle);
-	
+
 	if (Angle > ShowAngleRadian)
 	{
 		return ESlateVisibility::Hidden;
@@ -80,17 +80,6 @@ ESlateVisibility UUserHUD::GetHUDVisibility()
 	}
 
 	return ESlateVisibility::SelfHitTestInvisible;
-}
-
-void UUserHUD::OnLocalCharacterSpawned(ATpsCharacter* Character)
-{
-	LocalPawn = Character;
-
-	BindPlayerState(LocalPawn, [this](ASaucewichPlayerState* PS)
-		{
-			PS->OnTeamChangedDelegate.AddDynamic(this, &UUserHUD::OnLocalTeamChanged);
-			OnLocalTeamChanged(PS->GetTeam());
-		});
 }
 
 void UUserHUD::OnOwnerTeamChanged(const uint8 NewTeam)
