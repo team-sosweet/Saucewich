@@ -116,7 +116,8 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 		);
 	}
 
-	ASauceMarker::Add(Team, GetSauceMarkScale(), Hit, this);
+	if (bSauceMark)
+		ASauceMarker::Add(Team, GetSauceMarkScale(), Hit, this);
 #endif
 
 	Release();

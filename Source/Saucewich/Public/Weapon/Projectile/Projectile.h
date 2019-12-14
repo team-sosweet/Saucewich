@@ -66,4 +66,7 @@ private:
 
 	UPROPERTY(Transient, ReplicatedUsing=OnRep_Team, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team = -1;
+
+	UPROPERTY(EditDefaultsOnly)
+	uint8 bSauceMark : 1;
 };
