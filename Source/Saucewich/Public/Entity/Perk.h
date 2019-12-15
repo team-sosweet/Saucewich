@@ -11,10 +11,15 @@ class SAUCEWICH_API APerk : public APickup
 	GENERATED_BODY()
 
 public:
+	APerk();
+	
 	float GetDuration() const { return Duration; }
 	auto GetParticle() const { return Particle; }
 	
 private:
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Highlight;
+	
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* Particle;
 	

@@ -27,6 +27,7 @@ public:
 	APickup();
 
 	UTexture* GetIcon() const { return Icon; }
+	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	
 	uint8 bSpawnedFromSpawner : 1;
 
