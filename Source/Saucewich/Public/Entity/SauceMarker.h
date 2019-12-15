@@ -27,6 +27,9 @@ public:
 	static void Add(uint8 Team, float Scale, const FHitResult& Hit, const AActor* Ignore);
 	static void Add(const AActor* Owner, uint8 Team, const FVector& Location, float Scale = 1.f);
 
+	UFUNCTION(BlueprintCallable, meta=(WorldContext=WorldContext))
+	static void CleanupSauceMark(const UObject* WorldContext, const FVector& Origin, float Radius, ECollisionChannel Channel);
+
 protected:
 	void BeginPlay() override;
 

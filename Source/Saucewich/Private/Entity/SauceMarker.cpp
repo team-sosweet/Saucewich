@@ -95,6 +95,38 @@ void ASauceMarker::Add(const AActor* const Owner, const uint8 Team, const FVecto
 #endif
 }
 
+void ASauceMarker::CleanupSauceMark(const UObject* const WorldContext, const FVector& Origin, const float Radius, const ECollisionChannel Channel)
+{
+	const auto World = WorldContext->GetWorld();
+	const auto Shape = FCollisionShape::MakeSphere(Radius);
+	
+	TArray<FHitResult> Hits;
+	if (!World->SweepMultiByChannel(Hits, Origin, Origin, FQuat::Identity, Channel, Shape)) return;
+	
+	TMap<UInstancedStaticMeshComponent*, TArray<int32>> Indices;
+	for (const auto& Hit : Hits)
+	{
+		const auto Comp = Cast<UInstancedStaticMeshComponent>(Hit.GetComponent());
+		if (Comp && !World->LineTraceTestByChannel(Origin, Hit.ImpactPoint, ECC_Visibility))
+		{
+			Indices.FindOrAdd(Comp).Add(Hit.Item);
+		}
+	}
+	
+	for (auto& Pair : Indices)
+	{
+		const auto Comp = Pair.Key;
+		auto& Arr = Pair.Value;
+		Arr.Sort();
+		
+		for (auto i=0; i<Arr.Num(); ++i)
+		{
+			const auto bSucceeded = Comp->RemoveInstance(Arr[i] - i);
+			ensure(bSucceeded);
+		}
+	}
+}
+
 void ASauceMarker::BeginPlay()
 {
 	Super::BeginPlay();
