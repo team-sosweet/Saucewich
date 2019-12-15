@@ -64,7 +64,13 @@ void AGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProp
 
 void AGun::Shoot()
 {
-	if (!CanFire()) return;
+	if (!CanFire())
+	{
+#if !UE_SERVER
+		FirePSC->Deactivate();
+#endif
+		return;
+	}
 
 	auto&& Data = GetGunData();
 
