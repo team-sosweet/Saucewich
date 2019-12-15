@@ -18,12 +18,14 @@
 #include "Names.h"
 
 AGun::AGun()
-	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>(Names::FirePSC)}
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+#if !UE_SERVER
+	FirePSC = CreateDefaultSubobject<UParticleSystemComponent>(Names::FirePSC);
 	FirePSC->SetupAttachment(GetMesh(), Names::Muzzle);
 	FirePSC->bAutoActivate = false;
+#endif
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -38,11 +40,14 @@ void AGun::Tick(const float DeltaSeconds)
 			Shoot();
 		}
 	}
+#if !UE_SERVER
+	else
+	{
+		FirePSC->Deactivate();
+	}
+#endif
 	FireLag += DeltaSeconds;
 	if (!bFiring && FireLag > Delay) FireLag = Delay;
-
-	if (bFiring && CanFire()) FirePSC->Activate();
-	else FirePSC->Deactivate();
 	
 	Reload(DeltaSeconds);
 }
@@ -151,6 +156,8 @@ void AGun::Shoot()
 
 		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);
 	}
+
+	FirePSC->Activate();
 #endif
 
 	OnShoot();
@@ -228,11 +235,14 @@ void AGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FirePSC->SetFloatParameter(Names::RPM, GetData<FGunData>().Rpm);
 
 	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
 	GS->AddDilatableActor(this);
+
+#if !UE_SERVER
 	GS->AddDilatablePSC(FirePSC);
+	FirePSC->SetFloatParameter(Names::RPM, GetData<FGunData>().Rpm);
+#endif
 }
 
 void AGun::FireP()
