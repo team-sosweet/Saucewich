@@ -183,6 +183,8 @@ void ASaucewichGameState::OnRep_MatchState()
 	{
 		HandleMatchEnding();
 	}
+
+	OnMatchStateChanged.Broadcast(GetMatchState());
 }
 
 void ASaucewichGameState::MulticastPlayerDeath_Implementation(

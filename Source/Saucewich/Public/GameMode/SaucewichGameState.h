@@ -15,6 +15,7 @@ struct FGameData;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerChangedTeam, ASaucewichPlayerState*, Player, uint8, OldTeam, uint8, NewTeam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPlayerDeath, ASaucewichPlayerState*, Victim, ASaucewichPlayerState*, Attacker, AActor*, Inflictor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchEnd, uint8, WonTeam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMatchStateChanged, FName, NewMatchState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeavingMap);
 DECLARE_EVENT(ASaucewichGameState, FOnCleanupGame)
 
@@ -96,14 +97,17 @@ private:
 	UFUNCTION()
 	void OnRep_WonTeam() const;
 
+	UPROPERTY(Transient)
+	TSet<UParticleSystemComponent*> DilatablePSCs;
+
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	TArray<int32> TeamScore;
 
 	UPROPERTY(Transient)
 	TArray<AActor*> DilatableActors;
 
-	UPROPERTY(Transient)
-	TSet<UParticleSystemComponent*> DilatablePSCs;
+	UPROPERTY(BlueprintAssignable)
+	FOnMatchStateChanged OnMatchStateChanged;
 
 	FTimerHandle RoundTimer;
 	
