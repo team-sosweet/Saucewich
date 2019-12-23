@@ -292,7 +292,10 @@ void AGun::OnReleased()
 void AGun::SetColor(const FLinearColor& NewColor)
 {
 	Super::SetColor(NewColor);
+	
+#if !UE_SERVER
 	FirePSC->SetColorParameter(Names::Color, NewColor);
+#endif
 }
 
 void AGun::StartFire(const int32 RandSeed)

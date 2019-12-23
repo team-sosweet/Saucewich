@@ -40,8 +40,8 @@ void UUserHUD::InitPlayerState(ASaucewichPlayerState* const PlayerState)
 
 ESlateVisibility UUserHUD::GetHUDVisibility()
 {
-	const auto GS = CastChecked<AGameState>(GetWorld()->GetGameState());
-	if (!GS->IsMatchInProgress() || !OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
+	const auto GS = CastChecked<AGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed);
+	if (!GS || !GS->IsMatchInProgress() || !OwnerPawn || !LocalPawn || OwnerPawn == LocalPawn || IsDead)
 	{
 		return ESlateVisibility::Hidden;
 	}
