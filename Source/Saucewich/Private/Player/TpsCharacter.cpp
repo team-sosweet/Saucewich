@@ -144,9 +144,6 @@ void ATpsCharacter::OnControllerChanged()
 	{
 		const auto PC = CastChecked<ASaucewichPlayerController>(Ctrl);
 		ASaucewichPlayerController::BroadcastCharacterSpawned(PC, this);
-
-		if (Ctrl->IsLocalController()) BeTranslucent();
-		else BeOpaque();
 	}
 }
 
