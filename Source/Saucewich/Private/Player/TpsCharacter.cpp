@@ -242,8 +242,8 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	const auto GS = GetWorld()->GetGameState();
 	if (!GS) return false;
 
-	const auto SwGS = CastChecked<AGameState>(GS);
-	if (SwGS->HasMatchEnded()) return false;
+	const auto GS2 = CastChecked<AGameState>(GS);
+	if (GS2->HasMatchEnded()) return false;
 
 	if (!EventInstigator) return true;
 

@@ -103,5 +103,6 @@ private:
 	BroadcastCharacterSpawned(ASaucewichPlayerController* Controller, ATpsCharacter* Character)
 	{
 		Controller->OnCharacterSpawned.Broadcast(Character);
+		Controller->OnCharacterSpawned.Clear();
 	}
 };
