@@ -239,8 +239,11 @@ bool ATpsCharacter::ShouldTakeDamage(const float DamageAmount, const FDamageEven
 	if (IsInvincible()) return false;
 	if (FMath::IsNearlyZero(DamageAmount)) return false;
 
-	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
-	if (GS->HasMatchEnded()) return false;
+	const auto GS = GetWorld()->GetGameState();
+	if (!GS) return false;
+
+	const auto SwGS = CastChecked<AGameState>(GS);
+	if (SwGS->HasMatchEnded()) return false;
 
 	if (!EventInstigator) return true;
 
