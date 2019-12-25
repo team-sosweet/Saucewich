@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widget/BaseWidget.h"
+#include "Widget/CompositeWidget.h"
 #include "ResultWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UResultWidget : public UBaseWidget
+class SAUCEWICH_API UResultWidget : public UCompositeWidget
 {
 	GENERATED_BODY()
 	

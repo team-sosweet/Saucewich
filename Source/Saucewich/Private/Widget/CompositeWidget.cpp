@@ -1,20 +1,20 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
-#include "Widget/BaseWidget.h"
+#include "Widget/CompositeWidget.h"
 
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 
 #include "Widget/ComponentWidget.h"
 
-void UBaseWidget::NativeOnInitialized()
+void UCompositeWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	
 	RootPanel = Cast<UCanvasPanel>(GetWidgetFromName(TEXT("Root")));
 }
 
-void UBaseWidget::SetComponent(const TSubclassOf<UComponentWidget> ComponentClass)
+void UCompositeWidget::SetComponent(const TSubclassOf<UComponentWidget> ComponentClass)
 {
 	if (!ComponentClass)
 		return;

@@ -2,9 +2,7 @@
 
 #include "Widget/ComponentWidget.h"
 
-#include "Widget/BaseWidget.h"
-
-void UComponentWidget::Init(UBaseWidget* InOwnerWidget)
+void UComponentWidget::Init(UCompositeWidget* InOwnerWidget)
 {
 	OwnerWidget = InOwnerWidget;
 }

@@ -11,9 +11,9 @@ class SAUCEWICH_API UComponentWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void Init(class UBaseWidget* InOwnerWidget);
+	void Init(class UCompositeWidget* InOwnerWidget);
 	
 private:
 	UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	UBaseWidget* OwnerWidget;
+	UCompositeWidget* OwnerWidget;
 };

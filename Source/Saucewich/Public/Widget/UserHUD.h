@@ -3,11 +3,11 @@
 #pragma once
 
 #include "TimerManager.h"
-#include "Widget/BaseWidget.h"
+#include "Widget/CompositeWidget.h"
 #include "UserHUD.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UUserHUD : public UBaseWidget
+class SAUCEWICH_API UUserHUD : public UCompositeWidget
 {
 	GENERATED_BODY()
 

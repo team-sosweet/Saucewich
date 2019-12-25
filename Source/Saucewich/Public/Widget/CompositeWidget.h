@@ -3,10 +3,10 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "BaseWidget.generated.h"
+#include "CompositeWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UBaseWidget : public UUserWidget
+class SAUCEWICH_API UCompositeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

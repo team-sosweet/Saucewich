@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Widget/BaseWidget.h"
+#include "Widget/CompositeWidget.h"
 #include "AliveWidget.generated.h"
 
 enum class EMsgType : uint8;
 class UFeedBox;
 
 UCLASS()
-class SAUCEWICH_API UAliveWidget : public UBaseWidget
+class SAUCEWICH_API UAliveWidget : public UCompositeWidget
 {
 	GENERATED_BODY()
 
