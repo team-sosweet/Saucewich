@@ -35,7 +35,7 @@ void UBaseWidget::NativeDestruct()
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (bIsFocusable)
+	if (bCloseable)
 	{
 		const auto InputSettings = GetDefault<UInputSettings>();
 		TArray<FInputActionKeyMapping> Mappings;

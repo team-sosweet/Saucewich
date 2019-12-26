@@ -14,4 +14,8 @@ protected:
 	void NativeConstruct() override;
 	void NativeDestruct() override;
 	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+private:
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	uint8 bCloseable : 1;
 };
