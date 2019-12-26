@@ -1,27 +1,23 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
 #include "BaseHUD.h"
-
 #include "Widget/ErrorWidget.h"
-
-#include "Saucewich.h"
 
 void ABaseHUD::BeginPlay()
 {
-	Super::BeginPlay();
+	ErrorWidget = CreateWidget<UErrorWidget>(GetOwningPlayerController(), ErrorWidgetClass.LoadSynchronous());
+	MenuWidget = CreateWidget<UBaseWidget>(GetOwningPlayerController(), MenuWidgetClass.LoadSynchronous());
 
-	ErrorWidget = CreateWidget<UErrorWidget>(GetOwningPlayerController(), ErrorWidgetClass);
+	Super::BeginPlay();
 }
 
 void ABaseHUD::ShowError(const FText Message, const bool bCritical)
 {
-	if (ErrorWidget)
-	{
-		ErrorWidget->Activate(Message, bCritical);
-		OnShowError();
-	}
-	else
-	{
-		UE_LOG(LogSaucewich, Error, TEXT("ABaseHUD::ShowError called before BeginPlay. It'll be ignored."));
-	}
+	ErrorWidget->Activate(Message, bCritical);
+	OnShowError();
+}
+
+void ABaseHUD::OpenMenu() const
+{
+	MenuWidget->AddToViewport(2);
 }

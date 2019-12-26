@@ -2,20 +2,21 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "BaseWidget.h"
 #include "ErrorWidget.generated.h"
 
 UCLASS()
-class SAUCEWICH_API UErrorWidget : public UUserWidget
+class SAUCEWICH_API UErrorWidget : public UBaseWidget
 {
 	GENERATED_BODY()
 
-	void NativeOnInitialized() override;
-	
 public:
+	UErrorWidget();
 	void Activate(const FText& Message, bool bCritical);
 
+protected:
+	void NativeOnInitialized() override;
+	
 private:
 	UFUNCTION()
 	void OnClicked();

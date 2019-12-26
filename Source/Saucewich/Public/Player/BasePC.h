@@ -14,7 +14,12 @@ public:
 	void AddFocusedWidget(class UWidget* Widget);
 	void RemoveFocusedWidget(UWidget* Widget);
 
+protected:
+	void SetupInputComponent() override;
+
 private:
+	void OpenMenu();
+	
 	UPROPERTY(Transient)
-	TArray<UWidget*> FocusedWidgets;
+	TArray<TWeakObjectPtr<UWidget>> FocusedWidgets;
 };

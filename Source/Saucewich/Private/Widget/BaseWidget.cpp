@@ -5,6 +5,7 @@
 #include "GameFramework/InputSettings.h"
 #include "Names.h"
 #include "Player/BasePC.h"
+#include "BaseHUD.h"
 
 void UBaseWidget::NativeConstruct()
 {
@@ -18,6 +19,8 @@ void UBaseWidget::NativeConstruct()
 			SetFocus();
 		}
 	}
+
+	OnConstruct.Broadcast();
 }
 
 void UBaseWidget::NativeDestruct()
@@ -37,21 +40,28 @@ void UBaseWidget::NativeDestruct()
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	const auto PressedKey = InKeyEvent.GetKey();
+	const auto InputSettings = GetDefault<UInputSettings>();
+	const auto IsInputAction = [&](const FName ActionName)
+	{
+		TArray<FInputActionKeyMapping> Mappings;
+		InputSettings->GetActionMappingByName(ActionName, Mappings);
+		return std::any_of(Mappings.begin(), Mappings.end(), [&](const FInputActionKeyMapping& Mapping)
+		{
+			return Mapping.Key == PressedKey;
+		});
+	};
+
 	if (bIsCloseable)
 	{
-		const auto InputSettings = GetDefault<UInputSettings>();
-		TArray<FInputActionKeyMapping> Mappings;
-		InputSettings->GetActionMappingByName(NAME("Close"), Mappings);
-		
-		const auto bClose = std::any_of(Mappings.begin(), Mappings.end(), [&](const FInputActionKeyMapping& Mapping)
-		{
-			return Mapping.Key == InKeyEvent.GetKey();
-		});
-
-		if (bClose)
+		if (IsInputAction(NAME("Close")))
 		{
 			RemoveFromParent();
 		}
+	}
+	else if (IsInputAction(NAME("Menu")))
+	{
+		CastChecked<ABaseHUD>(GetOwningPlayer()->GetHUD())->OpenMenu();
 	}
 	
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);

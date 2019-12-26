@@ -5,7 +5,6 @@
 #include "Engine/World.h"
 
 #include "GameMode/SaucewichGameMode.h"
-#include "GameMode/SaucewichGameState.h"
 #include "Player/SaucewichPlayerState.h"
 #include "Player/SaucewichPlayerController.h"
 

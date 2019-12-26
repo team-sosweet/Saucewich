@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BaseWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnConstruct);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestruct);
 
 UCLASS()
@@ -22,6 +23,9 @@ protected:
 	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 private:
+	UPROPERTY(BlueprintAssignable)
+	FOnConstruct OnConstruct;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnDestruct OnDestruct;
 };

@@ -15,6 +15,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ShowError(FText Message, bool bCritical);
 
+	UFUNCTION(BlueprintCallable)
+	void OpenMenu() const;
+
 protected:
 	void BeginPlay() override;
 
@@ -23,8 +26,14 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UErrorWidget> ErrorWidgetClass;
+	TSoftClassPtr<class UErrorWidget> ErrorWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSoftClassPtr<class UBaseWidget> MenuWidgetClass;
 
 	UPROPERTY(Transient)
 	UErrorWidget* ErrorWidget;
+
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UBaseWidget* MenuWidget;
 };

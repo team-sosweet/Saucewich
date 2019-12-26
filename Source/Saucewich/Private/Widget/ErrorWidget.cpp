@@ -4,15 +4,12 @@
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Names.h"
 
-void UErrorWidget::NativeOnInitialized()
+UErrorWidget::UErrorWidget()
 {
-	Super::NativeOnInitialized();
-
-	DescriptionText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Text_Description")));
-	BackgroundButton = Cast<UButton>(GetWidgetFromName(TEXT("Button_Background")));
-
-	BackgroundButton->OnClicked.AddDynamic(this, &UErrorWidget::OnClicked);
+	bIsCloseable = true;
+	bIsFocusable = true;
 }
 
 void UErrorWidget::Activate(const FText& Message, const bool bCritical)
@@ -20,6 +17,16 @@ void UErrorWidget::Activate(const FText& Message, const bool bCritical)
 	bCriticalError = bCritical;
 	DescriptionText->SetText(Message);
 	AddToViewport(10);
+}
+
+void UErrorWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	DescriptionText = CastChecked<UTextBlock>(GetWidgetFromName(NAME("Text_Description")));
+	BackgroundButton = CastChecked<UButton>(GetWidgetFromName(NAME("Button_Background")));
+
+	BackgroundButton->OnClicked.AddDynamic(this, &UErrorWidget::OnClicked);
 }
 
 void UErrorWidget::OnClicked()
