@@ -18,13 +18,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OpenMenu() const;
 
-protected:
+	void AddFocusedWidget(class UWidget* Widget);
+	void RemoveFocusedWidget(UWidget* Widget);
+
+	protected:
 	void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnShowError();
 
 private:
+	UPROPERTY(Transient, VisibleInstanceOnly)
+	TArray<TWeakObjectPtr<UWidget>> FocusedWidgets;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TSoftClassPtr<class UErrorWidget> ErrorWidgetClass;
 

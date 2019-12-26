@@ -404,3 +404,5 @@ void ASaucewichGameMode::StartNextGame() const
 	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
 }
+
+#undef LOCTEXT_NAMESPACE

@@ -10,16 +10,9 @@ class SAUCEWICH_API ABasePC : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
-	void AddFocusedWidget(class UWidget* Widget);
-	void RemoveFocusedWidget(UWidget* Widget);
-
 protected:
 	void SetupInputComponent() override;
 
 private:
 	void OpenMenu();
-	
-	UPROPERTY(Transient, VisibleInstanceOnly)
-	TArray<TWeakObjectPtr<UWidget>> FocusedWidgets;
 };

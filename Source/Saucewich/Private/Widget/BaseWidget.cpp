@@ -1,11 +1,10 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
 #include "Widget/BaseWidget.h"
-#include <algorithm>
 #include "GameFramework/InputSettings.h"
 #include "Names.h"
 #include "Player/BasePC.h"
-#include "BaseHUD.h"
+#include "Player/BaseHUD.h"
 #include "Saucewich.h"
 
 void UBaseWidget::NativeConstruct()
@@ -16,7 +15,7 @@ void UBaseWidget::NativeConstruct()
 	{
 		if (const auto PC = GetOwningPlayer())
 		{
-			CastChecked<ABasePC>(PC)->AddFocusedWidget(this);
+			CastChecked<ABaseHUD>(PC->GetHUD())->AddFocusedWidget(this);
 			SetFocus();
 		}
 	}
@@ -32,7 +31,7 @@ void UBaseWidget::NativeDestruct()
 	{
 		if (const auto PC = GetOwningPlayer())
 		{
-			CastChecked<ABasePC>(PC)->RemoveFocusedWidget(this);
+			CastChecked<ABaseHUD>(PC->GetHUD())->RemoveFocusedWidget(this);
 		}
 	}
 

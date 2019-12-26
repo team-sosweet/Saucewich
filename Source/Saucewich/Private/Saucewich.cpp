@@ -2,6 +2,8 @@
 
 #include "Saucewich.h"
 
+#include "GameLiftServerSDK.h"
+
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 #include "Http.h"
@@ -9,8 +11,6 @@
 #include "JsonObjectConverter.h"
 #include "HttpManager.h"
 #include "GameFramework/InputSettings.h"
-
-#include "GameLiftServerSDK.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
@@ -28,10 +28,12 @@ bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEv
 	const auto PressedKey = KeyEvent.GetKey();
 	TArray<FInputActionKeyMapping> Mappings;
 	GetDefault<UInputSettings>()->GetActionMappingByName(ActionName, Mappings);
-	return std::any_of(Mappings.begin(), Mappings.end(), [&](const FInputActionKeyMapping& Mapping)
-	{
-		return Mapping.Key == PressedKey;
-	});
+
+	for (auto&& Mapping : Mappings)
+		if (Mapping.Key == PressedKey)
+			return true;
+	
+	return false;
 }
 
 void USaucewich::SearchSession(const FSearchSessionResponse& Callback)
