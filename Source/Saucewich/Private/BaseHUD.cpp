@@ -19,5 +19,6 @@ void ABaseHUD::ShowError(const FText Message, const bool bCritical)
 
 void ABaseHUD::OpenMenu() const
 {
-	MenuWidget->AddToViewport(2);
+	if (!MenuWidget->IsInViewport())
+		MenuWidget->AddToViewport(2);
 }

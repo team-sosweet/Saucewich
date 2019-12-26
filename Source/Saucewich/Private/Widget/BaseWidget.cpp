@@ -6,6 +6,7 @@
 #include "Names.h"
 #include "Player/BasePC.h"
 #include "BaseHUD.h"
+#include "Saucewich.h"
 
 void UBaseWidget::NativeConstruct()
 {
@@ -40,26 +41,14 @@ void UBaseWidget::NativeDestruct()
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	const auto PressedKey = InKeyEvent.GetKey();
-	const auto InputSettings = GetDefault<UInputSettings>();
-	const auto IsInputAction = [&](const FName ActionName)
-	{
-		TArray<FInputActionKeyMapping> Mappings;
-		InputSettings->GetActionMappingByName(ActionName, Mappings);
-		return std::any_of(Mappings.begin(), Mappings.end(), [&](const FInputActionKeyMapping& Mapping)
-		{
-			return Mapping.Key == PressedKey;
-		});
-	};
-
 	if (bIsCloseable)
 	{
-		if (IsInputAction(NAME("Close")))
+		if (USaucewich::CheckInputAction(NAME("Close"), InKeyEvent))
 		{
 			RemoveFromParent();
 		}
 	}
-	else if (IsInputAction(NAME("Menu")))
+	else if (USaucewich::CheckInputAction(NAME("Menu"), InKeyEvent))
 	{
 		CastChecked<ABaseHUD>(GetOwningPlayer()->GetHUD())->OpenMenu();
 	}

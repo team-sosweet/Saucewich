@@ -20,6 +20,6 @@ protected:
 private:
 	void OpenMenu();
 	
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, VisibleInstanceOnly)
 	TArray<TWeakObjectPtr<UWidget>> FocusedWidgets;
 };

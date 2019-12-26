@@ -8,6 +8,7 @@
 #include "Json.h"
 #include "JsonObjectConverter.h"
 #include "HttpManager.h"
+#include "GameFramework/InputSettings.h"
 
 #include "GameLiftServerSDK.h"
 
@@ -20,6 +21,17 @@ FGameLiftServerSDKModule& USaucewich::GetGameLift()
 {
 	static auto&& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
 	return Module;
+}
+
+bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEvent)
+{
+	const auto PressedKey = KeyEvent.GetKey();
+	TArray<FInputActionKeyMapping> Mappings;
+	GetDefault<UInputSettings>()->GetActionMappingByName(ActionName, Mappings);
+	return std::any_of(Mappings.begin(), Mappings.end(), [&](const FInputActionKeyMapping& Mapping)
+	{
+		return Mapping.Key == PressedKey;
+	});
 }
 
 void USaucewich::SearchSession(const FSearchSessionResponse& Callback)

@@ -40,6 +40,9 @@ class SAUCEWICH_API USaucewich : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure)
+	static bool CheckInputAction(FName ActionName, const struct FKeyEvent& KeyEvent);
+	
 	UFUNCTION(BlueprintCallable)
 	static void SearchSession(const FSearchSessionResponse& Callback);
 	
