@@ -15,6 +15,7 @@ void UBaseWidget::NativeConstruct()
 		if (const auto PC = GetOwningPlayer())
 		{
 			CastChecked<ABasePC>(PC)->AddFocusedWidget(this);
+			SetFocus();
 		}
 	}
 }

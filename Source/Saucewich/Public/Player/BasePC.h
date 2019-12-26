@@ -12,9 +12,9 @@ class SAUCEWICH_API ABasePC : public APlayerController
 
 public:
 	void AddFocusedWidget(class UWidget* Widget);
-	void RemoveFocusedWidget(class UWidget* Widget);
+	void RemoveFocusedWidget(UWidget* Widget);
 
 private:
 	UPROPERTY(Transient)
-	TSet<class UWidget*> FocusedWidgets;
+	TArray<UWidget*> FocusedWidgets;
 };
