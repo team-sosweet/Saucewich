@@ -4,15 +4,32 @@
 #include <algorithm>
 #include "GameFramework/InputSettings.h"
 #include "Names.h"
+#include "Player/BasePC.h"
 
 void UBaseWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
+	if (bIsFocusable)
+	{
+		if (const auto PC = GetOwningPlayer())
+		{
+			CastChecked<ABasePC>(PC)->AddFocusedWidget(this);
+		}
+	}
 }
 
 void UBaseWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+
+	if (bIsFocusable)
+	{
+		if (const auto PC = GetOwningPlayer())
+		{
+			CastChecked<ABasePC>(PC)->RemoveFocusedWidget(this);
+		}
+	}
 }
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

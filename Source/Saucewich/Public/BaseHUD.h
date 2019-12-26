@@ -6,8 +6,6 @@
 #include "UObject/TextProperty.h"
 #include "BaseHUD.generated.h"
 
-class UTextProperty;
-
 UCLASS()
 class SAUCEWICH_API ABaseHUD : public AHUD
 {

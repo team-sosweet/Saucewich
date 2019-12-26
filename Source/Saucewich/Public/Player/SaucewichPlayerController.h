@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameFramework/PlayerController.h"
+#include "Player/BasePC.h"
 #include "Saucewich.h"
 #include "SaucewichPlayerController.generated.h"
 
@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveMessage, const FText&, Message, float, Duration, EMsgType, Type);
 
 UCLASS()
-class SAUCEWICH_API ASaucewichPlayerController : public APlayerController
+class SAUCEWICH_API ASaucewichPlayerController : public ABasePC
 {
 	GENERATED_BODY()
 
