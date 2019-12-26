@@ -21,7 +21,7 @@ public:
 	void AddFocusedWidget(class UWidget* Widget);
 	void RemoveFocusedWidget(UWidget* Widget);
 
-	protected:
+protected:
 	void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
