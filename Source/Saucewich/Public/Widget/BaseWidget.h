@@ -5,10 +5,16 @@
 #include "Blueprint/UserWidget.h"
 #include "BaseWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestruct);
+
 UCLASS()
 class SAUCEWICH_API UBaseWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite)
+	uint8 bIsCloseable : 1;
 
 protected:
 	void NativeConstruct() override;
@@ -16,6 +22,6 @@ protected:
 	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Interaction")
-	uint8 bCloseable : 1;
+	UPROPERTY(BlueprintAssignable)
+	FOnDestruct OnDestruct;
 };

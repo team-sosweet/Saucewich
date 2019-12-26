@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "UsersInfo.generated.h"
 
@@ -11,12 +10,14 @@ class SAUCEWICH_API UUsersInfo : public UUserWidget
 {
 	GENERATED_BODY()
 
-	void NativeOnInitialized() override;
-
 public:
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Update Info"))
+	UFUNCTION(BlueprintCallable)
 	void UpdateInfo();
-	
+
+protected:
+	void NativeOnInitialized() override;
+	void NativeConstruct() override;
+
 private:
 	UPROPERTY(Transient)
 	TArray<class UUserInfo*> UserInfos;

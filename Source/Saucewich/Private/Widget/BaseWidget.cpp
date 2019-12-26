@@ -31,11 +31,13 @@ void UBaseWidget::NativeDestruct()
 			CastChecked<ABasePC>(PC)->RemoveFocusedWidget(this);
 		}
 	}
+
+	OnDestruct.Broadcast();
 }
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (bCloseable)
+	if (bIsCloseable)
 	{
 		const auto InputSettings = GetDefault<UInputSettings>();
 		TArray<FInputActionKeyMapping> Mappings;
