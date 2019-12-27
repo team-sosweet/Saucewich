@@ -8,6 +8,7 @@
 #include "GameFramework/Pawn.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include "Player/SaucewichPlayerController.h"
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "GameMode/SaucewichGameMode.h"
 #include "Names.h"
@@ -35,26 +36,16 @@ void AFridge::BeginPlay()
 	auto&& Color = ASaucewichGameMode::GetData(this).Teams[Team].Color;
 	Mat->SetVectorParameterValue(Names::Color, Color);
 
-	CastChecked<UFridgeHUD>(HUD->GetUserWidgetObject())->Init(Team);
-}
-
-
 #if !UE_SERVER
-
-void AFridge::Tick(const float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (const auto Pawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+	if (!IsNetMode(NM_DedicatedServer))
 	{
-		const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
-		const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
-		HUD->SetDrawSize({Size, Size});
+		GetHUD()->Init(Team);
+		
+		const auto PC = CastChecked<ASaucewichPlayerController>(GetWorld()->GetFirstPlayerController());
+		PC->SafePS(FOnPSSpawnedNative::FDelegate::CreateUObject(this, &AFridge::BindPS));
 	}
+#endif 
 }
-
-#endif
-
 
 void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
 	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
@@ -72,3 +63,58 @@ void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, 
 	Player->PutIngredientsInFridge();
 }
 
+
+#if !UE_SERVER
+
+void AFridge::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (!IsNetMode(NM_DedicatedServer))
+	{
+		if (const auto Pawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+		{
+			const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
+			const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
+			HUD->SetDrawSize({Size, Size});
+		}
+	}
+}
+
+UFridgeHUD* AFridge::GetHUD() const
+{
+	return CastChecked<UFridgeHUD>(HUD->GetUserWidgetObject());
+}
+
+void AFridge::BindPS(ASaucewichPlayerState* const InPS)
+{
+	LocalPS = CastChecked<AMakeSandwichPlayerState>(InPS);
+	InPS->BindOnTeamChanged(FOnTeamChangedNative::FDelegate::CreateUObject(this, &AFridge::OnPlyTeamChanged));
+}
+
+void AFridge::OnPlyTeamChanged(const uint8 NewTeam)
+{
+	if (NewTeam == Team)
+	{
+		OnIngChangedHandle = LocalPS->OnIngChangedNative.AddUObject(this, &AFridge::OnIngChanged);
+	}
+	else
+	{
+		SetHighlighted(false);
+		LocalPS->OnIngChangedNative.Remove(OnIngChangedHandle);
+	}
+}
+
+void AFridge::OnIngChanged(AMakeSandwichPlayerState* const InPS) const
+{
+	SetHighlighted(InPS->GetNumIngredients() > 0);
+}
+
+void AFridge::SetHighlighted(const bool bHighlight) const
+{
+	GetHUD()->SetHighlighted(bHighlight);
+	Mesh->SetRenderCustomDepth(bHighlight);
+}
+
+
+#endif

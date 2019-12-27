@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "Fridge.generated.h"
 
 UCLASS()
@@ -23,12 +24,23 @@ protected:
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	
 private:
+#if !UE_SERVER
+	class UFridgeHUD* GetHUD() const;
+	void BindPS(class ASaucewichPlayerState* InPS);
+	void OnPlyTeamChanged(uint8 NewTeam);
+	void OnIngChanged(class AMakeSandwichPlayerState* InPS) const;
+	void SetHighlighted(bool bHighlight) const;
+	
+	AMakeSandwichPlayerState* LocalPS;
+	FDelegateHandle OnIngChangedHandle;
+#endif
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere)
 	class UWidgetComponent* HUD;
-	
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team;
 };

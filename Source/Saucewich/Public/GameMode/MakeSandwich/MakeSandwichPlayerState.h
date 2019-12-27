@@ -8,6 +8,7 @@
 class ASandwichIngredient;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerIngredientChanged, class AMakeSandwichPlayerState*, PlayerState);
+DECLARE_EVENT_OneParam(AMakeSandwichPlayerState, FOnPlyIngChangedNative, AMakeSandwichPlayerState*)
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FIngredients
@@ -48,7 +49,7 @@ public:
 	void PickupIngredient(TSubclassOf<ASandwichIngredient> Class);
 
 	void PutIngredientsInFridge();
-	void BroadcastIngredientChanged() { OnIngredientChanged.Broadcast(this); }
+	void BroadcastIngredientChanged();
 	auto& GetIngredients() const { return Ingredients.Get(); }
 
 	UFUNCTION(BlueprintCallable)
@@ -57,6 +58,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CanPickupIngredient() const;
 
+	FOnPlyIngChangedNative OnIngChangedNative;
 	ASandwichIngredient* PickingUp;
 
 protected:

@@ -13,6 +13,9 @@ class SAUCEWICH_API UFridgeHUD : public UUserWidget
 public:
 	void Init(uint8 InFridgeTeam);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetHighlighted(bool bHighlight);
+
 private:
 	void InitWithPS(class ASaucewichPlayerState* InPS);
 	void OnPlayerTeamChanged(uint8 NewTeam);

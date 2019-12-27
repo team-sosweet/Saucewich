@@ -61,6 +61,12 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 	MulticastResetIngredients();
 }
 
+void AMakeSandwichPlayerState::BroadcastIngredientChanged()
+{
+	OnIngredientChanged.Broadcast(this);
+	OnIngChangedNative.Broadcast(this);
+}
+
 void AMakeSandwichPlayerState::MulticastResetIngredients_Implementation()
 {
 	Ingredients.Modify([](FIngMap& Ing){Ing.Reset();});
