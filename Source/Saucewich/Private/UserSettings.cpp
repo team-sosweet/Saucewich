@@ -2,6 +2,7 @@
 
 #include "UserSettings.h"
 #include "Saucewich.h"
+#include "Engine/Engine.h"
 
 UUserSettings* UUserSettings::Get()
 {
@@ -15,9 +16,19 @@ ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 	if (Validity == ENameValidity::Valid)
 	{
 		PlayerName = NewPlayerName;
-		Save();
 	}
 	return Validity;
+}
+
+void UUserSettings::SetMaxFPS(const float NewMaxFPS)
+{
+	MaxFPS = NewMaxFPS;
+	CommitMaxFPS();
+}
+
+void UUserSettings::CommitMaxFPS() const
+{
+	GEngine->Exec(nullptr, *FString::Printf(TEXT("t.MaxFPS %f"), MaxFPS));
 }
 
 float UUserSettings::GetCorrectedSensitivity() const
@@ -34,6 +45,5 @@ void UUserSettings::PostInitProperties()
 	{
 		PlayerName = TEXT("Player");
 		PlayerName.AppendInt(FMath::RandRange(100, 999));
-		Save();
 	}
 }

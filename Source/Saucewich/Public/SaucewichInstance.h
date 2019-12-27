@@ -39,6 +39,9 @@ public:
 	auto&& GetScoreData(const FName& ID) const { return ScoreData[ID]; }
 	ECollisionChannel GetDecalTraceChannel() const { return DecalTraceChannel; }
 
+protected:
+	void Init() override;
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;

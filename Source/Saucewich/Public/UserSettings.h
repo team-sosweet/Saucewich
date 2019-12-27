@@ -23,6 +23,11 @@ public:
 	const FString& GetPlayerName() const { return PlayerName; }
 
 	UFUNCTION(BlueprintCallable)
+	void SetMaxFPS(float NewMaxFPS);
+	void CommitMaxFPS() const;
+	float GetMaxFPS() const { return MaxFPS; }
+
+	UFUNCTION(BlueprintCallable)
 	float GetCorrectedSensitivity() const;
 
 	
@@ -41,4 +46,7 @@ protected:
 private:
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FString PlayerName;
+
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	float MaxFPS = 60.f;
 };

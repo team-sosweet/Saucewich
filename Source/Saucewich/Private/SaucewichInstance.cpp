@@ -4,6 +4,7 @@
 #include "Engine/World.h"
 #include "Entity/ActorPool.h"
 #include "Entity/SauceMarker.h"
+#include "UserSettings.h"
 
 template <class T>
 static T* GetOrSpawn(T*& Ptr, UClass* const Class, UWorld* const World)
@@ -31,4 +32,10 @@ AActorPool* USaucewichInstance::GetActorPool() const
 ASauceMarker* USaucewichInstance::GetSauceMarker() const
 {
 	return GetOrSpawn(SauceMarker, SauceMarkerClass.LoadSynchronous(), GetWorld());
+}
+
+void USaucewichInstance::Init()
+{
+	Super::Init();
+	UUserSettings::Get()->CommitMaxFPS();
 }
