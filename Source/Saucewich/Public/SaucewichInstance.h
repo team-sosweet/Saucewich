@@ -32,7 +32,8 @@ class SAUCEWICH_API USaucewichInstance : public UGameInstance
 public:
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Saucewich Instance", WorldContext=WorldContextObj))
 	static USaucewichInstance* Get(const UObject* WorldContextObj);
-	
+
+	class UUserSettings* GetUserSettings() const { return UserSettings; }
 	AActorPool* GetActorPool() const;
 	ASauceMarker* GetSauceMarker() const;
 	auto&& GetGameModes() const { return GameModes; }
@@ -63,6 +64,9 @@ private:
 
 	UPROPERTY(Transient)
 	mutable ASauceMarker* SauceMarker;
+
+	UPROPERTY(Transient)
+	UUserSettings* UserSettings;
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> DecalTraceChannel;

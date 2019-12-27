@@ -41,7 +41,7 @@ void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 	const auto Owner = Cast<APawn>(GetOwner());
 	if (Owner && Owner->IsLocallyControlled())
 	{
-		if (UUserSettings::Get()->bAutoFire)
+		if (UUserSettings::Get(this)->bAutoFire)
 		{
 			FHitResult Hit;
 			bShouldAutoFire = GunTrace(Hit) == EGunTraceHit::Pawn;

@@ -14,8 +14,8 @@ class SAUCEWICH_API UUserSettings : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, DisplayName="Get User Settings")
-	static UUserSettings* Get();
+	UFUNCTION(BlueprintPure, DisplayName="Get User Settings", meta=(WorldContext=W))
+	static UUserSettings* Get(const UObject* W);
 	
 	UFUNCTION(BlueprintCallable)
 	void Save() { SaveConfig(); }

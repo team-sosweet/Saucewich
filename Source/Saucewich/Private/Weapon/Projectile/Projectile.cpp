@@ -108,7 +108,7 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 		PSC->SetColorParameter(Names::Color, GetColor());
 	}
 
-	if (UUserSettings::Get()->bVibration)
+	if (UUserSettings::Get(this)->bVibration)
 	{
 		UGameplayStatics::SpawnForceFeedbackAtLocation(
 			World, ForceFeedbackEffect.LoadSynchronous(), Location,

@@ -37,5 +37,7 @@ ASauceMarker* USaucewichInstance::GetSauceMarker() const
 void USaucewichInstance::Init()
 {
 	Super::Init();
-	UUserSettings::Get()->CommitMaxFPS();
+
+	UserSettings = NewObject<UUserSettings>();
+	UserSettings->CommitMaxFPS();
 }

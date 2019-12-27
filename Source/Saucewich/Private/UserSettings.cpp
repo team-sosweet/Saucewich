@@ -1,13 +1,13 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
 #include "UserSettings.h"
-#include "Saucewich.h"
 #include "Engine/Engine.h"
+#include "Saucewich.h"
+#include "SaucewichInstance.h"
 
-UUserSettings* UUserSettings::Get()
+UUserSettings* UUserSettings::Get(const UObject* const W)
 {
-	static const auto UserSettings = NewObject<UUserSettings>(GetTransientPackage(), NAME_None, RF_MarkAsRootSet);
-	return UserSettings;
+	return USaucewichInstance::Get(W)->GetUserSettings();
 }
 
 ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)

@@ -157,7 +157,7 @@ void AGun::Shoot()
 	const auto PC = Cast<APlayerController>(GetInstigatorController());
 	if (PC && PC->IsLocalController())
 	{
-		if (UUserSettings::Get()->bVibration)
+		if (UUserSettings::Get(this)->bVibration)
 			PC->PlayDynamicForceFeedback(Data.FBBIntensity, Data.FBBDuration, true, false, true, false);
 
 		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);

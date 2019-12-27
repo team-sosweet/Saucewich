@@ -9,7 +9,7 @@ void AGlobalPPManager::BeginPlay()
 {
 	Super::BeginPlay();
 	PP = *TActorIterator<APostProcessVolume>{GetWorld()};
-	UUserSettings::Get()->RegisterPPManager(FOnPPSettingChanged::CreateUObject(this, &AGlobalPPManager::OnSettingChanged));
+	UUserSettings::Get(this)->RegisterPPManager(FOnPPSettingChanged::CreateUObject(this, &AGlobalPPManager::OnSettingChanged));
 }
 
 void AGlobalPPManager::OnSettingChanged(const uint8 Idx, const bool bNewVal) const
