@@ -37,6 +37,25 @@ float UUserSettings::GetCorrectedSensitivity() const
 	return Correction * RawSensitivity + Correction * .5f;
 }
 
+void UUserSettings::SetOutlineEnabled(const bool bEnabled)
+{
+	bOutline = bEnabled;
+	OnPPSettingChanged.ExecuteIfBound(0, bEnabled);
+}
+
+void UUserSettings::SetHighlightEnabled(const bool bEnabled)
+{
+	bHighlight = bEnabled;
+	OnPPSettingChanged.ExecuteIfBound(1, bEnabled);
+}
+
+void UUserSettings::RegisterPPManager(FOnPPSettingChanged&& Callback)
+{
+	OnPPSettingChanged = MoveTemp(Callback);
+	OnPPSettingChanged.Execute(0, bOutline);
+	OnPPSettingChanged.Execute(1, bHighlight);
+}
+
 void UUserSettings::PostInitProperties()
 {
 	Super::PostInitProperties();

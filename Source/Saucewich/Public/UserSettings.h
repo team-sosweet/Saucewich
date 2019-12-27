@@ -6,6 +6,8 @@
 
 enum class ENameValidity : uint8;
 
+DECLARE_DELEGATE_TwoParams(FOnPPSettingChanged, uint8, bool)
+
 UCLASS(Config=GameUserSettings)
 class SAUCEWICH_API UUserSettings : public UObject
 {
@@ -30,7 +32,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetCorrectedSensitivity() const;
 
-	
+	UFUNCTION(BlueprintCallable)
+	void SetOutlineEnabled(bool bEnabled);
+	bool IsOutlineEnabled() const { return bOutline; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetHighlightEnabled(bool bEnabled);
+	bool IsHighlightEnabled() const { return bHighlight; }
+
+	void RegisterPPManager(FOnPPSettingChanged&& Callback);
+
+
 	UPROPERTY(Config, BlueprintReadWrite)
 	float RawSensitivity = .5;
 
@@ -44,9 +56,17 @@ protected:
 	void PostInitProperties() override;
 
 private:
+	FOnPPSettingChanged OnPPSettingChanged;
+	
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FString PlayerName;
 
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float MaxFPS = 60.f;
+
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bOutline : 1;
+
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bHighlight : 1;
 };
