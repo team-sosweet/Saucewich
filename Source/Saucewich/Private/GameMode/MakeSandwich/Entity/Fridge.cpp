@@ -4,27 +4,57 @@
 
 #include "Engine/World.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
 #include "GameMode/SaucewichGameMode.h"
+#include "Names.h"
+#include "Widget/FridgeHUD.h"
 
 AFridge::AFridge()
-	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"))}
+	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(Names::Mesh)}
 {
 	RootComponent = Mesh;
+
+#if !UE_SERVER
+	HUD = CreateDefaultSubobject<UWidgetComponent>(NAME("HUD"));
+	HUD->SetupAttachment(Mesh);
+
+	PrimaryActorTick.bCanEverTick = true;
+#endif
 }
 
 void AFridge::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	const auto Idx = Mesh->GetMaterialIndex(TEXT("TeamColor"));
+	const auto Idx = Mesh->GetMaterialIndex(Names::TeamColor);
 	const auto Mat = Mesh->CreateDynamicMaterialInstance(Idx);
 	auto&& Color = ASaucewichGameMode::GetData(this).Teams[Team].Color;
-	Mat->SetVectorParameterValue(TEXT("Color"), Color);
+	Mat->SetVectorParameterValue(Names::Color, Color);
+
+	CastChecked<UFridgeHUD>(HUD->GetUserWidgetObject())->Init(Team);
 }
+
+
+#if !UE_SERVER
+
+void AFridge::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (const auto Pawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
+		const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
+		HUD->SetDrawSize({Size, Size});
+	}
+}
+
+#endif
+
 
 void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
 	const FVector HitLocation, const FVector HitNormal, const FVector NormalImpulse, const FHitResult& Hit)
@@ -36,9 +66,9 @@ void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, 
 	const auto Pawn = Cast<APawn>(Other);
 	if (!Pawn) return;
 
-	const auto Player = Pawn->GetPlayerState<AMakeSandwichPlayerState>();
-	if (!Player) return;
+	const auto Player = Pawn->GetPlayerStateChecked<AMakeSandwichPlayerState>();
 	if (Player->GetTeam() != Team) return;
 
 	Player->PutIngredientsInFridge();
 }
+

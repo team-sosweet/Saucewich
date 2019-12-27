@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScoreAdded, FName, ScoreID, int32, ActualScore);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
+DECLARE_EVENT_OneParam(ASaucewichPlayerState, FOnTeamChangedNative, uint8)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNameChanged, const FString&, NewName);
 
 UCLASS(Config=GameUserSettings)
@@ -48,6 +49,8 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)
 	void RequestSetPlayerName(const FString& NewPlayerName);
 
+	void BindOnTeamChanged(FOnTeamChangedNative::FDelegate&& Callback);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnTeamChanged OnTeamChangedDelegate;
 
@@ -80,6 +83,8 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreID, int32 ActualScore);
+
+	FOnTeamChangedNative OnTeamChangedNative;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnNameChanged OnNameChanged;

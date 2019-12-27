@@ -32,10 +32,15 @@ void ASaucewichPlayerController::Respawn()
 
 void ASaucewichPlayerController::SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate)
 {
-	if (!Delegate.IsBound()) return;
-	const auto PS = GetPlayerState<ASaucewichPlayerState>();
-	if (IsValid(PS)) Delegate.Execute(PS);
+	check(Delegate.IsBound());
+	if (IsValid(PlayerState)) Delegate.Execute(CastChecked<ASaucewichPlayerState>(PlayerState));
 	else OnPlayerStateSpawned.AddUnique(Delegate);
+}
+
+void ASaucewichPlayerController::SafePS(FOnPSSpawnedNative::FDelegate&& Delegate)
+{
+	if (IsValid(PlayerState)) Delegate.Execute(CastChecked<ASaucewichPlayerState>(PlayerState));
+	else OnPSSpawnedNative.Add(MoveTemp(Delegate));
 }
 
 void ASaucewichPlayerController::BeginPlay()
@@ -115,10 +120,10 @@ void ASaucewichPlayerController::ClientPing_Implementation()
 
 void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& Delegate)
 {
-	if (!Delegate.IsBound()) return;
-	if (const auto Char = Cast<ATpsCharacter>(GetCharacter()))
+	check(Delegate.IsBound());
+	if (const auto Char = GetCharacter())
 	{
-		Delegate.Execute(Char);
+		Delegate.Execute(CastChecked<ATpsCharacter>(Char));
 	}
 	else
 	{

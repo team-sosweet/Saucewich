@@ -7,6 +7,7 @@
 #include "SaucewichPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStateSpawned, class ASaucewichPlayerState*, PlayerState);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPSSpawnedNative, ASaucewichPlayerState*)
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPlayerStateSpawnedSingle, ASaucewichPlayerState*, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsCharacter*, Character);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
@@ -34,6 +35,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SafePlayerState(const FOnPlayerStateSpawnedSingle& Delegate);
+	void SafePS(FOnPSSpawnedNative::FDelegate&& Delegate);
 	
 	UFUNCTION(BlueprintCallable)
 	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
@@ -75,6 +77,7 @@ private:
 	void ClientPing();
 	
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
+	FOnPSSpawnedNative OnPSSpawnedNative;
 	FOnCharacterSpawned OnCharacterSpawned;
 
 	FString SessionID;
@@ -93,6 +96,9 @@ private:
 	BroadcastPlayerStateSpawned(ASaucewichPlayerController* Controller, ASaucewichPlayerState* PlayerState)
 	{
 		Controller->OnPlayerStateSpawned.Broadcast(PlayerState);
+		Controller->OnPlayerStateSpawned.Clear();
+		Controller->OnPSSpawnedNative.Broadcast(PlayerState);
+		Controller->OnPSSpawnedNative.Clear();
 	}
 };
 

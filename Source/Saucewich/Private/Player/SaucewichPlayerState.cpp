@@ -91,6 +91,7 @@ void ASaucewichPlayerState::SetTeam(const uint8 NewTeam)
 void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 {
 	OnTeamChangedDelegate.Broadcast(Team);
+	OnTeamChangedNative.Broadcast(Team);
 
 	if (const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed))
 		GS->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
@@ -137,6 +138,12 @@ void ASaucewichPlayerState::SetObjective(const uint8 NewObjective)
 	if (!GS || !GS->IsMatchInProgress()) return;
 
 	Objective = NewObjective;
+}
+
+void ASaucewichPlayerState::BindOnTeamChanged(FOnTeamChangedNative::FDelegate&& Callback)
+{
+	Callback.Execute(Team);
+	OnTeamChangedNative.Add(MoveTemp(Callback));
 }
 
 void ASaucewichPlayerState::RequestSetPlayerName_Implementation(const FString& NewPlayerName)
