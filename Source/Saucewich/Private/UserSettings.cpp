@@ -5,6 +5,11 @@
 #include "Saucewich.h"
 #include "SaucewichInstance.h"
 
+UUserSettings::UUserSettings()
+	:bAutoFire{true}, bVibration{true}, bParticle{true}
+{
+}
+
 UUserSettings* UUserSettings::Get(const UObject* const W)
 {
 	return USaucewichInstance::Get(W)->GetUserSettings();
@@ -39,21 +44,25 @@ float UUserSettings::GetCorrectedSensitivity() const
 
 void UUserSettings::SetOutlineEnabled(const bool bEnabled)
 {
-	bOutline = bEnabled;
-	OnPPSettingChanged.ExecuteIfBound(0, bEnabled);
+	OnOptionChanged.Execute(EGraphicOption::Outline, bOutline = bEnabled);
 }
 
 void UUserSettings::SetHighlightEnabled(const bool bEnabled)
 {
-	bHighlight = bEnabled;
-	OnPPSettingChanged.ExecuteIfBound(1, bEnabled);
+	OnOptionChanged.Execute(EGraphicOption::Highlight, bHighlight = bEnabled);
 }
 
-void UUserSettings::RegisterPPManager(FOnPPSettingChanged&& Callback)
+void UUserSettings::SetParticleEnabled(const bool bEnabled)
 {
-	OnPPSettingChanged = MoveTemp(Callback);
-	OnPPSettingChanged.Execute(0, bOutline);
-	OnPPSettingChanged.Execute(1, bHighlight);
+	OnOptionChanged.Execute(EGraphicOption::Particle, bParticle = bEnabled);
+}
+
+void UUserSettings::RegisterGraphicManager(FOnGraphicOptionChanged&& Callback)
+{
+	OnOptionChanged = MoveTemp(Callback);
+	OnOptionChanged.Execute(EGraphicOption::Outline, bOutline);
+	OnOptionChanged.Execute(EGraphicOption::Highlight, bHighlight);
+	OnOptionChanged.Execute(EGraphicOption::Particle, bParticle);
 }
 
 void UUserSettings::PostInitProperties()

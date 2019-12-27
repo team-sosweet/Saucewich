@@ -5,15 +5,21 @@
 #include "UserSettings.generated.h"
 
 enum class ENameValidity : uint8;
+enum class EGraphicOption : uint8
+{
+	Outline, Highlight, Particle = 255
+};
 
-DECLARE_DELEGATE_TwoParams(FOnPPSettingChanged, uint8, bool)
+DECLARE_DELEGATE_TwoParams(FOnGraphicOptionChanged, EGraphicOption, bool)
 
-UCLASS(Config=GameUserSettings)
+UCLASS(Config=UserSettings)
 class SAUCEWICH_API UUserSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	UUserSettings();
+	
 	UFUNCTION(BlueprintPure, DisplayName="Get User Settings", meta=(WorldContext=W))
 	static UUserSettings* Get(const UObject* W);
 	
@@ -40,7 +46,11 @@ public:
 	void SetHighlightEnabled(bool bEnabled);
 	bool IsHighlightEnabled() const { return bHighlight; }
 
-	void RegisterPPManager(FOnPPSettingChanged&& Callback);
+	UFUNCTION(BlueprintCallable)
+	void SetParticleEnabled(bool bEnabled);
+	bool IsParticleEnabled() const { return bParticle; }
+
+	void RegisterGraphicManager(FOnGraphicOptionChanged&& Callback);
 
 
 	UPROPERTY(Config, BlueprintReadWrite)
@@ -56,7 +66,7 @@ protected:
 	void PostInitProperties() override;
 
 private:
-	FOnPPSettingChanged OnPPSettingChanged;
+	FOnGraphicOptionChanged OnOptionChanged;
 	
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FString PlayerName;
@@ -69,4 +79,7 @@ private:
 
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bHighlight : 1;
+	
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bParticle : 1;
 };

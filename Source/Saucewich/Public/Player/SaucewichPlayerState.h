@@ -10,7 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTeamChanged, uint8, NewTeam);
 DECLARE_EVENT_OneParam(ASaucewichPlayerState, FOnTeamChangedNative, uint8)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNameChanged, const FString&, NewName);
 
-UCLASS(Config=GameUserSettings)
+UCLASS(Config=UserSettings)
 class SAUCEWICH_API ASaucewichPlayerState : public APlayerState
 {
 	GENERATED_BODY()
