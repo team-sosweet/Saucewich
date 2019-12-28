@@ -159,6 +159,7 @@ void ATpsCharacter::BeginPlay()
 		if (Data != nullptr)
 		{
 			HP = Data->MaxHP;
+			OnRep_HP();
 		}
 	}
 
@@ -212,8 +213,16 @@ float ATpsCharacter::TakeDamage(float DamageAmount, const FDamageEvent& DamageEv
 			if (const auto PS = EventInstigator->GetPlayerState<ASaucewichPlayerState>())
 				PS->AddScore(NAME("Heal"), FMath::Min(-DamageAmount, Data->MaxHP - HP) / 2);
 
-		HP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
-		if (FMath::IsNearlyZero(HP)) Kill(EventInstigator ? EventInstigator->GetPlayerState<ASaucewichPlayerState>() : nullptr, DamageCauser);
+		const auto NewHP = FMath::Clamp(HP - DamageAmount, 0.f, Data->MaxHP);
+		if (FMath::IsNearlyZero(NewHP))
+		{
+			Kill(EventInstigator ? CastChecked<ASaucewichPlayerState>(EventInstigator->PlayerState) : nullptr, DamageCauser);
+		}
+		else
+		{
+			HP = NewHP;
+			if (HasAuthority()) OnRep_HP();
+		}
 	}
 
 #if !UE_SERVER
@@ -261,8 +270,9 @@ void ATpsCharacter::SetPlayerDefaults()
 	{
 		if (HasAuthority())
 		{
-			HP = Data->MaxHP;
 			bAlive = true;
+			HP = Data->MaxHP;
+			OnRep_HP();
 		}
 		if (Data->RespawnInvincibleTime > 0 && !IsLocallyControlled())
 		{
@@ -362,6 +372,11 @@ void ATpsCharacter::OnRep_Alive()
 	else KillSilent();
 }
 
+void ATpsCharacter::OnRep_HP() const
+{
+	OnHPChanged.Broadcast(HP);
+}
+
 void ATpsCharacter::MulticastKill_Implementation(ASaucewichPlayerState* const Attacker, AActor* const Inflictor)
 {
 	Kill_Internal(Attacker, Inflictor);
@@ -371,6 +386,7 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 {
 	HP = 0;
 	bAlive = false;
+	OnRep_HP();
 	SetActorActivated(false);
 
 	WeaponComponent->OnCharacterDeath();
