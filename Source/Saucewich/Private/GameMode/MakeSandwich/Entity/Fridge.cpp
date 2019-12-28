@@ -83,7 +83,7 @@ void AFridge::Tick(const float DeltaSeconds)
 
 UFridgeHUD* AFridge::GetHUD() const
 {
-	return CastChecked<UFridgeHUD>(HUD->GetUserWidgetObject());
+	return CastChecked<UFridgeHUD>(HUD->GetUserWidgetObject(), ECastCheckedType::NullAllowed);
 }
 
 void AFridge::BindPS(ASaucewichPlayerState* const InPS)
@@ -112,7 +112,7 @@ void AFridge::OnIngChanged(AMakeSandwichPlayerState* const InPS) const
 
 void AFridge::SetHighlighted(const bool bHighlight) const
 {
-	GetHUD()->SetHighlighted(bHighlight);
+	if (const auto HUD = GetHUD()) HUD->SetHighlighted(bHighlight);
 	Mesh->SetRenderCustomDepth(bHighlight);
 }
 
