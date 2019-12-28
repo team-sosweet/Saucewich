@@ -14,16 +14,12 @@ struct FThrowingWeaponData : public FWeaponData
 	FTransform ThrowOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<class AProjectile> ProjectileClass;
+	TSoftClassPtr<class AProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ReloadTime;
 };
 
-/*
- * 던지는 무기입니다.
- * 주의: 이것은 무기 그 자체를 나타내고, 실제 던져지는 것은 projectile 입니다.
- */
 UCLASS(Abstract)
 class SAUCEWICH_API AThrowingWeapon : public AWeapon
 {

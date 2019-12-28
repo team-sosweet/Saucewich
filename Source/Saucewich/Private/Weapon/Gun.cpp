@@ -228,8 +228,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 
 void AGun::OnRep_Dried() const
 {
-	if (const auto Char = Cast<ATpsCharacter>(GetOwner()))
-		Char->GetWeaponComponent()->OnGunDried.Broadcast(bDried);
+	OnAvailabilityChanged(bDried);
 }
 
 const FGunData& AGun::GetGunData() const

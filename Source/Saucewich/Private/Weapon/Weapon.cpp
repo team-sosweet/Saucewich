@@ -88,6 +88,13 @@ void AWeapon::OnReleased()
 	Holster();
 }
 
+void AWeapon::OnAvailabilityChanged(const bool bAvailable) const
+{
+	UWeaponComponent::FBroadcastAvailabilityChanged{
+		CastChecked<ATpsCharacter>(GetOwner())->GetWeaponComponent(), this, bAvailable
+	};
+}
+
 const FWeaponData& AWeapon::GetWeaponData() const
 {
 	return GetData<FWeaponData>();

@@ -92,6 +92,8 @@ public:
 	virtual bool CanDeploy() const { return IsActive(); }
 	virtual bool CanHolster() const { return true; }
 
+	void OnAvailabilityChanged(bool bAvailable) const;
+
 protected:
 	void PostInitializeComponents() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -21,7 +21,7 @@ public:
 	bool IsValidTeam() const { return Team != static_cast<uint8>(-1); }
 
 	UFUNCTION(BlueprintCallable)
-	void SetWeapon(uint8 Slot, TSubclassOf<class AWeapon> Weapon);
+	void SetWeapon(uint8 Slot, const TSoftClassPtr<class AWeapon>& Weapon);
 
 	UFUNCTION(BlueprintCallable)
 	void SaveWeaponLoadout();
@@ -75,11 +75,11 @@ protected:
 
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSetWeapon(uint8 Slot, TSubclassOf<AWeapon> Weapon);
-	void SetWeapon_Internal(uint8 Slot, TSubclassOf<AWeapon> Weapon);
+	void ServerSetWeapon(uint8 Slot, const TSoftClassPtr<class AWeapon>& Weapon);
+	void SetWeapon_Internal(uint8 Slot, const TSoftClassPtr<class AWeapon>& Weapon);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSetWeaponLoadout(const TArray<TSubclassOf<AWeapon>>& Loadout);
+	void ServerSetWeaponLoadout(const TArray<TSoftClassPtr<AWeapon>>& Loadout);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreID, int32 ActualScore);
@@ -89,11 +89,8 @@ private:
 	UPROPERTY(BlueprintAssignable)
 	FOnNameChanged OnNameChanged;
 
-	// 현재 이 플레이어가 장착한 무기입니다. 리스폰시 지급됩니다.
-	// 배열 인덱스는 무기 슬롯을 의미합니다.
-	// 기본값을 설정해두면 저장된 로드아웃이 없을 경우 기본값을 사용합니다.
 	UPROPERTY(Replicated, EditAnywhere, Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TArray<TSubclassOf<AWeapon>> WeaponLoadout;
+	TArray<TSoftClassPtr<AWeapon>> WeaponLoadout;
 
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team = -1;

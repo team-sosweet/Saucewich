@@ -18,7 +18,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
 
-void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+void ASaucewichPlayerState::SetWeapon(const uint8 Slot, const TSoftClassPtr<class AWeapon>& Weapon)
 {
 	SetWeapon_Internal(Slot, Weapon);
 	if (!HasAuthority()) ServerSetWeapon(Slot, Weapon);
@@ -32,9 +32,10 @@ void ASaucewichPlayerState::SaveWeaponLoadout()
 
 void ASaucewichPlayerState::GiveWeapons()
 {
-	if (const auto Character = GetPawn<ATpsCharacter>())
-		for (const auto Weapon : WeaponLoadout)
-			Character->GetWeaponComponent()->Give(Weapon);
+	const auto Character = CastChecked<ATpsCharacter>(GetPawn());
+
+	for (const auto Weapon : WeaponLoadout)
+		Character->GetWeaponComponent()->Give(Weapon);
 }
 
 void ASaucewichPlayerState::OnKill()
@@ -97,18 +98,18 @@ void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 		GS->OnPlayerChangedTeam.Broadcast(this, OldTeam, Team);
 }
 
-void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSoftClassPtr<AWeapon>& Weapon)
 {
 	if (Slot >= WeaponLoadout.Num()) WeaponLoadout.AddZeroed(Slot - WeaponLoadout.Num() + 1);
 	WeaponLoadout[Slot] = Weapon;
 }
 
-void ASaucewichPlayerState::ServerSetWeaponLoadout_Implementation(const TArray<TSubclassOf<AWeapon>>& Loadout)
+void ASaucewichPlayerState::ServerSetWeaponLoadout_Implementation(const TArray<TSoftClassPtr<AWeapon>>& Loadout)
 {
 	WeaponLoadout = Loadout;
 }
 
-bool ASaucewichPlayerState::ServerSetWeaponLoadout_Validate(const TArray<TSubclassOf<AWeapon>>& Loadout)
+bool ASaucewichPlayerState::ServerSetWeaponLoadout_Validate(const TArray<TSoftClassPtr<AWeapon>>& Loadout)
 {
 	return true;
 }
@@ -118,12 +119,12 @@ void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreNa
 	OnScoreAdded.Broadcast(ScoreName, ActualScore);
 }
 
-void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, const TSoftClassPtr<AWeapon>& Weapon)
 {
 	SetWeapon_Internal(Slot, Weapon);
 }
 
-bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSubclassOf<AWeapon> Weapon)
+bool ASaucewichPlayerState::ServerSetWeapon_Validate(const uint8 Slot, const TSoftClassPtr<AWeapon>& Weapon)
 {
 	return true;
 }

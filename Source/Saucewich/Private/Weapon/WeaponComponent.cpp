@@ -10,6 +10,7 @@
 #include "Player/TpsCharacter.h"
 #include "Weapon/Gun.h"
 #include "UserSettings.h"
+#include "Names.h"
 
 UWeaponComponent::UWeaponComponent()
 {
@@ -18,28 +19,36 @@ UWeaponComponent::UWeaponComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UWeaponComponent::AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate, const bool bCallbackWithCurrentWeapons)
+void UWeaponComponent::AddOnEquipWeapon(const FOnEquipWeaponSingle& Delegate)
 {
-	if (!Delegate.IsBound()) return;
-	if (bCallbackWithCurrentWeapons)
-		for (const auto Weapon : Weapons)
-			if (Weapon) Delegate.Execute(Weapon);
-	OnEquipWeapon.AddUnique(Delegate);
+	check(Delegate.IsBound());
+
+	for (const auto Weapon : Weapons)
+		if (Weapon) Delegate.Execute(Weapon);
+
+	check(!OnEquipWeapon.Contains(Delegate));
+	OnEquipWeapon.Add(Delegate);
+}
+
+void UWeaponComponent::AddOnWepAvailabilityChanged(const uint8 Slot, const FOnWepAvailabilityChangedSingle& Delegate)
+{
+	OnWepAvailabilityChanged[Slot].Add(Delegate);
 }
 
 void UWeaponComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-	Weapons.Init(nullptr, WeaponSlots);
+	
+	Weapons.AddZeroed(WeaponSlots);
+	OnWepAvailabilityChanged.AddDefaulted(WeaponSlots);
 }
 
-void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick TickType,
-	FActorComponentTickFunction* const ThisTickFunction)
+void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* const ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const auto Owner = Cast<APawn>(GetOwner());
-	if (Owner && Owner->IsLocallyControlled())
+	const auto Owner = CastChecked<APawn>(GetOwner());
+	if (Owner->IsLocallyControlled())
 	{
 		if (UUserSettings::Get(this)->bAutoFire)
 		{
@@ -74,27 +83,19 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void UWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
-	for (auto& Wep : Weapons)
-	{
-		if (Wep) 
-		{
-			Wep->Release();
-			Wep = nullptr;
-		}
-	}
+	ClearWeapons();
 }
 
 void UWeaponComponent::SetupPlayerInputComponent(UInputComponent* Input)
 {
-	Input->BindAction("Fire", IE_Pressed, this, &UWeaponComponent::FireP);
-	Input->BindAction("Fire", IE_Released, this, &UWeaponComponent::FireR);
+	Input->BindAction(NAME("Fire"), IE_Pressed, this, &UWeaponComponent::FireP);
+	Input->BindAction(NAME("Fire"), IE_Released, this, &UWeaponComponent::FireR);
 
 	FString Slot = TEXT("Slot0");
 	for (uint8 i = 0; i < WeaponSlots; ++i)
 	{
-		using F = TBaseDelegate<void, uint8>;
 		Slot[4] = TEXT('1') + i;
+		using F = TBaseDelegate<void, uint8>;
 		Input->BindAction<F>(*Slot, IE_Pressed, this, &UWeaponComponent::SlotP, i);
 		Input->BindAction<F>(*Slot, IE_Released, this, &UWeaponComponent::SlotR, i);
 	}
@@ -104,6 +105,7 @@ EGunTraceHit UWeaponComponent::GunTrace(FHitResult& OutHit) const
 {
 	if (const auto Gun = Cast<AGun>(GetActiveWeapon()))
 		return Gun->GunTrace(OutHit);
+	
 	return EGunTraceHit::None;
 }
 
@@ -127,6 +129,7 @@ float UWeaponComponent::GetSpeedRatio() const
 {
 	if (const auto Weapon = GetActiveWeapon())
 		return Weapon->GetWeaponData().WalkSpeedRatio;
+	
 	return 1;
 }
 
@@ -134,6 +137,7 @@ float UWeaponComponent::GetArmorRatio() const
 {
 	if (const auto Weapon = GetWeapon(0))
 		return Weapon->GetWeaponData().ArmorRatio;
+	
 	return 1;
 }
 
@@ -141,14 +145,7 @@ void UWeaponComponent::OnCharacterDeath()
 {
 	if (GetOwner()->HasAuthority())
 	{
-		for (auto& Weapon : Weapons)
-		{
-			if (Weapon)
-			{
-				Weapon->Release();
-				Weapon = nullptr;
-			}
-		}
+		ClearWeapons();
 	}
 }
 
@@ -158,28 +155,24 @@ void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 		if (Weapon) Weapon->SetColor(NewColor);
 }
 
-AWeapon* UWeaponComponent::Give(const TSubclassOf<AWeapon> WeaponClass)
+AWeapon* UWeaponComponent::Give(const TSoftClassPtr<AWeapon>& WeaponClass)
 {
-	if (!ensure(WeaponClass)) return nullptr;
+	const auto Cls = WeaponClass.LoadSynchronous();
+	check(Cls);
 
-	const auto Slot = GetDefault<AWeapon>(WeaponClass)->GetData().Slot;
-	if (!ensure(Slot < Weapons.Num())) return nullptr;
-
-	if (Weapons[Slot])
-	{
-		Weapons[Slot]->Release();
-		Weapons[Slot] = nullptr;
-	}
+	const auto Slot = GetDefault<AWeapon>(Cls)->GetData().Slot;
+	check(Slot < Weapons.Num());
 
 	FActorSpawnParameters Parameters;
 	Parameters.Instigator = CastChecked<ATpsCharacter>(GetOwner());
 	Parameters.Owner = Parameters.Instigator;
 
-	const auto Weapon = AActorPool::Get(this)->Spawn<AWeapon>(WeaponClass, FTransform::Identity, Parameters);
-	if (!ensure(Weapon)) return nullptr;
+	const auto Weapon = AActorPool::Get(this)->Spawn<AWeapon>(Cls, FTransform::Identity, Parameters);
+	check(Weapon);
 
 	Weapon->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
 
+	if (Weapons[Slot]) Weapons[Slot]->Release();
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 
@@ -194,8 +187,27 @@ void UWeaponComponent::OnRep_Weapons()
 		ActiveWeapon->SetVisibility(true);
 	}
 
+	const auto Color = CastChecked<ATpsCharacter>(GetOwner())->GetColor();
 	for (const auto Wep : Weapons)
-		if (Wep) Wep->SetColor(CastChecked<ATpsCharacter>(GetOwner())->GetColor());
+		if (Wep) Wep->SetColor(Color);
+}
+
+void UWeaponComponent::ClearWeapons()
+{
+	for (auto& Weapon : Weapons)
+	{
+		if (Weapon)
+		{
+			Weapon->Release();
+			Weapon = nullptr;
+		}
+	}
+}
+
+UWeaponComponent::FBroadcastAvailabilityChanged::FBroadcastAvailabilityChanged(
+	UWeaponComponent* Comp, const AWeapon* Wep, const bool bAvailable)
+{
+	Comp->OnWepAvailabilityChanged[Wep->GetData().Slot].Broadcast(bAvailable);
 }
 
 void UWeaponComponent::FireP()
@@ -207,8 +219,8 @@ void UWeaponComponent::ServerFireP_Implementation() { MulticastFireP(); }
 bool UWeaponComponent::ServerFireP_Validate() { return true; }
 void UWeaponComponent::MulticastFireP_Implementation()
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) StartFire();
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsLocallyControlled()) StartFire();
 }
 
 void UWeaponComponent::FireR()
@@ -218,8 +230,8 @@ void UWeaponComponent::FireR()
 
 void UWeaponComponent::StartFire()
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner || !Owner->IsAlive()) return;
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireP();
@@ -230,8 +242,8 @@ void UWeaponComponent::StartFire()
 
 void UWeaponComponent::StopFire()
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner || !Owner->IsAlive()) return;
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsAlive()) return;
 	if (auto W = GetActiveWeapon())
 	{
 		W->FireR();
@@ -244,14 +256,14 @@ void UWeaponComponent::ServerFireR_Implementation() { MulticastFireR(); }
 bool UWeaponComponent::ServerFireR_Validate() { return true; }
 void UWeaponComponent::MulticastFireR_Implementation()
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) StopFire();
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsLocallyControlled()) StopFire();
 }
 
 void UWeaponComponent::SlotP(const uint8 Slot)
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner || !Owner->IsAlive()) return;
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotP();
@@ -263,14 +275,14 @@ void UWeaponComponent::ServerSlotP_Implementation(const uint8 Slot) { MulticastS
 bool UWeaponComponent::ServerSlotP_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
 void UWeaponComponent::MulticastSlotP_Implementation(const uint8 Slot)
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) SlotP(Slot);
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsLocallyControlled()) SlotP(Slot);
 }
 
 void UWeaponComponent::SlotR(const uint8 Slot)
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (!Owner || !Owner->IsAlive()) return;
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsAlive()) return;
 	if (auto W = Weapons[Slot])
 	{
 		W->SlotR();
@@ -282,6 +294,6 @@ void UWeaponComponent::ServerSlotR_Implementation(const uint8 Slot) { MulticastS
 bool UWeaponComponent::ServerSlotR_Validate(const uint8 Slot) { return Slot < Weapons.Num(); }
 void UWeaponComponent::MulticastSlotR_Implementation(const uint8 Slot)
 {
-	const auto Owner = Cast<ATpsCharacter>(GetOwner());
-	if (Owner && !Owner->IsLocallyControlled()) SlotR(Slot);
+	const auto Owner = CastChecked<ATpsCharacter>(GetOwner());
+	if (!Owner->IsLocallyControlled()) SlotR(Slot);
 }

@@ -24,21 +24,24 @@ void AThrowingWeapon::SlotP()
 	if (TimerManager.TimerExists(ReloadTimer)) return;
 
 	auto&& Data = GetThrowingWeaponData();
-	if (!ensure(Data.ProjectileClass)) return;
+	const auto ProjCls = Data.ProjectileClass.LoadSynchronous();
+	check(ProjCls);
 
-	if (HasAuthority() || !Data.ProjectileClass.GetDefaultObject()->GetIsReplicated())
+	if (HasAuthority() || !GetDefault<AActor>(ProjCls)->GetIsReplicated())
 	{
 		FActorSpawnParameters Parameters;
 		Parameters.Owner = this;
 		Parameters.Instigator = GetInstigator();
 
-		if (const auto Thrown = AActorPool::Get(this)->Spawn<AProjectile>(Data.ProjectileClass, Data.ThrowOffset * GetActorTransform(), Parameters))
+		if (const auto Thrown = AActorPool::Get(this)->Spawn<AProjectile>(ProjCls, Data.ThrowOffset * GetActorTransform(), Parameters))
 		{
 			Thrown->ResetSpeed();
 		}
 	}
-	
-	TimerManager.SetTimer(ReloadTimer, Data.ReloadTime, false);
+
+	auto&& Callback = FTimerDelegate::CreateUObject(this, &AWeapon::OnAvailabilityChanged, true);
+	TimerManager.SetTimer(ReloadTimer, MoveTemp(Callback), Data.ReloadTime, false);
+	OnAvailabilityChanged(false);
 }
 
 void AThrowingWeapon::OnReleased()
