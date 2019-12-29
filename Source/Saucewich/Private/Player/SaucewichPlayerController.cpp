@@ -101,17 +101,8 @@ void ASaucewichPlayerController::Ping()
 
 void ASaucewichPlayerController::OnPingFailed() const
 {
-	CastChecked<ABaseHUD>(GetHUD())->ShowError(
-		LOCTEXT("ConnectionLost", "서버와의 연결이 끊어졌습니다.")
-	)->OnDestructNativeSingle.BindUObject(this, &ASaucewichPlayerController::Disconnect);
-}
-
-void ASaucewichPlayerController::Disconnect() const
-{
-	const auto World = GetWorld();
-	const auto NetDriver = World->GetNetDriver();
-	GEngine->BroadcastNetworkFailure(World, NetDriver, ENetworkFailure::ConnectionTimeout);
-	if (NetDriver->ServerConnection) NetDriver->ServerConnection->Close();
+	const auto ServerConnection = GetWorld()->GetNetDriver()->ServerConnection;
+	if (ServerConnection) ServerConnection->Close();
 }
 
 void ASaucewichPlayerController::ServerPing_Implementation()

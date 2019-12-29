@@ -36,7 +36,6 @@ void UBaseWidget::NativeDestruct()
 	}
 
 	OnDestruct.Broadcast();
-	OnDestructNativeSingle.ExecuteIfBound();
 }
 
 FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

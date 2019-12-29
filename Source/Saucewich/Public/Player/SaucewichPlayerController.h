@@ -67,7 +67,6 @@ private:
 
 	void Ping();
 	void OnPingFailed() const;
-	void Disconnect() const;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPing();

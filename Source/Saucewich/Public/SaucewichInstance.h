@@ -3,14 +3,13 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "Engine/EngineTypes.h"
 #include "SaucewichInstance.generated.h"
 
 class AWeapon;
 class AActorPool;
 class ASauceMarker;
 class ASaucewichGameMode;
-
-enum ECollisionChannel;
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FScoreData
@@ -40,10 +39,15 @@ public:
 	auto&& GetScoreData(const FName& ID) const { return ScoreData[ID]; }
 	ECollisionChannel GetDecalTraceChannel() const { return DecalTraceChannel; }
 
+	UFUNCTION(BlueprintCallable)
+	bool PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Type, FString& Msg);
+
 protected:
 	void Init() override;
 
 private:
+	void OnNetworkError(UWorld*, class UNetDriver*, ENetworkFailure::Type, const FString&);
+	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
 
@@ -70,4 +74,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> DecalTraceChannel;
+
+	struct
+	{
+		FString Msg;
+		ENetworkFailure::Type Type;
+		uint8 bOccured : 1;
+	} LastNetworkError;
 };
