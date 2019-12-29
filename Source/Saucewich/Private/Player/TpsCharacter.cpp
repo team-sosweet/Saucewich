@@ -274,7 +274,7 @@ void ATpsCharacter::SetPlayerDefaults()
 			HP = Data->MaxHP;
 			OnRep_HP();
 		}
-		if (Data->RespawnInvincibleTime > 0 && !IsLocallyControlled())
+		if (Data->RespawnInvincibleTime > 0)
 		{
 			BeTranslucent();
 			GetWorldTimerManager().SetTimer(
