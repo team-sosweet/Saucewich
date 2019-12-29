@@ -14,6 +14,10 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerState.h"
+#include "Player/BaseHUD.h"
+#include "Widget/ErrorWidget.h"
+
+#define LOCTEXT_NAMESPACE ""
 
 void ASaucewichPlayerController::SetRespawnTimer_Implementation(const float RespawnTime)
 {
@@ -95,7 +99,14 @@ void ASaucewichPlayerController::Ping()
 	ServerPing();
 }
 
-void ASaucewichPlayerController::OnPingFailed_Implementation()
+void ASaucewichPlayerController::OnPingFailed() const
+{
+	CastChecked<ABaseHUD>(GetHUD())->ShowError(
+		LOCTEXT("ConnectionLost", "서버와의 연결이 끊어졌습니다.")
+	)->OnDestructNativeSingle.BindUObject(this, &ASaucewichPlayerController::Disconnect);
+}
+
+void ASaucewichPlayerController::Disconnect() const
 {
 	const auto World = GetWorld();
 	const auto NetDriver = World->GetNetDriver();
@@ -167,3 +178,5 @@ bool ASaucewichPlayerController::ServerRespawn_Validate()
 {
 	return true;
 }
+
+#undef LOCTEXT_NAMESPACE

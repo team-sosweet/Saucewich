@@ -12,20 +12,11 @@ class SAUCEWICH_API UErrorWidget : public UBaseWidget
 
 public:
 	UErrorWidget();
-	void Activate(const FText& Message, bool bCritical);
+	void Activate(FText&& Message);
 
 protected:
 	void NativeOnInitialized() override;
 	
 private:
-	UFUNCTION()
-	void OnClicked();
-	
-	UPROPERTY(Transient)
-	class UTextBlock* DescriptionText;
-
-	UPROPERTY(Transient)
-	class UButton* BackgroundButton;
-
-	uint8 bCriticalError : 1;
+	class UTextBlock* Text;
 };

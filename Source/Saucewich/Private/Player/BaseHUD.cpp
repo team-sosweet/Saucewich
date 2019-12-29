@@ -13,7 +13,7 @@ void ABaseHUD::AddFocusedWidget(UWidget* const Widget)
 void ABaseHUD::RemoveFocusedWidget(UWidget* const Widget)
 {
 	const auto Found = FocusedWidgets.FindLast(Widget);
-	if (ensure(Found != INDEX_NONE)) FocusedWidgets.RemoveAt(Found);
+	if (Found != INDEX_NONE) FocusedWidgets.RemoveAt(Found);
 
 	if (FocusedWidgets.Num() == 0)
 	{
@@ -37,16 +37,17 @@ void ABaseHUD::RemoveFocusedWidget(UWidget* const Widget)
 
 void ABaseHUD::BeginPlay()
 {
-	ErrorWidget = CreateWidget<UErrorWidget>(GetOwningPlayerController(), ErrorWidgetClass.LoadSynchronous());
-	MenuWidget = CreateWidget<UBaseWidget>(GetOwningPlayerController(), MenuWidgetClass.LoadSynchronous());
+	const auto PC = GetOwningPlayerController();
+	MenuWidget = CreateWidget<UBaseWidget>(PC, MenuWidgetClass.LoadSynchronous());
+	ErrorWidget = CreateWidget<UErrorWidget>(PC, ErrorWidgetClass.LoadSynchronous());
 
 	Super::BeginPlay();
 }
 
-void ABaseHUD::ShowError(const FText Message, const bool bCritical)
+UErrorWidget* ABaseHUD::ShowError(FText Message)
 {
-	ErrorWidget->Activate(Message, bCritical);
-	OnShowError();
+	ErrorWidget->Activate(MoveTemp(Message));
+	return ErrorWidget;
 }
 
 void ABaseHUD::OpenMenu() const

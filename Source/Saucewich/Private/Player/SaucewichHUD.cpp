@@ -22,12 +22,14 @@ void ASaucewichHUD::BeginPlay()
 
 void ASaucewichHUD::BindChangedColor(const FOnChangedColorSingle& InDelegate)
 {
-	OnChangedColor.AddUnique(InDelegate);
+	check(InDelegate.IsBound());
+	check(!OnChangedColor.Contains(InDelegate));
+	OnChangedColor.Add(InDelegate);
 
 	auto&& Data = ASaucewichGameMode::GetData(this);
-	
-	if (const auto PlayerState = CastChecked<ASaucewichPlayerState>(GetOwningPlayerController()->PlayerState, ECastCheckedType::NullAllowed))
-		(void)InDelegate.Execute(Data.Teams[PlayerState->GetTeam()].Color);
+
+	const auto PS = GetOwningPlayerController()->PlayerState;
+	if (PS) InDelegate.Execute(Data.Teams[CastChecked<ASaucewichPlayerState>(PS)->GetTeam()].Color);
 }
 
 void ASaucewichHUD::OnGetPlayerState(ASaucewichPlayerState* const PS)

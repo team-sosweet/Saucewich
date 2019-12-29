@@ -13,7 +13,7 @@ class SAUCEWICH_API ABaseHUD : public AHUD
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void ShowError(FText Message, bool bCritical);
+	class UErrorWidget* ShowError(FText Message);
 
 	UFUNCTION(BlueprintCallable)
 	void OpenMenu() const;
@@ -24,22 +24,17 @@ public:
 protected:
 	void BeginPlay() override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnShowError();
-
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<class UBaseWidget> MenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<UErrorWidget> ErrorWidgetClass;
+
 	UPROPERTY(Transient, VisibleInstanceOnly)
 	TArray<TWeakObjectPtr<UWidget>> FocusedWidgets;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	TSoftClassPtr<class UErrorWidget> ErrorWidgetClass;
-
-	UPROPERTY(EditAnywhere)
-	TSoftClassPtr<class UBaseWidget> MenuWidgetClass;
-
-	UPROPERTY(Transient)
-	UErrorWidget* ErrorWidget;
-
 	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UBaseWidget* MenuWidget;
+	UErrorWidget* ErrorWidget;
 };

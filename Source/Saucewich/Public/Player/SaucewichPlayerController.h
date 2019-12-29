@@ -61,14 +61,13 @@ public:
 protected:
 	void BeginPlay() override;
 	void InitPlayerState() override;
-	
-	UFUNCTION(BlueprintNativeEvent)
-	void OnPingFailed();
 
 private:
 	bool CanRespawn() const;
 
 	void Ping();
+	void OnPingFailed() const;
+	void Disconnect() const;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPing();

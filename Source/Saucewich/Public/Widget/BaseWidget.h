@@ -7,6 +7,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnConstruct);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestruct);
+DECLARE_DELEGATE(FOnDestructNativeSingle)
 
 UCLASS()
 class SAUCEWICH_API UBaseWidget : public UUserWidget
@@ -16,6 +17,8 @@ class SAUCEWICH_API UBaseWidget : public UUserWidget
 public:
 	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite)
 	uint8 bIsCloseable : 1;
+
+	FOnDestructNativeSingle OnDestructNativeSingle;
 
 protected:
 	void NativeConstruct() override;
