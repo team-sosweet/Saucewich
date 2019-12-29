@@ -15,6 +15,7 @@
 #include "Weapon/WeaponComponent.h"
 #include "Saucewich.h"
 #include "SaucewichInstance.h"
+#include "Names.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerState, Log, All)
 
@@ -46,7 +47,7 @@ void ASaucewichPlayerState::OnKill()
 	if (!GS->IsMatchInProgress()) return;
 
 	++Kill;
-	AddScore(TEXT("Kill"));
+	AddScore(NAME("Kill"));
 }
 
 void ASaucewichPlayerState::OnDeath()
@@ -100,8 +101,49 @@ void ASaucewichPlayerState::OnTeamChanged(const uint8 OldTeam)
 
 void ASaucewichPlayerState::SetWeapon_Internal(const uint8 Slot, const TSoftClassPtr<AWeapon>& Weapon)
 {
-	if (Slot >= WeaponLoadout.Num()) WeaponLoadout.AddZeroed(Slot - WeaponLoadout.Num() + 1);
 	WeaponLoadout[Slot] = Weapon;
+}
+
+void ASaucewichPlayerState::ValidateLoadout()
+{
+	const auto OrigNum = WeaponLoadout.Num();
+	const auto DefNum = DefaultWeaponLoadout.Num();
+	
+	WeaponLoadout.SetNum(DefNum);
+
+	const auto Validate = [](TArray<TSoftClassPtr<AWeapon>>& Arr, const int32 Num, auto&& Fn)
+	{
+		for (auto i=0; i<Num; ++i)
+		{
+			const auto Cls = Arr[i].LoadSynchronous();
+			if (!Cls || GetDefault<AWeapon>(Cls)->GetData().Slot != i)
+			{
+				Fn(i);
+			}
+		}
+	};
+
+#if DO_CHECK
+	if (DefNum == 0)
+	{
+		UE_LOG(LogPlayerState, Error, TEXT("Default weapon loadout not set for %s"), *GetClass()->GetName());
+	}
+	else
+	{
+		Validate(DefaultWeaponLoadout, DefNum, [this](const int32 Idx)
+		{
+			UE_LOG(LogPlayerState, Error, TEXT("Invalid slot of default weapon (index %d) for %s"), Idx, *GetClass()->GetName());
+		});
+	}
+#endif
+
+	Validate(WeaponLoadout, FMath::Min(OrigNum, DefNum), [&](const int32 Idx)
+	{
+		WeaponLoadout[Idx] = DefaultWeaponLoadout[Idx];
+	});
+	
+	for (auto i=OrigNum; i<DefNum; ++i)
+		WeaponLoadout[i] = DefaultWeaponLoadout[i];
 }
 
 void ASaucewichPlayerState::ServerSetWeaponLoadout_Implementation(const TArray<TSoftClassPtr<AWeapon>>& Loadout)
@@ -163,6 +205,8 @@ bool ASaucewichPlayerState::RequestSetPlayerName_Validate(const FString& NewPlay
 void ASaucewichPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ValidateLoadout();
 	
 	if (const auto PC = Cast<ASaucewichPlayerController>(GetOwner()))
 	{
@@ -209,5 +253,4 @@ void ASaucewichPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(ASaucewichPlayerState, Objective);
 	DOREPLIFETIME(ASaucewichPlayerState, Kill);
 	DOREPLIFETIME(ASaucewichPlayerState, Death);
-	DOREPLIFETIME(ASaucewichPlayerState, WeaponLoadout);
 }

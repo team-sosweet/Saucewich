@@ -84,13 +84,18 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastAddScore(FName ScoreID, int32 ActualScore);
 
+	void ValidateLoadout();
+
 	FOnTeamChangedNative OnTeamChangedNative;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnNameChanged OnNameChanged;
 
-	UPROPERTY(Replicated, EditAnywhere, Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(Transient, Config, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TArray<TSoftClassPtr<AWeapon>> WeaponLoadout;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSoftClassPtr<AWeapon>> DefaultWeaponLoadout;
 
 	UPROPERTY(ReplicatedUsing=OnTeamChanged, Transient, VisibleInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Team = -1;

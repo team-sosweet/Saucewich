@@ -112,7 +112,7 @@ void AFridge::OnIngChanged(AMakeSandwichPlayerState* const InPS) const
 
 void AFridge::SetHighlighted(const bool bHighlight) const
 {
-	if (const auto HUD = GetHUD()) HUD->SetHighlighted(bHighlight);
+	if (const auto Widget = GetHUD()) Widget->SetHighlighted(bHighlight);
 	Mesh->SetRenderCustomDepth(bHighlight);
 }
 
