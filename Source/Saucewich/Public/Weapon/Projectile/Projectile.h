@@ -24,6 +24,7 @@ public:
 
 	FLinearColor GetColor() const;
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
+	UProjectileMovementComponent* GetMovement() const { return Movement; }
 	bool IsTeamValid() const { return Team != static_cast<decltype(Team)>(-1); }
 
 	UFUNCTION(BlueprintCallable)

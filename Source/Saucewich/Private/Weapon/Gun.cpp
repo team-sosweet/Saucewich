@@ -3,9 +3,10 @@
 #include "Weapon/Gun.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Sound/SoundBase.h"
 
 #include "Entity/ActorPool.h"
@@ -75,54 +76,54 @@ void AGun::Shoot()
 	auto&& Data = GetGunData();
 
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform(Names::Muzzle);
-	const auto MuzzleLocation = MuzzleTransform.GetLocation();
+	const auto MuzzleLoc = MuzzleTransform.GetLocation();
+	const auto Forward = MuzzleTransform.GetUnitAxis(EAxis::X);
+	const auto Right = MuzzleTransform.GetUnitAxis(EAxis::Y);
+	const auto Up = MuzzleTransform.GetUnitAxis(EAxis::Z);
 
-	const auto Proj = GetDefault<AGunProjectile>(Data.ProjectileClass.LoadSynchronous());
+	const auto ProjCls = Data.ProjectileClass.LoadSynchronous();
+	const auto Proj = GetDefault<AGunProjectile>(ProjCls);
 	const auto ProjColProf = Proj->GetCollisionProfile();
 
 	FHitResult Hit;
 	const auto HitType = GunTraceInternal(Hit, ProjColProf, Data);
 
-	auto&& Transform = GetActorTransform();
-	const auto Forward = Transform.GetUnitAxis(EAxis::X);
-	const auto Right = Transform.GetUnitAxis(EAxis::Y);
 
 	const auto Dir = [&]
 	{
 		if (HitType == EGunTraceHit::None) return MuzzleTransform.GetRotation().Vector();
 
-		const auto MuzzleToEnemy = Hit.ImpactPoint - MuzzleLocation;
-		check(!MuzzleToEnemy.IsNearlyZero());
-		
-		const auto BaseDir = MuzzleToEnemy.GetUnsafeNormal();
-		const auto EnemyVel = Hit.GetActor()->GetVelocity();
-		if (EnemyVel.IsNearlyZero()) return BaseDir;
+		const auto ProjSpd = Data.ProjectileSpeed;
 
-		const auto EnemyToMuzzle = -MuzzleToEnemy;
+		const auto PredictGravity = [&](const FVector& To)
+		{
+			// TODO: 실제 중력 적용
+			const auto G = -980.f;
+			const auto K = FVector::Dist(MuzzleLoc, To);
+			const auto Theta = FMath::Asin(-G*K / (ProjSpd*ProjSpd)) / 2;
+			// TODO: 위 공식은 고저차를 반영하지 못함
+			auto Direction = To - MuzzleLoc; // Direction.Z = 0.f;
+			return Direction.GetUnsafeNormal().RotateAngleAxis(FMath::RadiansToDegrees(Theta), -Up);
+		};
+		
+		const auto EnemyVel = Hit.GetActor()->GetVelocity();
+		if (EnemyVel.IsNearlyZero()) return PredictGravity(Hit.ImpactPoint);
+
+		const auto EnemyToMuzzle = MuzzleLoc - Hit.ImpactPoint;
 		const auto Dot = EnemyToMuzzle.GetUnsafeNormal() | EnemyVel.GetUnsafeNormal();
 		const auto Alpha = FMath::Acos(Dot);
 		const auto EnemySpd = EnemyVel.Size();
-		const auto Theta = FMath::Asin(EnemySpd * FMath::Sin(Alpha) / Data.ProjectileSpeed);
-		const auto Time = EnemyToMuzzle.Size() / (EnemySpd*FMath::Cos(Alpha) + Data.ProjectileSpeed*FMath::Cos(Theta));
+		const auto Theta = FMath::Asin(EnemySpd * FMath::Sin(Alpha) / ProjSpd);
+		const auto Time = EnemyToMuzzle.Size() / (EnemySpd*FMath::Cos(Alpha) + ProjSpd*FMath::Cos(Theta));
 		const auto PredictedHitLocation = Hit.ImpactPoint + EnemyVel * Time;
-		return (PredictedHitLocation - MuzzleLocation).GetUnsafeNormal();
+		return PredictGravity(PredictedHitLocation);
 	}();
 
 	const auto V = 45.f * Data.VerticalSpread;
 	const auto H = 45.f * Data.HorizontalSpread;
 	
-	TArray<FVector> RDirs;
-	RDirs.Reserve(Data.NumProjectile);
-	for (auto i = 0; i < Data.NumProjectile; ++i)
-	{
-		const auto VR = FireRand.FRandRange(-V, V) * SpreadAlpha;
-		const auto HR = FireRand.FRandRange(-H, H) * SpreadAlpha;
-		RDirs.Add(Dir.RotateAngleAxis(VR, Forward).RotateAngleAxis(HR, Right));
-		SpreadAlpha = FMath::Min(SpreadAlpha + Data.SpreadIncrease, 1.f);
-	}
-
 	FTransform SpawnTransform{
-		FQuat::Identity, MuzzleLocation,
+		FQuat::Identity, MuzzleLoc,
 		FVector{FireRand.FRandRange(Data.MinProjectileSize, Data.MaxProjectileSize)}
 	};
 
@@ -132,8 +133,11 @@ void AGun::Shoot()
 
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
-		SpawnTransform.SetRotation(RDirs[i].ToOrientationQuat());
-		AActorPool::Get(this)->Spawn(Data.ProjectileClass.LoadSynchronous(), SpawnTransform, Parameters);
+		const auto VR = FireRand.FRandRange(-V, V) * SpreadAlpha;
+		const auto HR = FireRand.FRandRange(-H, H) * SpreadAlpha;
+		SpawnTransform.SetRotation(Dir.RotateAngleAxis(VR, Up).RotateAngleAxis(HR, Right).ToOrientationQuat());
+		AActorPool::Get(this)->Spawn<AGunProjectile>(ProjCls, SpawnTransform, Parameters);
+		SpreadAlpha = FMath::Min(SpreadAlpha + Data.SpreadIncrease, 1.f);
 	}
 
 	LastClip = --Clip;
@@ -146,7 +150,7 @@ void AGun::Shoot()
 	ReloadWaitingTime = 0.f;
 
 #if !UE_SERVER
-	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLocation);
+	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLoc);
 
 	const auto PC = Cast<APlayerController>(GetInstigatorController());
 	if (PC && PC->IsLocalController())
