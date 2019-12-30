@@ -44,17 +44,17 @@ float UUserSettings::GetCorrectedSensitivity() const
 
 void UUserSettings::SetOutlineEnabled(const bool bEnabled)
 {
-	OnOptionChanged.Execute(EGraphicOption::Outline, bOutline = bEnabled);
+	OnOptionChanged.ExecuteIfBound(EGraphicOption::Outline, bOutline = bEnabled);
 }
 
 void UUserSettings::SetHighlightEnabled(const bool bEnabled)
 {
-	OnOptionChanged.Execute(EGraphicOption::Highlight, bHighlight = bEnabled);
+	OnOptionChanged.ExecuteIfBound(EGraphicOption::Highlight, bHighlight = bEnabled);
 }
 
 void UUserSettings::SetParticleEnabled(const bool bEnabled)
 {
-	OnOptionChanged.Execute(EGraphicOption::Particle, bParticle = bEnabled);
+	OnOptionChanged.ExecuteIfBound(EGraphicOption::Particle, bParticle = bEnabled);
 }
 
 void UUserSettings::RegisterGraphicManager(FOnGraphicOptionChanged&& Callback)
