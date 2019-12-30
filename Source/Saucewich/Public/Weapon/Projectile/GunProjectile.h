@@ -10,9 +10,6 @@ class SAUCEWICH_API AGunProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
-public:	
-	uint8 bCosmetic : 1;
-
 protected:
 	float GetSauceMarkScale() const override;
 	void OnExplode(const FHitResult& Hit) override;

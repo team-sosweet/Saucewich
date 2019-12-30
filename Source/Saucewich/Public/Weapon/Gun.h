@@ -22,10 +22,10 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	FVector2D TraceBoxSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
-	TSubclassOf<UDamageType> DamageType;
+	TSoftClassPtr<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, AdvancedDisplay)
-	TSubclassOf<class AGunProjectile> ProjectileClass;
+	TSoftClassPtr<class AGunProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Damage;

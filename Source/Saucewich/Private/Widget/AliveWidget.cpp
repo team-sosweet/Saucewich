@@ -26,7 +26,12 @@ void UAliveWidget::NativeOnInitialized()
 	GameState = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
 	GameState->OnPlayerDeath.AddDynamic(this, &UAliveWidget::OnPlayerDeath);
 
-	const auto PC = CastChecked<ASaucewichPlayerController>(GetOwningPlayer());
+	const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer());
+	if (!PC)
+	{
+		RemoveFromParent();
+		return;
+	}
 	
 	FOnPlayerStateSpawnedSingle PSSpawned;
 	PSSpawned.BindDynamic(this, &UAliveWidget::OnPlayerStateSpawned);

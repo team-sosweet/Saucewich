@@ -1,24 +1,21 @@
 // Copyright 2019 Othereum. All Rights Reserved.
 
 #include "Weapon/Projectile/GunProjectile.h"
-#include "GameFramework/Pawn.h"
+#include "Components/StaticMeshComponent.h"
 #include "Weapon/Gun.h"
 
 void AGunProjectile::OnExplode(const FHitResult& Hit)
 {
-	if (!bCosmetic)
+	if (const auto Other = Hit.GetActor())
 	{
-		if (const auto Other = Hit.GetActor())
-		{
-			auto&& Data = CastChecked<AGun>(GetOwner())->GetGunData();
-			const auto Damage = Data.Damage;
-			Other->TakeDamage(
-				Damage,
-				FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType},
-				GetInstigatorController(),
-				GetOwner()
-			);
-		}
+		auto&& Data = CastChecked<AGun>(GetOwner())->GetGunData();
+		const auto Damage = Data.Damage;
+		Other->TakeDamage(
+			Damage,
+			FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType.LoadSynchronous()},
+			GetInstigatorController(),
+			GetOwner()
+		);
 	}
 	
 	Super::OnExplode(Hit);
@@ -35,8 +32,7 @@ void AGunProjectile::OnActivated()
 	Super::OnActivated();
 
 	const auto Gun = Cast<AGun>(GetOwner());
-	if (!ensure(Gun)) return;
-	
+	check(Gun);
 	SetSpeed(Gun->GetGunData().ProjectileSpeed);
 }
 

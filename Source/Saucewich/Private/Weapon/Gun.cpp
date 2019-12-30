@@ -77,19 +77,36 @@ void AGun::Shoot()
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform(Names::Muzzle);
 	const auto MuzzleLocation = MuzzleTransform.GetLocation();
 
-	const auto ProjColProf = GetDefault<AGunProjectile>(Data.ProjectileClass)->GetCollisionProfile();
+	const auto Proj = GetDefault<AGunProjectile>(Data.ProjectileClass.LoadSynchronous());
+	const auto ProjColProf = Proj->GetCollisionProfile();
 
 	FHitResult Hit;
 	const auto HitType = GunTraceInternal(Hit, ProjColProf, Data);
 
-	auto& Transform = GetRootComponent()->GetComponentTransform();
+	auto&& Transform = GetActorTransform();
 	const auto Forward = Transform.GetUnitAxis(EAxis::X);
 	const auto Right = Transform.GetUnitAxis(EAxis::Y);
 
-	const auto Dir =
-		HitType != EGunTraceHit::None
-		? (Hit.ImpactPoint - MuzzleLocation).GetSafeNormal()
-		: MuzzleTransform.GetRotation().Vector();
+	const auto Dir = [&]
+	{
+		if (HitType == EGunTraceHit::None) return MuzzleTransform.GetRotation().Vector();
+
+		const auto MuzzleToEnemy = Hit.ImpactPoint - MuzzleLocation;
+		check(!MuzzleToEnemy.IsNearlyZero());
+		
+		const auto BaseDir = MuzzleToEnemy.GetUnsafeNormal();
+		const auto EnemyVel = Hit.GetActor()->GetVelocity();
+		if (EnemyVel.IsNearlyZero()) return BaseDir;
+
+		const auto EnemyToMuzzle = -MuzzleToEnemy;
+		const auto Dot = EnemyToMuzzle.GetUnsafeNormal() | EnemyVel.GetUnsafeNormal();
+		const auto Alpha = FMath::Acos(Dot);
+		const auto EnemySpd = EnemyVel.Size();
+		const auto Theta = FMath::Asin(EnemySpd * FMath::Sin(Alpha) / Data.ProjectileSpeed);
+		const auto Time = EnemyToMuzzle.Size() / (EnemySpd*FMath::Cos(Alpha) + Data.ProjectileSpeed*FMath::Cos(Theta));
+		const auto PredictedHitLocation = Hit.ImpactPoint + EnemyVel * Time;
+		return (PredictedHitLocation - MuzzleLocation).GetUnsafeNormal();
+	}();
 
 	const auto V = 45.f * Data.VerticalSpread;
 	const auto H = 45.f * Data.HorizontalSpread;
@@ -104,26 +121,6 @@ void AGun::Shoot()
 		SpreadAlpha = FMath::Min(SpreadAlpha + Data.SpreadIncrease, 1.f);
 	}
 
-	TArray<bool> HitPawn;
-	HitPawn.AddZeroed(Data.NumProjectile);
-	if (HitType == EGunTraceHit::Pawn)
-	{
-		FHitResult PawnHitResult;
-		for (auto i = 0; i < Data.NumProjectile; ++i)
-		{
-			if (GetWorld()->LineTraceSingleByProfile(PawnHitResult, MuzzleLocation, MuzzleLocation + RDirs[i] * Data.MaxDistance, ProjColProf))
-			{
-				Hit.GetActor()->TakeDamage(
-					Data.Damage,
-					FPointDamageEvent{ Data.Damage, PawnHitResult, RDirs[i], Data.DamageType },
-					GetInstigator()->GetController(),
-					this
-				);
-				HitPawn[i] = true;
-			}
-		}
-	}
-
 	FTransform SpawnTransform{
 		FQuat::Identity, MuzzleLocation,
 		FVector{FireRand.FRandRange(Data.MinProjectileSize, Data.MaxProjectileSize)}
@@ -136,10 +133,7 @@ void AGun::Shoot()
 	for (auto i = 0; i < Data.NumProjectile; ++i)
 	{
 		SpawnTransform.SetRotation(RDirs[i].ToOrientationQuat());
-		if (const auto Projectile = AActorPool::Get(this)->Spawn<AGunProjectile>(*Data.ProjectileClass, SpawnTransform, Parameters))
-		{
-			Projectile->bCosmetic = HitPawn[i];
-		}
+		AActorPool::Get(this)->Spawn(Data.ProjectileClass.LoadSynchronous(), SpawnTransform, Parameters);
 	}
 
 	LastClip = --Clip;
@@ -172,17 +166,15 @@ void AGun::Shoot()
 EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 {
 	auto& Data = GetGunData();
-	if (const auto Def = Data.ProjectileClass.GetDefaultObject())
-	{
-		const auto Profile = Def->GetCollisionProfile();
-		return GunTraceInternal(OutHit, Profile, Data);
-	}
-	return EGunTraceHit::None;
+	const auto Cls = Data.ProjectileClass.LoadSynchronous();
+	const auto Def = GetDefault<AProjectile>(Cls);
+	const auto Profile = Def->GetCollisionProfile();
+	return GunTraceInternal(OutHit, Profile, Data);
 }
 
 EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
-	const auto Character = Cast<ATpsCharacter>(GetOwner());
+	const auto Character = CastChecked<ATpsCharacter>(GetOwner(), ECastCheckedType::NullAllowed);
 	if (!IsValid(Character)) return EGunTraceHit::None;
 	
 	const auto AimRotation = Character->GetBaseAimRotation();
@@ -191,7 +183,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	const auto End = Start + AimDir * Data.MaxDistance;
 
 	FCollisionQueryParams Params;
-	if (const auto GS = GetWorld()->GetGameState<ASaucewichGameState>())
+	if (const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed))
 	{
 		Params.AddIgnoredActors(TArray<AActor*>{GS->GetCharactersByTeam(Character->GetTeam())});
 	}
@@ -207,7 +199,7 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	{
 		const auto Chr = Cast<APawn>(BoxHits[i].GetActor());
 		if (!Chr || !Chr->ShouldTakeDamage(Data.Damage, FPointDamageEvent{
-			Data.Damage, BoxHits[i], (End-Start).GetSafeNormal(), Data.DamageType
+			Data.Damage, BoxHits[i], (End-Start).GetSafeNormal(), Data.DamageType.LoadSynchronous()
 		}, GetInstigatorController(), this)) continue;
 
 		if (!GetWorld()->LineTraceTestByProfile(BoxHits[i].ImpactPoint, Start, NAME("NoPawn"), Params))

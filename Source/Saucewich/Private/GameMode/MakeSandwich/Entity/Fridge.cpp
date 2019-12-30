@@ -39,10 +39,11 @@ void AFridge::BeginPlay()
 #if !UE_SERVER
 	if (!IsNetMode(NM_DedicatedServer))
 	{
-		GetHUD()->Init(Team);
-		
-		const auto PC = CastChecked<ASaucewichPlayerController>(GetWorld()->GetFirstPlayerController());
-		PC->SafePS(FOnPSSpawnedNative::FDelegate::CreateUObject(this, &AFridge::BindPS));
+		if (const auto PC = Cast<ASaucewichPlayerController>(GetWorld()->GetFirstPlayerController()))
+		{
+			GetHUD()->Init(Team);
+			PC->SafePS(FOnPSSpawnedNative::FDelegate::CreateUObject(this, &AFridge::BindPS));
+		}
 	}
 #endif 
 }
