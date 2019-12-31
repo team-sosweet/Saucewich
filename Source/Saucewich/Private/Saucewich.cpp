@@ -2,8 +2,6 @@
 
 #include "Saucewich.h"
 
-#include "GameLiftServerSDK.h"
-
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 #include "Http.h"
@@ -12,16 +10,23 @@
 #include "HttpManager.h"
 #include "GameFramework/InputSettings.h"
 
+#if WITH_GAMELIFT
+	#include "GameLiftServerSDK.h"
+#endif
+
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
 DEFINE_LOG_CATEGORY(LogGameLift)
-DEFINE_LOG_CATEGORY(LogSaucewich)
 
-FGameLiftServerSDKModule& USaucewich::GetGameLift()
-{
-	static auto&& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
-	return Module;
-}
+#if WITH_GAMELIFT
+	DEFINE_LOG_CATEGORY(LogSaucewich)
+
+	FGameLiftServerSDKModule& GameLift::Get()
+	{
+		static auto&& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
+		return Module;
+	}
+#endif
 
 bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEvent)
 {

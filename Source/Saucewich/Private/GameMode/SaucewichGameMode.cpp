@@ -114,19 +114,18 @@ void ASaucewichGameMode::BeginPlay()
 	}
 }
 
-void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-	FString& ErrorMessage)
+void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	
+#if WITH_GAMELIFT
 	if (!ErrorMessage.IsEmpty()) return;
 
-#if WITH_GAMELIFT
-	auto& GameLiftSdkModule = USaucewich::GetGameLift();
-	const auto Result = GameLiftSdkModule.AcceptPlayerSession(UGameplayStatics::ParseOption(Options, TEXT("SessionID")));
+	static const FString SessionIDKey = TEXT("SessionID");
+	const auto Result = GameLift::Get().AcceptPlayerSession(UGameplayStatics::ParseOption(Options, SessionIDKey));
 	if (!Result.IsSuccess())
 	{
 		ErrorMessage = Result.GetError().m_errorMessage;
-		return;
 	}
 #endif
 }
@@ -144,14 +143,16 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 
 	GameSession->RegisterPlayer(PC, UniqueId.GetUniqueNetId(), false);
 	
-	auto PlayerName = UGameplayStatics::ParseOption(Options, TEXT("PlayerName"));
+	static const FString PlayerNameKey = TEXT("PlayerName");
+	auto PlayerName = UGameplayStatics::ParseOption(Options, PlayerNameKey);
 	
 	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), PC->PlayerState->PlayerId);
 	
 	ChangeName(PC, PlayerName, false);
 
-	PC->SetSessionID(UGameplayStatics::ParseOption(Options, TEXT("SessionID")));
+	static const FString SessionIDKey = TEXT("SessionID");
+	PC->SetSessionID(UGameplayStatics::ParseOption(Options, SessionIDKey));
 	
 	return {};
 }
@@ -166,6 +167,19 @@ void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 	);
 }
 
+#if WITH_GAMELIFT
+static void Check(const FGameLiftGenericOutcome& Outcome)
+{
+	if (!Outcome.IsSuccess())
+	{
+		auto&& Error = Outcome.GetError();
+		UE_LOG(LogGameLift, Error, TEXT("FATAL ERROR: [%s] %s"), *Error.m_errorName, *Error.m_errorMessage);
+		UE_LOG(LogGameLift, Error, TEXT("Terminating process..."));
+		FPlatformMisc::RequestExit(false);
+	}
+}
+#endif
+
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
@@ -174,14 +188,22 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 		FMT_MSG(LOCTEXT("Logout", "{0}님이 게임에서 나갔습니다."), FText::FromString(Exiting->PlayerState->GetPlayerName())),
 		EMsgType::Left
 	);
-
+	
 #if WITH_GAMELIFT
+	auto&& GameLiftSDK = GameLift::Get();
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
 	{
-		auto& Module = USaucewich::GetGameLift();
-		Module.RemovePlayerSession(PC->GetSessionID());
+		GameLiftSDK.RemovePlayerSession(PC->GetSessionID());
 	}
 #endif
+	
+	if (NumPlayers == 0)
+	{
+		GEngine->SetClientTravel(GetWorld(), TEXT("DSDef?listen"), TRAVEL_Absolute);
+#if WITH_GAMELIFT
+		Check(GameLiftSDK.TerminateGameSession());
+#endif
+	}
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -301,11 +323,6 @@ bool ASaucewichGameMode::ReadyToEndMatch_Implementation()
 		return true;
 	}
 
-	if (NumPlayers <= 0)
-	{
-		return true;
-	}
-	
 	return false;
 }
 
@@ -331,15 +348,7 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-	
-	if (NumPlayers == 0)
-	{
-		StartNextGame();
-	}
-	else
-	{
-		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
-	}
+	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
 }
 
 void ASaucewichGameMode::EndMatch()
@@ -401,7 +410,7 @@ void ASaucewichGameMode::StartNextGame() const
 	const auto DefGm = GetDefault<ASaucewichGameMode>(GmClass.LoadSynchronous());
 	const auto NewMap = DefGm->ChooseNextMap();
 
-	const auto URL = FString::Printf(TEXT("/Game/Maps/%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
+	const auto URL = FString::Printf(TEXT("%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
 	GetWorld()->ServerTravel(URL);
 }
 

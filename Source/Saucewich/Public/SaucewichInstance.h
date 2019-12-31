@@ -11,6 +11,15 @@ class AActorPool;
 class ASauceMarker;
 class ASaucewichGameMode;
 
+namespace Aws {
+namespace GameLift {
+namespace Server {
+namespace Model {
+	
+	class GameSession;
+	
+}}}}
+
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FScoreData
 {
@@ -32,6 +41,9 @@ public:
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Saucewich Instance", WorldContext=WorldContextObj))
 	static USaucewichInstance* Get(const UObject* WorldContextObj);
 
+	UFUNCTION(BlueprintCallable)
+	void StartGame() const;
+
 	class UUserSettings* GetUserSettings() const { return UserSettings; }
 	AActorPool* GetActorPool() const;
 	ASauceMarker* GetSauceMarker() const;
@@ -47,6 +59,7 @@ protected:
 
 private:
 	void OnNetworkError(UWorld*, class UNetDriver*, ENetworkFailure::Type, const FString&);
+	void StartGameSession(Aws::GameLift::Server::Model::GameSession) const;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;

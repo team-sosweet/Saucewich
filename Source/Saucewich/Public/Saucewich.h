@@ -12,6 +12,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogSaucewich, Log, All)
 DECLARE_LOG_CATEGORY_EXTERN(LogGameLift, Log, All)
 
 class FJsonObject;
+class FGameLiftServerSDKModule;
 
 DECLARE_DYNAMIC_DELEGATE_ThreeParams(FSearchSessionResponse, bool, bFound, const FString&, URL, const FString&, PlayerID);
 DECLARE_DELEGATE_TwoParams(FOnHttpResponse, int32, const FJsonObject&)
@@ -34,6 +35,11 @@ enum class ENameValidity : uint8
 	Valid, Character, Length
 };
 
+namespace GameLift
+{
+	FGameLiftServerSDKModule& Get();
+}
+
 UCLASS()
 class SAUCEWICH_API USaucewich : public UBlueprintFunctionLibrary
 {
@@ -54,8 +60,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMaxLen();
-
-	static class FGameLiftServerSDKModule& GetGameLift();
 
 	static void Request(const FString& Verb, const FString& URL, const FOnHttpResponse& OnResponse);
 	static void Request(const FString& Verb, const FString& URL, const TSharedRef<FJsonObject>& Content, const FOnHttpResponse& OnResponse);
