@@ -91,13 +91,9 @@ void AGun::Shoot()
 
 		const auto PredictGravity = [&](const FVector& To)
 		{
-			// TODO: 실제 중력 적용
-			const auto G = -980.f;
-			const auto K = FVector::Dist(MuzzleLoc, To);
-			const auto Theta = FMath::Asin(-G*K / (ProjSpd*ProjSpd)) / 2;
-			// TODO: 위 공식은 고저차를 반영하지 못함
-			auto Direction = To - MuzzleLoc; // Direction.Z = 0.f;
-			return Direction.GetUnsafeNormal().RotateAngleAxis(FMath::RadiansToDegrees(Theta), -Up);
+			// 이 수치는 근사값인데, 고저차를 반영하지 못하기 때문이다.
+			const auto Theta = FMath::Asin(980.f*FVector::Dist(MuzzleLoc, To) / (ProjSpd*ProjSpd)) / 2;
+			return (To - MuzzleLoc).GetUnsafeNormal().RotateAngleAxis(-FMath::RadiansToDegrees(Theta), Up);
 		};
 		
 		const auto EnemyVel = Hit.GetActor()->GetVelocity();
