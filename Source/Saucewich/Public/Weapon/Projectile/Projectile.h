@@ -57,6 +57,9 @@ private:
 	TArray<TSoftObjectPtr<USoundBase>> ImpactSounds;
 
 	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<class USoundAttenuation> ImpactSoundAttenuation;
+
+	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UParticleSystem> ImpactFX;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -70,4 +73,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	uint8 bSauceMark : 1;
+
+	UPROPERTY(EditDefaultsOnly)
+	uint8 bVolumeByScale : 1;
 };

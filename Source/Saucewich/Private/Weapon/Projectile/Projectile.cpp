@@ -90,10 +90,10 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 
 	if (ImpactSounds.Num() > 0)
 	{
-		UGameplayStatics::PlaySoundAtLocation(
-			World,
+		UGameplayStatics::PlaySoundAtLocation(World,
 			ImpactSounds[FMath::RandHelper(ImpactSounds.Num())].LoadSynchronous(),
-			Location
+			Location, bVolumeByScale ? Mesh->GetComponentScale().Size() : 1.f,
+			1.f, 0.f, ImpactSoundAttenuation.LoadSynchronous()
 		);
 	}
 

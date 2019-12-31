@@ -62,9 +62,9 @@ public:
 	const T& GetData() const
 	{
 		static_assert(TIsDerivedFrom<T, FWeaponData>::IsDerived, "T must be derived from FWeaponData");
-		static const T Default{};
 		const auto Data = WeaponData.GetRow<T>(TEXT(""));
-		return ensure(Data) ? *Data : Default;
+		check(Data);
+		return *Data;
 	}
 
 	UFUNCTION(BlueprintCallable)

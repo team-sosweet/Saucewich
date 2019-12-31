@@ -44,23 +44,27 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 
 	// 초탄퍼짐 비율
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
-	float FirstSpreadRatio = .1f;
-
-	// 탄퍼짐 비율 증가
+	float FirstSpreadRatio = .2f;
+	
+	// 발사당 탄퍼짐 증가 비율
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=1, ClampMin=0, ClampMax=1))
-	float SpreadIncrease = .3f;
+	float SpreadIncrease = .2f;
+
+	// 초당 탄퍼짐 감소율
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
+	float SpreadDecrease = 1.f;
 
 	// 지향사격 각도 오프셋
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
-	float HipFireAngleOffset = 25;
+	float HipFireAngleOffset = 25.f;
 
 	// 자동 조준 최대 거리 (cm)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxDistance;
+	float MaxDistance = 1000.f;
 
 	// 발사되는 소스 발사체의 속력 (cm/s)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ProjectileSpeed;
+	float ProjectileSpeed = 1000.f;
 
 	// 최소 발사체 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

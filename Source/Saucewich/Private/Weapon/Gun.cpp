@@ -31,7 +31,8 @@ void AGun::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	const auto Delay = 60 / GetGunData().Rpm;
+	auto&& Data = GetGunData();
+	const auto Delay = 60.f / Data.Rpm;
 	if (bFiring)
 	{
 		for (; FireLag >= Delay; FireLag -= Delay)
@@ -41,6 +42,7 @@ void AGun::Tick(const float DeltaSeconds)
 	}
 	else
 	{
+		SpreadAlpha = FMath::Clamp(SpreadAlpha - Data.SpreadDecrease*DeltaSeconds, Data.FirstSpreadRatio, 1.f);
 		FirePSC->Deactivate();
 	}
 	FireLag += DeltaSeconds;
@@ -267,7 +269,6 @@ void AGun::OnReleased()
 	FireLag = 0.f;
 	bDried = false;
 	ReloadWaitingTime = 0.f;
-	ReloadAlpha = 0.f;
 }
 
 void AGun::SetColor(const FLinearColor& NewColor)
@@ -280,7 +281,6 @@ void AGun::StartFire(const int32 RandSeed)
 {
 	FireRand.Initialize(RandSeed);
 	bFiring = true;
-	SpreadAlpha = GetGunData().FirstSpreadRatio;
 }
 
 void AGun::MulticastStartFire_Implementation(const int32 RandSeed)
