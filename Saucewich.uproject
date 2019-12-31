@@ -102,6 +102,10 @@
 		{
 			"Name": "ProceduralMeshComponent",
 			"Enabled": false
+		},
+		{
+			"Name": "GameLiftServerSDK",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

@@ -18,13 +18,10 @@ public:
 protected:
 	void BeginPlay() override;
 	
-#if !UE_SERVER
 	void Tick(float DeltaSeconds) override;
-#endif
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	
 private:
-#if !UE_SERVER
 	class UFridgeHUD* GetHUD() const;
 	void BindPS(class ASaucewichPlayerState* InPS);
 	void OnPlyTeamChanged(uint8 NewTeam);
@@ -33,7 +30,6 @@ private:
 	
 	AMakeSandwichPlayerState* LocalPS;
 	FDelegateHandle OnIngChangedHandle;
-#endif
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* Mesh;

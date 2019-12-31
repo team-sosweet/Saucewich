@@ -16,16 +16,38 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
-DEFINE_LOG_CATEGORY(LogGameLift)
+DEFINE_LOG_CATEGORY(LogSaucewich)
 
 #if WITH_GAMELIFT
-	DEFINE_LOG_CATEGORY(LogSaucewich)
 
-	FGameLiftServerSDKModule& GameLift::Get()
+DEFINE_LOG_CATEGORY(LogGameLift)
+
+namespace GameLift
+{
+	FGameLiftServerSDKModule& Get()
 	{
 		static auto&& Module = FModuleManager::GetModuleChecked<FGameLiftServerSDKModule>(TEXT("GameLiftServerSDK"));
 		return Module;
 	}
+
+	void SafeTerminate()
+	{
+		Get().ProcessEnding();
+		FPlatformMisc::RequestExit(false);
+	}
+	
+	void Check(const FGameLiftGenericOutcome& Outcome)
+	{
+		if (!Outcome.IsSuccess())
+		{
+			auto&& Error = Outcome.GetError();
+			UE_LOG(LogGameLift, Error, TEXT("FATAL ERROR: [%s] %s"), *Error.m_errorName, *Error.m_errorMessage);
+			UE_LOG(LogGameLift, Error, TEXT("Terminating process..."));
+			SafeTerminate();
+		}
+	}
+}
+
 #endif
 
 bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEvent)

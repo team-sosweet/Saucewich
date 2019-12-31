@@ -31,7 +31,10 @@ void UBaseWidget::NativeDestruct()
 	{
 		if (const auto PC = GetOwningPlayer())
 		{
-			CastChecked<ABaseHUD>(PC->GetHUD())->RemoveFocusedWidget(this);
+			if (const auto HUD = Cast<ABaseHUD>(PC->GetHUD()))
+			{
+				HUD->RemoveFocusedWidget(this);
+			}
 		}
 	}
 

@@ -38,6 +38,7 @@ enum class ENameValidity : uint8
 namespace GameLift
 {
 	FGameLiftServerSDKModule& Get();
+	void SafeTerminate();
 }
 
 UCLASS()

@@ -353,7 +353,7 @@ void ATpsCharacter::BindOnTeamChanged()
 	{
 		const auto Player = CastChecked<ASaucewichPlayerState>(PS);
 		Player->OnTeamChangedDelegate.AddDynamic(this, &ATpsCharacter::OnTeamChanged);
-		OnTeamChanged(Player->GetTeam());
+		if (Player->GetTeam() != uint8(-1)) OnTeamChanged(Player->GetTeam());
 	}
 	else
 	{

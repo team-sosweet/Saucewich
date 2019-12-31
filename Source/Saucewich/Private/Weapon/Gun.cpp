@@ -19,14 +19,12 @@
 #include "Names.h"
 
 AGun::AGun()
+	:FirePSC{CreateDefaultSubobject<UParticleSystemComponent>(Names::FirePSC)}
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-#if !UE_SERVER
-	FirePSC = CreateDefaultSubobject<UParticleSystemComponent>(Names::FirePSC);
 	FirePSC->SetupAttachment(GetMesh(), Names::Muzzle);
 	FirePSC->bAutoActivate = false;
-#endif
 }
 
 void AGun::Tick(const float DeltaSeconds)
@@ -41,12 +39,10 @@ void AGun::Tick(const float DeltaSeconds)
 			Shoot();
 		}
 	}
-#if !UE_SERVER
 	else
 	{
 		FirePSC->Deactivate();
 	}
-#endif
 	FireLag += DeltaSeconds;
 	if (!bFiring && FireLag > Delay) FireLag = Delay;
 	
@@ -67,9 +63,7 @@ void AGun::Shoot()
 {
 	if (!CanFire())
 	{
-#if !UE_SERVER
 		FirePSC->Deactivate();
-#endif
 		return;
 	}
 
@@ -149,7 +143,6 @@ void AGun::Shoot()
 	ReloadAlpha = 0.f;
 	ReloadWaitingTime = 0.f;
 
-#if !UE_SERVER
 	UGameplayStatics::PlaySoundAtLocation(this, Data.FireSound.LoadSynchronous(), MuzzleLoc);
 
 	const auto PC = Cast<APlayerController>(GetInstigatorController());
@@ -162,7 +155,6 @@ void AGun::Shoot()
 	}
 
 	FirePSC->Activate();
-#endif
 
 	OnShoot();
 }
@@ -240,10 +232,8 @@ void AGun::BeginPlay()
 	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
 	GS->AddDilatableActor(this);
 
-#if !UE_SERVER
 	GS->AddDilatablePSC(FirePSC);
 	FirePSC->SetFloatParameter(Names::RPM, GetData<FGunData>().Rpm);
-#endif
 }
 
 void AGun::FireP()
@@ -287,10 +277,7 @@ void AGun::OnReleased()
 void AGun::SetColor(const FLinearColor& NewColor)
 {
 	Super::SetColor(NewColor);
-	
-#if !UE_SERVER
 	FirePSC->SetColorParameter(Names::Color, NewColor);
-#endif
 }
 
 void AGun::StartFire(const int32 RandSeed)

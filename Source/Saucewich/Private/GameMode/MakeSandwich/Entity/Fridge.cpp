@@ -15,16 +15,12 @@
 #include "Widget/FridgeHUD.h"
 
 AFridge::AFridge()
-	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(Names::Mesh)}
+	:Mesh{CreateDefaultSubobject<UStaticMeshComponent>(Names::Mesh)},
+	HUD{CreateDefaultSubobject<UWidgetComponent>(NAME("HUD"))}
 {
 	RootComponent = Mesh;
-
-#if !UE_SERVER
-	HUD = CreateDefaultSubobject<UWidgetComponent>(NAME("HUD"));
 	HUD->SetupAttachment(Mesh);
-
 	PrimaryActorTick.bCanEverTick = true;
-#endif
 }
 
 void AFridge::BeginPlay()
@@ -36,7 +32,6 @@ void AFridge::BeginPlay()
 	auto&& Color = ASaucewichGameMode::GetData(this).Teams[Team].Color;
 	Mat->SetVectorParameterValue(Names::Color, Color);
 
-#if !UE_SERVER
 	if (!IsNetMode(NM_DedicatedServer))
 	{
 		if (const auto PC = Cast<ASaucewichPlayerController>(GetWorld()->GetFirstPlayerController()))
@@ -45,7 +40,6 @@ void AFridge::BeginPlay()
 			PC->SafePS(FOnPSSpawnedNative::FDelegate::CreateUObject(this, &AFridge::BindPS));
 		}
 	}
-#endif 
 }
 
 void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,
@@ -65,19 +59,20 @@ void AFridge::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, 
 }
 
 
-#if !UE_SERVER
-
 void AFridge::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
 	if (!IsNetMode(NM_DedicatedServer))
 	{
-		if (const auto Pawn = GetWorld()->GetFirstPlayerController()->GetPawn())
+		if (const auto PC = GetWorld()->GetFirstPlayerController())
 		{
-			const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
-			const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
-			HUD->SetDrawSize({Size, Size});
+			if (const auto Pawn = PC->GetPawn())
+			{
+				const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
+				const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
+				HUD->SetDrawSize({Size, Size});
+			}
 		}
 	}
 }
@@ -116,6 +111,3 @@ void AFridge::SetHighlighted(const bool bHighlight) const
 	if (const auto Widget = GetHUD()) Widget->SetHighlighted(bHighlight);
 	Mesh->SetRenderCustomDepth(bHighlight);
 }
-
-
-#endif

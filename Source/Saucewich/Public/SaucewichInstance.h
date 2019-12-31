@@ -41,9 +41,6 @@ public:
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Saucewich Instance", WorldContext=WorldContextObj))
 	static USaucewichInstance* Get(const UObject* WorldContextObj);
 
-	UFUNCTION(BlueprintCallable)
-	void StartGame() const;
-
 	class UUserSettings* GetUserSettings() const { return UserSettings; }
 	AActorPool* GetActorPool() const;
 	ASauceMarker* GetSauceMarker() const;

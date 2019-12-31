@@ -122,10 +122,19 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 	if (!ErrorMessage.IsEmpty()) return;
 
 	static const FString SessionIDKey = TEXT("SessionID");
-	const auto Result = GameLift::Get().AcceptPlayerSession(UGameplayStatics::ParseOption(Options, SessionIDKey));
+	const auto SessionID = UGameplayStatics::ParseOption(Options, SessionIDKey);
+	if (SessionID.IsEmpty())
+	{
+		ErrorMessage = TEXT("SessionID not provided.");
+		return;
+	}
+	
+	const auto Result = GameLift::Get().AcceptPlayerSession(SessionID);
 	if (!Result.IsSuccess())
 	{
 		ErrorMessage = Result.GetError().m_errorMessage;
+		if (ErrorMessage.IsEmpty()) ErrorMessage = TEXT("Unable to accept player session.");
+		return;
 	}
 #endif
 }
@@ -138,8 +147,7 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 	const auto PC = Cast<ASaucewichPlayerController>(NewPlayerController);
 	if (!PC) return {};
 
-	if (!PC->PlayerState)
-		return TEXT("PlayerState is null");
+	if (!PC->PlayerState) return TEXT("PlayerState is null");
 
 	GameSession->RegisterPlayer(PC, UniqueId.GetUniqueNetId(), false);
 	
@@ -168,15 +176,9 @@ void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 }
 
 #if WITH_GAMELIFT
-static void Check(const FGameLiftGenericOutcome& Outcome)
+namespace GameLift
 {
-	if (!Outcome.IsSuccess())
-	{
-		auto&& Error = Outcome.GetError();
-		UE_LOG(LogGameLift, Error, TEXT("FATAL ERROR: [%s] %s"), *Error.m_errorName, *Error.m_errorMessage);
-		UE_LOG(LogGameLift, Error, TEXT("Terminating process..."));
-		FPlatformMisc::RequestExit(false);
-	}
+	extern void Check(const FGameLiftGenericOutcome& Outcome);
 }
 #endif
 
@@ -196,12 +198,13 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 		GameLiftSDK.RemovePlayerSession(PC->GetSessionID());
 	}
 #endif
-	
-	if (NumPlayers == 0)
+
+	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
 	{
 		GEngine->SetClientTravel(GetWorld(), TEXT("DSDef?listen"), TRAVEL_Absolute);
 #if WITH_GAMELIFT
-		Check(GameLiftSDK.TerminateGameSession());
+		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
+		GameLift::Check(GameLiftSDK.TerminateGameSession());
 #endif
 	}
 }
