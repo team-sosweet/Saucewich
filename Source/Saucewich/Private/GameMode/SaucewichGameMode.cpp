@@ -45,13 +45,15 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
 
-void ASaucewichGameMode::PrintMessage(const FText& Message, const EMsgType Type, const float Duration) const
+void ASaucewichGameMode::PrintMessage(const FText& Msg, const EMsgType Type, const float Duration) const
 {
+	if (Msg.IsEmpty()) return;
+	
 	for (const auto PC : TActorRange<ASaucewichPlayerController>{GetWorld()})
 	{
-		PC->PrintMessage(Message, Duration, Type);
+		PC->PrintMessage(Msg, Duration, Type);
 	}
-	UE_LOG(LogGameMode, Log, TEXT("%s"), *Message.ToString());
+	UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
 }
 
 template <class T, class Alloc>

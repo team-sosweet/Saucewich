@@ -74,12 +74,17 @@ uint8 ASaucewichGameState::GetMinPlayerTeam() const
 
 void ASaucewichGameState::SetTeamScore(const uint8 Team, const int32 NewScore)
 {
-	if (!IsMatchInProgress()) return;
+	if (TeamScore[Team] == NewScore || !IsMatchInProgress()) return;
+
+	const auto GameMode = CastChecked<ASaucewichGameMode>(GetWorld()->GetAuthGameMode());
+	auto&& TeamName = GameMode->GetData().Teams[Team].Name;
 	
-	if (TeamScore.Num() <= Team) TeamScore.AddZeroed(Team - TeamScore.Num() + 1);
-	
-	UE_LOG(LogGameState, Log, TEXT("Added %d score to the [%d] %s team. Total score: %d"),
-		NewScore - TeamScore[Team], static_cast<int32>(Team), *GetGmData().Teams[Team].Name.ToString(), NewScore);
+	const auto Msg = FText::FormatNamed(TeamScoreAddMsgFmt,
+		TEXT("Team"), TeamName,
+		TEXT("Score"), NewScore - TeamScore[Team]
+	);
+
+	GameMode->PrintMessage(Msg, EMsgType::Center);
 	
 	TeamScore[Team] = NewScore;
 }
@@ -98,6 +103,7 @@ void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
 	TeamScore.AddZeroed(GetGmData().Teams.Num());
+	TeamScoreAddMsgFmt = GetGmData().TeamScoreAddMsg;
 }
 
 void ASaucewichGameState::Tick(const float DeltaTime)
@@ -106,7 +112,7 @@ void ASaucewichGameState::Tick(const float DeltaTime)
 	
 	if (Dilation > KINDA_SMALL_NUMBER)
 	{
-		const auto Duration = ASaucewichGameMode::GetData(this).MatchEndingTime;
+		const auto Duration = GetGmData().MatchEndingTime;
 		Dilation = FMath::Max(Dilation - DeltaTime / Duration, KINDA_SMALL_NUMBER);
 		for (const auto Actor : DilatableActors) if (IsValid(Actor)) Actor->CustomTimeDilation = Dilation;
 		for (const auto PSC : DilatablePSCs) if (IsValid(PSC)) PSC->CustomTimeDilation = Dilation;

@@ -110,6 +110,7 @@ private:
 	FOnMatchStateChanged OnMatchStateChanged;
 
 	FTimerHandle RoundTimer;
+	FTextFormat TeamScoreAddMsgFmt;
 	
 	UPROPERTY(Replicated, Transient, VisibleInstanceOnly)
 	float RoundStartTime = -1;

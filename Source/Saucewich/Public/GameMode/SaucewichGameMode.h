@@ -33,6 +33,10 @@ struct FGameData
 {
 	GENERATED_BODY()
 
+	// {Team}, {Score}
+	UPROPERTY(EditDefaultsOnly)
+	FText TeamScoreAddMsg;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TSoftObjectPtr<UWorld>> Maps;
 
