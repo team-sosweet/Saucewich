@@ -18,12 +18,6 @@ DECLARE_DYNAMIC_DELEGATE_ThreeParams(FSearchSessionResponse, bool, bFound, const
 DECLARE_DELEGATE_TwoParams(FOnHttpResponse, int32, const FJsonObject&)
 
 UENUM(BlueprintType)
-enum class EGunTraceHit : uint8
-{
-	None, Pawn, Other
-};
-
-UENUM(BlueprintType)
 enum class EMsgType : uint8
 {
 	Center, Left

@@ -83,12 +83,12 @@ void AGun::Shoot()
 	const auto ProjColProf = Proj->GetCollisionProfile();
 
 	FHitResult Hit;
-	const auto HitType = GunTraceInternal(Hit, ProjColProf, Data);
+	const auto bHit = GunTraceInternal(Hit, ProjColProf, Data);
 
 
 	const auto Dir = [&]
 	{
-		if (HitType == EGunTraceHit::None) return MuzzleTransform.GetRotation().Vector();
+		if (!bHit) return MuzzleTransform.GetRotation().Vector();
 
 		const auto ProjSpd = Data.ProjectileSpeed;
 
@@ -158,7 +158,7 @@ void AGun::Shoot()
 	OnShoot();
 }
 
-EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
+bool AGun::GunTrace(FHitResult& OutHit)
 {
 	auto& Data = GetGunData();
 	const auto Cls = Data.ProjectileClass.LoadSynchronous();
@@ -167,15 +167,16 @@ EGunTraceHit AGun::GunTrace(FHitResult& OutHit)
 	return GunTraceInternal(OutHit, Profile, Data);
 }
 
-EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
+bool AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
 	const auto Character = CastChecked<ATpsCharacter>(GetOwner(), ECastCheckedType::NullAllowed);
-	if (!IsValid(Character)) return EGunTraceHit::None;
+	if (!IsValid(Character)) return false;
 	
 	const auto AimRotation = Character->GetBaseAimRotation();
 	const auto AimDir = AimRotation.Vector();
 	const auto Start = Character->GetSpringArmLocation() + AimDir * 10.f;
-	const auto End = Start + AimDir * Data.MaxDistance;
+	const auto Offset = AimDir * Data.MaxDistance;
+	const auto End = Start + Offset;
 
 	FCollisionQueryParams Params;
 	if (const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState(), ECastCheckedType::NullAllowed))
@@ -207,10 +208,10 @@ EGunTraceHit AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf,
 	if (HitPawn != -1)
 	{
 		OutHit = BoxHits[HitPawn];
-		return EGunTraceHit::Pawn;
+		return true;
 	}
 
-	return GetWorld()->LineTraceSingleByProfile(OutHit, Start, End, ProjColProf, Params) ? EGunTraceHit::Other : EGunTraceHit::None;
+	return false;
 }
 
 void AGun::OnRep_Dried() const

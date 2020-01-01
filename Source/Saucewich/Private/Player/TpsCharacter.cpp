@@ -46,12 +46,14 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	return WeaponComponent ? WeaponComponent->GetActiveWeapon() : nullptr;
+	check(WeaponComponent);
+	return WeaponComponent->GetActiveWeapon();
 }
 
-EGunTraceHit ATpsCharacter::GunTrace(FHitResult& OutHit) const
+bool ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
-	return WeaponComponent ? WeaponComponent->GunTrace(OutHit) : EGunTraceHit::None;
+	check(WeaponComponent);
+	return WeaponComponent->GunTrace(OutHit);
 }
 
 uint8 ATpsCharacter::GetTeam() const

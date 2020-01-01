@@ -31,7 +31,7 @@ public:
 	AWeapon* GetWeapon(const uint8 Slot) const { return Slot < Weapons.Num() ? Weapons[Slot] : nullptr; }
 
 	UFUNCTION(BlueprintCallable)
-	EGunTraceHit GunTrace(FHitResult& OutHit) const;
+	bool GunTrace(FHitResult& OutHit) const;
 
 	void OnCharacterDeath();
 	bool TrySelectWeapon(uint8 Slot);

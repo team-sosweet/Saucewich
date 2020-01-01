@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Weapon/Weapon.h"
-#include "Saucewich.h"
 #include "Gun.generated.h"
 
 USTRUCT(BlueprintType)
@@ -117,7 +116,7 @@ public:
 	AGun();
 	
 	UFUNCTION(BlueprintCallable)
-	EGunTraceHit GunTrace(FHitResult& OutHit);
+	bool GunTrace(FHitResult& OutHit);
 
 	UFUNCTION(BlueprintCallable)
 	const FGunData& GetGunData() const;
@@ -151,7 +150,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastStartFire(int32 RandSeed);
 
-	EGunTraceHit GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data);
+	bool GunTraceInternal(FHitResult& OutHit, FName ProjColProf, const FGunData& Data);
 
 	UFUNCTION()
 	void OnRep_Dried() const;

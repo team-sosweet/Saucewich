@@ -53,7 +53,7 @@ void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 		if (UUserSettings::Get(this)->bAutoFire)
 		{
 			FHitResult Hit;
-			bShouldAutoFire = GunTrace(Hit) == EGunTraceHit::Pawn;
+			bShouldAutoFire = GunTrace(Hit);
 		}
 		else
 		{
@@ -101,12 +101,12 @@ void UWeaponComponent::SetupPlayerInputComponent(UInputComponent* Input)
 	}
 }
 
-EGunTraceHit UWeaponComponent::GunTrace(FHitResult& OutHit) const
+bool UWeaponComponent::GunTrace(FHitResult& OutHit) const
 {
 	if (const auto Gun = Cast<AGun>(GetActiveWeapon()))
 		return Gun->GunTrace(OutHit);
 	
-	return EGunTraceHit::None;
+	return false;
 }
 
 bool UWeaponComponent::TrySelectWeapon(const uint8 Slot)

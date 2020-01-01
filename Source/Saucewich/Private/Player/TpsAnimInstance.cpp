@@ -16,7 +16,7 @@ void UTpsAnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 	if (IsValid(Gun))
 	{
 		FHitResult Hit;
-		if (Gun->GunTrace(Hit) != EGunTraceHit::None)
+		if (Gun->GunTrace(Hit))
 		{
 			AimPitch = ((Hit.ImpactPoint - Gun->GetActorLocation()).Rotation() - Pawn->GetActorRotation()).GetNormalized().Pitch * AimPitchMul;
 		}

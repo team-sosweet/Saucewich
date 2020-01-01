@@ -48,7 +48,7 @@ public:
 	class AWeapon* GetActiveWeapon() const;
 
 	UFUNCTION(BlueprintCallable)
-	EGunTraceHit GunTrace(FHitResult& OutHit) const;
+	bool GunTrace(FHitResult& OutHit) const;
 
 	UFUNCTION(BlueprintCallable)
 	uint8 GetTeam() const;
