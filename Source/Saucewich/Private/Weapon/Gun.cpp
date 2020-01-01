@@ -73,9 +73,10 @@ void AGun::Shoot()
 
 	const auto MuzzleTransform = GetMesh()->GetSocketTransform(Names::Muzzle);
 	const auto MuzzleLoc = MuzzleTransform.GetLocation();
-	const auto Forward = MuzzleTransform.GetUnitAxis(EAxis::X);
-	const auto Right = MuzzleTransform.GetUnitAxis(EAxis::Y);
-	const auto Up = MuzzleTransform.GetUnitAxis(EAxis::Z);
+
+	auto&& ActorTransform = GetActorTransform();
+	const auto Forward = ActorTransform.GetUnitAxis(EAxis::X);
+	const auto Right = ActorTransform.GetUnitAxis(EAxis::Y);
 
 	const auto ProjCls = Data.ProjectileClass.LoadSynchronous();
 	const auto Proj = GetDefault<AGunProjectile>(ProjCls);
@@ -95,7 +96,7 @@ void AGun::Shoot()
 		{
 			// 이 수치는 근사값인데, 고저차를 반영하지 못하기 때문이다.
 			const auto Theta = FMath::Asin(980.f*FVector::Dist(MuzzleLoc, To) / (ProjSpd*ProjSpd)) / 2;
-			return (To - MuzzleLoc).GetUnsafeNormal().RotateAngleAxis(-FMath::RadiansToDegrees(Theta), Up);
+			return (To - MuzzleLoc).GetUnsafeNormal().RotateAngleAxis(FMath::RadiansToDegrees(Theta), Forward);
 		};
 		
 		const auto EnemyVel = Hit.GetActor()->GetVelocity();
@@ -127,7 +128,7 @@ void AGun::Shoot()
 	{
 		const auto VR = FireRand.FRandRange(-V, V) * SpreadAlpha;
 		const auto HR = FireRand.FRandRange(-H, H) * SpreadAlpha;
-		SpawnTransform.SetRotation(Dir.RotateAngleAxis(VR, Up).RotateAngleAxis(HR, Right).ToOrientationQuat());
+		SpawnTransform.SetRotation(Dir.RotateAngleAxis(VR, Forward).RotateAngleAxis(HR, Right).ToOrientationQuat());
 		AActorPool::Get(this)->Spawn<AGunProjectile>(ProjCls, SpawnTransform, Parameters);
 		SpreadAlpha = FMath::Min(SpreadAlpha + Data.SpreadIncrease, 1.f);
 	}
