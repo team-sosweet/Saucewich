@@ -114,12 +114,15 @@ class SAUCEWICH_API AGun : public AWeapon
 
 public:
 	AGun();
-	
-	UFUNCTION(BlueprintCallable)
-	bool GunTrace(FHitResult& OutHit);
 
 	UFUNCTION(BlueprintCallable)
+	static const FGunData& GetGunDataFromClass(TSubclassOf<AGun> Class);
+	
+	UFUNCTION(BlueprintCallable)
 	const FGunData& GetGunData() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool GunTrace(FHitResult& OutHit);
 
 protected:
 	void BeginPlay() override;

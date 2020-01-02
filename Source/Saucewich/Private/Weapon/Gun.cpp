@@ -27,6 +27,11 @@ AGun::AGun()
 	FirePSC->bAutoActivate = false;
 }
 
+const FGunData& AGun::GetGunDataFromClass(const TSubclassOf<AGun> Class)
+{
+	return GetDefault<AGun>(Class)->GetGunData();
+}
+
 void AGun::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
