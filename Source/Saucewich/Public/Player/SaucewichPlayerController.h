@@ -13,6 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterSpawned, class ATpsChara
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnCharacterSpawnedSingle, ATpsCharacter*, Character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharRespawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharDied);
+DECLARE_EVENT(ASaucewichPlayerController, FOnPlyRespawnNative)
+DECLARE_EVENT(ASaucewichPlayerController, FOnPlyDeathNative)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveMessage, const FText&, Message, float, Duration, EMsgType, Type);
 
 UCLASS()
@@ -46,14 +48,19 @@ public:
 	void SetSessionID(FString&& ID);
 	const FString& GetSessionID() const;
 
+	void BroadcastRespawn() const;
+	void BroadcastDeath() const;
+
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCharRespawn OnCharRespawn;
+	FOnPlyRespawnNative OnPlyRespawnNative;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCharDied OnCharDied;
+	FOnPlyDeathNative OnPlyDeathNative;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnReceiveMessage OnReceiveMessage;

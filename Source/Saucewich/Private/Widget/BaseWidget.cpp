@@ -3,9 +3,23 @@
 #include "Widget/BaseWidget.h"
 #include "GameFramework/InputSettings.h"
 #include "Names.h"
-#include "Player/BasePC.h"
 #include "Player/BaseHUD.h"
 #include "Saucewich.h"
+#include "Player/SaucewichPlayerController.h"
+
+void UBaseWidget::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	if (bVisibleOnlyAlive)
+	{
+		if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer()))
+		{
+			PC->OnPlyRespawnNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::HitTestInvisible);
+			PC->OnPlyDeathNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::Collapsed);
+		}
+	}
+}
 
 void UBaseWidget::NativeConstruct()
 {

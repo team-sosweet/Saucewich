@@ -144,6 +144,18 @@ const FString& ASaucewichPlayerController::GetSessionID() const
 	return SessionID;
 }
 
+void ASaucewichPlayerController::BroadcastRespawn() const
+{
+	OnPlyRespawnNative.Broadcast();
+	OnCharRespawn.Broadcast();
+}
+
+void ASaucewichPlayerController::BroadcastDeath() const
+{
+	OnPlyDeathNative.Broadcast();
+	OnCharDied.Broadcast();
+}
+
 void ASaucewichPlayerController::PrintMessage_Implementation(const FText& Message, const float Duration, const EMsgType Type)
 {
 	OnReceiveMessage.Broadcast(Message, Duration, Type);

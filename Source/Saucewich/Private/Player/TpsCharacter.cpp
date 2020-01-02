@@ -287,9 +287,9 @@ void ATpsCharacter::SetPlayerDefaults()
 		}
 	}
 
-	if (const auto PC = GetController<ASaucewichPlayerController>())
+	if (const auto PC = CastChecked<ASaucewichPlayerController>(GetController(), ECastCheckedType::NullAllowed))
 	{
-		PC->OnCharRespawn.Broadcast();
+		PC->BroadcastRespawn();
 	}
 	
 	OnCharacterSpawn.Broadcast();
@@ -320,9 +320,9 @@ void ATpsCharacter::KillSilent()
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 
-	if (const auto PC = GetController<ASaucewichPlayerController>())
+	if (const auto PC = CastChecked<ASaucewichPlayerController>(GetController(), ECastCheckedType::NullAllowed))
 	{
-		PC->OnCharDied.Broadcast();
+		PC->BroadcastDeath();
 	}
 }
 
@@ -394,9 +394,9 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 	WeaponComponent->OnCharacterDeath();
 	OnCharacterDeath.Broadcast();
 	
-	if (const auto PC = GetController<ASaucewichPlayerController>())
+	if (const auto PC = CastChecked<ASaucewichPlayerController>(GetController(), ECastCheckedType::NullAllowed))
 	{
-		PC->OnCharDied.Broadcast();
+		PC->BroadcastDeath();
 	}
 	
 	if (HasAuthority())

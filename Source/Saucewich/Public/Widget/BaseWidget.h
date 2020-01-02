@@ -17,7 +17,11 @@ public:
 	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite)
 	uint8 bIsCloseable : 1;
 
+	UPROPERTY(EditAnywhere, Category="Behavior", BlueprintReadWrite)
+	uint8 bVisibleOnlyAlive : 1;
+
 protected:
+	void NativeOnInitialized() override;
 	void NativeConstruct() override;
 	void NativeDestruct() override;
 	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
