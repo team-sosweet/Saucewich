@@ -6,7 +6,7 @@
 #include "SaucewichInstance.h"
 
 UUserSettings::UUserSettings()
-	:bAutoFire{true}, bVibration{true}, bParticle{true}
+	:bAutoFire{true}, bVibration{true}, bParticle{true}, bMusic{true}
 {
 }
 

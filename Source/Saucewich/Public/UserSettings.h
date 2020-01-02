@@ -82,4 +82,7 @@ private:
 	
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bParticle : 1;
+
+	UPROPERTY(Config, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
+	uint8 bMusic : 1;
 };
