@@ -43,9 +43,6 @@ class SAUCEWICH_API USaucewich : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure)
 	static bool CheckInputAction(FName ActionName, const struct FKeyEvent& KeyEvent);
-
-	UFUNCTION(BlueprintCallable)
-	static void CopyToClipboard(const FString& String);
 	
 	UFUNCTION(BlueprintCallable)
 	static void SearchSession(const FSearchSessionResponse& Callback);

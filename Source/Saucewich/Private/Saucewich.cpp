@@ -9,7 +9,6 @@
 #include "JsonObjectConverter.h"
 #include "HttpManager.h"
 #include "GameFramework/InputSettings.h"
-#include "HAL/PlatformApplicationMisc.h"
 
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
@@ -62,11 +61,6 @@ bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEv
 			return true;
 	
 	return false;
-}
-
-void USaucewich::CopyToClipboard(const FString& String)
-{
-	FPlatformApplicationMisc::ClipboardCopy(*String);
 }
 
 void USaucewich::SearchSession(const FSearchSessionResponse& Callback)
