@@ -1,4 +1,4 @@
-// Copyright 2019 Othereum. All Rights Reserved.
+// Copyright 2019-2020 Seokjin Lee. All Rights Reserved.
 
 #include "GameMode/MakeSandwich/Entity/Fridge.h"
 
