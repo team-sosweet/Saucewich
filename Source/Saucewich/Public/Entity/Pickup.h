@@ -7,17 +7,6 @@
 
 class ATpsCharacter;
 
-USTRUCT(BlueprintType)
-struct FPickupIcon
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UTexture* Icon;
-
-	operator UTexture*() const { return Icon; }
-};
-
 UCLASS()
 class SAUCEWICH_API APickup : public APoolActor
 {
@@ -25,8 +14,6 @@ class SAUCEWICH_API APickup : public APoolActor
 
 public:
 	APickup();
-
-	UTexture* GetIcon() const { return Icon; }
 	UStaticMeshComponent* GetMesh() const { return Mesh; }
 	
 	uint8 bSpawnedFromSpawner : 1;
@@ -74,7 +61,7 @@ private:
 	class UShadowComponent* Shadow;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	FPickupIcon Icon;
+	TSoftObjectPtr<UTexture2D> Icon;
 
 	ATpsCharacter* PickingChar;
 	float PickingTimer;

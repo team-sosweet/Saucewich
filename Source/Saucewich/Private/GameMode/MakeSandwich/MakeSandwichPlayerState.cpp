@@ -17,10 +17,22 @@ FIngredients::FIngredients(AMakeSandwichPlayerState* const Owner)
 {
 }
 
-void FIngredients::OnModify() const
+void FIngredients::Reset()
+{
+	Ingredients.Reset();
+	OnModify({});
+}
+
+void FIngredients::Add(const TSubclassOf<ASandwichIngredient> Ing)
+{
+	++Ingredients.FindOrAdd(Ing);
+	OnModify(Ing);
+}
+
+void FIngredients::OnModify(const TSubclassOf<ASandwichIngredient> NewIng) const
 {
 	check(Owner);
-	Owner->BroadcastIngredientChanged();
+	Owner->BroadcastIngredientChanged(NewIng);
 }
 
 AMakeSandwichPlayerState::AMakeSandwichPlayerState()
@@ -39,7 +51,7 @@ void AMakeSandwichPlayerState::PickupIngredient(const TSubclassOf<ASandwichIngre
 
 void AMakeSandwichPlayerState::MulticastPickupIngredient_Implementation(const TSubclassOf<ASandwichIngredient> Class)
 {
-	Ingredients.Modify([&](FIngMap& Ing){++Ing.FindOrAdd(Class);});
+	Ingredients.Add(Class);
 	OnPickupIngredient();
 }
 
@@ -61,15 +73,15 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 	MulticastResetIngredients();
 }
 
-void AMakeSandwichPlayerState::BroadcastIngredientChanged()
+void AMakeSandwichPlayerState::BroadcastIngredientChanged(const TSubclassOf<ASandwichIngredient> NewIng) const
 {
-	OnIngredientChanged.Broadcast(this);
-	OnIngChangedNative.Broadcast(this);
+	OnIngredientChanged.Broadcast(NewIng);
+	OnIngChangedNative.Broadcast(NewIng);
 }
 
 void AMakeSandwichPlayerState::MulticastResetIngredients_Implementation()
 {
-	Ingredients.Modify([](FIngMap& Ing){Ing.Reset();});
+	Ingredients.Reset();
 	OnPutIngredients();
 }
 
@@ -91,7 +103,7 @@ bool AMakeSandwichPlayerState::CanPickupIngredient() const
 void AMakeSandwichPlayerState::Reset()
 {
 	Super::Reset();
-	Ingredients.Modify([](FIngMap& Ing){Ing.Reset();});
+	Ingredients.Reset();
 }
 
 void AMakeSandwichPlayerState::OnDeath()
@@ -117,5 +129,5 @@ void AMakeSandwichPlayerState::DropIngredients()
 					AActorPool::Get(this)->Spawn(Ingredient.Key, Transform);
 		}
 	}
-	Ingredients.Modify([](FIngMap& Ing){Ing.Reset();});
+	Ingredients.Reset();
 }

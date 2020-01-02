@@ -25,7 +25,7 @@ private:
 	class UFridgeHUD* GetHUD() const;
 	void BindPS(class ASaucewichPlayerState* InPS);
 	void OnPlyTeamChanged(uint8 NewTeam);
-	void OnIngChanged(class AMakeSandwichPlayerState* InPS) const;
+	void OnIngChanged(TSubclassOf<ASandwichIngredient> NewIng) const;
 	void SetHighlighted(bool bHighlight) const;
 	
 	AMakeSandwichPlayerState* LocalPS;

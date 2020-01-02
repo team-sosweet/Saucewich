@@ -7,8 +7,8 @@
 
 class ASandwichIngredient;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerIngredientChanged, class AMakeSandwichPlayerState*, PlayerState);
-DECLARE_EVENT_OneParam(AMakeSandwichPlayerState, FOnPlyIngChangedNative, AMakeSandwichPlayerState*)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerIngredientChanged, TSubclassOf<ASandwichIngredient>, NewIngredient);
+DECLARE_EVENT_OneParam(AMakeSandwichPlayerState, FOnPlyIngChangedNative, TSubclassOf<ASandwichIngredient>)
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FIngredients
@@ -16,21 +16,16 @@ struct SAUCEWICH_API FIngredients
 	GENERATED_BODY()
 
 	FIngredients() = default;
-	explicit FIngredients(AMakeSandwichPlayerState* const Owner);
+	explicit FIngredients(AMakeSandwichPlayerState* Owner);
 	
 	auto& Get() const { return Ingredients; }
-
-	template <class Fn>
-	decltype(auto) Modify(Fn&& Func)
-	{
-		Func(Ingredients);
-		OnModify();
-	}
+	void Reset();
+	void Add(TSubclassOf<ASandwichIngredient> Ing);
 
 private:
-	void OnModify() const;
+	void OnModify(TSubclassOf<ASandwichIngredient> NewIng) const;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TMap<TSubclassOf<ASandwichIngredient>, uint8> Ingredients;
 
 	UPROPERTY()
@@ -49,7 +44,7 @@ public:
 	void PickupIngredient(TSubclassOf<ASandwichIngredient> Class);
 
 	void PutIngredientsInFridge();
-	void BroadcastIngredientChanged();
+	void BroadcastIngredientChanged(TSubclassOf<ASandwichIngredient> NewIng) const;
 	auto& GetIngredients() const { return Ingredients.Get(); }
 
 	UFUNCTION(BlueprintCallable)
@@ -81,7 +76,7 @@ private:
 	
 	void DropIngredients();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FIngredients Ingredients;
 
 	UPROPERTY(BlueprintAssignable)

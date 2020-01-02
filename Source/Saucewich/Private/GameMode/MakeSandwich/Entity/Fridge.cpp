@@ -10,6 +10,7 @@
 
 #include "Player/SaucewichPlayerController.h"
 #include "GameMode/MakeSandwich/MakeSandwichPlayerState.h"
+#include "GameMode/MakeSandwich/Entity/SandwichIngredient.h"
 #include "GameMode/SaucewichGameMode.h"
 #include "Names.h"
 #include "Widget/FridgeHUD.h"
@@ -101,9 +102,9 @@ void AFridge::OnPlyTeamChanged(const uint8 NewTeam)
 	}
 }
 
-void AFridge::OnIngChanged(AMakeSandwichPlayerState* const InPS) const
+void AFridge::OnIngChanged(const TSubclassOf<ASandwichIngredient> NewIng) const
 {
-	SetHighlighted(InPS->GetNumIngredients() > 0);
+	SetHighlighted(!!NewIng);
 }
 
 void AFridge::SetHighlighted(const bool bHighlight) const
