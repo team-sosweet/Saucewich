@@ -44,9 +44,9 @@ void ABaseHUD::BeginPlay()
 	Super::BeginPlay();
 }
 
-UErrorWidget* ABaseHUD::ShowError(FText Message)
+UErrorWidget* ABaseHUD::ShowError(const FText Message)
 {
-	ErrorWidget->Activate(MoveTemp(Message));
+	if (IsValid(ErrorWidget)) ErrorWidget->Activate(Message);
 	return ErrorWidget;
 }
 

@@ -5,6 +5,7 @@
 #include "UObject/NameTypes.h"
 
 #define NAME(n) []()->auto&{static const FName N{TEXT(n)};return N;}()
+#define SSTR(s) []()->auto&{static const FString S=TEXT(s);return S;}()
 
 namespace Names
 {

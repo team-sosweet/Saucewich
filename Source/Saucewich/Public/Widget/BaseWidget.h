@@ -14,6 +14,9 @@ class SAUCEWICH_API UBaseWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
+	void ShowError(FText Message) const;
+	
 	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite)
 	uint8 bIsCloseable : 1;
 
@@ -32,4 +35,7 @@ private:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDestruct OnDestruct;
+
+	UPROPERTY(BlueprintReadOnly, Transient, meta=(AllowPrivateAccess=true))
+	class ABaseHUD* HUD;
 };

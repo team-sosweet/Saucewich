@@ -9,6 +9,7 @@
 #include "JsonObjectConverter.h"
 #include "HttpManager.h"
 #include "GameFramework/InputSettings.h"
+#include "Names.h"
 
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
@@ -61,6 +62,16 @@ FString GameLift::RandomString()
 	return Str;
 }
 
+EHttpResponse Http::ToEnum(const int32 Code)
+{
+	switch (Code)
+	{
+	case 200: return EHttpResponse::OK;
+	case 0: return EHttpResponse::ConnectionFailed;
+	default: return EHttpResponse::Error;
+	}
+}
+
 bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEvent)
 {
 	const auto PressedKey = KeyEvent.GetKey();
@@ -74,29 +85,53 @@ bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEv
 	return false;
 }
 
-void USaucewich::SearchSession(const FSearchSessionResponse& Callback)
-{
-	FString URL = TEXT("http://localhost:3000/match/start?ticketId=");
-	URL += GameLift::RandomString();
+static const FString GServerURL = TEXT("http://localhost:3000");
 
-	Request(TEXT("GET"), URL, FOnHttpResponse::CreateLambda(
-		[=](const int32 ResponseCode, const FJsonObject& Content)
+FMatchmakingRequest USaucewich::StartMatchmaking(const FStartMatchmakingResponse& Callback)
+{
+	auto TicketID = GameLift::RandomString();
+	const auto URL = GServerURL + TEXT("/match/start?ticketId=") + TicketID;
+
+	const auto Handle = Request(SSTR("GET"), URL, FOnHttpResponse::CreateLambda(
+		[=](const int32 Code, const FJsonObject& Content)
 		{
-			if (ResponseCode == 200)
+			if (Code == 200)
 			{
-				auto&& SessionInfo = Content.GetArrayField(TEXT("GameSessionConnectionInfo"))[0]->AsObject();
-				auto ServerIP = SessionInfo->GetStringField(TEXT("IpAddress"));
-				ServerIP += SessionInfo->GetStringField(TEXT("Port"));
-				const auto PlayerID = Content.GetArrayField(TEXT("Players"))[0]->AsObject()->GetStringField(TEXT("PlayerId"));
+				auto&& SessionInfo = Content.GetArrayField(SSTR("GameSessionConnectionInfo"))[0]->AsObject();
+				auto ServerIP = SessionInfo->GetStringField(SSTR("IpAddress"));
+				ServerIP += SessionInfo->GetStringField(SSTR("Port"));
+				const auto PlayerID = Content.GetArrayField(SSTR("Players"))[0]->AsObject()->GetStringField(SSTR("PlayerId"));
 				if (!PlayerID.IsEmpty() && !ServerIP.IsEmpty())
 				{
-					(void)Callback.ExecuteIfBound(true, ServerIP, PlayerID);
-					return;
+					Callback.Execute(EHttpResponse::OK, ServerIP, PlayerID);
+				}
+				else
+				{
+					Callback.Execute(EHttpResponse::Error, {}, {});
 				}
 			}
-			(void)Callback.ExecuteIfBound(false, {}, {});
+			else
+			{
+				Callback.Execute(Http::ToEnum(Code), {}, {});
+			}
 		}
 	));
+
+	return {MoveTemp(TicketID), Handle};
+}
+
+void USaucewich::CancelMatchmaking(const FMatchmakingRequest& Handle)
+{
+	if (Handle.Handle)
+	{
+		Handle.Handle->CancelRequest();
+	}
+
+	if (!Handle.TicketID.IsEmpty())
+	{
+		const auto URL = GServerURL + TEXT("/match/cancel?ticketId=") + Handle.TicketID;
+		Request(SSTR("DELETE"), URL, {});
+	}
 }
 
 ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
@@ -105,8 +140,14 @@ ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
 		return ENameValidity::Length;
 
 	for (const auto c : PlayerName)
-		if (!FChar::IsIdentifier(c))
+	{
+#define OUT_OF(a, b) ((TEXT(a) > c) | (c > TEXT(b)))
+#define NOT(a) (c!=TEXT(a))
+		if (OUT_OF('A', 'Z') | OUT_OF('a', 'z') | OUT_OF('0', '9') | NOT('_') | NOT('-') | NOT('.'))
 			return ENameValidity::Character;
+#undef NOT
+#undef OUT_OF
+	}
 
 	return ENameValidity::Valid;
 }
@@ -130,16 +171,17 @@ static TSharedRef<IHttpRequest> CreateRequest(const FString& Verb, const FString
 	Request->OnProcessRequestComplete().BindLambda(
 		[=](const FHttpRequestPtr&, const FHttpResponsePtr& Response, const bool bConnectedSuccessfully)
 		{
-			if (bConnectedSuccessfully && Response)
+			if (bConnectedSuccessfully)
 			{
 				const auto Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 				TSharedPtr<FJsonObject> JsonObject;
 				FJsonSerializer::Deserialize(Reader, JsonObject);
-				(void)OnResponse.ExecuteIfBound(Response->GetResponseCode(), JsonObject ? *JsonObject : FJsonObject{});
+				static const FJsonObject DefaultJson;
+				(void)OnResponse.ExecuteIfBound(Response->GetResponseCode(), JsonObject ? *JsonObject : DefaultJson);
 			}
 			else
 			{
-				(void)OnResponse.ExecuteIfBound(0, {});
+				OnResponse.ExecuteIfBound(0, {});
 			}
 		}
 	);
@@ -147,13 +189,14 @@ static TSharedRef<IHttpRequest> CreateRequest(const FString& Verb, const FString
 	return Request;
 }
 
-void USaucewich::Request(const FString& Verb, const FString& URL, const FOnHttpResponse& OnResponse)
+TSharedRef<IHttpRequest> USaucewich::Request(const FString& Verb, const FString& URL, const FOnHttpResponse& OnResponse)
 {
 	const auto Request = CreateRequest(Verb, URL, OnResponse);
 	if (!Request->ProcessRequest()) OnResponse.ExecuteIfBound(0, {});
+	return Request;
 }
 
-void USaucewich::Request(const FString& Verb, const FString& URL, const TSharedRef<FJsonObject>& Content, const FOnHttpResponse& OnResponse)
+TSharedRef<IHttpRequest> USaucewich::Request(const FString& Verb, const FString& URL, const TSharedRef<FJsonObject>& Content, const FOnHttpResponse& OnResponse)
 {
 	const auto Request = CreateRequest(Verb, URL, OnResponse);
 	
@@ -165,4 +208,5 @@ void USaucewich::Request(const FString& Verb, const FString& URL, const TSharedR
 	}
 
 	if (!Request->ProcessRequest()) OnResponse.ExecuteIfBound(0, {});
+	return Request;
 }

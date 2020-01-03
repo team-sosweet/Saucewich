@@ -12,10 +12,10 @@ UErrorWidget::UErrorWidget()
 	bIsFocusable = true;
 }
 
-void UErrorWidget::Activate(FText&& Message)
+void UErrorWidget::Activate(const FText& Message)
 {
-	Text->SetText(MoveTemp(Message));
-	AddToViewport(10);
+	if (IsValid(Text)) Text->SetText(Message);
+	if (!IsInViewport()) AddToViewport(10);
 }
 
 void UErrorWidget::NativeOnInitialized()

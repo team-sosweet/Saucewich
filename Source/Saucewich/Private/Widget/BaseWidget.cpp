@@ -7,16 +7,24 @@
 #include "Saucewich.h"
 #include "Player/SaucewichPlayerController.h"
 
+void UBaseWidget::ShowError(const FText Message) const
+{
+	HUD->ShowError(Message);
+}
+
 void UBaseWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	const auto PC = GetOwningPlayer();
+	HUD = CastChecked<ABaseHUD>(PC->GetHUD());
+
 	if (bVisibleOnlyAlive)
 	{
-		if (const auto PC = Cast<ASaucewichPlayerController>(GetOwningPlayer()))
+		if (const auto SwPC = Cast<ASaucewichPlayerController>(PC))
 		{
-			PC->OnPlyRespawnNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::HitTestInvisible);
-			PC->OnPlyDeathNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::Collapsed);
+			SwPC->OnPlyRespawnNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::HitTestInvisible);
+			SwPC->OnPlyDeathNative.AddUObject(this, &UWidget::SetVisibility, ESlateVisibility::Collapsed);
 		}
 	}
 }
@@ -27,11 +35,8 @@ void UBaseWidget::NativeConstruct()
 	
 	if (bIsFocusable)
 	{
-		if (const auto PC = GetOwningPlayer())
-		{
-			CastChecked<ABaseHUD>(PC->GetHUD())->AddFocusedWidget(this);
-			SetFocus();
-		}
+		HUD->AddFocusedWidget(this);
+		SetFocus();
 	}
 
 	OnConstruct.Broadcast();
@@ -40,18 +45,8 @@ void UBaseWidget::NativeConstruct()
 void UBaseWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-
-	if (bIsFocusable)
-	{
-		if (const auto PC = GetOwningPlayer())
-		{
-			if (const auto HUD = Cast<ABaseHUD>(PC->GetHUD()))
-			{
-				HUD->RemoveFocusedWidget(this);
-			}
-		}
-	}
-
+	
+	if (HUD && bIsFocusable) HUD->RemoveFocusedWidget(this);
 	OnDestruct.Broadcast();
 }
 
@@ -66,7 +61,7 @@ FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent
 	}
 	else if (USaucewich::CheckInputAction(NAME("Menu"), InKeyEvent))
 	{
-		CastChecked<ABaseHUD>(GetOwningPlayer()->GetHUD())->OpenMenu();
+		HUD->OpenMenu();
 	}
 	
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);

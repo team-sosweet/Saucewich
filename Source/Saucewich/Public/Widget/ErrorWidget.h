@@ -12,7 +12,7 @@ class SAUCEWICH_API UErrorWidget : public UBaseWidget
 
 public:
 	UErrorWidget();
-	void Activate(FText&& Message);
+	void Activate(const FText& Message);
 
 protected:
 	void NativeOnInitialized() override;
