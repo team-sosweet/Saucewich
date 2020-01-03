@@ -50,6 +50,17 @@ namespace GameLift
 
 #endif
 
+FString GameLift::RandomString()
+{
+	static const TCHAR Chars[] = TEXT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.");
+	constexpr auto Len = 128;
+	FString Str;
+	Str.Reserve(Len);
+	for (auto i=0; i<Len; ++i)
+		Str += Chars[FMath::RandHelper(std::extent_v<decltype(Chars)>-1)];
+	return Str;
+}
+
 bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEvent)
 {
 	const auto PressedKey = KeyEvent.GetKey();
@@ -65,13 +76,18 @@ bool USaucewich::CheckInputAction(const FName ActionName, const FKeyEvent& KeyEv
 
 void USaucewich::SearchSession(const FSearchSessionResponse& Callback)
 {
-	Request(TEXT("GET"), TEXT("http://localhost:6974/session"), FOnHttpResponse::CreateLambda(
+	FString URL = TEXT("http://localhost:3000/match/start?ticketId=");
+	URL += GameLift::RandomString();
+
+	Request(TEXT("GET"), URL, FOnHttpResponse::CreateLambda(
 		[=](const int32 ResponseCode, const FJsonObject& Content)
 		{
 			if (ResponseCode == 200)
 			{
-				const auto ServerIP = Content.GetStringField(TEXT("server-ip"));
-				const auto PlayerID = Content.GetStringField(TEXT("player-id"));
+				auto&& SessionInfo = Content.GetArrayField(TEXT("GameSessionConnectionInfo"))[0]->AsObject();
+				auto ServerIP = SessionInfo->GetStringField(TEXT("IpAddress"));
+				ServerIP += SessionInfo->GetStringField(TEXT("Port"));
+				const auto PlayerID = Content.GetArrayField(TEXT("Players"))[0]->AsObject()->GetStringField(TEXT("PlayerId"));
 				if (!PlayerID.IsEmpty() && !ServerIP.IsEmpty())
 				{
 					(void)Callback.ExecuteIfBound(true, ServerIP, PlayerID);

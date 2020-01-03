@@ -33,6 +33,7 @@ namespace GameLift
 {
 	FGameLiftServerSDKModule& Get();
 	void SafeTerminate();
+	FString RandomString();
 }
 
 UCLASS()
