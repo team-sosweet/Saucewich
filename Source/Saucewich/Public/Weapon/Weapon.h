@@ -43,15 +43,9 @@ class SAUCEWICH_API AWeapon : public APoolActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	USceneComponent* SceneRoot;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	class UStaticMeshComponent* Mesh;
-	
 public:
 	UFUNCTION(BlueprintCallable)
-	static AWeapon* GetDefaultWeapon(TSubclassOf<AWeapon> Class);
+	static const FWeaponData& GetWeaponDataFromClass(TSubclassOf<AWeapon> Class);
 	
 	AWeapon();
 
@@ -110,6 +104,12 @@ private:
 
 	int32 GetColIdx() const;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	USceneComponent* SceneRoot;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* Mesh;
+	
 	UPROPERTY(EditDefaultsOnly)
 	FDataTableRowHandle WeaponData;
 

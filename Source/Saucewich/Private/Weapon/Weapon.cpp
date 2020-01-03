@@ -11,9 +11,9 @@
 #include "Weapon/WeaponComponent.h"
 #include "Names.h"
 
-AWeapon* AWeapon::GetDefaultWeapon(const TSubclassOf<AWeapon> Class)
+const FWeaponData& AWeapon::GetWeaponDataFromClass(const TSubclassOf<AWeapon> Class)
 {
-	return Class ? Class.GetDefaultObject() : nullptr;
+	return GetDefault<AWeapon>(Class)->GetData();
 }
 
 AWeapon::AWeapon()
