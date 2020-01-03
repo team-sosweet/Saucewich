@@ -12,9 +12,10 @@ class SAUCEWICH_API AGunProjectile : public AProjectile
 
 protected:
 	float GetSauceMarkScale() const override;
+	void OnActivated() override;
 	void OnExplode(const FHitResult& Hit) override;
 	void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:
-	void OnActivated() override;
+	float FiredTime;
 };

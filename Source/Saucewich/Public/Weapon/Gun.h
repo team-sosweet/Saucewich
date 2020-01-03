@@ -31,6 +31,15 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Damage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MinDmg;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float DmgFalloffStartDist = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float DmgFalloffEndDist = 1500.f;
+
 	// 분당 발사 수 (연사력)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Rpm;
@@ -55,10 +64,6 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
 	float SpreadDecrease = 1.f;
 
-	// 지향사격 각도 오프셋
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
-	float HipFireAngleOffset = 25.f;
-
 	// 자동 조준 최대 거리 (cm)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxDistance = 1000.f;
@@ -67,13 +72,9 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ProjectileSpeed = 1000.f;
 
-	// 최소 발사체 크기
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MinProjectileSize = 1.f;
-
-	// 최대 발사체 크기
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MaxProjectileSize = 1.f;
+	// 지향사격 각도 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, UIMax=60))
+	float HipFireAngleOffset = 25.f;
 
 	// 재장전에 걸리는 시간 (초)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -87,14 +88,22 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ReloadWaitTimeAfterDried;
 
+	// 최소 발사체 크기
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MinProjectileSize = 1.f;
+
+	// 최대 발사체 크기
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MaxProjectileSize = 1.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(UIMin=0, ClampMin=0))
 	float Recoil = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (UIMin = 0, UIMax=1, ClampMin=0, ClampMax=1))
-	float FBBIntensity = .05f;
+	float FFBIntensity = .05f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (UIMin = 0, ClampMin = 0))
-	float FBBDuration = .2f;
+	float FFBDuration = .2f;
 
 	// 탄창 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

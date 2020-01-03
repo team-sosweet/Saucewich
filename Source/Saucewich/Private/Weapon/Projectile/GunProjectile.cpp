@@ -9,7 +9,10 @@ void AGunProjectile::OnExplode(const FHitResult& Hit)
 	if (const auto Other = Hit.GetActor())
 	{
 		auto&& Data = CastChecked<AGun>(GetOwner())->GetGunData();
-		const auto Damage = Data.Damage;
+		const auto ElapsedTime = GetGameTimeSinceCreation() - FiredTime;
+		const auto TravelDist = Data.ProjectileSpeed * ElapsedTime;
+		const FVector2D FireRange{Data.DmgFalloffStartDist, Data.DmgFalloffEndDist};
+		const auto Damage = FMath::GetMappedRangeValueClamped(FireRange, {Data.Damage, Data.MinDmg}, TravelDist);
 		Other->TakeDamage(
 			Damage,
 			FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType.LoadSynchronous()},
@@ -31,9 +34,9 @@ void AGunProjectile::OnActivated()
 {
 	Super::OnActivated();
 
-	const auto Gun = Cast<AGun>(GetOwner());
-	check(Gun);
+	const auto Gun = CastChecked<AGun>(GetOwner());
 	SetSpeed(Gun->GetGunData().ProjectileSpeed);
+	FiredTime = GetGameTimeSinceCreation();
 }
 
 void AGunProjectile::NotifyHit(UPrimitiveComponent* const MyComp, AActor* const Other, UPrimitiveComponent* const OtherComp, const bool bSelfMoved,

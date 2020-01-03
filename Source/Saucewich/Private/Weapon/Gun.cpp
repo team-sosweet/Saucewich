@@ -154,7 +154,7 @@ void AGun::Shoot()
 	if (PC && PC->IsLocalController())
 	{
 		if (UUserSettings::Get(this)->bVibration)
-			PC->PlayDynamicForceFeedback(Data.FBBIntensity, Data.FBBDuration, true, false, true, false);
+			PC->PlayDynamicForceFeedback(Data.FFBIntensity, Data.FFBDuration, true, false, true, false);
 
 		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);
 	}
@@ -238,7 +238,6 @@ const FGunData& AGun::GetGunData() const
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
-
 
 	const auto GS = CastChecked<ASaucewichGameState>(GetWorld()->GetGameState());
 	GS->AddDilatableActor(this);
