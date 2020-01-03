@@ -139,6 +139,7 @@ void AGun::Shoot()
 	}
 
 	LastClip = --Clip;
+	OnRep_Clip();
 	if (!bDried && Clip == 0 && HasAuthority())
 	{
 		bDried = true;
@@ -221,7 +222,12 @@ bool AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const F
 
 void AGun::OnRep_Dried() const
 {
-	OnAvailabilityChanged(bDried);
+	OnAvailabilityChanged(!bDried);
+}
+
+void AGun::OnRep_Clip() const
+{
+	OnClipChanged.Broadcast(Clip);
 }
 
 const FGunData& AGun::GetGunData() const
@@ -267,6 +273,7 @@ void AGun::OnActivated()
 {
 	Super::OnActivated();
 	Clip = GetGunData().ClipSize;
+	OnRep_Clip();
 }
 
 void AGun::OnReleased()
@@ -276,6 +283,7 @@ void AGun::OnReleased()
 	FireLag = 0.f;
 	bDried = false;
 	ReloadWaitingTime = 0.f;
+	OnClipChanged.Clear();
 }
 
 void AGun::SetColor(const FLinearColor& NewColor)
@@ -323,6 +331,7 @@ void AGun::Reload(const float DeltaSeconds)
 		{
 			ReloadAlpha = FMath::Clamp(ReloadAlpha + DeltaSeconds / Data.ReloadTime, 0.f, 1.f);
 			Clip = FMath::CubicInterp<float>(LastClip, 0.f, Data.ClipSize, 0.f, ReloadAlpha);
+			OnRep_Clip();
 
 			if (bDried && Clip >= Data.MinClipToFireAfterDried)
 			{

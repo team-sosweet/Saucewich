@@ -5,6 +5,8 @@
 #include "Weapon/Weapon.h"
 #include "Gun.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGunClipChanged, uint8, NewClip);
+
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FGunData : public FWeaponData
 {
@@ -158,6 +160,12 @@ private:
 	UFUNCTION()
 	void OnRep_Dried() const;
 
+	UFUNCTION()
+	void OnRep_Clip() const;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGunClipChanged OnClipChanged;
+
 	UPROPERTY(VisibleAnywhere)
 	class UParticleSystemComponent* FirePSC;
 
@@ -169,7 +177,7 @@ private:
 	float ReloadWaitingTime;
 	float ReloadAlpha;
 
-	UPROPERTY(Replicated, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(ReplicatedUsing=OnRep_Clip, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Clip;
 	uint8 LastClip;
 
