@@ -143,7 +143,7 @@ ENameValidity USaucewich::IsValidPlayerName(const FString& PlayerName)
 	{
 #define OUT_OF(a, b) ((TEXT(a) > c) | (c > TEXT(b)))
 #define NOT(a) (c!=TEXT(a))
-		if (OUT_OF('A', 'Z') | OUT_OF('a', 'z') | OUT_OF('0', '9') | NOT('_') | NOT('-') | NOT('.'))
+		if (OUT_OF('A', 'Z') & OUT_OF('a', 'z') & OUT_OF('0', '9') & NOT('_') & NOT('-') & NOT('.'))
 			return ENameValidity::Character;
 #undef NOT
 #undef OUT_OF

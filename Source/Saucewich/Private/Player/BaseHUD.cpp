@@ -46,7 +46,7 @@ void ABaseHUD::BeginPlay()
 
 UErrorWidget* ABaseHUD::ShowError(const FText Message)
 {
-	if (IsValid(ErrorWidget)) ErrorWidget->Activate(Message);
+	ErrorWidget->Activate(Message);
 	return ErrorWidget;
 }
 

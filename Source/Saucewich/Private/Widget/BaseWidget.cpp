@@ -46,7 +46,7 @@ void UBaseWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 	
-	if (HUD && bIsFocusable) HUD->RemoveFocusedWidget(this);
+	if (IsValid(HUD) && bIsFocusable) HUD->RemoveFocusedWidget(this);
 	OnDestruct.Broadcast();
 }
 

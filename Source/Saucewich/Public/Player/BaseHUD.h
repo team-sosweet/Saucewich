@@ -36,5 +36,7 @@ private:
 
 	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	UBaseWidget* MenuWidget;
+	
+	UPROPERTY(Transient)
 	UErrorWidget* ErrorWidget;
 };

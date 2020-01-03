@@ -14,7 +14,7 @@ UErrorWidget::UErrorWidget()
 
 void UErrorWidget::Activate(const FText& Message)
 {
-	if (IsValid(Text)) Text->SetText(Message);
+	Text->SetText(Message);
 	if (!IsInViewport()) AddToViewport(10);
 }
 
