@@ -1,13 +1,14 @@
 // Copyright 2019-2020 Seokjin Lee. All Rights Reserved.
 
 #include "Matchmaker.h"
+#include <chrono>
 #include "Http.h"
 #include "Json.h"
 #include "Names.h"
 
 namespace Matchmaker
 {
-	static constexpr auto GBaseURL = TEXT("http://localhost:3000");
+	static const FString GBaseURL = TEXT("http://localhost:3000");
 	
 	static FString RandomString()
 	{
@@ -45,6 +46,40 @@ namespace Matchmaker
 
 		return Request;
 	}
+
+	static FString GetServerAddress(const FJsonObject& Content)
+	{
+		const TSharedPtr<FJsonObject>* SessionPtr;
+		if (!Content.TryGetObjectField(SSTR("GameSessionConnectionInfo"), SessionPtr)) return {};
+		auto&& Session = **SessionPtr;
+
+		FString IP;
+		if (!Session.TryGetStringField(SSTR("IpAddress"), IP)) return {};
+
+		int32 Port;
+		if (!Session.TryGetNumberField(SSTR("Port"), Port)) return {};
+
+		IP += TEXT(':');
+		IP.AppendInt(Port);
+		return IP;
+	}
+
+	static FString GetPlayerID(const FJsonObject& Content)
+	{
+		const TArray<TSharedPtr<FJsonValue>>* PlayersPtr;
+		if (!Content.TryGetArrayField(SSTR("Players"), PlayersPtr)) return {};
+		auto&& Players = *PlayersPtr;
+
+		if (Players.Num() == 0) return {};
+
+		const TSharedPtr<FJsonObject>* PlayerPtr;
+		if (!Players[0]->TryGetObject(PlayerPtr)) return {};
+		auto&& Player = **PlayerPtr;
+
+		FString ID;
+		Player.TryGetStringField(SSTR("PlayerId"), ID);
+		return ID;
+	}
 }
 
 UMatchmaker* UMatchmaker::Get()
@@ -56,35 +91,24 @@ UMatchmaker* UMatchmaker::Get()
 void UMatchmaker::StartMatchmaking()
 {
 	using namespace Matchmaker;
+	using namespace std::chrono;
 	
-	FString URL = GBaseURL;
-	URL.Append(TEXT("/match/start?ticketId=")).Append(TicketID = RandomString());
-
-	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const TSharedPtr<FJsonObject>& Content)
-		{
-			if (Code == 200 && Content)
-			{
-				auto&& SessionInfo = Content->GetArrayField(SSTR("GameSessionConnectionInfo"))[0]->AsObject();
-				auto ServerIP = SessionInfo->GetStringField(SSTR("IpAddress"));
-				ServerIP += TEXT(':');
-				ServerIP += SessionInfo->GetStringField(SSTR("Port"));
-				const auto PlayerID = Content->GetArrayField(SSTR("Players"))[0]->AsObject()->GetStringField(SSTR("PlayerId"));
-				OnResponse.ExecuteIfBound(EMatchmakingResponse::OK, ServerIP, PlayerID);
-			}
-			else
-			{
-				OnResponse.ExecuteIfBound(Code == 0 ? EMatchmakingResponse::ConnectionFailed : EMatchmakingResponse::Error, {}, {});
-			}
-		
-			TicketID.Reset();
-			Handle.Reset();
-		}
-	);
-
-	if (!Handle->ProcessRequest())
+	Handle = CreateRequest(SSTR("GET"), GBaseURL + TEXT("/ping"),
+		[this, StartTime=steady_clock::now()](const int32 Code, const TSharedPtr<FJsonObject>&)
 	{
-		OnResponse.ExecuteIfBound(EMatchmakingResponse::ConnectionFailed, {}, {});
-	}
+		if (Code == 200)
+		{
+			const auto RoundTrip = steady_clock::now() - StartTime;
+			const auto Latency = duration_cast<milliseconds>(RoundTrip / 2);
+			OnPingComplete(static_cast<int32>(Latency.count()));
+		}
+		else
+		{
+			Error(EMMResponse::ConnFail);
+		}
+	});
+
+	ProcessRequest();
 }
 
 void UMatchmaker::CancelMatchmaking()
@@ -94,22 +118,84 @@ void UMatchmaker::CancelMatchmaking()
 	if (Handle)
 	{
 		Handle->CancelRequest();
-		Handle.Reset();
 	}
 
 	if (!TicketID.IsEmpty())
 	{
-		FString URL = GBaseURL;
+		auto URL = GBaseURL;
 		URL += TEXT("/match/cancel?ticketId=");
 		URL += TicketID;
 		
 		CreateRequest(SSTR("DELETE"), URL)->ProcessRequest();
-
-		TicketID.Reset();
 	}
+
+	Reset();
 }
 
 void UMatchmaker::BindCallback(const FOnStartMatchmakingResponse& Callback)
 {
 	OnResponse = Callback;
+}
+
+void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
+{
+	using namespace Matchmaker;
+	
+	auto URL = GBaseURL;
+	URL += TEXT("/match/start?ticketId=");
+	URL += TicketID = RandomString();
+	URL += TEXT("?LatencyInMs=");
+	URL.AppendInt(LatencyInMs);
+	
+	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const TSharedPtr<FJsonObject>& Content)
+	{
+		if (Code == 200 && Content)
+		{
+			OnMatchmakingComplete(*Content);
+		}
+		else
+		{
+			Error(Code == 0 ? EMMResponse::ConnFail : EMMResponse::Error);
+		}
+	});
+	
+	ProcessRequest();
+}
+
+void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
+{
+	using namespace Matchmaker;
+	
+	const auto Address = GetServerAddress(Content);
+	const auto PlayerID = GetPlayerID(Content);
+
+	if (!Address.IsEmpty() && !PlayerID.IsEmpty())
+	{
+		OnResponse.ExecuteIfBound(EMMResponse::OK, Address, PlayerID);
+		Reset();
+	}
+	else
+	{
+		Error(EMMResponse::Error);
+	}
+}
+
+void UMatchmaker::ProcessRequest()
+{
+	if (!Handle->ProcessRequest())
+	{
+		Error(EMMResponse::ConnFail);
+	}
+}
+
+void UMatchmaker::Error(const EMMResponse Code)
+{
+	OnResponse.ExecuteIfBound(Code, {}, {});
+	Reset();
+}
+
+void UMatchmaker::Reset()
+{
+	Handle.Reset();
+	TicketID.Reset();
 }

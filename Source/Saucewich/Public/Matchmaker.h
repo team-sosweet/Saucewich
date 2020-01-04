@@ -6,12 +6,12 @@
 #include "Matchmaker.generated.h"
 
 UENUM(BlueprintType)
-enum class EMatchmakingResponse : uint8
+enum class EMMResponse : uint8
 {
-	OK, ConnectionFailed, Error
+	OK, ConnFail, Error
 };
 
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnStartMatchmakingResponse, EMatchmakingResponse, Response, const FString&, URL, const FString&, PlayerID);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnStartMatchmakingResponse, EMMResponse, Response, const FString&, URL, const FString&, PlayerID);
 
 UCLASS()
 class SAUCEWICH_API UMatchmaker : public UObject
@@ -32,6 +32,12 @@ public:
 	void BindCallback(const FOnStartMatchmakingResponse& Callback);
 
 private:
+	void OnPingComplete(int32 LatencyInMs);
+	void OnMatchmakingComplete(const class FJsonObject& Content);
+	void ProcessRequest();
+	void Error(EMMResponse Code);
+	void Reset();
+	
 	FString TicketID;
 	TSharedPtr<class IHttpRequest> Handle;
 	FOnStartMatchmakingResponse OnResponse;
