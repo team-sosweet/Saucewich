@@ -13,10 +13,11 @@ namespace Matchmaker
 	static FString RandomString()
 	{
 		static const TCHAR Chars[] = TEXT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.");
+		constexpr auto NumChar = std::extent<decltype(Chars)>::value - 1;
 		constexpr auto Len = 128;
 		FString Str;
 		Str.Reserve(Len);
-		for (auto i=0; i<Len; ++i) Str += Chars[FMath::RandHelper(std::extent_v<decltype(Chars)>-1)];
+		for (auto i=0; i<Len; ++i) Str += Chars[FMath::RandHelper(NumChar)];
 		return Str;
 	}
 
