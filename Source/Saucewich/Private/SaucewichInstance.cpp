@@ -54,19 +54,6 @@ bool USaucewichInstance::PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Typ
 	return true;
 }
 
-void USaucewichInstance::OnGameReady()
-{
-#if WITH_GAMELIFT
-	if (bShouldActivateGameSession)
-	{
-		UE_LOG(LogGameLift, Log, TEXT("Activating game session..."));
-		GameLift::Check(GameLift::Get().ActivateGameSession());
-		UE_LOG(LogGameLift, Log, TEXT("Game session activated."));
-		bShouldActivateGameSession = false;
-	}
-#endif
-}
-
 #if WITH_GAMELIFT
 static void Terminate()
 {
@@ -85,7 +72,7 @@ namespace GameLift
 	extern void Check(const FGameLiftGenericOutcome& Outcome);
 }
 
-void USaucewichInstance::StartGameSession(Aws::GameLift::Server::Model::GameSession) const
+void USaucewichInstance::StartGameSession(Aws::GameLift::Server::Model::GameSession)
 {
 	UE_LOG(LogGameLift, Log, TEXT("OnStartGameSession called. Starting game..."));
 
@@ -102,6 +89,19 @@ void USaucewichInstance::StartGameSession(Aws::GameLift::Server::Model::GameSess
 	}
 }
 #endif
+
+void USaucewichInstance::OnGameReady()
+{
+#if WITH_GAMELIFT
+	if (bShouldActivateGameSession)
+	{
+		UE_LOG(LogGameLift, Log, TEXT("Activating game session..."));
+		GameLift::Check(GameLift::Get().ActivateGameSession());
+		UE_LOG(LogGameLift, Log, TEXT("Game session activated."));
+		bShouldActivateGameSession = false;
+	}
+#endif
+}
 
 void USaucewichInstance::Init()
 {

@@ -48,36 +48,35 @@ namespace Matchmaker
 		return Request;
 	}
 
-	static const TSharedPtr<FJsonObject>& GetTicket(const FJsonObject& Content)
+	static const TSharedPtr<FJsonObject>& GetSessionInfo(const FJsonObject& Content)
 	{
 		auto&& Tickets = Content.GetArrayField(SSTR("TicketList"));
-		if (Tickets.Num() > 0) return Tickets[0]->AsObject();
+		if (Tickets.Num() > 0)
+		{
+			return Tickets[0]->AsObject()->GetObjectField(SSTR("GameSessionConnectionInfo"));
+		}
 		
 		static const TSharedPtr<FJsonObject> Default = MakeShared<FJsonObject>();
 		return Default;
 	}
 
-	static FString GetServerAddress(const FJsonObject& Ticket)
+	static FString GetServerAddress(const FJsonObject& SessionInfo)
 	{
-		const TSharedPtr<FJsonObject>* SessionPtr;
-		if (!Ticket.TryGetObjectField(SSTR("GameSessionConnectionInfo"), SessionPtr)) return {};
-		auto&& Session = **SessionPtr;
-
 		FString IP;
-		if (!Session.TryGetStringField(SSTR("IpAddress"), IP)) return {};
+		if (!SessionInfo.TryGetStringField(SSTR("IpAddress"), IP)) return {};
 
 		int32 Port;
-		if (!Session.TryGetNumberField(SSTR("Port"), Port)) return {};
+		if (!SessionInfo.TryGetNumberField(SSTR("Port"), Port)) return {};
 
 		IP += TEXT(':');
 		IP.AppendInt(Port);
 		return IP;
 	}
 
-	static FString GetPlayerID(const FJsonObject& Ticket)
+	static FString GetPlayerID(const FJsonObject& SessionInfo)
 	{
 		const TArray<TSharedPtr<FJsonValue>>* PlayersPtr;
-		if (!Ticket.TryGetArrayField(SSTR("Players"), PlayersPtr)) return {};
+		if (!SessionInfo.TryGetArrayField(SSTR("MatchedPlayerSessions"), PlayersPtr)) return {};
 		auto&& Players = *PlayersPtr;
 
 		if (Players.Num() == 0) return {};
@@ -87,7 +86,7 @@ namespace Matchmaker
 		auto&& Player = **PlayerPtr;
 
 		FString ID;
-		Player.TryGetStringField(SSTR("PlayerId"), ID);
+		Player.TryGetStringField(SSTR("PlayerSessionId"), ID);
 		return ID;
 	}
 }
@@ -176,9 +175,9 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 {
 	using namespace Matchmaker;
 
-	auto&& Ticket = *GetTicket(Content);
-	const auto Address = GetServerAddress(Ticket);
-	const auto PlayerID = GetPlayerID(Ticket);
+	auto&& SessionInfo = *GetSessionInfo(Content);
+	const auto Address = GetServerAddress(SessionInfo);
+	const auto PlayerID = GetPlayerID(SessionInfo);
 
 	if (!Address.IsEmpty() && !PlayerID.IsEmpty())
 	{

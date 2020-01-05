@@ -58,7 +58,7 @@ protected:
 
 private:
 	void OnNetworkError(UWorld*, class UNetDriver*, ENetworkFailure::Type, const FString&);
-	void StartGameSession(Aws::GameLift::Server::Model::GameSession) const;
+	void StartGameSession(Aws::GameLift::Server::Model::GameSession);
 	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;

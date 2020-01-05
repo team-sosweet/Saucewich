@@ -108,7 +108,7 @@ void ASaucewichGameMode::BeginPlay()
 
 	TimerManager.SetTimer(CheckIfNoPlayersTimer,
 		this, &ASaucewichGameMode::CheckIfNoPlayers,
-		10.f, true
+		60.f, true
 	);
 
 	check(TeamStarts.Num() == 0);
@@ -210,8 +210,6 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 		GameLiftSDK.RemovePlayerSession(PC->GetSessionID());
 	}
 #endif
-
-	CheckIfNoPlayers();
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -372,7 +370,7 @@ void ASaucewichGameMode::CheckIfNoPlayers()
 		GetWorld()->ServerTravel(SSTR("DSDef?listen"), true);
 #if WITH_GAMELIFT
 		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
-		GameLift::Check(GameLiftSDK.TerminateGameSession());
+		GameLift::Check(GameLift::Get().TerminateGameSession());
 #endif
 		GetWorldTimerManager().ClearTimer(CheckIfNoPlayersTimer);
 	}
