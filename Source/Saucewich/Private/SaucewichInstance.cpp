@@ -93,11 +93,14 @@ void USaucewichInstance::Init()
 {
 	Super::Init();
 
-	UserSettings = NewObject<UUserSettings>();
+	UserSettings = NewObject<UUserSettings>(this);
+
+#if !UE_SERVER
 	UserSettings->CommitMaxFPS();
+#endif
 
 	GEngine->NetworkFailureEvent.AddUObject(this, &USaucewichInstance::OnNetworkError);
-
+	
 #if WITH_GAMELIFT
 	UE_LOG(LogGameLift, Log, TEXT("Starting GameLift SDK..."));
 

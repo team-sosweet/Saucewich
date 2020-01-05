@@ -33,7 +33,8 @@ void UUserSettings::SetMaxFPS(const float NewMaxFPS)
 
 void UUserSettings::CommitMaxFPS() const
 {
-	GEngine->Exec(nullptr, *FString::Printf(TEXT("t.MaxFPS %f"), MaxFPS));
+	if (MaxFPS > 0.f)
+		GEngine->Exec(nullptr, *FString::Printf(TEXT("t.MaxFPS %f"), MaxFPS));
 }
 
 float UUserSettings::GetCorrectedSensitivity() const
@@ -73,5 +74,10 @@ void UUserSettings::PostInitProperties()
 	{
 		PlayerName = TEXT("Player");
 		PlayerName.AppendInt(FMath::RandRange(100, 999));
+	}
+
+	if (MaxFPS <= 0.f)
+	{
+		MaxFPS = IConsoleManager::Get().FindTConsoleVariableDataFloat(TEXT("t.MaxFPS"))->GetValueOnAnyThread();
 	}
 }

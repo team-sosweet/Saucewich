@@ -72,7 +72,7 @@ private:
 	FString PlayerName;
 
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float MaxFPS = 60.f;
+	float MaxFPS;
 
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 bOutline : 1;
