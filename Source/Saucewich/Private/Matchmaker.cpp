@@ -8,7 +8,7 @@
 
 namespace Matchmaker
 {
-	static const FString GBaseURL = TEXT("http://localhost:3000");
+	static const FString GBaseURL = TEXT("http://api.saucewich.net");
 	
 	static FString RandomString()
 	{
@@ -145,7 +145,7 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 	auto URL = GBaseURL;
 	URL += TEXT("/match/start?ticketId=");
 	URL += TicketID = RandomString();
-	URL += TEXT("?LatencyInMs=");
+	URL += TEXT("&LatencyInMs=");
 	URL.AppendInt(LatencyInMs);
 	
 	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const TSharedPtr<FJsonObject>& Content)
