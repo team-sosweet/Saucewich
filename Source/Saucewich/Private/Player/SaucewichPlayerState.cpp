@@ -73,9 +73,9 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore, con
 	const auto GI = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 	if (ActualScore == 0)
 		ActualScore = GI->GetScoreData(ScoreID).Score;
-	
+
 	Score += ActualScore;
-	MulticastAddScore(ScoreID, ActualScore);
+	MulticastAddScore(ScoreID, ActualScore, static_cast<int32>(Score));
 
 	UE_LOG(LogPlayerState, Log, TEXT("Add %d score to %s by %s"), ActualScore, *GetPlayerName(), *ScoreID.ToString())
 }
@@ -156,9 +156,10 @@ bool ASaucewichPlayerState::ServerSetWeaponLoadout_Validate(const TArray<TSoftCl
 	return true;
 }
 
-void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore)
+void ASaucewichPlayerState::MulticastAddScore_Implementation(const FName ScoreName, const int32 ActualScore, const int32 NewScore)
 {
-	OnScoreAdded.Broadcast(ScoreName, ActualScore);
+	OnScoreAddedNative.Broadcast(ScoreName, ActualScore, NewScore);
+	OnScoreAdded.Broadcast(ScoreName, ActualScore, NewScore);
 }
 
 void ASaucewichPlayerState::ServerSetWeapon_Implementation(const uint8 Slot, const TSoftClassPtr<AWeapon>& Weapon)

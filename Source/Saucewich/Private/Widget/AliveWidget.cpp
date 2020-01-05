@@ -42,19 +42,19 @@ void UAliveWidget::NativeOnInitialized()
 
 void UAliveWidget::OnPlayerStateSpawned(ASaucewichPlayerState* PlayerState)
 {
-	PlayerState->OnScoreAdded.AddDynamic(this, &UAliveWidget::OnScoreAdded);
+	PlayerState->OnScoreAddedNative.AddUObject(this, &UAliveWidget::OnScoreAdded);
 }
 
 void UAliveWidget::OnPlayerDeath(ASaucewichPlayerState* Victim, ASaucewichPlayerState* Attacker, AActor* Inflictor)
 {
-	KillFeedBox->MakeNewFeed(FKillFeedContent(Victim, Attacker, Inflictor));
+	KillFeedBox->MakeNewFeed(FKillFeedContent{Victim, Attacker, Inflictor});
 }
 
-void UAliveWidget::OnScoreAdded(const FName ScoreID, const int32 ActualScore)
+void UAliveWidget::OnScoreAdded(const FName ScoreID, const int32 ActualScore, const int32 NewScore) const
 {
 	const auto GI = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 	const auto& DisplayName = GI->GetScoreData(ScoreID).DisplayName;
-	ScoreFeedBox->MakeNewFeed(FScoreFeedContent(DisplayName, ActualScore));
+	ScoreFeedBox->MakeNewFeed(FScoreFeedContent{DisplayName, ActualScore});
 }
 
 void UAliveWidget::PrintMessage(const FText& Message, const float Duration, const EMsgType Type)

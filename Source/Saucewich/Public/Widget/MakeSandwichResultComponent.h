@@ -13,11 +13,15 @@ class SAUCEWICH_API UMakeSandwichResultComponent : public UComponentWidget
 {
 	GENERATED_BODY()
 
-	void NativeOnInitialized() override;
-
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidget(uint8 WinningTeam) const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetTimeRemainingForNextGame() const;
+
+protected:
+	void NativeOnInitialized() override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
@@ -59,8 +63,5 @@ private:
 	UPROPERTY(Transient)
 	UMaterialInstanceDynamic* EnemyTeamSandwichMat;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	int32 WaitTime;
-	
-	FTimerHandle WaitTimer;
+	float NextMatchStartTime;
 };

@@ -23,8 +23,7 @@ private:
 	UFUNCTION()
 	void OnPlayerDeath(class ASaucewichPlayerState* Victim, ASaucewichPlayerState* Attacker, AActor* Inflictor);
 
-	UFUNCTION()
-	void OnScoreAdded(FName ScoreID, int32 ActualScore);
+	void OnScoreAdded(FName ScoreID, int32 ActualScore, int32 NewScore) const;
 
 	UFUNCTION()
 	void PrintMessage(const FText& Message, float Duration, EMsgType Type);

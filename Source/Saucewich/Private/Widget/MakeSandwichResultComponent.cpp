@@ -6,7 +6,6 @@
 #include "Components/TextBlock.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "TimerManager.h"
 
 #include "GameMode/SaucewichGameMode.h"
 #include "GameMode/SaucewichGameState.h"
@@ -18,31 +17,27 @@ void UMakeSandwichResultComponent::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	ResultText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_Result")));
-	MyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_MyTeamScore")));
-	EnemyTeamScoreText = Cast<UTextBlock>(GetWidgetFromName(NAME("Text_EnemyTeamScore")));
-	MyTeamSandwich = Cast<UImage>(GetWidgetFromName(NAME("Image_MyTeamSandwich")));
-	EnemyTeamSandwich = Cast<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamSandwich")));
-	MyTeamResultImage = Cast<UImage>(GetWidgetFromName(NAME("Image_MyTeamResult")));
-	EnemyTeamResultImage = Cast<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamResult")));
-	UsersInfo = Cast<UUsersInfo>(GetWidgetFromName(NAME("UserInfo")));
+	ResultText = CastChecked<UTextBlock>(GetWidgetFromName(NAME("Text_Result")));
+	MyTeamScoreText = CastChecked<UTextBlock>(GetWidgetFromName(NAME("Text_MyTeamScore")));
+	EnemyTeamScoreText = CastChecked<UTextBlock>(GetWidgetFromName(NAME("Text_EnemyTeamScore")));
+	MyTeamSandwich = CastChecked<UImage>(GetWidgetFromName(NAME("Image_MyTeamSandwich")));
+	EnemyTeamSandwich = CastChecked<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamSandwich")));
+	MyTeamResultImage = CastChecked<UImage>(GetWidgetFromName(NAME("Image_MyTeamResult")));
+	EnemyTeamResultImage = CastChecked<UImage>(GetWidgetFromName(NAME("Image_EnemyTeamResult")));
+	UsersInfo = CastChecked<UUsersInfo>(GetWidgetFromName(NAME("UserInfo")));
+
+	const auto World = GetWorld();
 	
 	MyTeamSandwichMat =
-		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), SandwichMaterialParent);
+		UKismetMaterialLibrary::CreateDynamicMaterialInstance(World, SandwichMaterialParent);
 
 	EnemyTeamSandwichMat =
-		UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), SandwichMaterialParent);
+		UKismetMaterialLibrary::CreateDynamicMaterialInstance(World, SandwichMaterialParent);
 
 	MyTeamSandwich->SetBrushFromMaterial(MyTeamSandwichMat);
 	EnemyTeamSandwich->SetBrushFromMaterial(EnemyTeamSandwichMat);
 
-	WaitTime = ASaucewichGameMode::GetData(this).NextGameWaitTime;
-
-	FTimerDelegate Delegate;
-	Delegate.BindWeakLambda(this, [this] {
-		if (--WaitTime <= 0) GetWorld()->GetTimerManager().ClearTimer(WaitTimer);
-	});
-	GetWorld()->GetTimerManager().SetTimer(WaitTimer, Delegate, 1, true);
+	NextMatchStartTime = World->GetRealTimeSeconds() + ASaucewichGameMode::GetData(this).NextGameWaitTime;
 
 	UsersInfo->UpdateInfo();
 }
@@ -64,7 +59,7 @@ void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 	constexpr uint8 Invalid = -1;
 	const auto ResultName = WinningTeam == MyTeam ? Names::Win : WinningTeam == Invalid ? Names::Draw : Names::Lose;
 	const auto EnemyResultName = WinningTeam == MyTeam ? Names::Lose : WinningTeam == Invalid ? Names::Draw : Names::Win;
-	ResultText->SetText(ResultTexts.FindRef(ResultName));
+	ResultText->SetText(ResultTexts[ResultName]);
 
 	const auto ResultColor = WinningTeam == Invalid ? (MyTeamColor + EnemyTeamColor) * 0.5f : MyTeamColor;
 	ResultText->SetColorAndOpacity(ResultColor);
@@ -75,9 +70,14 @@ void UMakeSandwichResultComponent::SetWidget(const uint8 WinningTeam) const
 	MyTeamScoreText->SetText(FText::FromString(FString::FromInt(MyTeamScore)));
 	EnemyTeamScoreText->SetText(FText::FromString(FString::FromInt(EnemyTeamScore)));
 
-	MyTeamScoreText->SetColorAndOpacity(FSlateColor(MyTeamColor));
-	EnemyTeamScoreText->SetColorAndOpacity(FSlateColor(EnemyTeamColor));
+	MyTeamScoreText->SetColorAndOpacity(MyTeamColor);
+	EnemyTeamScoreText->SetColorAndOpacity(EnemyTeamColor);
 
-	MyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(ResultName));
-	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures.FindRef(EnemyResultName));
+	MyTeamResultImage->SetBrushFromTexture(ResultTextures[ResultName]);
+	EnemyTeamResultImage->SetBrushFromTexture(ResultTextures[EnemyResultName]);
+}
+
+float UMakeSandwichResultComponent::GetTimeRemainingForNextGame() const
+{
+	return FMath::Max(NextMatchStartTime - GetWorld()->GetRealTimeSeconds(), 0.f);
 }
