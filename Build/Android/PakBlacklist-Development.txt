@@ -1,0 +1,11 @@
+../../../Engine/Content/EngineMaterials/DefaultBloomKernel.uasset
+../../../Engine/Content/EngineMaterials/DefaultBloomKernel.uexp
+../../../Engine/Content/EngineMaterials/BlueNoise.uasset
+../../../Engine/Content/EngineMaterials/BlueNoise.uexp
+../../../Engine/Content/EngineSky/T_Sky_Blue.uasset
+../../../Engine/Content/EngineSky/T_Sky_Blue.ubulk
+../../../Engine/Content/EngineSky/T_Sky_Blue.uexp
+../../../Engine/Content/EngineSky/T_Sky_Clouds_M.uasset
+../../../Engine/Content/EngineSky/T_Sky_Clouds_M.ubulk
+../../../Engine/Content/EngineSky/T_Sky_Clouds_M.uexp
+../../../Saucewich/AssetRegistry.bin
