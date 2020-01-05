@@ -21,6 +21,7 @@
 #include "Player/TpsCharacter.h"
 #include "Saucewich.h"
 #include "SaucewichInstance.h"
+#include "Names.h"
 
 #define LOCTEXT_NAMESPACE ""
 
@@ -98,9 +99,16 @@ void ASaucewichGameMode::InitGame(const FString& MapName, const FString& Options
 void ASaucewichGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	auto&& TimerManager = GetWorldTimerManager();
 	
-	GetWorldTimerManager().SetTimer(
-		MatchStateUpdateTimer, this, &ASaucewichGameMode::UpdateMatchState, Data.MatchStateUpdateInterval, true
+	TimerManager.SetTimer(MatchStateUpdateTimer,
+		this, &ASaucewichGameMode::UpdateMatchState,
+		Data.MatchStateUpdateInterval, true
+	);
+
+	TimerManager.SetTimer(CheckIfNoPlayersTimer,
+		this, &ASaucewichGameMode::CheckIfNoPlayers,
+		10.f, true
 	);
 
 	check(TeamStarts.Num() == 0);
@@ -114,6 +122,8 @@ void ASaucewichGameMode::BeginPlay()
 			TeamStarts[Team].Add(Start);
 		}
 	}
+
+	USaucewichInstance::Get(this)->OnGameReady();
 }
 
 void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -201,14 +211,7 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 	}
 #endif
 
-	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
-	{
-		GEngine->SetClientTravel(GetWorld(), TEXT("DSDef?listen"), TRAVEL_Absolute);
-#if WITH_GAMELIFT
-		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
-		GameLift::Check(GameLiftSDK.TerminateGameSession());
-#endif
-	}
+	CheckIfNoPlayers();
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -362,6 +365,19 @@ void ASaucewichGameMode::EndMatch()
 		SetMatchState(MatchState::WaitingPostMatch);
 }
 
+void ASaucewichGameMode::CheckIfNoPlayers()
+{
+	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
+	{
+		GetWorld()->ServerTravel(SSTR("DSDef?listen"), true);
+#if WITH_GAMELIFT
+		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
+		GameLift::Check(GameLiftSDK.TerminateGameSession());
+#endif
+		GetWorldTimerManager().ClearTimer(CheckIfNoPlayersTimer);
+	}
+}
+
 void ASaucewichGameMode::OnMatchStateSet()
 {
 	Super::OnMatchStateSet();
@@ -416,7 +432,7 @@ void ASaucewichGameMode::StartNextGame() const
 	const auto NewMap = DefGm->ChooseNextMap();
 
 	const auto URL = FString::Printf(TEXT("%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
-	GetWorld()->ServerTravel(URL);
+	GetWorld()->ServerTravel(URL, true);
 }
 
 #undef LOCTEXT_NAMESPACE

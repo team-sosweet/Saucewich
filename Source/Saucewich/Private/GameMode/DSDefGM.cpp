@@ -52,11 +52,5 @@ void ADSDefGM::StartGame() const
 	auto&& NewMap = Maps[FMath::RandHelper(Maps.Num())];
 
 	const auto URL = FString::Printf(TEXT("%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
-	GetWorld()->ServerTravel(URL);
-
-#if WITH_GAMELIFT
-	UE_LOG(LogGameLift, Log, TEXT("Activating game session..."));
-	GameLift::Check(GameLift::Get().ActivateGameSession());
-	UE_LOG(LogGameLift, Log, TEXT("Game session activated."));
-#endif
+	GetWorld()->ServerTravel(URL, true);
 }

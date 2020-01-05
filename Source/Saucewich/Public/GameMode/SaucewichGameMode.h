@@ -123,6 +123,7 @@ protected:
 	void EndMatch() override;
 
 private:
+	void CheckIfNoPlayers();
 	void UpdateMatchState();
 	USaucewichInstance* GetSaucewichInstance() const;
 	
@@ -134,6 +135,7 @@ private:
 	FTimerHandle MatchStateTimer;
 	FTimerHandle MatchStateUpdateTimer;
 	FTimerHandle ExtPlyCntUpdateTimer;
+	FTimerHandle CheckIfNoPlayersTimer;
 
 	uint8 bAboutToStartMatch : 1;
 };

@@ -51,6 +51,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Type, FString& Msg);
 
+	void OnGameReady();
+
 protected:
 	void Init() override;
 
@@ -91,4 +93,6 @@ private:
 		ENetworkFailure::Type Type;
 		uint8 bOccured : 1;
 	} LastNetworkError;
+
+	TAtomic<bool> bShouldActivateGameSession;
 };

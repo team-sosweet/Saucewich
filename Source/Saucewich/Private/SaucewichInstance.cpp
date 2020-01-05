@@ -54,6 +54,19 @@ bool USaucewichInstance::PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Typ
 	return true;
 }
 
+void USaucewichInstance::OnGameReady()
+{
+#if WITH_GAMELIFT
+	if (bShouldActivateGameSession)
+	{
+		UE_LOG(LogGameLift, Log, TEXT("Activating game session..."));
+		GameLift::Check(GameLift::Get().ActivateGameSession());
+		UE_LOG(LogGameLift, Log, TEXT("Game session activated."));
+		bShouldActivateGameSession = false;
+	}
+#endif
+}
+
 #if WITH_GAMELIFT
 static void Terminate()
 {
@@ -79,6 +92,7 @@ void USaucewichInstance::StartGameSession(Aws::GameLift::Server::Model::GameSess
 	const auto GameMode = GetWorld()->GetAuthGameMode();
 	if (const auto DsGm = Cast<ADSDefGM>(GameMode))
 	{
+		bShouldActivateGameSession = true;
 		DsGm->BeginStartGame();
 	}
 	else

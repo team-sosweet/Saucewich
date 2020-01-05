@@ -48,10 +48,19 @@ namespace Matchmaker
 		return Request;
 	}
 
-	static FString GetServerAddress(const FJsonObject& Content)
+	static const TSharedPtr<FJsonObject>& GetTicket(const FJsonObject& Content)
+	{
+		auto&& Tickets = Content.GetArrayField(SSTR("TicketList"));
+		if (Tickets.Num() > 0) return Tickets[0]->AsObject();
+		
+		static const TSharedPtr<FJsonObject> Default = MakeShared<FJsonObject>();
+		return Default;
+	}
+
+	static FString GetServerAddress(const FJsonObject& Ticket)
 	{
 		const TSharedPtr<FJsonObject>* SessionPtr;
-		if (!Content.TryGetObjectField(SSTR("GameSessionConnectionInfo"), SessionPtr)) return {};
+		if (!Ticket.TryGetObjectField(SSTR("GameSessionConnectionInfo"), SessionPtr)) return {};
 		auto&& Session = **SessionPtr;
 
 		FString IP;
@@ -65,10 +74,10 @@ namespace Matchmaker
 		return IP;
 	}
 
-	static FString GetPlayerID(const FJsonObject& Content)
+	static FString GetPlayerID(const FJsonObject& Ticket)
 	{
 		const TArray<TSharedPtr<FJsonValue>>* PlayersPtr;
-		if (!Content.TryGetArrayField(SSTR("Players"), PlayersPtr)) return {};
+		if (!Ticket.TryGetArrayField(SSTR("Players"), PlayersPtr)) return {};
 		auto&& Players = *PlayersPtr;
 
 		if (Players.Num() == 0) return {};
@@ -166,9 +175,10 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 {
 	using namespace Matchmaker;
-	
-	const auto Address = GetServerAddress(Content);
-	const auto PlayerID = GetPlayerID(Content);
+
+	auto&& Ticket = *GetTicket(Content);
+	const auto Address = GetServerAddress(Ticket);
+	const auto PlayerID = GetPlayerID(Ticket);
 
 	if (!Address.IsEmpty() && !PlayerID.IsEmpty())
 	{
