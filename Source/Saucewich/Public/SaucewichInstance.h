@@ -41,6 +41,8 @@ class SAUCEWICH_API USaucewichInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	~USaucewichInstance();
+	
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Saucewich Instance", WorldContext=WorldContextObj))
 	static USaucewichInstance* Get(const UObject* WorldContextObj);
 
@@ -107,7 +109,7 @@ public:
 	uint8 bIsBackfillInProgress : 1;
 
 private:
-	TUniquePtr<Aws::GameLift::Server::Model::GameSession> GameSession;
+	Aws::GameLift::Server::Model::GameSession* GameSession;
 	uint8 bIsGameLiftInitialized : 1;
 	uint8 bShouldActivateGameSession : 1;
 #endif

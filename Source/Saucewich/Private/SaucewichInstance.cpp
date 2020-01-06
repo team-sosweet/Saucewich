@@ -28,6 +28,17 @@ static T* GetOrSpawn(T*& Ptr, UWorld* const World)
 	return GetOrSpawn(Ptr, T::StaticClass(), World);
 }
 
+USaucewichInstance::~USaucewichInstance()
+{
+#if WITH_GAMELIFT
+	if (GameSession)
+	{
+		delete GameSession;
+		GameSession = nullptr;
+	}
+#endif
+}
+
 USaucewichInstance* USaucewichInstance::Get(const UObject* const WorldContextObj)
 {
 	return WorldContextObj->GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
@@ -146,7 +157,6 @@ bool OnHealthCheck(void* State)
 
 #endif
 
-
 void USaucewichInstance::StartupServer()
 {
 #if WITH_GAMELIFT
@@ -156,14 +166,14 @@ void USaucewichInstance::StartupServer()
 		auto& Module = GameLift::Get();
 		GameLift::Check(Module.InitSDK());
 		UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
-		
-		GameSession = MakeUnique<Aws::GameLift::Server::Model::GameSession>();
+
+		GameSession = new Aws::GameLift::Server::Model::GameSession;
 		
 		const auto Port = GetWorld()->URL.Port;
 		UE_LOG(LogGameLift, Log, TEXT("Port: %d"), Port);
 
 		const auto LogFile = FPlatformOutputDevices::GetAbsoluteLogFilename();
-		const char* LogPath = TCHAR_TO_UTF8(*LogFile);
+		const char* LogFileUTF8 = TCHAR_TO_UTF8(*LogFile);
 		UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), *LogFile);
 
 		const Aws::GameLift::Server::ProcessParameters Params
@@ -172,7 +182,7 @@ void USaucewichInstance::StartupServer()
 	    	OnUpdateGameSession, this,
 	    	OnProcessTerminate, nullptr,
 	    	OnHealthCheck, nullptr,
-	    	Port, {&LogPath, 1}
+	    	Port, {&LogFileUTF8, 1}
 	    };
 
 		const auto Outcome = ProcessReady(Params);

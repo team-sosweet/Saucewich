@@ -2,8 +2,6 @@
 
 #include "GameMode/SaucewichGameMode.h"
 
-#include <regex>
-
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 #endif
@@ -435,11 +433,10 @@ namespace Backfill
 
 	static FString GetRegionFromGameSessionID(const FString& ID)
 	{
-		const std::basic_regex<TCHAR> Fmt{TEXT("arn:aws:gamelift:([A-Za-z0-9-]+).+")};
-		std::match_results<const TCHAR*> Region;
-		if (std::regex_search(*ID, Region, Fmt))
-			if (Region.size() > 0)
-				return Region[0].str().c_str();
+		const FRegexPattern Pattern{SSTR("arn:aws:gamelift:([A-Za-z0-9-]+).+")};
+		FRegexMatcher Matcher{Pattern, ID};
+		const auto Region = Matcher.GetCaptureGroup(0);
+		if (Region.Len() > 0) return Region;
 		return TEXT("ap-northeast-2");
 	}
 }
