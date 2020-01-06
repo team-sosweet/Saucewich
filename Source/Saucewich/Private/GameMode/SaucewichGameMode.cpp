@@ -447,12 +447,10 @@ void ASaucewichGameMode::Backfill()
 	
 	if (NumPlayers <= 0 || NumPlayers >= Data.MaxPlayers) return;
 	if (HasMatchEnded() || MatchState == MatchState::Ending) return;
-	
-	const auto GI = USaucewichInstance::Get(this);
-	if (GI->bIsBackfillInProgress) return;
 
 	UE_LOG(LogGameLift, Log, TEXT("%d players left. Starting match backfill..."), NumPlayers);
 	
+	const auto GI = USaucewichInstance::Get(this);
 	auto&& Session = GI->GetGameSession();
 	
 	const auto MMData = GetMatchmakerData(Session.GetMatchmakerData());
@@ -491,7 +489,6 @@ void ASaucewichGameMode::Backfill()
 	
 	if (Outcome.IsSuccess())
 	{
-		GI->bIsBackfillInProgress = true;
 		UE_LOG(LogGameLift, Log, TEXT("Match backfill started."));
 	}
 	else

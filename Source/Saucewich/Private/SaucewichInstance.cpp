@@ -127,8 +127,6 @@ void USaucewichInstance::UpdateGameSession(Aws::GameLift::Server::Model::UpdateG
 	{
 		*GameSession = Updated.GetGameSession();
 	}
-	
-	bIsBackfillInProgress = false;
 }
 
 void OnStartGameSession(Aws::GameLift::Server::Model::GameSession GameSession, void* State)
