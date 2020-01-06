@@ -11,14 +11,17 @@ class AActorPool;
 class ASauceMarker;
 class ASaucewichGameMode;
 
+#if WITH_GAMELIFT
 namespace Aws {
 namespace GameLift {
 namespace Server {
 namespace Model {
 	
 	class GameSession;
+	class UpdateGameSession;
 	
 }}}}
+#endif
 
 USTRUCT(BlueprintType)
 struct SAUCEWICH_API FScoreData
@@ -59,7 +62,6 @@ protected:
 
 private:
 	void OnNetworkError(UWorld*, class UNetDriver*, ENetworkFailure::Type, const FString&);
-	void StartGameSession(Aws::GameLift::Server::Model::GameSession);
 	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, FScoreData> ScoreData;
@@ -96,6 +98,16 @@ private:
 	} LastNetworkError;
 
 #if WITH_GAMELIFT
+public:
+	const Aws::GameLift::Server::Model::GameSession& GetGameSession() const;
+	void StartGameSession(Aws::GameLift::Server::Model::GameSession&& Session);
+	void UpdateGameSession(Aws::GameLift::Server::Model::UpdateGameSession&& Updated);
+
+	TMap<FString, class ASaucewichPlayerController*> IDtoPC;
+	uint8 bIsBackfillInProgress : 1;
+
+private:
+	TUniquePtr<Aws::GameLift::Server::Model::GameSession> GameSession;
 	uint8 bIsGameLiftInitialized : 1;
 	uint8 bShouldActivateGameSession : 1;
 #endif

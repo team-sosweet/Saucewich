@@ -2,6 +2,8 @@
 
 #include "GameMode/SaucewichGameMode.h"
 
+#include <regex>
+
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 #endif
@@ -13,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
+#include "Json.h"
 
 #include "Entity/PickupSpawner.h"
 #include "GameMode/SaucewichGameState.h"
@@ -107,9 +110,16 @@ void ASaucewichGameMode::BeginPlay()
 	);
 
 	TimerManager.SetTimer(CheckIfNoPlayersTimer,
-		this, &ASaucewichGameMode::CheckIfNoPlayers,
-		60.f, true
+		FTimerDelegate::CreateWeakLambda(this, [this]{EndMatchIfNoPlayers();}),
+		30.f, true
 	);
+
+#if WITH_GAMELIFT
+	TimerManager.SetTimer(BackfillTimer,
+		this, &ASaucewichGameMode::Backfill,
+		10.f, true
+	);
+#endif
 
 	check(TeamStarts.Num() == 0);
 	TeamStarts.AddDefaulted(Data.Teams.Num());
@@ -163,16 +173,18 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 
 	GameSession->RegisterPlayer(PC, UniqueId.GetUniqueNetId(), false);
 	
-	static const FString PlayerNameKey = TEXT("PlayerName");
-	auto PlayerName = UGameplayStatics::ParseOption(Options, PlayerNameKey);
+	auto PlayerName = UGameplayStatics::ParseOption(Options, SSTR("PlayerName"));
 	
 	if (USaucewich::IsValidPlayerName(PlayerName) != ENameValidity::Valid)
 		PlayerName = FString::Printf(TEXT("%s%i"), *DefaultPlayerName.ToString(), PC->PlayerState->PlayerId);
 	
 	ChangeName(PC, PlayerName, false);
 
-	static const FString SessionIDKey = TEXT("SessionID");
-	PC->SetSessionID(UGameplayStatics::ParseOption(Options, SessionIDKey));
+#if WITH_GAMELIFT
+	PC->SetSessionID(UGameplayStatics::ParseOption(Options, SSTR("SessionID")));
+	PC->SetPlayerID(UGameplayStatics::ParseOption(Options, SSTR("PlayerID")));
+	USaucewichInstance::Get(this)->IDtoPC.Add(PC->GetPlayerID(), PC);
+#endif
 	
 	return {};
 }
@@ -208,13 +220,17 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
 	{
 		GameLiftSDK.RemovePlayerSession(PC->GetSessionID());
+		USaucewichInstance::Get(this)->IDtoPC.Remove(PC->GetPlayerID());
 	}
 #endif
 
 	if (HasMatchStarted())
-	{
-		CheckIfNoPlayers();
-	}
+		if (EndMatchIfNoPlayers())
+			return;
+
+#if WITH_GAMELIFT
+	Backfill();
+#endif
 }
 
 void ASaucewichGameMode::HandleStartingNewPlayer_Implementation(APlayerController* const NewPlayer)
@@ -368,7 +384,130 @@ void ASaucewichGameMode::EndMatch()
 		SetMatchState(MatchState::WaitingPostMatch);
 }
 
-void ASaucewichGameMode::CheckIfNoPlayers()
+
+#if WITH_GAMELIFT
+
+namespace Backfill
+{
+	static TSharedPtr<FJsonObject> GetMatchmakerData(FString Data)
+	{
+		const auto Reader = TJsonReaderFactory<>::Create(MoveTemp(Data));
+		TSharedPtr<FJsonObject> JsonObject;
+		FJsonSerializer::Deserialize(Reader, JsonObject);
+		return JsonObject;
+	}
+
+	static FAttributeValue GetAttributeValue(const FJsonObject& AttJson)
+	{
+		FAttributeValue Att{};
+		auto&& Json = AttJson.GetField<EJson::None>(SSTR("valueAttribute"));
+		
+		switch (Json->Type)
+		{
+		case EJson::String:
+			Att.m_type = FAttributeType::STRING;
+			Att.m_S = Json->AsString();
+			break;
+			
+		case EJson::Number:
+			Att.m_type = FAttributeType::DOUBLE;
+			Att.m_N = Json->AsNumber();
+			break;
+			
+		case EJson::Array:
+			Att.m_type = FAttributeType::STRING_LIST;
+			for (auto&& S : Json->AsArray())
+				Att.m_SL.Add(S->AsString());
+			break;
+			
+		case EJson::Object:
+			Att.m_type = FAttributeType::STRING_DOUBLE_MAP;
+			for (auto&& S : Json->AsObject()->Values)
+				Att.m_SDM.Add(S.Key, S.Value->AsNumber());
+			break;
+			
+		default:
+			Att.m_type = FAttributeType::NONE;
+		}
+
+		return Att;
+	}
+
+	static FString GetRegionFromGameSessionID(const FString& ID)
+	{
+		const std::basic_regex<TCHAR> Fmt{TEXT("arn:aws:gamelift:([A-Za-z0-9-]+).+")};
+		std::match_results<const TCHAR*> Region;
+		if (std::regex_search(*ID, Region, Fmt))
+			if (Region.size() > 0)
+				return Region[0].str().c_str();
+		return TEXT("ap-northeast-2");
+	}
+}
+
+void ASaucewichGameMode::Backfill()
+{
+	using namespace Backfill;
+	
+	if (NumPlayers <= 0 || NumPlayers >= Data.MaxPlayers) return;
+	if (HasMatchEnded() || MatchState == MatchState::Ending) return;
+	
+	const auto GI = USaucewichInstance::Get(this);
+	if (GI->bIsBackfillInProgress) return;
+
+	UE_LOG(LogGameLift, Log, TEXT("%d players left. Starting match backfill..."), NumPlayers);
+	
+	auto&& Session = GI->GetGameSession();
+	
+	const auto MMData = GetMatchmakerData(Session.GetMatchmakerData());
+	const auto MMArn = MMData->GetStringField(SSTR("matchmakingConfigurationArn"));
+	const auto Region = GetRegionFromGameSessionID(Session.GetGameSessionId());
+
+	TArray<FPlayer> Players;
+	for (auto&& TeamValue : MMData->GetArrayField(SSTR("teams")))
+	{
+		auto&& Team = TeamValue->AsObject();
+		const auto TeamName = Team->GetStringField(SSTR("name"));
+		for (auto&& PlayerValue : Team->GetArrayField(SSTR("players")))
+		{
+			auto&& PlyObj = PlayerValue->AsObject();
+			
+			FPlayer Ply;
+			Ply.m_team = TeamName;
+			Ply.m_playerId = PlyObj->GetStringField(SSTR("playerId"));
+
+			const auto PC = GI->IDtoPC.FindRef(Ply.m_playerId);
+			Ply.m_latencyInMs.Add(Region, PC ? PC->GetLatencyInMs() : 0.f);
+
+			for (auto&& AttVal : PlyObj->GetObjectField(SSTR("attributes"))->Values)
+			{
+				auto&& Att = AttVal.Value->AsObject();
+				Ply.m_playerAttributes.Add(AttVal.Key, GetAttributeValue(*Att));
+			}
+
+			Players.Add(MoveTemp(Ply));
+		}
+	}
+	
+	const auto Outcome = GameLift::Get().StartMatchBackfill({
+		{}, Session.GetGameSessionId(), MMArn, Players
+	});
+	
+	if (Outcome.IsSuccess())
+	{
+		GI->bIsBackfillInProgress = true;
+		UE_LOG(LogGameLift, Log, TEXT("Match backfill started."));
+	}
+	else
+	{
+		auto&& Err = Outcome.GetError();
+		UE_LOG(LogGameLift, Error, TEXT("%s: %s"), *Err.m_errorName, *Err.m_errorMessage);
+	}
+}
+
+#endif
+
+
+bool ASaucewichGameMode::EndMatchIfNoPlayers()
 {
 	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
 	{
@@ -378,7 +517,9 @@ void ASaucewichGameMode::CheckIfNoPlayers()
 #endif
 		GetWorld()->ServerTravel(SSTR("DSDef?listen"), true);
 		GetWorldTimerManager().ClearTimer(CheckIfNoPlayersTimer);
+		return true;
 	}
+	return false;
 }
 
 void ASaucewichGameMode::OnMatchStateSet()

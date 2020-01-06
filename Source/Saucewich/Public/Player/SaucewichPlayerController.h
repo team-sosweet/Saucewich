@@ -47,9 +47,13 @@ public:
 
 	void SetSessionID(FString&& ID);
 	const FString& GetSessionID() const;
+	void SetPlayerID(FString&& ID);
+	const FString& GetPlayerID() const;
 
 	void BroadcastRespawn() const;
 	void BroadcastDeath() const;
+
+	float GetLatencyInMs() const { return LatencyInMs; }
 
 	struct BroadcastPlayerStateSpawned;
 	struct BroadcastCharacterSpawned;
@@ -80,18 +84,34 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void ClientPing();
+
+	void MeasureLatency();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void InitialMeasureLatency();
+	
+	UFUNCTION(Client, Reliable)
+	void BeginMeasureLatency();
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ReplyMeasureLatency();
 	
 	FOnPlayerStateSpawned OnPlayerStateSpawned;
 	FOnPSSpawnedNative OnPSSpawnedNative;
 	FOnCharacterSpawned OnCharacterSpawned;
 
 	FString SessionID;
+	FString PlayerID;
 
 	FTimerHandle RespawnTimer;
 	FTimerHandle PingTimer;
+	FTimerHandle LatencyMeasureTimer;
 
 	UPROPERTY(EditDefaultsOnly)
 	float PingTimeout = 1;
+
+	float LatencyMeasureBeginTime;
+	float LatencyInMs;
 };
 
 struct ASaucewichPlayerController::BroadcastPlayerStateSpawned

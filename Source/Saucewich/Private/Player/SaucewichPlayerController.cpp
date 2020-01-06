@@ -51,10 +51,15 @@ void ASaucewichPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!HasAuthority())
+	if (HasAuthority())
+	{
+		GetWorldTimerManager().SetTimer(LatencyMeasureTimer, this, &ASaucewichPlayerController::MeasureLatency, 10.f, true);
+	}
+	else
 	{
 		FCoreDelegates::ApplicationHasReactivatedDelegate.AddUObject(this, &ThisClass::Ping);
 		FCoreDelegates::ApplicationHasEnteredForegroundDelegate.AddUObject(this, &ThisClass::Ping);
+		InitialMeasureLatency();
 	}
 }
 
@@ -105,6 +110,37 @@ void ASaucewichPlayerController::OnPingFailed() const
 	if (ServerConnection) ServerConnection->Close();
 }
 
+void ASaucewichPlayerController::MeasureLatency()
+{
+	LatencyMeasureBeginTime = GetWorld()->GetRealTimeSeconds();
+	BeginMeasureLatency();
+}
+
+void ASaucewichPlayerController::InitialMeasureLatency_Implementation()
+{
+	MeasureLatency();
+}
+
+bool ASaucewichPlayerController::InitialMeasureLatency_Validate()
+{
+	return true;
+}
+
+void ASaucewichPlayerController::BeginMeasureLatency_Implementation()
+{
+	ReplyMeasureLatency();
+}
+
+void ASaucewichPlayerController::ReplyMeasureLatency_Implementation()
+{
+	LatencyInMs = GetWorld()->GetRealTimeSeconds() - LatencyMeasureBeginTime;
+}
+
+bool ASaucewichPlayerController::ReplyMeasureLatency_Validate()
+{
+	return true;
+}
+
 void ASaucewichPlayerController::ServerPing_Implementation()
 {
 	ClientPing();
@@ -142,6 +178,16 @@ void ASaucewichPlayerController::SetSessionID(FString&& ID)
 const FString& ASaucewichPlayerController::GetSessionID() const
 {
 	return SessionID;
+}
+
+void ASaucewichPlayerController::SetPlayerID(FString&& ID)
+{
+	PlayerID = MoveTemp(ID);
+}
+
+const FString& ASaucewichPlayerController::GetPlayerID() const
+{
+	return PlayerID;
 }
 
 void ASaucewichPlayerController::BroadcastRespawn() const
