@@ -473,7 +473,7 @@ void ASaucewichGameMode::Backfill()
 			Ply.m_playerId = PlyObj->GetStringField(SSTR("playerId"));
 
 			const auto PC = GI->IDtoPC.FindRef(Ply.m_playerId);
-			Ply.m_latencyInMs.Add(Region, PC ? PC->GetLatencyInMs() : 0.f);
+			Ply.m_latencyInMs.Add(Region, PC ? FMath::Max(PC->GetLatencyInMs(), 1.f) : 1.f);
 
 			for (auto&& AttVal : PlyObj->GetObjectField(SSTR("attributes"))->Values)
 			{

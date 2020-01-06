@@ -172,9 +172,9 @@ void USaucewichInstance::StartupServer()
 		const auto Port = GetWorld()->URL.Port;
 		UE_LOG(LogGameLift, Log, TEXT("Port: %d"), Port);
 
-		const auto LogFile = FPlatformOutputDevices::GetAbsoluteLogFilename();
-		const char* LogFileUTF8 = TCHAR_TO_UTF8(*LogFile);
-		UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), *LogFile);
+		const auto LogFile = static_cast<FOutputDeviceFile*>(FPlatformOutputDevices::GetLog())->GetFilename();
+		const char* LogFileUTF8 = TCHAR_TO_UTF8(LogFile);
+		UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), LogFile);
 
 		const Aws::GameLift::Server::ProcessParameters Params
 		{

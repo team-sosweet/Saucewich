@@ -43,7 +43,8 @@ namespace Matchmaker
   				const auto Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 				TSharedPtr<FJsonObject> JsonObject;
 				FJsonSerializer::Deserialize(Reader, JsonObject);
-				OnResponse(Response->GetResponseCode(), JsonObject);
+				static const FJsonObject Default;
+				OnResponse(Response->GetResponseCode(), JsonObject ? *JsonObject : Default);
 			}
 		);
 
@@ -105,7 +106,7 @@ void UMatchmaker::StartMatchmaking()
 	using namespace std::chrono;
 	
 	Handle = CreateRequest(SSTR("GET"), GBaseURL + TEXT("/ping"),
-		[this, StartTime=steady_clock::now()](const int32 Code, const TSharedPtr<FJsonObject>&)
+		[this, StartTime=steady_clock::now()](const int32 Code, const FJsonObject&)
 	{
 		if (Code == 200)
 		{
@@ -158,16 +159,24 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 	URL += TEXT("&LatencyInMs=");
 	URL.AppendInt(LatencyInMs);
 	
-	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const TSharedPtr<FJsonObject>& Content)
+	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
 	{
-		if (Code == 200 && Content)
+		if (Code == 200)
 		{
-			OnMatchmakingComplete(*Content);
+			OnMatchmakingComplete(Content);
 		}
 		else
 		{
-			UE_LOG(LogMatchmaker, Error, TEXT("/match/start responded %d"), Code);
-			Error(Code == 0 ? EMMResponse::ConnFail : EMMResponse::Error);
+			const auto Desc = Content.GetStringField(SSTR("description"));
+			
+			if (Code == 0)
+				Error(EMMResponse::ConnFail);
+			
+			else if (Desc == TEXT("TIMED_OUT"))
+				Error(EMMResponse::Timeout);
+			
+			else if (Desc != TEXT("CANCELLED"))
+				Error(EMMResponse::Error);
 		}
 	});
 	

@@ -111,7 +111,7 @@ private:
 	float PingTimeout = 1;
 
 	float LatencyMeasureBeginTime;
-	float LatencyInMs;
+	float LatencyInMs = 1.f;
 };
 
 struct ASaucewichPlayerController::BroadcastPlayerStateSpawned
