@@ -6,6 +6,8 @@
 #include "Json.h"
 #include "Names.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogMatchmaker, Log, All)
+
 namespace Matchmaker
 {
 	static const FString GBaseURL = TEXT("http://api.saucewich.net");
@@ -164,6 +166,7 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 		}
 		else
 		{
+			UE_LOG(LogMatchmaker, Error, TEXT("/match/start responded %d"), Code);
 			Error(Code == 0 ? EMMResponse::ConnFail : EMMResponse::Error);
 		}
 	});

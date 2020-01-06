@@ -14,6 +14,12 @@ ADSDefGM::ADSDefGM()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ADSDefGM::BeginPlay()
+{
+	Super::BeginPlay();
+	USaucewichInstance::Get(this)->StartupServer();
+}
+
 void ADSDefGM::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

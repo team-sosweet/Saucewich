@@ -7,12 +7,12 @@
 #include "UserSettings.h"
 #include "Engine/Engine.h"
 #include "Saucewich.h"
-#include "GameMode/DSDefGM.h"
 
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 	#include "Misc/OutputDeviceFile.h"
 	#include "HAL/PlatformOutputDevices.h"
+	#include "GameMode/DSDefGM.h"
 #endif
 
 template <class T>
@@ -90,6 +90,37 @@ void USaucewichInstance::StartGameSession(Aws::GameLift::Server::Model::GameSess
 }
 #endif
 
+void USaucewichInstance::StartupServer()
+{
+#if WITH_GAMELIFT
+	if (!bIsGameLiftInitialized)
+	{
+		UE_LOG(LogGameLift, Log, TEXT("Starting GameLift SDK..."));
+
+		auto& Module = GameLift::Get();
+		GameLift::Check(Module.InitSDK());
+		
+		UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
+
+		static FProcessParameters Params;
+		Params.OnStartGameSession.BindUObject(this, &USaucewichInstance::StartGameSession);
+		Params.OnTerminate.BindStatic(Terminate);
+		Params.OnHealthCheck.BindStatic(CheckHealth);
+		
+		Params.port = GetWorld()->URL.Port;
+		UE_LOG(LogGameLift, Log, TEXT("Port: %d"), Params.port);
+
+		Params.logParameters.Add(FPlatformOutputDevices::GetAbsoluteLogFilename());
+		UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), *Params.logParameters[0]);
+
+		GameLift::Check(Module.ProcessReady(Params));
+		UE_LOG(LogGameLift, Log, TEXT("Ready for create game session"));
+
+		bIsGameLiftInitialized = true;
+	}
+#endif
+}
+
 void USaucewichInstance::OnGameReady()
 {
 #if WITH_GAMELIFT
@@ -114,29 +145,6 @@ void USaucewichInstance::Init()
 #endif
 
 	GEngine->NetworkFailureEvent.AddUObject(this, &USaucewichInstance::OnNetworkError);
-	
-#if WITH_GAMELIFT
-	UE_LOG(LogGameLift, Log, TEXT("Starting GameLift SDK..."));
-
-	auto& Module = GameLift::Get();
-	GameLift::Check(Module.InitSDK());
-	
-	UE_LOG(LogGameLift, Log, TEXT("GameLift SDK Initialized"));
-
-	static FProcessParameters Params;
-	Params.OnStartGameSession.BindUObject(this, &USaucewichInstance::StartGameSession);
-	Params.OnTerminate.BindStatic(Terminate);
-	Params.OnHealthCheck.BindStatic(CheckHealth);
-	
-	Params.port = GetWorld()->URL.Port;
-	UE_LOG(LogGameLift, Log, TEXT("Port: %d"), Params.port);
-
-	Params.logParameters.Add(FPlatformOutputDevices::GetAbsoluteLogFilename());
-	UE_LOG(LogGameLift, Log, TEXT("Log file: %s"), *Params.logParameters[0]);
-
-	GameLift::Check(Module.ProcessReady(Params));
-	UE_LOG(LogGameLift, Log, TEXT("Ready for create game session"));
-#endif
 }
 
 void USaucewichInstance::OnNetworkError(UWorld*, UNetDriver*, const ENetworkFailure::Type Type, const FString& Msg)

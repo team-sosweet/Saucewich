@@ -15,6 +15,7 @@ public:
 	void BeginStartGame() { bStartGame = true; }
 
 protected:
+	void BeginPlay() override;
 	void Tick(float DeltaSeconds) override;
 	void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
 
