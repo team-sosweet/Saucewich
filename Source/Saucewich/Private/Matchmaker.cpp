@@ -12,17 +12,6 @@ namespace Matchmaker
 {
 	static const FString GBaseURL = TEXT("http://api.saucewich.net");
 	
-	static FString RandomString()
-	{
-		static const TCHAR Chars[] = TEXT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.");
-		constexpr auto NumChar = std::extent<decltype(Chars)>::value - 1;
-		constexpr auto Len = 128;
-		FString Str;
-		Str.Reserve(Len);
-		for (auto i=0; i<Len; ++i) Str += Chars[FMath::RandHelper(NumChar)];
-		return Str;
-	}
-
 	static TSharedRef<IHttpRequest> CreateRequest(const FString& Verb, const FString& URL)
 	{
 		const auto Request = FHttpModule::Get().CreateRequest();
@@ -164,7 +153,7 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 	
 	auto URL = GBaseURL;
 	URL += TEXT("/match/start?ticketId=");
-	URL += TicketID = RandomString();
+	URL += TicketID = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens);
 	URL += TEXT("&LatencyInMs=");
 	URL.AppendInt(LatencyInMs);
 	
