@@ -185,13 +185,11 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 {
 	using namespace Matchmaker;
 
-	auto&& SessionInfo = *GetSessionInfo(Content);
-	const auto Address = GetServerAddress(SessionInfo);
-	auto&& PlayerInfo = *GetPlayer(SessionInfo);
-	const auto PlayerID = PlayerInfo.GetStringField(SSTR("PlayerId"));
-	const auto SessionID = PlayerInfo.GetStringField(SSTR("PlayerSessionId"));
+	const auto Address = Content.GetStringField(SSTR("Address"));
+	const auto PlayerID = Content.GetStringField(SSTR("PlayerId"));
+	const auto SessionID = Content.GetStringField(SSTR("PlayerSessionId"));
 
-	if (!Address.IsEmpty() && !PlayerID.IsEmpty())
+	if (!Address.IsEmpty() && !PlayerID.IsEmpty() && !SessionID.IsEmpty())
 	{
 		OnResponse.ExecuteIfBound(EMMResponse::OK, Address, PlayerID, SessionID);
 		Reset();
