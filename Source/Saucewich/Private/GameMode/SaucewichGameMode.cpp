@@ -57,21 +57,38 @@ void ASaucewichGameMode::PrintMessage(const FText& Msg, const EMsgType Type, con
 	UE_LOG(LogGameMode, Log, TEXT("%s"), *Msg.ToString());
 }
 
-template <class T, class Alloc>
-static T RandomDistinct(TArray<T, Alloc> Arr, const T& Elem)
+template <class T>
+static T RandomDistinct(TArray<T> Arr, const UObject* const Elem)
 {
-	Arr.RemoveSingleSwap(Elem, false);
-	return Arr.Num() > 0 ? Arr[FMath::RandHelper(Arr.Num())] : Elem;
+	auto Predicate = [&](const T& E)
+	{
+		return E.GetAssetName() == Elem->GetName();
+	};
+	
+	const auto Found = Arr.FindByPredicate(Predicate);
+	if (Found) Arr.RemoveAtSwap(Found - Arr.GetData());
+	
+	return Arr.Num() > 0 ? Arr[FMath::RandHelper(Arr.Num())] : T{Elem};
 }
 
 TSoftClassPtr<ASaucewichGameMode> ASaucewichGameMode::ChooseNextGameMode() const
 {
-	return RandomDistinct<TSoftClassPtr<ASaucewichGameMode>>(GetSaucewichInstance()->GetGameModes(), GetClass());
+	const TSoftClassPtr<ASaucewichGameMode> Cur = GetClass();
+	auto Arr = GetSaucewichInstance()->GetGameModes();
+	Arr.RemoveSingleSwap(Cur);
+	return Arr.Num() > 0 ? Arr[FMath::RandHelper(Arr.Num())] : Cur;
 }
 
-TSoftObjectPtr<UWorld> ASaucewichGameMode::ChooseNextMap() const
+FString ASaucewichGameMode::ChooseNextMap(const UWorld* const World) const
 {
-	return RandomDistinct<TSoftObjectPtr<UWorld>>(Data.Maps, GetWorld());
+	const auto Cur = World->GetName();
+	TArray<FString> Maps;
+	for (auto&& Map : Data.Maps)
+	{
+		auto Name = Map.GetAssetName();
+		if (Name != Cur) Maps.Add(MoveTemp(Name));
+	}
+	return Maps.Num() > 0 ? Maps[FMath::RandHelper(Maps.Num())] : Cur;
 }
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName) const
@@ -378,7 +395,7 @@ bool ASaucewichGameMode::EndMatchIfNoPlayers()
 		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
 		GameLift::Check(GameLift::Get().TerminateGameSession());
 #endif
-		GetWorld()->ServerTravel(SSTR("DSDef?listen"), true);
+		GetWorld()->ServerTravel(SSTR("DSDef"), true);
 		GetWorldTimerManager().ClearTimer(CheckIfNoPlayersTimer);
 		return true;
 	}
@@ -436,9 +453,9 @@ void ASaucewichGameMode::StartNextGame() const
 {
 	const auto GmClass = ChooseNextGameMode();
 	const auto DefGm = GetDefault<ASaucewichGameMode>(GmClass.LoadSynchronous());
-	const auto NewMap = DefGm->ChooseNextMap();
-
-	const auto URL = FString::Printf(TEXT("%s?game=%s?listen"), *NewMap.GetAssetName(), *GmClass->GetPathName());
+	auto URL = DefGm->ChooseNextMap(GetWorld());
+	URL += TEXT("?game=");
+	URL += *GmClass.ToString();
 	GetWorld()->ServerTravel(URL, true);
 }
 

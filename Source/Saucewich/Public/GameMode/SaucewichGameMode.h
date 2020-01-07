@@ -89,7 +89,7 @@ public:
 	void PrintMessage(const FText& Msg, EMsgType Type, float Duration = 3) const;
 
 	TSoftClassPtr<ASaucewichGameMode> ChooseNextGameMode() const;
-	TSoftObjectPtr<UWorld> ChooseNextMap() const;
+	FString ChooseNextMap(const UWorld* World) const;
 
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
 	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName) const;

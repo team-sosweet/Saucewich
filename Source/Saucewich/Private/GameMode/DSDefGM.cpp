@@ -12,6 +12,7 @@
 ADSDefGM::ADSDefGM()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bUseSeamlessTravel = true;
 }
 
 void ADSDefGM::BeginPlay()
