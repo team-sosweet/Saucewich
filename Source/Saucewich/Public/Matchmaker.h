@@ -8,7 +8,7 @@
 UENUM(BlueprintType)
 enum class EMMResponse : uint8
 {
-	OK, ConnFail, Error, Timeout
+	OK, ConnFail, Error, Timeout, Canceled
 };
 
 DECLARE_DYNAMIC_DELEGATE_FourParams(FOnStartMatchmakingResponse, EMMResponse, Response, const FString&, URL, const FString&, PlayerID, const FString&, SessionID);
@@ -19,14 +19,17 @@ class SAUCEWICH_API UMatchmaker : public UObject
 	GENERATED_BODY()
 
 public:
+	UMatchmaker();
+	~UMatchmaker();
+	
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Matchmaker"))
 	static UMatchmaker* Get();
 	
 	UFUNCTION(BlueprintCallable)
 	void StartMatchmaking();
 	
-	UFUNCTION(BlueprintCallable)
-	void CancelMatchmaking();
+	UFUNCTION(BlueprintCallable, meta=(AdvancedDisplay=bError))
+	void CancelMatchmaking(bool bError = false);
 
 	UFUNCTION(BlueprintCallable)
 	void BindCallback(const FOnStartMatchmakingResponse& Callback);

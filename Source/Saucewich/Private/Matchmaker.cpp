@@ -90,6 +90,18 @@ namespace Matchmaker
 	}
 }
 
+UMatchmaker::UMatchmaker()
+{
+	FCoreDelegates::ApplicationWillDeactivateDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
+	FCoreDelegates::ApplicationWillEnterBackgroundDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
+	FCoreDelegates::ApplicationWillTerminateDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
+}
+
+UMatchmaker::~UMatchmaker()
+{
+	CancelMatchmaking(true);
+}
+
 UMatchmaker* UMatchmaker::Get()
 {
 	static const auto Matchmaker = NewObject<UMatchmaker>(GetTransientPackage(), NAME_None, RF_MarkAsRootSet);
@@ -119,7 +131,7 @@ void UMatchmaker::StartMatchmaking()
 	ProcessRequest();
 }
 
-void UMatchmaker::CancelMatchmaking()
+void UMatchmaker::CancelMatchmaking(const bool bError)
 {
 	using namespace Matchmaker;
 
@@ -137,7 +149,8 @@ void UMatchmaker::CancelMatchmaking()
 		CreateRequest(SSTR("DELETE"), URL)->ProcessRequest();
 	}
 
-	Reset();
+	if (bError) Error(EMMResponse::Canceled);
+	else Reset();
 }
 
 void UMatchmaker::BindCallback(const FOnStartMatchmakingResponse& Callback)
