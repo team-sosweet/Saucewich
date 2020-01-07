@@ -11,7 +11,7 @@ enum class EMMResponse : uint8
 	OK, ConnFail, Error, Timeout
 };
 
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnStartMatchmakingResponse, EMMResponse, Response, const FString&, URL, const FString&, PlayerID);
+DECLARE_DYNAMIC_DELEGATE_FourParams(FOnStartMatchmakingResponse, EMMResponse, Response, const FString&, URL, const FString&, PlayerID, const FString&, SessionID);
 
 UCLASS()
 class SAUCEWICH_API UMatchmaker : public UObject

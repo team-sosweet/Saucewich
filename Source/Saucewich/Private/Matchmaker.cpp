@@ -76,21 +76,17 @@ namespace Matchmaker
 		return IP;
 	}
 
-	static FString GetPlayerID(const FJsonObject& SessionInfo)
+	static const TSharedPtr<FJsonObject>& GetPlayer(const FJsonObject& SessionInfo)
 	{
+		static const TSharedPtr<FJsonObject> Default = MakeShared<FJsonObject>();
+		
 		const TArray<TSharedPtr<FJsonValue>>* PlayersPtr;
-		if (!SessionInfo.TryGetArrayField(SSTR("MatchedPlayerSessions"), PlayersPtr)) return {};
+		if (!SessionInfo.TryGetArrayField(SSTR("MatchedPlayerSessions"), PlayersPtr)) return Default;
 		auto&& Players = *PlayersPtr;
 
-		if (Players.Num() == 0) return {};
+		if (Players.Num() == 0) return Default;
 
-		const TSharedPtr<FJsonObject>* PlayerPtr;
-		if (!Players[0]->TryGetObject(PlayerPtr)) return {};
-		auto&& Player = **PlayerPtr;
-
-		FString ID;
-		Player.TryGetStringField(SSTR("PlayerSessionId"), ID);
-		return ID;
+		return Players[0]->AsObject();
 	}
 }
 
@@ -189,11 +185,13 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 
 	auto&& SessionInfo = *GetSessionInfo(Content);
 	const auto Address = GetServerAddress(SessionInfo);
-	const auto PlayerID = GetPlayerID(SessionInfo);
+	auto&& PlayerInfo = *GetPlayer(SessionInfo);
+	const auto PlayerID = PlayerInfo.GetStringField(SSTR("PlayerId"));
+	const auto SessionID = PlayerInfo.GetStringField(SSTR("PlayerSessionId"));
 
 	if (!Address.IsEmpty() && !PlayerID.IsEmpty())
 	{
-		OnResponse.ExecuteIfBound(EMMResponse::OK, Address, PlayerID);
+		OnResponse.ExecuteIfBound(EMMResponse::OK, Address, PlayerID, SessionID);
 		Reset();
 	}
 	else
@@ -212,7 +210,7 @@ void UMatchmaker::ProcessRequest()
 
 void UMatchmaker::Error(const EMMResponse Code)
 {
-	OnResponse.ExecuteIfBound(Code, {}, {});
+	OnResponse.ExecuteIfBound(Code, {}, {}, {});
 	Reset();
 }
 
