@@ -141,6 +141,5 @@ private:
 
 #if WITH_GAMELIFT
 	void Backfill();
-	FTimerHandle BackfillTimer;
 #endif
 };

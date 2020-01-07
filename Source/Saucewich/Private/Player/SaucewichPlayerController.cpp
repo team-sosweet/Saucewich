@@ -133,7 +133,7 @@ void ASaucewichPlayerController::BeginMeasureLatency_Implementation()
 
 void ASaucewichPlayerController::ReplyMeasureLatency_Implementation()
 {
-	LatencyInMs = GetWorld()->GetRealTimeSeconds() - LatencyMeasureBeginTime;
+	LatencyInMs = (GetWorld()->GetRealTimeSeconds() - LatencyMeasureBeginTime) / 2.f;
 }
 
 bool ASaucewichPlayerController::ReplyMeasureLatency_Validate()

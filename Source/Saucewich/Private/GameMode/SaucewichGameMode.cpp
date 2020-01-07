@@ -112,13 +112,6 @@ void ASaucewichGameMode::BeginPlay()
 		30.f, true
 	);
 
-#if WITH_GAMELIFT
-	TimerManager.SetTimer(BackfillTimer,
-		this, &ASaucewichGameMode::Backfill,
-		10.f, true
-	);
-#endif
-
 	check(TeamStarts.Num() == 0);
 	TeamStarts.AddDefaulted(Data.Teams.Num());
 	for (const auto Start : TActorRange<APlayerStart>{GetWorld()})
@@ -133,6 +126,156 @@ void ASaucewichGameMode::BeginPlay()
 
 	USaucewichInstance::Get(this)->OnGameReady();
 }
+
+
+#if WITH_GAMELIFT
+
+namespace Backfill
+{
+	static TSharedPtr<FJsonObject> GetMatchmakerData(FString Data)
+	{
+		const auto Reader = TJsonReaderFactory<>::Create(MoveTemp(Data));
+		TSharedPtr<FJsonObject> JsonObject;
+		FJsonSerializer::Deserialize(Reader, JsonObject);
+		return JsonObject;
+	}
+
+	static FAttributeValue GetAttributeValue(const FJsonObject& AttJson)
+	{
+		FAttributeValue Att{};
+		auto&& Json = AttJson.GetField<EJson::None>(SSTR("valueAttribute"));
+		
+		switch (Json->Type)
+		{
+		case EJson::String:
+			Att.m_type = FAttributeType::STRING;
+			Att.m_S = Json->AsString();
+			break;
+			
+		case EJson::Number:
+			Att.m_type = FAttributeType::DOUBLE;
+			Att.m_N = Json->AsNumber();
+			break;
+			
+		case EJson::Array:
+			Att.m_type = FAttributeType::STRING_LIST;
+			for (auto&& S : Json->AsArray())
+				Att.m_SL.Add(S->AsString());
+			break;
+			
+		case EJson::Object:
+			Att.m_type = FAttributeType::STRING_DOUBLE_MAP;
+			for (auto&& S : Json->AsObject()->Values)
+				Att.m_SDM.Add(S.Key, S.Value->AsNumber());
+			break;
+			
+		default:
+			Att.m_type = FAttributeType::NONE;
+		}
+
+		return Att;
+	}
+
+	static FString GetRegionFromGameSessionID(const FString& ID)
+	{
+		constexpr TCHAR Prefix[] = TEXT("arn:aws:gamelift:");
+		constexpr auto PreLen = std::extent<decltype(Prefix)>::value - 1;
+
+		if (ID.Len() > PreLen)
+		{
+			auto i=PreLen;
+			for (; i<ID.Len() && (isalnum(ID[i]) || ID[i] == '-'); ++i) {}
+
+			if (PreLen < i)
+				return ID.Mid(PreLen, i - PreLen);
+		}
+
+		UE_LOG(LogGameLift, Error, TEXT("Failed to parse region from game session ID %s. Falling back to ap-northeast-2..."), *ID);
+		return TEXT("ap-northeast-2");
+	}
+}
+
+void ASaucewichGameMode::Backfill()
+{
+	using namespace Backfill;
+	
+	if (NumPlayers <= 0 || NumPlayers >= Data.MaxPlayers) return;
+
+	UE_LOG(LogGameLift, Log, TEXT("%d players left. Starting match backfill..."), NumPlayers);
+	
+	const auto GI = USaucewichInstance::Get(this);
+	auto&& Session = GI->GetGameSession();
+	
+	const auto MMData = GetMatchmakerData(Session.GetMatchmakerData());
+	const auto MMArn = MMData->GetStringField(SSTR("matchmakingConfigurationArn"));
+	const FString GameSessionID = Session.GetGameSessionId();
+	const auto Region = GetRegionFromGameSessionID(GameSessionID);
+
+	TArray<FPlayer> Players;
+	for (const auto PC : TActorRange<ASaucewichPlayerController>{GetWorld()})
+	{
+		FPlayer Ply;
+		Ply.m_latencyInMs.Add(TEXT("ap-northeast-2"), FMath::Max(PC->GetLatencyInMs(), 1.f));
+		Ply.m_playerId = PC->GetPlayerID();
+		Ply.m_team = CastChecked<ASaucewichPlayerState>(PC->PlayerState)->GetTeam() == 0 ? TEXT("team_1") : TEXT("team_2");
+		Players.Add(MoveTemp(Ply));
+	}
+
+	/*
+	for (auto&& TeamValue : MMData->GetArrayField(SSTR("teams")))
+	{
+		auto&& Team = TeamValue->AsObject();
+		const auto TeamName = Team->GetStringField(SSTR("name"));
+		for (auto&& PlayerValue : Team->GetArrayField(SSTR("players")))
+		{
+			auto&& PlyObj = PlayerValue->AsObject();
+			
+			FPlayer Ply;
+			Ply.m_team = TeamName;
+			Ply.m_playerId = PlyObj->GetStringField(SSTR("playerId"));
+
+			const auto PC = GI->IDtoPC.FindRef(Ply.m_playerId);
+			Ply.m_latencyInMs.Add(Region, PC ? FMath::Max(PC->GetLatencyInMs(), 1.f) : 1.f);
+
+			for (auto&& AttVal : PlyObj->GetObjectField(SSTR("attributes"))->Values)
+			{
+				auto&& Att = AttVal.Value->AsObject();
+				Ply.m_playerAttributes.Add(AttVal.Key, GetAttributeValue(*Att));
+			}
+
+			Players.Add(MoveTemp(Ply));
+		}
+	}
+	*/
+
+	if (!GI->BackfillTicket.IsEmpty())
+	{
+		const auto Outcome = GameLift::Get().StopMatchBackfill({GI->BackfillTicket, GameSessionID, MMArn});
+		if (!Outcome.IsSuccess())
+		{
+			auto&& Err = Outcome.GetError();
+			UE_LOG(LogGameLift, Error, TEXT("%s: %s"), *Err.m_errorName, *Err.m_errorMessage);
+		}
+	}
+	
+	const auto Outcome = GameLift::Get().StartMatchBackfill({
+		{}, GameSessionID, MMArn, Players
+	});
+	
+	if (Outcome.IsSuccess())
+	{
+		UE_LOG(LogGameLift, Log, TEXT("Match backfill started."));
+		GI->BackfillTicket = Outcome.GetResult();
+	}
+	else
+	{
+		auto&& Err = Outcome.GetError();
+		UE_LOG(LogGameLift, Error, TEXT("%s: %s"), *Err.m_errorName, *Err.m_errorMessage);
+	}
+}
+
+#endif
+
 
 void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
@@ -182,6 +325,7 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 	PC->SetSessionID(UGameplayStatics::ParseOption(Options, SSTR("SessionID")));
 	PC->SetPlayerID(UGameplayStatics::ParseOption(Options, SSTR("PlayerID")));
 	USaucewichInstance::Get(this)->IDtoPC.Add(PC->GetPlayerID(), PC);
+	Backfill();
 #endif
 	
 	return {};
@@ -381,125 +525,6 @@ void ASaucewichGameMode::EndMatch()
 	if (GetMatchState() == MatchState::Ending)
 		SetMatchState(MatchState::WaitingPostMatch);
 }
-
-
-#if WITH_GAMELIFT
-
-namespace Backfill
-{
-	static TSharedPtr<FJsonObject> GetMatchmakerData(FString Data)
-	{
-		const auto Reader = TJsonReaderFactory<>::Create(MoveTemp(Data));
-		TSharedPtr<FJsonObject> JsonObject;
-		FJsonSerializer::Deserialize(Reader, JsonObject);
-		return JsonObject;
-	}
-
-	static FAttributeValue GetAttributeValue(const FJsonObject& AttJson)
-	{
-		FAttributeValue Att{};
-		auto&& Json = AttJson.GetField<EJson::None>(SSTR("valueAttribute"));
-		
-		switch (Json->Type)
-		{
-		case EJson::String:
-			Att.m_type = FAttributeType::STRING;
-			Att.m_S = Json->AsString();
-			break;
-			
-		case EJson::Number:
-			Att.m_type = FAttributeType::DOUBLE;
-			Att.m_N = Json->AsNumber();
-			break;
-			
-		case EJson::Array:
-			Att.m_type = FAttributeType::STRING_LIST;
-			for (auto&& S : Json->AsArray())
-				Att.m_SL.Add(S->AsString());
-			break;
-			
-		case EJson::Object:
-			Att.m_type = FAttributeType::STRING_DOUBLE_MAP;
-			for (auto&& S : Json->AsObject()->Values)
-				Att.m_SDM.Add(S.Key, S.Value->AsNumber());
-			break;
-			
-		default:
-			Att.m_type = FAttributeType::NONE;
-		}
-
-		return Att;
-	}
-
-	static FString GetRegionFromGameSessionID(const FString& ID)
-	{
-		const FRegexPattern Pattern{SSTR("arn:aws:gamelift:([A-Za-z0-9-]+).+")};
-		FRegexMatcher Matcher{Pattern, ID};
-		const auto Region = Matcher.GetCaptureGroup(0);
-		if (Region.Len() > 0) return Region;
-		return TEXT("ap-northeast-2");
-	}
-}
-
-void ASaucewichGameMode::Backfill()
-{
-	using namespace Backfill;
-	
-	if (NumPlayers <= 0 || NumPlayers >= Data.MaxPlayers) return;
-	if (HasMatchEnded() || MatchState == MatchState::Ending) return;
-
-	UE_LOG(LogGameLift, Log, TEXT("%d players left. Starting match backfill..."), NumPlayers);
-	
-	const auto GI = USaucewichInstance::Get(this);
-	auto&& Session = GI->GetGameSession();
-	
-	const auto MMData = GetMatchmakerData(Session.GetMatchmakerData());
-	const auto MMArn = MMData->GetStringField(SSTR("matchmakingConfigurationArn"));
-	const auto Region = GetRegionFromGameSessionID(Session.GetGameSessionId());
-
-	TArray<FPlayer> Players;
-	for (auto&& TeamValue : MMData->GetArrayField(SSTR("teams")))
-	{
-		auto&& Team = TeamValue->AsObject();
-		const auto TeamName = Team->GetStringField(SSTR("name"));
-		for (auto&& PlayerValue : Team->GetArrayField(SSTR("players")))
-		{
-			auto&& PlyObj = PlayerValue->AsObject();
-			
-			FPlayer Ply;
-			Ply.m_team = TeamName;
-			Ply.m_playerId = PlyObj->GetStringField(SSTR("playerId"));
-
-			const auto PC = GI->IDtoPC.FindRef(Ply.m_playerId);
-			Ply.m_latencyInMs.Add(Region, PC ? FMath::Max(PC->GetLatencyInMs(), 1.f) : 1.f);
-
-			for (auto&& AttVal : PlyObj->GetObjectField(SSTR("attributes"))->Values)
-			{
-				auto&& Att = AttVal.Value->AsObject();
-				Ply.m_playerAttributes.Add(AttVal.Key, GetAttributeValue(*Att));
-			}
-
-			Players.Add(MoveTemp(Ply));
-		}
-	}
-	
-	const auto Outcome = GameLift::Get().StartMatchBackfill({
-		{}, Session.GetGameSessionId(), MMArn, Players
-	});
-	
-	if (Outcome.IsSuccess())
-	{
-		UE_LOG(LogGameLift, Log, TEXT("Match backfill started."));
-	}
-	else
-	{
-		auto&& Err = Outcome.GetError();
-		UE_LOG(LogGameLift, Error, TEXT("%s: %s"), *Err.m_errorName, *Err.m_errorMessage);
-	}
-}
-
-#endif
-
 
 bool ASaucewichGameMode::EndMatchIfNoPlayers()
 {

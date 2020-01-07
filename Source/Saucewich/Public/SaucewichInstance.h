@@ -106,6 +106,7 @@ public:
 	void UpdateGameSession(Aws::GameLift::Server::Model::UpdateGameSession&& Updated);
 
 	TMap<FString, class ASaucewichPlayerController*> IDtoPC;
+	FString BackfillTicket;
 
 private:
 	Aws::GameLift::Server::Model::GameSession* GameSession;
