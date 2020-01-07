@@ -90,9 +90,12 @@ void AWeapon::OnReleased()
 
 void AWeapon::OnAvailabilityChanged(const bool bAvailable) const
 {
-	UWeaponComponent::FBroadcastAvailabilityChanged{
-		CastChecked<ATpsCharacter>(GetOwner())->GetWeaponComponent(), this, bAvailable
-	};
+	if (const auto Ply = GetOwner())
+	{
+		UWeaponComponent::FBroadcastAvailabilityChanged{
+			CastChecked<ATpsCharacter>(Ply)->GetWeaponComponent(), this, bAvailable
+		};
+	}
 }
 
 const FWeaponData& AWeapon::GetWeaponData() const

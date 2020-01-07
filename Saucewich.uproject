@@ -112,6 +112,9 @@
 		"Android",
 		"IOS",
 		"LinuxNoEditor",
-		"WindowsNoEditor"
+		"WindowsNoEditor",
+		"LinuxAArch64NoEditor",
+		"AllDesktop",
+		"MacNoEditor"
 	]
 }
