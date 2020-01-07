@@ -173,8 +173,11 @@ bool AGun::GunTrace(FHitResult& OutHit)
 	return GunTraceInternal(OutHit, Profile, Data);
 }
 
+DECLARE_CYCLE_STAT(TEXT("GunTrace"), STAT_GunTrace, STATGROUP_Game)
 bool AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const FGunData& Data)
 {
+	SCOPE_CYCLE_COUNTER(STAT_GunTrace);
+	
 	const auto Character = CastChecked<ATpsCharacter>(GetOwner(), ECastCheckedType::NullAllowed);
 	if (!IsValid(Character)) return false;
 	
