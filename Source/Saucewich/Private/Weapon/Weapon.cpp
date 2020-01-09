@@ -81,6 +81,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 void AWeapon::OnActivated()
 {
 	Init();
+	OnAvailabilityChanged(true);
 }
 
 void AWeapon::OnReleased()
