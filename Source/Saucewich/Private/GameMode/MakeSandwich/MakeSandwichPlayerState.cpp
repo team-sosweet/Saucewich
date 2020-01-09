@@ -59,8 +59,10 @@ void AMakeSandwichPlayerState::PutIngredientsInFridge()
 {
 	if (Ingredients.Get().Num() <= 0) return;
 
-	const auto GameInstance = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 	const auto GameState = CastChecked<AMakeSandwichState>(GetWorld()->GetGameState());
+	if (!GameState->IsMatchInProgress()) return;
+	
+	const auto GameInstance = GetWorld()->GetGameInstanceChecked<USaucewichInstance>();
 
 	static const FName ScoreName = TEXT("PutIngredients");
 	const auto NumIngredients = GetNumIngredients();
