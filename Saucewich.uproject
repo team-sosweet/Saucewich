@@ -106,6 +106,10 @@
 		{
 			"Name": "GameLiftServerSDK",
 			"Enabled": true
+		},
+		{
+			"Name": "SunPosition",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
