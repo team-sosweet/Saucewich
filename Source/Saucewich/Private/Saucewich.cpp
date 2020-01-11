@@ -87,3 +87,9 @@ int32 USaucewich::GetPlayerNameMaxLen()
 {
 	return 16;
 }
+
+const FString& USaucewich::GetBuildDate()
+{
+	static const FString Date = TEXT(__DATE__);
+	return Date;
+}
