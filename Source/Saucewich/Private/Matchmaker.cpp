@@ -53,7 +53,7 @@ void UMatchmaker::StartMatchmaking()
 	auto URL = GBaseURL;
 	URL += TEXT("/match/start?AliasId=alias-53ca2617-e3b1-4c0a-a0e6-a0721b1f8176");
 	
-	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
+	const auto Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
 	{
 		if (Code == 200)
 		{
@@ -66,7 +66,7 @@ void UMatchmaker::StartMatchmaking()
 		}
 	});
 
-	ProcessRequest();
+	ProcessRequest(Handle);
 }
 
 void UMatchmaker::BindCallback(const FOnStartMatchmakingResponse& Callback)
@@ -85,7 +85,6 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 	if (!Address.IsEmpty() && !PlayerID.IsEmpty() && !SessionID.IsEmpty())
 	{
 		OnResponse.ExecuteIfBound(EMMResponse::OK, Address, PlayerID, SessionID);
-		Reset();
 	}
 	else
 	{
@@ -93,7 +92,7 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
 	}
 }
 
-void UMatchmaker::ProcessRequest()
+void UMatchmaker::ProcessRequest(const TSharedRef<IHttpRequest>& Handle)
 {
 	if (!Handle->ProcessRequest())
 	{
@@ -104,10 +103,4 @@ void UMatchmaker::ProcessRequest()
 void UMatchmaker::Error(const EMMResponse Code)
 {
 	OnResponse.ExecuteIfBound(Code, {}, {}, {});
-	Reset();
-}
-
-void UMatchmaker::Reset()
-{
-	Handle.Reset();
 }
