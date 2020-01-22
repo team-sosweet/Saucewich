@@ -50,5 +50,5 @@ public:
 	static int32 GetPlayerNameMaxLen();
 
 	UFUNCTION(BlueprintCallable)
-	static void ScheduleLocalNotificationAtTime(int32 Hour, int32 Minute, bool bLocalTime, const FText& Title, const FText& Body, const FText& Action, const FString& ActivationEvent);
+	static FDateTime ScheduleLocalNotificationAtTime(int32 Hour, int32 Minute, bool bLocalTime, const FText& Title, const FText& Body, const FText& Action, const FString& ActivationEvent);
 };

@@ -181,9 +181,7 @@ void UMatchmaker::SetPlayableTimeNotification()
 	const auto Body = FText::FormatOrdered(
 		LOCTEXT("PlayableNotifyBody", "지금부터 {0}동안 플레이할 수 있습니다! 놓지지 마세요!"), FText::AsTimespan(Duration));
 
-	USaucewich::ScheduleLocalNotificationAtTime(S.Hour, S.Minute, false, Title, Body, FText::GetEmpty(), {});
-	
-	LastNotificationTime = FDateTime::UtcNow();
+	LastNotificationTime = USaucewich::ScheduleLocalNotificationAtTime(S.Hour, S.Minute, false, Title, Body, FText::GetEmpty(), {});
 	SaveConfig();
 }
 

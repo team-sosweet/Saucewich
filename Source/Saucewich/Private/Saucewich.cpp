@@ -90,7 +90,7 @@ int32 USaucewich::GetPlayerNameMaxLen()
 	return 16;
 }
 
-void USaucewich::ScheduleLocalNotificationAtTime(const int32 Hour, const int32 Minute, const bool bLocalTime, const FText& Title,
+FDateTime USaucewich::ScheduleLocalNotificationAtTime(const int32 Hour, const int32 Minute, const bool bLocalTime, const FText& Title,
 	const FText& Body, const FText& Action, const FString& ActivationEvent)
 {
 	auto Date = bLocalTime ? FDateTime::Now() : FDateTime::UtcNow();
@@ -103,4 +103,5 @@ void USaucewich::ScheduleLocalNotificationAtTime(const int32 Hour, const int32 M
 	const FDateTime Time{Year, Month, Day, Hour, Minute};
 
 	UBlueprintPlatformLibrary::ScheduleLocalNotificationAtTime(Time, bLocalTime, Title, Body, Action, ActivationEvent);
+	return Time;
 }
