@@ -76,6 +76,8 @@ void USaucewichInstance::Init()
 #endif
 
 	GEngine->NetworkFailureEvent.AddUObject(this, &USaucewichInstance::OnNetworkError);
+
+	UE_LOG(LogSaucewich, Log, TEXT("BUILD TIME: " __DATE__ " " __TIME__));
 }
 
 void USaucewichInstance::OnNetworkError(UWorld*, UNetDriver*, const ENetworkFailure::Type Type, const FString& Msg)
