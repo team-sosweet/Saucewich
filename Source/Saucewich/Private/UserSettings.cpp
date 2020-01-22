@@ -4,6 +4,7 @@
 #include "Engine/Engine.h"
 #include "Saucewich.h"
 #include "SaucewichInstance.h"
+#include "Kismet/BlueprintPlatformLibrary.h"
 
 UUserSettings::UUserSettings()
 	:bAutoFire{true}, bVibration{true}, bParticle{true}, bMusic{true}
@@ -64,6 +65,16 @@ void UUserSettings::RegisterGraphicManager(FOnGraphicOptionChanged&& Callback)
 	OnOptionChanged.Execute(EGraphicOption::Outline, bOutline);
 	OnOptionChanged.Execute(EGraphicOption::Highlight, bHighlight);
 	OnOptionChanged.Execute(EGraphicOption::Particle, bParticle);
+}
+
+void UUserSettings::SetNotificationEnabled(const bool bEnabled)
+{
+	if (!bEnabled)
+	{
+		UBlueprintPlatformLibrary::ClearAllLocalNotifications();
+		OnNotificationDisabled.Broadcast();
+	}
+	bNotification = bEnabled;
 }
 
 void UUserSettings::PostInitProperties()

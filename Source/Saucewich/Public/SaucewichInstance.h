@@ -47,6 +47,7 @@ public:
 	static USaucewichInstance* Get(const UObject* WorldContextObj);
 
 	class UUserSettings* GetUserSettings() const { return UserSettings; }
+	class UMatchmaker* GetMatchmaker() const { return Matchmaker; }
 	AActorPool* GetActorPool() const;
 	ASauceMarker* GetSauceMarker() const;
 	auto&& GetGameModes() const { return GameModes; }
@@ -88,6 +89,9 @@ private:
 
 	UPROPERTY(Transient)
 	UUserSettings* UserSettings;
+
+	UPROPERTY(Transient)
+	UMatchmaker* Matchmaker;
 
 	UPROPERTY(EditDefaultsOnly)
 	TEnumAsByte<ECollisionChannel> DecalTraceChannel;

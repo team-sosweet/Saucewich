@@ -11,6 +11,7 @@ enum class EGraphicOption : uint8
 };
 
 DECLARE_DELEGATE_TwoParams(FOnGraphicOptionChanged, EGraphicOption, bool)
+DECLARE_EVENT(UUserSettings, FOnNotificationDisabled)
 
 UCLASS(Config=UserSettings)
 class SAUCEWICH_API UUserSettings : public UObject
@@ -52,6 +53,10 @@ public:
 
 	void RegisterGraphicManager(FOnGraphicOptionChanged&& Callback);
 
+	UFUNCTION(BlueprintCallable)
+	void SetNotificationEnabled(bool bEnabled);
+	bool IsNotificationEnabled() const { return bNotification; }
+
 
 	UPROPERTY(Config, BlueprintReadWrite)
 	float RawSensitivity = .5;
@@ -61,6 +66,8 @@ public:
 
 	UPROPERTY(Config, BlueprintReadWrite)
 	uint8 bVibration : 1;
+
+	FOnNotificationDisabled OnNotificationDisabled;
 
 protected:
 	void PostInitProperties() override;
@@ -85,4 +92,7 @@ private:
 
 	UPROPERTY(Config, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bMusic : 1;
+
+	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 bNotification : 1;
 };

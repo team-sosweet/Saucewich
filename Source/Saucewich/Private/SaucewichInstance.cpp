@@ -1,11 +1,14 @@
 // Copyright 2019-2020 Seokjin Lee. All Rights Reserved.
 
 #include "SaucewichInstance.h"
+
 #include "Engine/World.h"
+#include "Engine/Engine.h"
+
 #include "Entity/ActorPool.h"
 #include "Entity/SauceMarker.h"
 #include "UserSettings.h"
-#include "Engine/Engine.h"
+#include "Matchmaker.h"
 #include "Saucewich.h"
 
 #if WITH_GAMELIFT
@@ -70,6 +73,7 @@ void USaucewichInstance::Init()
 	Super::Init();
 
 	UserSettings = NewObject<UUserSettings>(this);
+	Matchmaker = NewObject<UMatchmaker>(this);
 
 #if !UE_SERVER
 	UserSettings->CommitMaxFPS();

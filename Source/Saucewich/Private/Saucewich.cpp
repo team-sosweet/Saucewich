@@ -5,6 +5,8 @@
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 #include "GameFramework/InputSettings.h"
+#include "Kismet/BlueprintPlatformLibrary.h"
+
 #include "Names.h"
 
 #if WITH_GAMELIFT
@@ -86,4 +88,19 @@ int32 USaucewich::GetPlayerNameMinLen()
 int32 USaucewich::GetPlayerNameMaxLen()
 {
 	return 16;
+}
+
+void USaucewich::ScheduleLocalNotificationAtTime(const int32 Hour, const int32 Minute, const bool bLocalTime, const FText& Title,
+	const FText& Body, const FText& Action, const FString& ActivationEvent)
+{
+	auto Date = bLocalTime ? FDateTime::Now() : FDateTime::UtcNow();
+
+	if (Date.GetHour() > Hour || (Date.GetHour() == Hour && Date.GetMinute() >= Minute))
+		Date += FTimespan::FromDays(1);
+
+	int32 Year, Month, Day;
+	Date.GetDate(Year, Month, Day);
+	const FDateTime Time{Year, Month, Day, Hour, Minute};
+
+	UBlueprintPlatformLibrary::ScheduleLocalNotificationAtTime(Time, bLocalTime, Title, Body, Action, ActivationEvent);
 }
