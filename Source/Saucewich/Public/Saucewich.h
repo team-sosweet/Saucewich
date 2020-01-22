@@ -48,7 +48,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	static int32 GetPlayerNameMaxLen();
-
-	UFUNCTION(BlueprintPure)
-	static const FString& GetBuildDate();
 };
