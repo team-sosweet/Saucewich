@@ -6,7 +6,6 @@
 #include "Json.h"
 #include "Names.h"
 
-
 namespace Matchmaker
 {
 	static const FString GBaseURL = TEXT("http://api.saucewich.net");
@@ -38,56 +37,6 @@ namespace Matchmaker
 
 		return Request;
 	}
-
-	static const TSharedPtr<FJsonObject>& GetSessionInfo(const FJsonObject& Content)
-	{
-		auto&& Tickets = Content.GetArrayField(SSTR("TicketList"));
-		if (Tickets.Num() > 0)
-		{
-			return Tickets[0]->AsObject()->GetObjectField(SSTR("GameSessionConnectionInfo"));
-		}
-		
-		static const TSharedPtr<FJsonObject> Default = MakeShared<FJsonObject>();
-		return Default;
-	}
-
-	static FString GetServerAddress(const FJsonObject& SessionInfo)
-	{
-		FString IP;
-		if (!SessionInfo.TryGetStringField(SSTR("IpAddress"), IP)) return {};
-
-		int32 Port;
-		if (!SessionInfo.TryGetNumberField(SSTR("Port"), Port)) return {};
-
-		IP += TEXT(':');
-		IP.AppendInt(Port);
-		return IP;
-	}
-
-	static const TSharedPtr<FJsonObject>& GetPlayer(const FJsonObject& SessionInfo)
-	{
-		static const TSharedPtr<FJsonObject> Default = MakeShared<FJsonObject>();
-		
-		const TArray<TSharedPtr<FJsonValue>>* PlayersPtr;
-		if (!SessionInfo.TryGetArrayField(SSTR("MatchedPlayerSessions"), PlayersPtr)) return Default;
-		auto&& Players = *PlayersPtr;
-
-		if (Players.Num() == 0) return Default;
-
-		return Players[0]->AsObject();
-	}
-}
-
-UMatchmaker::UMatchmaker()
-{
-	FCoreDelegates::ApplicationWillDeactivateDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
-	FCoreDelegates::ApplicationWillEnterBackgroundDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
-	FCoreDelegates::ApplicationWillTerminateDelegate.AddUObject(this, &UMatchmaker::CancelMatchmaking, true);
-}
-
-UMatchmaker::~UMatchmaker()
-{
-	CancelMatchmaking(true);
 }
 
 UMatchmaker* UMatchmaker::Get()
@@ -101,60 +50,8 @@ void UMatchmaker::StartMatchmaking()
 	using namespace Matchmaker;
 	using namespace std::chrono;
 	
-	Handle = CreateRequest(SSTR("GET"), GBaseURL + TEXT("/ping"),
-		[this, StartTime=steady_clock::now()](const int32 Code, const FJsonObject&)
-	{
-		if (Code == 200)
-		{
-			const auto RoundTrip = steady_clock::now() - StartTime;
-			const auto Latency = duration_cast<milliseconds>(RoundTrip / 2);
-			OnPingComplete(static_cast<int32>(Latency.count()));
-		}
-		else
-		{
-			Error(EMMResponse::ConnFail);
-		}
-	});
-
-	ProcessRequest();
-}
-
-void UMatchmaker::CancelMatchmaking(const bool bError)
-{
-	using namespace Matchmaker;
-
-	if (Handle)
-	{
-		Handle->CancelRequest();
-	}
-
-	if (!TicketID.IsEmpty())
-	{
-		auto URL = GBaseURL;
-		URL += TEXT("/match/cancel?ticketId=");
-		URL += TicketID;
-		
-		CreateRequest(SSTR("DELETE"), URL)->ProcessRequest();
-	}
-
-	if (bError) Error(EMMResponse::Canceled);
-	else Reset();
-}
-
-void UMatchmaker::BindCallback(const FOnStartMatchmakingResponse& Callback)
-{
-	OnResponse = Callback;
-}
-
-void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
-{
-	using namespace Matchmaker;
-	
 	auto URL = GBaseURL;
-	URL += TEXT("/match/start?ticketId=");
-	URL += TicketID = FGuid::NewGuid().ToString(EGuidFormats::DigitsWithHyphens);
-	URL += TEXT("&LatencyInMs=");
-	URL.AppendInt(LatencyInMs);
+	URL += TEXT("/match/start?AliasId=alias-53ca2617-e3b1-4c0a-a0e6-a0721b1f8176");
 	
 	Handle = CreateRequest(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
 	{
@@ -164,20 +61,17 @@ void UMatchmaker::OnPingComplete(const int32 LatencyInMs)
 		}
 		else
 		{
-			const auto Desc = Content.GetStringField(SSTR("description"));
-			
-			if (Code == 0)
-				Error(EMMResponse::ConnFail);
-			
-			else if (Desc == TEXT("TIMED_OUT"))
-				Error(EMMResponse::Timeout);
-			
-			else if (Desc != TEXT("CANCELLED"))
-				Error(EMMResponse::Error);
+			if (Code == 0) Error(EMMResponse::ConnFail);
+			else Error(EMMResponse::Error);
 		}
 	});
-	
+
 	ProcessRequest();
+}
+
+void UMatchmaker::BindCallback(const FOnStartMatchmakingResponse& Callback)
+{
+	OnResponse = Callback;
 }
 
 void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content)
@@ -216,5 +110,4 @@ void UMatchmaker::Error(const EMMResponse Code)
 void UMatchmaker::Reset()
 {
 	Handle.Reset();
-	TicketID.Reset();
 }
