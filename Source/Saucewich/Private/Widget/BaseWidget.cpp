@@ -7,6 +7,11 @@
 #include "Saucewich.h"
 #include "Player/SaucewichPlayerController.h"
 
+UBaseWidget::UBaseWidget()
+	:Super{FObjectInitializer::Get()}, bCanOpenMenu{true}
+{
+}
+
 void UBaseWidget::ShowError(const FText Message) const
 {
 	HUD->ShowError(Message);
@@ -59,7 +64,7 @@ FReply UBaseWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent
 			RemoveFromParent();
 		}
 	}
-	else if (USaucewich::CheckInputAction(NAME("Menu"), InKeyEvent))
+	else if (bCanOpenMenu && USaucewich::CheckInputAction(NAME("Menu"), InKeyEvent))
 	{
 		HUD->OpenMenu();
 	}

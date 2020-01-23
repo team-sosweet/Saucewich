@@ -14,11 +14,16 @@ class SAUCEWICH_API UBaseWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UBaseWidget();
+	
 	UFUNCTION(BlueprintCallable)
 	void ShowError(FText Message) const;
 	
 	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite)
 	uint8 bIsCloseable : 1;
+
+	UPROPERTY(EditAnywhere, Category="Interaction", BlueprintReadWrite, meta=(EditCondition="!bIsCloseable"))
+	uint8 bCanOpenMenu : 1;
 
 	UPROPERTY(EditAnywhere, Category="Behavior", BlueprintReadWrite)
 	uint8 bVisibleOnlyAlive : 1;
