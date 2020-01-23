@@ -10,6 +10,7 @@
 #include "UserSettings.h"
 #include "Matchmaker.h"
 #include "Saucewich.h"
+#include "GameMode/SaucewichGameMode.h"
 
 #if WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
@@ -149,8 +150,16 @@ void OnUpdateGameSession(Aws::GameLift::Server::Model::UpdateGameSession Updated
 
 void OnProcessTerminate(void* State)
 {
-	UE_LOG(LogGameLift, Log, TEXT("OnTerminated called. Terminating process..."));
-	GameLift::SafeTerminate();
+	const auto GI = static_cast<USaucewichInstance*>(State);
+	if (const auto Gm = GI->GetWorld()->GetAuthGameMode<ASaucewichGameMode>())
+	{
+		Gm->OnProcessTerminate();
+	}
+	else
+	{
+		UE_LOG(LogGameLift, Log, TEXT("OnTerminated called. Terminating process..."));
+		GameLift::SafeTerminate();
+	}
 }
 
 bool OnHealthCheck(void* State)
@@ -184,8 +193,8 @@ void USaucewichInstance::StartupServer()
 		{
 	    	OnStartGameSession, this,
 	    	OnUpdateGameSession, this,
-	    	OnProcessTerminate, nullptr,
-	    	OnHealthCheck, nullptr,
+	    	OnProcessTerminate, this,
+	    	OnHealthCheck, this,
 	    	Port, {&LogFileUTF8, 1}
 	    };
 

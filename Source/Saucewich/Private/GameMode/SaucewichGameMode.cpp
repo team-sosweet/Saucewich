@@ -93,13 +93,8 @@ FString ASaucewichGameMode::ChooseNextMap(const UWorld* const World) const
 
 void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName) const
 {
-	PrintMessage(
-		FMT_MSG(
-			LOCTEXT("NameChange", "{0}님이 이름을 {1}|hpp(으로,로) 변경했습니다."),
-			FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())
-		),
-		EMsgType::Left
-	);
+	PrintMessage(FMT_MSG(LOCTEXT("NameChange", "{0}님이 이름을 {1}|hpp(으로,로) 변경했습니다."),
+		FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())), EMsgType::Left);
 }
 
 void ASaucewichGameMode::HandleMatchEnding()
@@ -211,16 +206,44 @@ namespace GameLift
 {
 	extern void Check(const FGameLiftGenericOutcome& Outcome);
 }
+
+void ASaucewichGameMode::OnProcessTerminate()
+{
+	bTerminating = true;
+	
+	const auto GS = CastChecked<ASaucewichGameState>(GameState);
+	const auto CurRemaining = GS->GetRemainingRoundSeconds();
+	const auto Time = GameLift::Get().GetTerminationTime().GetResult() - 1 - Data.MatchEndingTime;
+	
+	if (Time > 0 && CurRemaining > 0)
+	{
+		if (Time < CurRemaining)
+		{
+			GS->SetRemainingRoundSeconds(Time);
+			PrintMessage(FMT_MSG(LOCTEXT("LastRoundEndsIn", "마지막 라운드! 남은 시간: {0}"),
+				FText::AsTimespan(FTimespan::FromSeconds(Time))), EMsgType::Center, 5);
+		}
+		else
+		{
+			PrintMessage(LOCTEXT("LastRound", "마지막 라운드!"), EMsgType::Center, 5);
+		}
+	}
+	else
+	{
+		for (const auto Ply : TActorRange<APlayerController>{GetWorld()})
+		{
+			GameSession->KickPlayer(Ply, LOCTEXT("ServerShutdown", "서버가 종료되었습니다"));
+		}
+	}
+}
 #endif
 
 void ASaucewichGameMode::Logout(AController* const Exiting)
 {
 	Super::Logout(Exiting);
 	
-	PrintMessage(
-		FMT_MSG(LOCTEXT("Logout", "{0}님이 게임에서 나갔습니다."), FText::FromString(Exiting->PlayerState->GetPlayerName())),
-		EMsgType::Left
-	);
+	PrintMessage(FMT_MSG(LOCTEXT("Logout", "{0}님이 게임에서 나갔습니다."),
+		FText::FromString(Exiting->PlayerState->GetPlayerName())), EMsgType::Left);
 	
 #if WITH_GAMELIFT
 	auto&& GameLiftSDK = GameLift::Get();
@@ -378,7 +401,17 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
+
+#if WITH_GAMELIFT
+	if (bTerminating)
+	{
+		GameLift::SafeTerminate();
+	}
+	else
+#endif
+	{
+		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
+	}
 }
 
 void ASaucewichGameMode::EndMatch()
@@ -392,10 +425,19 @@ bool ASaucewichGameMode::EndMatchIfNoPlayers()
 	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
 	{
 #if WITH_GAMELIFT
-		UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
-		GameLift::Check(GameLift::Get().TerminateGameSession());
+		if (bTerminating)
+		{
+			GameLift::SafeTerminate();
+		}
+		else
+		{
+			UE_LOG(LogGameLift, Log, TEXT("There's no one left. Terminating the game session..."))
+			GameLift::Check(GameLift::Get().TerminateGameSession());
+#else
+		{
 #endif
-		GetWorld()->ServerTravel(SSTR("DSDef"), true);
+			GetWorld()->ServerTravel(SSTR("DSDef"), true);
+		}
 		GetWorldTimerManager().ClearTimer(CheckIfNoPlayersTimer);
 		return true;
 	}
@@ -451,6 +493,14 @@ USaucewichInstance* ASaucewichGameMode::GetSaucewichInstance() const
 
 void ASaucewichGameMode::StartNextGame() const
 {
+#if WITH_GAMELIFT
+	if (bTerminating)
+	{
+		GameLift::SafeTerminate();
+		return;
+	}
+#endif
+
 	const auto GmClass = ChooseNextGameMode();
 	const auto DefGm = GetDefault<ASaucewichGameMode>(GmClass.LoadSynchronous());
 	auto URL = DefGm->ChooseNextMap(GetWorld());

@@ -138,4 +138,12 @@ private:
 	FTimerHandle CheckIfNoPlayersTimer;
 
 	uint8 bAboutToStartMatch : 1;
+	
+#if WITH_GAMELIFT
+public:
+	void OnProcessTerminate();
+
+private:
+	uint8 bTerminating : 1;
+#endif
 };

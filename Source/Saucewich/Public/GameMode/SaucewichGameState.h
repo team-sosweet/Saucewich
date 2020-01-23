@@ -54,6 +54,7 @@ public:
 	// 현재 라운드의 남은 시간을 구합니다.
 	UFUNCTION(BlueprintCallable)
 	float GetRemainingRoundSeconds() const;
+	void SetRemainingRoundSeconds(float Time);
 
 	UFUNCTION(BlueprintCallable)
 	void AddDilatableActor(AActor* Actor) { DilatableActors.Add(Actor); }

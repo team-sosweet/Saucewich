@@ -99,6 +99,11 @@ float ASaucewichGameState::GetRemainingRoundSeconds() const
 	return IsMatchInProgress() ? FMath::Max(0.f, GetGmData().RoundMinutes * 60 - (GetServerWorldTimeSeconds() - RoundStartTime)) : 0;
 }
 
+void ASaucewichGameState::SetRemainingRoundSeconds(const float Time)
+{
+	RoundStartTime = Time - GetGmData().RoundMinutes * 60 + GetServerWorldTimeSeconds();
+}
+
 void ASaucewichGameState::BeginPlay()
 {
 	Super::BeginPlay();
