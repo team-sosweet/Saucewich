@@ -65,7 +65,7 @@ public:
 
 private:
 	void OnMatchmakingComplete(const class FJsonObject& Content) const;
-	void Error(EMMResponse Code) const;
+	void Error(EMMResponse Code, const TCHAR* Msg = TEXT("")) const;
 
 	void UpdatePlayableTime();
 	void SetPlayableTimeNotification();

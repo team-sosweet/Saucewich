@@ -9,6 +9,8 @@
 #include "UserSettings.h"
 #include "SaucewichInstance.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogMatchmaker, Log, All)
+
 #define LOCTEXT_NAMESPACE ""
 
 namespace Matchmaker
@@ -40,17 +42,17 @@ namespace Matchmaker
 
 UMatchmaker::UMatchmaker()
 {
+	UpdatePlayableTime();
+	
+	const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
+	FCoreDelegates::ApplicationWillDeactivateDelegate.Add(Delegate);
+	FCoreDelegates::ApplicationHasReactivatedDelegate.Add(Delegate);
+	FCoreDelegates::ApplicationWillEnterBackgroundDelegate.Add(Delegate);
+	FCoreDelegates::ApplicationHasEnteredForegroundDelegate.Add(Delegate);
+	FCoreDelegates::ApplicationWillTerminateDelegate.Add(Delegate);
+
 	if (const auto World = UObject::GetWorld())
 	{
-		UpdatePlayableTime();
-		
-		const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
-		FCoreDelegates::ApplicationWillDeactivateDelegate.Add(Delegate);
-		FCoreDelegates::ApplicationHasReactivatedDelegate.Add(Delegate);
-		FCoreDelegates::ApplicationWillEnterBackgroundDelegate.Add(Delegate);
-		FCoreDelegates::ApplicationHasEnteredForegroundDelegate.Add(Delegate);
-		FCoreDelegates::ApplicationWillTerminateDelegate.Add(Delegate);
-
 		UUserSettings::Get(World)->OnNotificationDisabled.AddWeakLambda(this, [this]
 		{
 			LastNotificationTime = {};
@@ -61,10 +63,7 @@ UMatchmaker::UMatchmaker()
 
 UMatchmaker::~UMatchmaker()
 {
-	if (UObject::GetWorld())
-	{
-		SetPlayableTimeNotification();
-	}
+	SetPlayableTimeNotification();
 }
 
 UMatchmaker* UMatchmaker::Get(const UObject* const W)
@@ -81,23 +80,34 @@ void UMatchmaker::StartMatchmaking()
 	
 	const auto bSuccess = Request(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
 	{
-		switch (Code)
+		if (Code == 200)
 		{
-		case 200:
 			OnMatchmakingComplete(Content);
-			break;
-		case 500:
-			if (Content.GetStringField(SSTR("description")).Contains(TEXT("OUTDATED"), ESearchCase::CaseSensitive, ESearchDir::FromEnd))
-				Error(EMMResponse::Outdated);
-			else
-				Error(EMMResponse::NotPlayableTime);
-			break;
-		case 0:
-			Error(EMMResponse::ConnFail);
-			break;
-		default:
-			Error(EMMResponse::Error);
 		}
+		else
+		{
+			const auto Msg = Content.GetStringField(SSTR("description"));
+			auto Error = [&](const EMMResponse Response)
+			{
+				UMatchmaker::Error(Response, *FString::Printf(TEXT("Code: %d, Description: \"%s\""), Code, *Msg));
+			};
+			
+			switch (Code)
+			{
+			case 500:
+				if (Msg.Contains(TEXT("OUTDATED"), ESearchCase::CaseSensitive, ESearchDir::FromEnd))
+					Error(EMMResponse::Outdated);
+				else
+					Error(EMMResponse::NotPlayableTime);
+				break;
+			case 0:
+				Error(EMMResponse::ConnFail);
+				break;
+			default:
+				Error(EMMResponse::Error);
+			}
+		}
+		
 	});
 
 	if (!bSuccess)
@@ -125,12 +135,14 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content) const
 	}
 	else
 	{
-		Error(EMMResponse::Error);
+		Error(EMMResponse::Error, *FString::Printf(TEXT("Address: %s, PlayerId: %s, PlayerSessionId: %s"), *Address, *PlayerID, *SessionID));
 	}
 }
 
-void UMatchmaker::Error(const EMMResponse Code) const
+void UMatchmaker::Error(const EMMResponse Code, const TCHAR* const Msg) const
 {
+	const auto EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMResponse"), true);
+	UE_LOG(LogMatchmaker, Error, TEXT("[%s]: %s"), *EnumPtr->GetNameStringByIndex(int32(Code)), Msg);
 	OnResponse.ExecuteIfBound(Code, {}, {}, {});
 }
 
