@@ -42,8 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SafeCharacter(const FOnCharacterSpawnedSingle& Delegate);
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(BlueprintCallable, Client, Reliable)
 	void PrintMessage(const FText& Message, float Duration, EMsgType Type);
+	void PrintMessageLocal(const FText& Message, float Duration, EMsgType Type) const;
 
 	void SetSessionID(FString&& ID);
 	const FString& GetSessionID() const;

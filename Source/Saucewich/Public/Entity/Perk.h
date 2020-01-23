@@ -12,9 +12,9 @@ class SAUCEWICH_API APerk : public APickup
 
 public:
 	APerk();
-	
 	float GetDuration() const { return Duration; }
 	auto GetParticle() const { return Particle; }
+	const FText& GetPickupMsg() const { return PickupMessage; }
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -25,4 +25,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	float Duration;
+
+	UPROPERTY(EditDefaultsOnly)
+	FText PickupMessage;
 };

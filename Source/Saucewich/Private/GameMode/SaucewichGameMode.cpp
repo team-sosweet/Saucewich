@@ -46,7 +46,7 @@ void ASaucewichGameMode::SetPlayerRespawnTimer(ASaucewichPlayerController* const
 	PC->SetRespawnTimer(MinRespawnDelay);
 }
 
-void ASaucewichGameMode::PrintMessage(const FText& Msg, const EMsgType Type, const float Duration) const
+void ASaucewichGameMode::PrintMessage(const FText& Msg, const EMsgType Type, const float Duration)
 {
 	if (Msg.IsEmpty()) return;
 	
@@ -91,7 +91,7 @@ FString ASaucewichGameMode::ChooseNextMap(const UWorld* const World) const
 	return Maps.Num() > 0 ? Maps[FMath::RandHelper(Maps.Num())] : Cur;
 }
 
-void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName) const
+void ASaucewichGameMode::OnPlayerChangedName(ASaucewichPlayerState* const Player, FString&& OldName)
 {
 	PrintMessage(FMT_MSG(LOCTEXT("NameChange", "{0}님이 이름을 {1}|hpp(으로,로) 변경했습니다."),
 		FText::FromString(MoveTemp(OldName)), FText::FromString(Player->GetPlayerName())), EMsgType::Left);

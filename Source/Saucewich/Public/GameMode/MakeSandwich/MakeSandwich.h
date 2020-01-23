@@ -14,7 +14,7 @@ protected:
 	void HandleMatchHasStarted() override;
 	
 private:
-	void SpawnPerk() const;
+	void SpawnPerk();
 	
 	TArray<class APickupSpawnVolume*> PerkSpawnVolumes;
 	FTimerHandle PerkSpawnTimer;

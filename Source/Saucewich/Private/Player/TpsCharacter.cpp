@@ -512,4 +512,10 @@ void ATpsCharacter::MulticastAddPerk_Implementation(UClass* const PerkClass)
 		Perks.Remove(PerkClass);
 	});
 	GetWorldTimerManager().SetTimer(Perk.Timer, Delegate, Def->GetDuration(), false);
+
+	if (GetController())
+	{
+		const auto PC = CastChecked<ASaucewichPlayerController>(GetController());
+		PC->PrintMessageLocal(Def->GetPickupMsg(), 3, EMsgType::Left);
+	}
 }

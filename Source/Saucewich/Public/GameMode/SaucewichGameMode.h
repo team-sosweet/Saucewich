@@ -86,13 +86,13 @@ public:
 	void StartNextGame() const;
 
 	UFUNCTION(BlueprintCallable)
-	void PrintMessage(const FText& Msg, EMsgType Type, float Duration = 3) const;
+	void PrintMessage(const FText& Msg, EMsgType Type, float Duration = 3);
 
 	TSoftClassPtr<ASaucewichGameMode> ChooseNextGameMode() const;
 	FString ChooseNextMap(const UWorld* World) const;
 
 	void SetPlayerRespawnTimer(ASaucewichPlayerController* PC) const;
-	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName) const;
+	void OnPlayerChangedName(class ASaucewichPlayerState* Player, FString&& OldName);
 
 protected:
 	virtual void HandleMatchEnding();

@@ -173,6 +173,11 @@ void ASaucewichPlayerController::SafeCharacter(const FOnCharacterSpawnedSingle& 
 	}
 }
 
+void ASaucewichPlayerController::PrintMessageLocal(const FText& Message, const float Duration, const EMsgType Type) const
+{
+	OnReceiveMessage.Broadcast(Message, Duration, Type);
+}
+
 void ASaucewichPlayerController::SetSessionID(FString&& ID)
 {
 	ensure(SessionID.IsEmpty());
@@ -208,7 +213,7 @@ void ASaucewichPlayerController::BroadcastDeath() const
 
 void ASaucewichPlayerController::PrintMessage_Implementation(const FText& Message, const float Duration, const EMsgType Type)
 {
-	OnReceiveMessage.Broadcast(Message, Duration, Type);
+	PrintMessageLocal(Message, Duration, Type);
 }
 
 void ASaucewichPlayerController::ServerRespawn_Implementation()
