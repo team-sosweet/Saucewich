@@ -72,8 +72,7 @@ public:
 protected:
 	void BeginPlay() override;
 	void InitPlayerState() override;
-	void ClientWasKicked_Implementation(const FText& KickReason) override;
-
+	
 private:
 	bool CanRespawn() const;
 

@@ -90,11 +90,6 @@ void ASaucewichPlayerController::InitPlayerState()
 	}
 }
 
-void ASaucewichPlayerController::ClientWasKicked_Implementation(const FText& KickReason)
-{
-	DisconnectWithError(LOCTEXT("ServerShutdown", "서버가 종료되었습니다."));
-}
-
 bool ASaucewichPlayerController::CanRespawn() const
 {
 	const auto Char = CastChecked<ATpsCharacter>(GetPawn(), ECastCheckedType::NullAllowed);
@@ -114,6 +109,7 @@ void ASaucewichPlayerController::OnPingFailed() const
 
 void ASaucewichPlayerController::DisconnectWithError(const FText& Msg) const
 {
+	if (HasAuthority()) return;
 	USaucewichInstance::Get(this)->PushNetworkError(Msg);
 	GEngine->SetClientTravel(GetWorld(), TEXT("Main"), TRAVEL_Absolute);
 }
