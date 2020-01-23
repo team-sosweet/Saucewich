@@ -154,16 +154,7 @@ void UMatchmaker::UpdatePlayableTime()
 		if (!Content.TryGetNumberField(SSTR("startMinute"), Time.Start.Minute)) return;
 		if (!Content.TryGetNumberField(SSTR("endHour"), Time.End.Hour)) return;
 		if (!Content.TryGetNumberField(SSTR("endMinute"), Time.End.Minute)) return;
-		
-		auto ToUtc = [](int32& Hour)
-		{
-			// 서버가 반환하는 플레이 가능 시간은 서버 로컬 한국시간 (UTC+9) 기준이다.
-			Hour = (24 - 9 + Hour) % 24;
-		};
-
-		ToUtc(Time.Start.Hour);
-		ToUtc(Time.End.Hour);
-		
+				
 		Time.bIsSet = true;
 
 		PlayableTime = MoveTemp(Time);
@@ -180,7 +171,7 @@ void UMatchmaker::SetPlayableTimeNotification()
 	}
 
 	if (!UUserSettings::Get(this)->IsNotificationEnabled()) return;
-	if (FDateTime::UtcNow() <= LastNotificationTime) return;
+	if (FDateTime::Now() <= LastNotificationTime) return;
 	
 	const auto& P = PlayableTime;
 	auto& S = P.Start;
@@ -193,7 +184,7 @@ void UMatchmaker::SetPlayableTimeNotification()
 	const auto Title = LOCTEXT("PlayableNotifyTitle", "이제 플레이할 수 있습니다!");
 	const auto Body = FMT_MSG(LOCTEXT("PlayableNotifyBody", "지금부터 {0}동안 플레이할 수 있습니다! 놓지지 마세요!"), FText::AsTimespan(Duration));
 
-	LastNotificationTime = USaucewich::ScheduleLocalNotificationAtTime(S.Hour, S.Minute, false, Title, Body, FText::GetEmpty(), {});
+	LastNotificationTime = USaucewich::ScheduleLocalNotificationAtTime(S.Hour, S.Minute, true, Title, Body, FText::GetEmpty(), {});
 	SaveConfig();
 }
 
