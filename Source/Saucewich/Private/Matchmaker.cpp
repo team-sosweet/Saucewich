@@ -150,7 +150,7 @@ void UMatchmaker::UpdatePlayableTime()
 {
 	using namespace Matchmaker;
 
-	Request(SSTR("GET"), GBaseURL + TEXT("/playTime"), [this](const int32 Code, const FJsonObject& Content)
+	Request(SSTR("GET"), GBaseURL + TEXT("/fleet/playTime"), [this](const int32 Code, const FJsonObject& Content)
 	{
 		if (Code != 200) return;
 
