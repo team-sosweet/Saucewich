@@ -102,6 +102,8 @@ FDateTime USaucewich::ScheduleLocalNotificationAtTime(const int32 Hour, const in
 	Date.GetDate(Year, Month, Day);
 	const FDateTime Time{Year, Month, Day, Hour, Minute};
 
+	UE_LOG(LogSaucewich, Log, TEXT("Scheduling notification at %s"), *FText::AsDateTime(Time).ToString());
+
 	UBlueprintPlatformLibrary::ScheduleLocalNotificationAtTime(Time, bLocalTime, Title, Body, Action, ActivationEvent);
 	return Time;
 }
