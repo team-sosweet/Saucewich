@@ -389,17 +389,7 @@ void ASaucewichGameMode::HandleMatchHasStarted()
 void ASaucewichGameMode::HandleMatchHasEnded()
 {
 	Super::HandleMatchHasEnded();
-
-#if WITH_GAMELIFT
-	if (bTerminating)
-	{
-		GameLift::SafeTerminate();
-	}
-	else
-#endif
-	{
-		GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
-	}
+	GetWorldTimerManager().SetTimer(MatchStateTimer, this, &ASaucewichGameMode::StartNextGame, Data.NextGameWaitTime);
 }
 
 void ASaucewichGameMode::EndMatch()
