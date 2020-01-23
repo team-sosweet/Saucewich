@@ -4,6 +4,7 @@
 
 #include "Engine/GameInstance.h"
 #include "Engine/EngineTypes.h"
+#include "UObject/TextProperty.h"
 #include "SaucewichInstance.generated.h"
 
 class AWeapon;
