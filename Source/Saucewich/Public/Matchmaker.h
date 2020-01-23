@@ -52,7 +52,6 @@ class SAUCEWICH_API UMatchmaker : public UObject
 
 public:
 	UMatchmaker();
-	~UMatchmaker();
 
 	UFUNCTION(BlueprintPure, meta=(DisplayName="Get Matchmaker", WorldContext=W))
 	static UMatchmaker* Get(const UObject* W);

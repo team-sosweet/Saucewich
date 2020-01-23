@@ -42,6 +42,9 @@ namespace Matchmaker
 
 UMatchmaker::UMatchmaker()
 {
+	const auto World = UObject::GetWorld();
+	if (!World) return;
+
 	UpdatePlayableTime();
 	
 	const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
@@ -51,19 +54,11 @@ UMatchmaker::UMatchmaker()
 	FCoreDelegates::ApplicationHasEnteredForegroundDelegate.Add(Delegate);
 	FCoreDelegates::ApplicationWillTerminateDelegate.Add(Delegate);
 
-	if (const auto World = UObject::GetWorld())
+	UUserSettings::Get(World)->OnNotificationDisabled.AddWeakLambda(this, [this]
 	{
-		UUserSettings::Get(World)->OnNotificationDisabled.AddWeakLambda(this, [this]
-		{
-			LastNotificationTime = {};
-			SaveConfig();
-		});
-	}
-}
-
-UMatchmaker::~UMatchmaker()
-{
-	SetPlayableTimeNotification();
+		LastNotificationTime = {};
+		SaveConfig();
+	});
 }
 
 UMatchmaker* UMatchmaker::Get(const UObject* const W)
