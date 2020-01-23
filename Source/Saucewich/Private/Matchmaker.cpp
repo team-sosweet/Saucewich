@@ -77,7 +77,7 @@ void UMatchmaker::StartMatchmaking()
 	using namespace Matchmaker;
 	using namespace std::chrono;
 
-	const auto URL = GBaseURL + TEXT("/match/start?AliasId=alias-53ca2617-e3b1-4c0a-a0e6-a0721b1f8176");
+	const auto URL = GBaseURL + TEXT("/session/create?AliasId=alias-53ca2617-e3b1-4c0a-a0e6-a0721b1f8176");
 	
 	const auto bSuccess = Request(SSTR("GET"), URL, [this](const int32 Code, const FJsonObject& Content)
 	{
