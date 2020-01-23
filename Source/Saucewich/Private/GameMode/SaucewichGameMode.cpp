@@ -213,27 +213,15 @@ void ASaucewichGameMode::OnProcessTerminate()
 	
 	const auto GS = CastChecked<ASaucewichGameState>(GameState);
 	const auto CurRemaining = GS->GetRemainingRoundSeconds();
-	const auto Time = GameLift::Get().GetTerminationTime().GetResult() - 1 - Data.MatchEndingTime;
+	const auto Time = GameLift::Get().GetTerminationTime().GetResult() - (Data.MatchEndingTime + Data.NextGameWaitTime);
 	
-	if (Time > 0 && CurRemaining > 0)
+	if (0 < Time && Time < CurRemaining)
 	{
-		if (Time < CurRemaining)
-		{
-			GS->SetRemainingRoundSeconds(Time);
-			PrintMessage(FMT_MSG(LOCTEXT("LastRoundEndsIn", "마지막 라운드! 남은 시간: {0}"),
-				FText::AsTimespan(FTimespan::FromSeconds(Time))), EMsgType::Center, 5);
-		}
-		else
-		{
-			PrintMessage(LOCTEXT("LastRound", "마지막 라운드!"), EMsgType::Center, 5);
-		}
+		GS->SetRemainingRoundSeconds(Time);
 	}
-	else
+	else if (!HasMatchStarted())
 	{
-		for (const auto Ply : TActorRange<APlayerController>{GetWorld()})
-		{
-			GameSession->KickPlayer(Ply, LOCTEXT("ServerShutdown", "서버가 종료되었습니다"));
-		}
+		GameLift::SafeTerminate();
 	}
 }
 #endif
