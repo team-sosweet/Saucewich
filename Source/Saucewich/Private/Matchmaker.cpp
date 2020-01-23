@@ -40,25 +40,31 @@ namespace Matchmaker
 
 UMatchmaker::UMatchmaker()
 {
-	UpdatePlayableTime();
-	
-	const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
-	FCoreDelegates::ApplicationWillDeactivateDelegate.Add(Delegate);
-	FCoreDelegates::ApplicationHasReactivatedDelegate.Add(Delegate);
-	FCoreDelegates::ApplicationWillEnterBackgroundDelegate.Add(Delegate);
-	FCoreDelegates::ApplicationHasEnteredForegroundDelegate.Add(Delegate);
-	FCoreDelegates::ApplicationWillTerminateDelegate.Add(Delegate);
-
-	UUserSettings::Get(this)->OnNotificationDisabled.AddWeakLambda(this, [this]
+	if (const auto World = UObject::GetWorld())
 	{
-		LastNotificationTime = {};
-		SaveConfig();
-	});
+		UpdatePlayableTime();
+		
+		const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
+		FCoreDelegates::ApplicationWillDeactivateDelegate.Add(Delegate);
+		FCoreDelegates::ApplicationHasReactivatedDelegate.Add(Delegate);
+		FCoreDelegates::ApplicationWillEnterBackgroundDelegate.Add(Delegate);
+		FCoreDelegates::ApplicationHasEnteredForegroundDelegate.Add(Delegate);
+		FCoreDelegates::ApplicationWillTerminateDelegate.Add(Delegate);
+
+		UUserSettings::Get(World)->OnNotificationDisabled.AddWeakLambda(this, [this]
+		{
+			LastNotificationTime = {};
+			SaveConfig();
+		});
+	}
 }
 
 UMatchmaker::~UMatchmaker()
 {
-	SetPlayableTimeNotification();
+	if (UObject::GetWorld())
+	{
+		SetPlayableTimeNotification();
+	}
 }
 
 UMatchmaker* UMatchmaker::Get(const UObject* const W)
