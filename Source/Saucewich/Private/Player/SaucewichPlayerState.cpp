@@ -213,6 +213,11 @@ void ASaucewichPlayerState::BeginPlay()
 	{
 		ASaucewichPlayerController::BroadcastPlayerStateSpawned(PC, this);
 	}
+	
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		ServerSetWeaponLoadout(WeaponLoadout);
+	}
 }
 
 void ASaucewichPlayerState::SetPlayerName(const FString& S)
