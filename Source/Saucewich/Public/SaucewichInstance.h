@@ -55,7 +55,8 @@ public:
 	ECollisionChannel GetDecalTraceChannel() const { return DecalTraceChannel; }
 
 	UFUNCTION(BlueprintCallable)
-	bool PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Type, FString& Msg);
+	bool PopNetworkError(FText& OutMsg);
+	void PushNetworkError(const FText& Msg);
 
 	void StartupServer();
 	void OnGameReady();
@@ -98,8 +99,7 @@ private:
 
 	struct
 	{
-		FString Msg;
-		ENetworkFailure::Type Type;
+		FText Msg;
 		uint8 bOccured : 1;
 	} LastNetworkError;
 

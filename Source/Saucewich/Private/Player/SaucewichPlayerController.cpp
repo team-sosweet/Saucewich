@@ -4,8 +4,6 @@
 
 #include "Misc/CoreDelegates.h"
 #include "Engine/Engine.h"
-#include "Engine/NetConnection.h"
-#include "Engine/NetDriver.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
@@ -14,8 +12,8 @@
 #include "GameMode/SaucewichGameState.h"
 #include "Player/TpsCharacter.h"
 #include "Player/SaucewichPlayerState.h"
-#include "Player/BaseHUD.h"
 #include "Widget/ErrorWidget.h"
+#include "SaucewichInstance.h"
 
 #define LOCTEXT_NAMESPACE ""
 
@@ -92,6 +90,11 @@ void ASaucewichPlayerController::InitPlayerState()
 	}
 }
 
+void ASaucewichPlayerController::ClientWasKicked_Implementation(const FText& KickReason)
+{
+	DisconnectWithError(LOCTEXT("ServerShutdown", "서버가 종료되었습니다."));
+}
+
 bool ASaucewichPlayerController::CanRespawn() const
 {
 	const auto Char = CastChecked<ATpsCharacter>(GetPawn(), ECastCheckedType::NullAllowed);
@@ -106,8 +109,13 @@ void ASaucewichPlayerController::Ping()
 
 void ASaucewichPlayerController::OnPingFailed() const
 {
-	const auto ServerConnection = GetWorld()->GetNetDriver()->ServerConnection;
-	if (ServerConnection) ServerConnection->Close();
+	DisconnectWithError(LOCTEXT("KickedByAFK", "오랜 시간 입력이 없어 연결이 끊어졌습니다."));
+}
+
+void ASaucewichPlayerController::DisconnectWithError(const FText& Msg) const
+{
+	USaucewichInstance::Get(this)->PushNetworkError(Msg);
+	GEngine->SetClientTravel(GetWorld(), TEXT("Main"), TRAVEL_Absolute);
 }
 
 void ASaucewichPlayerController::MeasureLatency()

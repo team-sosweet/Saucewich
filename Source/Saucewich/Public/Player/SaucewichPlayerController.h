@@ -72,12 +72,14 @@ public:
 protected:
 	void BeginPlay() override;
 	void InitPlayerState() override;
+	void ClientWasKicked_Implementation(const FText& KickReason) override;
 
 private:
 	bool CanRespawn() const;
 
 	void Ping();
 	void OnPingFailed() const;
+	void DisconnectWithError(const FText& Msg) const;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPing();

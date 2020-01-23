@@ -19,6 +19,8 @@
 	#include "GameMode/DSDefGM.h"
 #endif
 
+#define LOCTEXT_NAMESPACE ""
+
 template <class T>
 static T* GetOrSpawn(T*& Ptr, UClass* const Class, UWorld* const World)
 {
@@ -58,15 +60,19 @@ ASauceMarker* USaucewichInstance::GetSauceMarker() const
 	return GetOrSpawn(SauceMarker, SauceMarkerClass.LoadSynchronous(), GetWorld());
 }
 
-bool USaucewichInstance::PopNetworkError(TEnumAsByte<ENetworkFailure::Type>& Type, FString& Msg)
+bool USaucewichInstance::PopNetworkError(FText& OutMsg)
 {
 	if (!LastNetworkError.bOccured) return false;
 	
-	Msg = MoveTemp(LastNetworkError.Msg);
-	Type = LastNetworkError.Type;
-	
+	OutMsg = LastNetworkError.Msg;
 	LastNetworkError.bOccured = false;
 	return true;
+}
+
+void USaucewichInstance::PushNetworkError(const FText& Msg)
+{
+	LastNetworkError.Msg = Msg;
+	LastNetworkError.bOccured = true;
 }
 
 void USaucewichInstance::Init()
@@ -87,9 +93,9 @@ void USaucewichInstance::Init()
 
 void USaucewichInstance::OnNetworkError(UWorld*, UNetDriver*, const ENetworkFailure::Type Type, const FString& Msg)
 {
-	LastNetworkError.Msg = Msg;
-	LastNetworkError.Type = Type;
-	LastNetworkError.bOccured = true;
+	const auto EnumPtr = FindObjectChecked<UEnum>(ANY_PACKAGE, TEXT("ENetworkFailure"), true);
+	PushNetworkError(FMT_MSG(LOCTEXT("OnNetworkError", "{0}\n{1}"),
+		FText::FromString(EnumPtr->GetNameStringByIndex(Type)), FText::FromString(Msg)));
 }
 
 
@@ -227,3 +233,5 @@ void USaucewichInstance::OnGameReady()
 	}
 #endif
 }
+
+#undef LOCTEXT_NAMESPACE

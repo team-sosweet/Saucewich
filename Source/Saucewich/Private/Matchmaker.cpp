@@ -136,7 +136,7 @@ void UMatchmaker::OnMatchmakingComplete(const FJsonObject& Content) const
 
 void UMatchmaker::Error(const EMMResponse Code, const TCHAR* const Msg) const
 {
-	const auto EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EMMResponse"), true);
+	const auto EnumPtr = FindObjectChecked<UEnum>(ANY_PACKAGE, TEXT("EMMResponse"), true);
 	UE_LOG(LogMatchmaker, Error, TEXT("[%s]: %s"), *EnumPtr->GetNameStringByIndex(int32(Code)), Msg);
 	OnResponse.ExecuteIfBound(Code, {}, {}, {});
 }
