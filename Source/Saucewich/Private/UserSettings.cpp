@@ -7,7 +7,7 @@
 #include "Kismet/BlueprintPlatformLibrary.h"
 
 UUserSettings::UUserSettings()
-	:bAutoFire{true}, bVibration{true}, bParticle{true}, bMusic{true}
+	:bAutoFire{true}, bVibration{true}, bParticle{true}, bMusic{true}, bNotification{true}
 {
 }
 
