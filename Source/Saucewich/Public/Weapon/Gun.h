@@ -13,10 +13,10 @@ struct SAUCEWICH_API FGunData : public FWeaponData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<class USoundBase> FireSound;
+	TSoftObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditAnywhere)
-	TSoftClassPtr<class UCameraShake> FireShake;
+	TSoftClassPtr<UCameraShakeBase> FireShake;
 
 	// 자동조준 상자 크기
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -176,7 +176,7 @@ private:
 	FOnGunClipChanged OnClipChanged;
 
 	UPROPERTY(VisibleAnywhere)
-	class UParticleSystemComponent* FirePSC;
+	UParticleSystemComponent* FirePSC;
 
 	FRandomStream FireRand;
 	float SpreadAlpha;

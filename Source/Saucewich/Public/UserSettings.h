@@ -10,7 +10,6 @@ enum class EGraphicOption : uint8
 	Outline, Highlight, Particle = 255
 };
 
-DECLARE_DELEGATE_TwoParams(FOnGraphicOptionChanged, EGraphicOption, bool)
 DECLARE_EVENT(UUserSettings, FOnNotificationDisabled)
 
 UCLASS(Config=UserSettings)
@@ -32,26 +31,7 @@ public:
 	const FString& GetPlayerName() const { return PlayerName; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetMaxFPS(float NewMaxFPS);
-	void CommitMaxFPS() const;
-	float GetMaxFPS() const { return MaxFPS; }
-
-	UFUNCTION(BlueprintCallable)
 	float GetCorrectedSensitivity() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetOutlineEnabled(bool bEnabled);
-	bool IsOutlineEnabled() const { return bOutline; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetHighlightEnabled(bool bEnabled);
-	bool IsHighlightEnabled() const { return bHighlight; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetParticleEnabled(bool bEnabled);
-	bool IsParticleEnabled() const { return bParticle; }
-
-	void RegisterGraphicManager(FOnGraphicOptionChanged&& Callback);
 
 	UFUNCTION(BlueprintCallable)
 	void SetNotificationEnabled(bool bEnabled);
@@ -73,22 +53,8 @@ protected:
 	void PostInitProperties() override;
 
 private:
-	FOnGraphicOptionChanged OnOptionChanged;
-	
 	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	FString PlayerName;
-
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	float MaxFPS;
-
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 bOutline : 1;
-
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 bHighlight : 1;
-	
-	UPROPERTY(Config, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 bParticle : 1;
 
 	UPROPERTY(Config, BlueprintReadWrite, meta=(AllowPrivateAccess=true))
 	uint8 bMusic : 1;

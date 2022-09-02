@@ -15,9 +15,9 @@ void UUsersInfo::UpdateInfo()
 		auto&& Lhs = *CastChecked<ASaucewichPlayerState>(&A);
 		auto&& Rhs = *CastChecked<ASaucewichPlayerState>(&B);
 		
-		if (Lhs.Score != Rhs.Score)
+		if (Lhs.GetScore() != Rhs.GetScore())
 		{
-			return Lhs.Score > Rhs.Score;
+			return Lhs.GetScore() > Rhs.GetScore();
 		}
 		if (Lhs.GetObjective() != Rhs.GetObjective())
 		{

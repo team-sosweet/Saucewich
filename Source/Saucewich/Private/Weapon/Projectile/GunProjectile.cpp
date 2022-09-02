@@ -12,7 +12,7 @@ void AGunProjectile::OnExplode(const FHitResult& Hit)
 		const auto ElapsedTime = GetGameTimeSinceCreation() - FiredTime;
 		const auto TravelDist = Data.ProjectileSpeed * ElapsedTime;
 		const FVector2D FireRange{Data.DmgFalloffStartDist, Data.DmgFalloffEndDist};
-		const auto Damage = FMath::GetMappedRangeValueClamped(FireRange, {Data.Damage, Data.MinDmg}, TravelDist);
+		float Damage = FMath::GetMappedRangeValueClamped(FireRange, {Data.Damage, Data.MinDmg}, TravelDist);
 		Other->TakeDamage(
 			Damage,
 			FPointDamageEvent{Damage, Hit, GetVelocity().GetSafeNormal(), Data.DamageType.LoadSynchronous()},

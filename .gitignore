@@ -1,9 +1,10 @@
 Binaries
 DerivedDataCache
+Developer
 Intermediate
 Saved
-Plugins
 ThirdParty
+.idea
 .vscode
 .vs
 *.VC.db
@@ -17,7 +18,5 @@ ThirdParty
 *.user
 *.log
 *.lnk
-
 *.bat
-
 *.keystore

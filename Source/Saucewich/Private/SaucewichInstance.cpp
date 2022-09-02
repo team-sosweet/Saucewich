@@ -12,7 +12,7 @@
 #include "Saucewich.h"
 #include "GameMode/SaucewichGameMode.h"
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 	#include "Misc/OutputDeviceFile.h"
 	#include "HAL/PlatformOutputDevices.h"
@@ -36,7 +36,7 @@ static T* GetOrSpawn(T*& Ptr, UWorld* const World)
 
 USaucewichInstance::~USaucewichInstance()
 {
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	if (GameSession)
 	{
 		delete GameSession;
@@ -99,7 +99,7 @@ void USaucewichInstance::OnNetworkError(UWorld*, UNetDriver*, const ENetworkFail
 }
 
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 
 namespace GameLift
 {
@@ -178,7 +178,7 @@ bool OnHealthCheck(void* State)
 
 void USaucewichInstance::StartupServer()
 {
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	if (!bIsGameLiftInitialized)
 	{
 		UE_LOG(LogGameLift, Log, TEXT("Starting GameLift SDK..."));
@@ -223,7 +223,7 @@ void USaucewichInstance::StartupServer()
 
 void USaucewichInstance::OnGameReady()
 {
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	if (bShouldActivateGameSession)
 	{
 		UE_LOG(LogGameLift, Log, TEXT("Activating game session..."));

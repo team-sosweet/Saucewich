@@ -38,7 +38,7 @@ private:
 	UPROPERTY(Transient)
 	class UTextBlock* DamageText;
 
-	UPROPERTY(meta = (BindWidgetAnim))
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	UWidgetAnimation* Fade;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))

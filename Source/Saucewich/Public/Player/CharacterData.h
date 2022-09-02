@@ -11,22 +11,22 @@ class SAUCEWICH_API UCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	class UMaterialInterface* GetTranslMat(uint8 Idx, const UMaterialInterface* Mat) const;
+	UMaterialInterface* GetTranslMat(uint8 Idx, const UMaterialInterface* Mat) const;
 
 	UPROPERTY(EditAnywhere)
-	TArray<TSoftObjectPtr<class USoundBase>> DeathSounds;
+	TArray<TSoftObjectPtr<USoundBase>> DeathSounds;
 	
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<class UParticleSystem> DeathFX;
+	TSoftObjectPtr<UParticleSystem> DeathFX;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<class UForceFeedbackEffect> DeathFBB;
+	TSoftObjectPtr<UForceFeedbackEffect> DeathFBB;
 
 	UPROPERTY(EditAnywhere)
-	TSoftClassPtr<class UCameraShake> DeathShake;
+	TSoftClassPtr<UCameraShakeBase> DeathShake;
 
 	UPROPERTY(EditAnywhere)
-	TSoftClassPtr<class UCameraShake> HitShake;
+	TSoftClassPtr<UCameraShakeBase> HitShake;
 
 	UPROPERTY(EditAnywhere, AdvancedDisplay)
 	FName ColMatName;

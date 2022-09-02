@@ -196,7 +196,7 @@ bool AGun::GunTraceInternal(FHitResult& OutHit, const FName ProjColProf, const F
 	TArray<FHitResult> BoxHits;
 	GetWorld()->SweepMultiByProfile(
 		BoxHits, Start, End, AimRotation.Quaternion(), NAME("PawnOnly"),
-		FCollisionShape::MakeBox({ 0.f, Data.TraceBoxSize.X, Data.TraceBoxSize.Y }), Params
+		FCollisionShape::MakeBox(FVector(0.f, Data.TraceBoxSize.X, Data.TraceBoxSize.Y)), Params
 	);
 
 	auto HitPawn = -1;

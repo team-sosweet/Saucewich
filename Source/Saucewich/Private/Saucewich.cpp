@@ -9,7 +9,7 @@
 
 #include "Names.h"
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 #endif
 
@@ -17,7 +17,7 @@ IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Saucewich, "Saucewich")
 
 DEFINE_LOG_CATEGORY(LogSaucewich)
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 
 DEFINE_LOG_CATEGORY(LogGameLift)
 

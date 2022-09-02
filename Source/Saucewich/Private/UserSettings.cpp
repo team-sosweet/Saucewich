@@ -7,7 +7,7 @@
 #include "Kismet/BlueprintPlatformLibrary.h"
 
 UUserSettings::UUserSettings()
-	:bAutoFire{true}, bVibration{true}, bParticle{true}, bMusic{true}, bNotification{true}
+	:bAutoFire{true}, bVibration{true}, bMusic{true}, bNotification{true}
 {
 }
 
@@ -26,45 +26,10 @@ ENameValidity UUserSettings::SetPlayerName(const FString& NewPlayerName)
 	return Validity;
 }
 
-void UUserSettings::SetMaxFPS(const float NewMaxFPS)
-{
-	MaxFPS = NewMaxFPS;
-	CommitMaxFPS();
-}
-
-void UUserSettings::CommitMaxFPS() const
-{
-	if (MaxFPS > 0.f)
-		GEngine->Exec(nullptr, *FString::Printf(TEXT("t.MaxFPS %f"), MaxFPS));
-}
-
 float UUserSettings::GetCorrectedSensitivity() const
 {
 	constexpr auto Correction = .25f;
 	return Correction * RawSensitivity + Correction * .5f;
-}
-
-void UUserSettings::SetOutlineEnabled(const bool bEnabled)
-{
-	OnOptionChanged.ExecuteIfBound(EGraphicOption::Outline, bOutline = bEnabled);
-}
-
-void UUserSettings::SetHighlightEnabled(const bool bEnabled)
-{
-	OnOptionChanged.ExecuteIfBound(EGraphicOption::Highlight, bHighlight = bEnabled);
-}
-
-void UUserSettings::SetParticleEnabled(const bool bEnabled)
-{
-	OnOptionChanged.ExecuteIfBound(EGraphicOption::Particle, bParticle = bEnabled);
-}
-
-void UUserSettings::RegisterGraphicManager(FOnGraphicOptionChanged&& Callback)
-{
-	OnOptionChanged = MoveTemp(Callback);
-	OnOptionChanged.Execute(EGraphicOption::Outline, bOutline);
-	OnOptionChanged.Execute(EGraphicOption::Highlight, bHighlight);
-	OnOptionChanged.Execute(EGraphicOption::Particle, bParticle);
 }
 
 void UUserSettings::SetNotificationEnabled(const bool bEnabled)
@@ -85,10 +50,5 @@ void UUserSettings::PostInitProperties()
 	{
 		PlayerName = TEXT("Player");
 		PlayerName.AppendInt(FMath::RandRange(100, 999));
-	}
-
-	if (MaxFPS <= 0.f)
-	{
-		MaxFPS = IConsoleManager::Get().FindTConsoleVariableDataFloat(TEXT("t.MaxFPS"))->GetValueOnAnyThread();
 	}
 }

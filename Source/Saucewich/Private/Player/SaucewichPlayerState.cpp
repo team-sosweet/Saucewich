@@ -74,8 +74,9 @@ void ASaucewichPlayerState::AddScore(const FName ScoreID, int32 ActualScore, con
 	if (ActualScore == 0)
 		ActualScore = GI->GetScoreData(ScoreID).Score;
 
-	Score += ActualScore;
-	MulticastAddScore(ScoreID, ActualScore, static_cast<int32>(Score));
+	float NewScore = GetScore() + ActualScore;
+	SetScore(NewScore);
+	MulticastAddScore(ScoreID, ActualScore, static_cast<int32>(NewScore));
 
 	UE_LOG(LogPlayerState, Log, TEXT("Add %d score to %s by %s"), ActualScore, *GetPlayerName(), *ScoreID.ToString())
 }
@@ -224,7 +225,7 @@ void ASaucewichPlayerState::SetPlayerName(const FString& S)
 {
 	for (const auto Player : TActorRange<APlayerState>{GetWorld()})
 	{
-		if (Player == this || Player->IsPendingKill()) continue;
+		if (Player == this || !IsValid(Player)) continue;
 		
 		auto Name = Player->GetPlayerName();
 		if (Name.Equals(S, ESearchCase::IgnoreCase))

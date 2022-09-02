@@ -47,7 +47,7 @@ UMatchmaker::UMatchmaker()
 
 	UpdatePlayableTime();
 	
-	const auto Delegate = TBaseDelegate<void>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
+	const auto Delegate = TDelegate<void()>::CreateUObject(this, &UMatchmaker::SetPlayableTimeNotification);
 	FCoreDelegates::ApplicationWillDeactivateDelegate.Add(Delegate);
 	FCoreDelegates::ApplicationHasReactivatedDelegate.Add(Delegate);
 	FCoreDelegates::ApplicationWillEnterBackgroundDelegate.Add(Delegate);

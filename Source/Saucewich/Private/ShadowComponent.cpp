@@ -9,8 +9,9 @@ UShadowComponent::UShadowComponent()
 {
 #if !UE_SERVER
 	PrimaryComponentTick.bCanEverTick = true;
-	const auto Mesh = TSoftObjectPtr<UStaticMesh>{{TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")}}.LoadSynchronous();
-	UStaticMeshComponent::SetStaticMesh(Mesh);
+	FSoftObjectPath MeshPath{TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")};
+	TSoftObjectPtr<UStaticMesh> Mesh{MeshPath};
+	UStaticMeshComponent::SetStaticMesh(Mesh.LoadSynchronous());
 	BodyInstance.SetCollisionProfileNameDeferred(Names::NoCollision);
 #endif 
 }
@@ -71,7 +72,7 @@ void UShadowComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 			const auto bOverlapped = World->SweepSingleByChannel(
 				H, Start, Start - Hit.ImpactNormal * (Hit.Distance + 1.f), Rot,
 				USaucewichInstance::Get(World)->GetDecalTraceChannel(),
-				FCollisionShape::MakeBox({Size, Size, 0.f})
+				FCollisionShape::MakeBox(FVector{Size, Size, 0.f})
 			);
 			if (bOverlapped && H.Distance < MinDist) MinDist = H.Distance;
 

@@ -26,7 +26,7 @@ void UUserInfo::UpdateInfo(ASaucewichPlayerState* PlayerState) const
 	NameText->SetText(FText::FromString(Name));
 	NameText->SetColorAndOpacity(Color);
 
-	const auto Score = FString::SanitizeFloat(PlayerState->Score, 0);
+	const auto Score = FString::SanitizeFloat(PlayerState->GetScore(), 0);
 	ScoreText->SetText(FText::FromString(Score));
 	ScoreText->SetColorAndOpacity(Color);
 	

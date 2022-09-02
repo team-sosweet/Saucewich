@@ -3,7 +3,6 @@
 #include "Entity/SauceMarker.h"
 
 #include "Components/InstancedStaticMeshComponent.h"
-#include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "GameFramework/GameStateBase.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -58,7 +57,7 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 		Hit.ImpactPoint - Hit.ImpactNormal,
 		Rot,
 		GI->GetDecalTraceChannel(),
-		FCollisionShape::MakeBox({Scale3D.X * 50.f, Scale3D.Y * 50.f, 0.f})
+		FCollisionShape::MakeBox(FVector(Scale3D.X * 50.f, Scale3D.Y * 50.f, 0.f))
 	);
 	auto Offset = 0.f;
 	for (auto&& H : Hits)
@@ -71,7 +70,7 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	}
 
 	const auto Comp = Marker->TeamMarkers[Team].PickRand();
-	Comp->AddInstanceWorldSpace({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (Offset + .01f), Scale3D});
+	Comp->AddInstance({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (Offset + .01f), Scale3D}, true);
 #endif
 }
 

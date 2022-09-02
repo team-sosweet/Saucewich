@@ -2,7 +2,7 @@
 
 #include "GameMode/SaucewichGameMode.h"
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 #endif
 
@@ -142,7 +142,7 @@ void ASaucewichGameMode::PreLogin(const FString& Options, const FString& Address
 {
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 	
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	if (!ErrorMessage.IsEmpty()) return;
 
 	static const FString SessionIDKey = TEXT("SessionID");
@@ -182,7 +182,7 @@ FString ASaucewichGameMode::InitNewPlayer(APlayerController* const NewPlayerCont
 	
 	ChangeName(PC, PlayerName, false);
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	PC->SetSessionID(UGameplayStatics::ParseOption(Options, SSTR("SessionID")));
 	PC->SetPlayerID(UGameplayStatics::ParseOption(Options, SSTR("PlayerID")));
 	USaucewichInstance::Get(this)->IDtoPC.Add(PC->GetPlayerID(), PC);
@@ -201,7 +201,7 @@ void ASaucewichGameMode::PostLogin(APlayerController* const NewPlayer)
 	);
 }
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 namespace GameLift
 {
 	extern void Check(const FGameLiftGenericOutcome& Outcome);
@@ -233,7 +233,7 @@ void ASaucewichGameMode::Logout(AController* const Exiting)
 	PrintMessage(FMT_MSG(LOCTEXT("Logout", "{0}님이 게임에서 나갔습니다."),
 		FText::FromString(Exiting->PlayerState->GetPlayerName())), EMsgType::Left);
 	
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	auto&& GameLiftSDK = GameLift::Get();
 	if (const auto PC = Cast<ASaucewichPlayerController>(Exiting))
 	{
@@ -402,7 +402,7 @@ bool ASaucewichGameMode::EndMatchIfNoPlayers()
 {
 	if (NumPlayers == 0 && IsNetMode(NM_DedicatedServer))
 	{
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 		if (bTerminating)
 		{
 			GameLift::SafeTerminate();
@@ -471,7 +471,7 @@ USaucewichInstance* ASaucewichGameMode::GetSaucewichInstance() const
 
 void ASaucewichGameMode::StartNextGame() const
 {
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	if (bTerminating)
 	{
 		GameLift::SafeTerminate();

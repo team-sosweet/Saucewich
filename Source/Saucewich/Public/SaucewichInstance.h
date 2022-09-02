@@ -12,7 +12,7 @@ class AActorPool;
 class ASauceMarker;
 class ASaucewichGameMode;
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 namespace Aws {
 namespace GameLift {
 namespace Server {
@@ -104,7 +104,7 @@ private:
 		uint8 bOccured : 1;
 	} LastNetworkError;
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 public:
 	const Aws::GameLift::Server::Model::GameSession& GetGameSession() const;
 	void StartGameSession(Aws::GameLift::Server::Model::GameSession&& Session);

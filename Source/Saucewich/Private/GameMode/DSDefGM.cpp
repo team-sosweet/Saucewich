@@ -5,7 +5,7 @@
 #include "GameMode/SaucewichGameMode.h"
 #include "SaucewichInstance.h"
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	#include "GameLiftServerSDK.h"
 #endif
 
@@ -34,7 +34,7 @@ void ADSDefGM::Tick(const float DeltaSeconds)
 
 void ADSDefGM::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 	UE_LOG(LogGameMode, Warning, TEXT("Someone tried to join while server is not ready!"));
 	UE_LOG(LogGameMode, Warning, TEXT("Options: %s"), *Options);
 	UE_LOG(LogGameMode, Warning, TEXT("Address: %s"), *Address);
@@ -45,7 +45,7 @@ void ADSDefGM::PreLogin(const FString& Options, const FString& Address, const FU
 #endif
 }
 
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 namespace GameLift
 {
 	extern void Check(const FGameLiftGenericOutcome& Outcome);

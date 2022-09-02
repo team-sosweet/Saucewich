@@ -17,7 +17,7 @@ public:
 	void SetValue(float InValue);
 
 private:
-	FAnchors GetAnchorByValue();
+	FAnchors GetAnchorByValue() const;
 	
 	UPROPERTY(Transient)
 	class UImage* LeftImage;

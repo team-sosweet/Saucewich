@@ -19,7 +19,7 @@ class UWeaponComponent : public USceneComponent
 public:
 	UWeaponComponent();
 
-	void SetupPlayerInputComponent(class UInputComponent* Input);
+	void SetupPlayerInputComponent(UInputComponent* Input);
 
 	UFUNCTION(BlueprintCallable)
 	AWeapon* Give(const TSoftClassPtr<AWeapon>& WeaponClass);

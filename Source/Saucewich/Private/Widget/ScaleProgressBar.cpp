@@ -31,10 +31,15 @@ void UScaleProgressBar::SetValue(const float InValue)
 	RightSlot->SetAnchors(NewAnchor);
 }
 
-FAnchors UScaleProgressBar::GetAnchorByValue()
+FAnchors UScaleProgressBar::GetAnchorByValue() const
 {
 	const auto Pos = Value * (ProgressMaxAnchor - ProgressMinAnchor) + ProgressMinAnchor;
 	const auto SlotDistance = StartAnchor.Maximum.X - StartAnchor.Minimum.X;
 
-	return FAnchors{ Pos, StartAnchor.Minimum.Y, Pos + SlotDistance, StartAnchor.Maximum.Y };
+	return FAnchors{
+		Pos,
+		static_cast<float>(StartAnchor.Minimum.Y),
+		static_cast<float>(Pos + SlotDistance),
+		static_cast<float>(StartAnchor.Maximum.Y)
+	};
 }

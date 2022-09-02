@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{80243AAD-4E17-0C06-A8BB-B8B2C9678F21}",
+	"EngineAssociation": "5.0",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -14,107 +14,5 @@
 				"CoreUObject"
 			]
 		}
-	],
-	"Plugins": [
-		{
-			"Name": "MagicLeap",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Lumin",
-				"Mac",
-				"Win64"
-			]
-		},
-		{
-			"Name": "MagicLeapMedia",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Lumin"
-			]
-		},
-		{
-			"Name": "MLSDK",
-			"Enabled": false
-		},
-		{
-			"Name": "CableComponent",
-			"Enabled": false
-		},
-		{
-			"Name": "Paper2D",
-			"Enabled": false
-		},
-		{
-			"Name": "OculusVR",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Win32",
-				"Win64",
-				"Android"
-			]
-		},
-		{
-			"Name": "SteamVR",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Win32",
-				"Win64",
-				"Linux",
-				"Mac"
-			]
-		},
-		{
-			"Name": "CodeView",
-			"Enabled": true
-		},
-		{
-			"Name": "CodeEditor",
-			"Enabled": true
-		},
-		{
-			"Name": "CustomMeshComponent",
-			"Enabled": false
-		},
-		{
-			"Name": "EditableMesh",
-			"Enabled": false
-		},
-		{
-			"Name": "FacialAnimation",
-			"Enabled": false
-		},
-		{
-			"Name": "SpeedTreeImporter",
-			"Enabled": false
-		},
-		{
-			"Name": "UObjectPlugin",
-			"Enabled": false
-		},
-		{
-			"Name": "ArchVisCharacter",
-			"Enabled": false
-		},
-		{
-			"Name": "CharacterAI",
-			"Enabled": false
-		},
-		{
-			"Name": "ProceduralMeshComponent",
-			"Enabled": false
-		},
-		{
-			"Name": "GameLiftServerSDK",
-			"Enabled": true
-		}
-	],
-	"TargetPlatforms": [
-		"Android",
-		"IOS",
-		"LinuxNoEditor",
-		"WindowsNoEditor",
-		"LinuxAArch64NoEditor",
-		"AllDesktop",
-		"MacNoEditor"
 	]
 }

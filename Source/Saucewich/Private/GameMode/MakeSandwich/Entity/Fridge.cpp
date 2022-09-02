@@ -71,7 +71,7 @@ void AFridge::Tick(const float DeltaSeconds)
 			if (const auto Pawn = PC->GetPawn())
 			{
 				const auto Dist = FVector::Dist(GetActorLocation(), Pawn->GetActorLocation());
-				const auto Size = FMath::GetMappedRangeValueClamped({0, 2000}, {100, 40}, Dist);
+				const auto Size = FMath::GetMappedRangeValueClamped(FVector2D(0, 2000), FVector2D(100, 40), Dist);
 				HUD->SetDrawSize({Size, Size});
 			}
 		}

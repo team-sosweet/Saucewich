@@ -139,7 +139,7 @@ private:
 
 	uint8 bAboutToStartMatch : 1;
 	
-#if WITH_GAMELIFT
+#if defined(WITH_GAMELIFT) && WITH_GAMELIFT
 public:
 	void OnProcessTerminate();
 

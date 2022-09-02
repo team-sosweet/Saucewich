@@ -19,7 +19,7 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSoftClassPtr<class UCameraShake> CameraShake;
+	TSoftClassPtr<UCameraShakeBase> CameraShake;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float Damage = 100;

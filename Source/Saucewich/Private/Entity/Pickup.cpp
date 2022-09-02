@@ -62,7 +62,7 @@ void APickup::Tick(const float DeltaSeconds)
 
 	for (auto&& OverlapInfo : Collision->GetOverlapInfos())
 	{
-		if (const auto Other = Cast<APickup>(OverlapInfo.OverlapInfo.Actor.Get()))
+		if (const auto Other = Cast<APickup>(OverlapInfo.OverlapInfo.GetActor()))
 		{
 			auto Force = Other->GetActorLocation();
 			Force -= GetActorLocation();
