@@ -26,7 +26,7 @@ class SAUCEWICH_API ATpsCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	class UWeaponComponent* WeaponComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
@@ -156,10 +156,10 @@ private:
 	const class UCharacterData* Data;
 
 	UPROPERTY(Transient)
-	class UMaterialInstanceDynamic* ColMat;
+	UMaterialInstanceDynamic* ColMat;
 
 	UPROPERTY(Transient)
-	class UMaterialInstanceDynamic* ColTranslMat;
+	UMaterialInstanceDynamic* ColTranslMat;
 
 	UPROPERTY(ReplicatedUsing=OnRep_HP, Transient, EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	float HP;

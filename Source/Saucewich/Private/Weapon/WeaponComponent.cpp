@@ -75,8 +75,11 @@ void UWeaponComponent::TickComponent(const float DeltaTime, const ELevelTick Tic
 void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UWeaponComponent, Weapons);
+	
+	// BUG: UE5.0.3에서 배열이 리플리케이트되지 않는 버그가 있음. 이를 위한 임시 방편
+	DOREPLIFETIME(UWeaponComponent, Weapon0);
+	DOREPLIFETIME(UWeaponComponent, Weapon1);
+	
 	DOREPLIFETIME(UWeaponComponent, Active);
 }
 
@@ -95,7 +98,7 @@ void UWeaponComponent::SetupPlayerInputComponent(UInputComponent* Input)
 	for (uint8 i = 0; i < WeaponSlots; ++i)
 	{
 		Slot[4] = TEXT('1') + i;
-		using F = TBaseDelegate<void, uint8>;
+		using F = TDelegate<void(uint8)>;
 		Input->BindAction<F>(*Slot, IE_Pressed, this, &UWeaponComponent::SlotP, i);
 		Input->BindAction<F>(*Slot, IE_Released, this, &UWeaponComponent::SlotR, i);
 	}
@@ -158,10 +161,7 @@ void UWeaponComponent::SetColor(const FLinearColor& NewColor)
 AWeapon* UWeaponComponent::Give(const TSoftClassPtr<AWeapon>& WeaponClass)
 {
 	const auto Cls = WeaponClass.LoadSynchronous();
-	check(Cls);
-
 	const auto Slot = GetDefault<AWeapon>(Cls)->GetData().Slot;
-	check(Slot < Weapons.Num());
 
 	FActorSpawnParameters Parameters;
 	Parameters.Instigator = CastChecked<ATpsCharacter>(GetOwner());
@@ -176,11 +176,26 @@ AWeapon* UWeaponComponent::Give(const TSoftClassPtr<AWeapon>& WeaponClass)
 	Weapons[Slot] = Weapon;
 	if (Slot == Active) Weapon->Deploy();
 
+	// BUG: UE5.0.3에서 배열이 리플리케이트되지 않는 버그가 있음. 이를 위한 임시 방편
+	switch (Slot) {
+		case 0:
+			Weapon0 = Weapon;
+			break;
+		case 1:
+			Weapon1 = Weapon;
+			break;
+		default: ;
+	}
+
 	return Weapon;
 }
 
 void UWeaponComponent::OnRep_Weapons()
 {
+	// BUG: UE5.0.3에서 배열이 리플리케이트되지 않는 버그가 있음. 이를 위한 임시 방편
+	Weapons[0] = Weapon0;
+	Weapons[1] = Weapon1;
+	
 	const auto ActiveWeapon = GetActiveWeapon();
 	if (ActiveWeapon && !ActiveWeapon->IsVisible())
 	{

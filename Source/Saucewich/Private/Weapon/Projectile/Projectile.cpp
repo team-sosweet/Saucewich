@@ -100,12 +100,13 @@ void AProjectile::OnExplode(const FHitResult& Hit)
 	if (const auto FX = ImpactFX.LoadSynchronous())
 	{
 		const FTransform Transform{Hit.ImpactNormal.ToOrientationQuat() * FQuat{FRotator{-90.f, 0.f, 0.f}}, Hit.ImpactPoint};
-		const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(
+		if (const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(
 			World, FX, Transform, true, EPSCPoolMethod::AutoRelease
-		);
-		const auto GS = CastChecked<ASaucewichGameState>(World->GetGameState());
-		GS->AddDilatablePSC(PSC);
-		PSC->SetColorParameter(Names::Color, GetColor());
+		)) {
+			const auto GS = CastChecked<ASaucewichGameState>(World->GetGameState());
+			GS->AddDilatablePSC(PSC);
+			PSC->SetColorParameter(Names::Color, GetColor());
+		}
 	}
 
 	if (UUserSettings::Get(this)->bVibration)

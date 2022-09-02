@@ -33,10 +33,10 @@ void ASaucewichPlayerState::SaveWeaponLoadout()
 
 void ASaucewichPlayerState::GiveWeapons()
 {
-	const auto Character = CastChecked<ATpsCharacter>(GetPawn());
-
-	for (const auto Weapon : WeaponLoadout)
-		Character->GetWeaponComponent()->Give(Weapon);
+	if (const auto Character = Cast<ATpsCharacter>(GetPawn()))
+		if (const auto WeaponComp = Character->GetWeaponComponent())
+			for (const auto Weapon : WeaponLoadout)
+				WeaponComp->Give(Weapon);
 }
 
 void ASaucewichPlayerState::OnKill()

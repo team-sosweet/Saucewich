@@ -46,14 +46,12 @@ ATpsCharacter::ATpsCharacter(const FObjectInitializer& ObjectInitializer)
 
 AWeapon* ATpsCharacter::GetActiveWeapon() const
 {
-	check(WeaponComponent);
-	return WeaponComponent->GetActiveWeapon();
+	return WeaponComponent ? WeaponComponent->GetActiveWeapon() : nullptr;
 }
 
 bool ATpsCharacter::GunTrace(FHitResult& OutHit) const
 {
-	check(WeaponComponent);
-	return WeaponComponent->GunTrace(OutHit);
+	return WeaponComponent && WeaponComponent->GunTrace(OutHit);
 }
 
 uint8 ATpsCharacter::GetTeam() const
@@ -424,15 +422,22 @@ void ATpsCharacter::Kill_Internal(ASaucewichPlayerState* const Attacker, AActor*
 void ATpsCharacter::SpawnDeathEffects() const
 {
 #if !UE_SERVER
+	if (IsRunningDedicatedServer()) {
+		return;
+	}
+	
 	const auto World = GetWorld();
 	auto Location = GetActorLocation();
 	UGameplayStatics::PlaySoundAtLocation(World, Data->DeathSounds[FMath::RandHelper(Data->DeathSounds.Num())].LoadSynchronous(), Location);
 
-	const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(), FTransform{ Location }, true, EPSCPoolMethod::AutoRelease);
-	PSC->SetColorParameter(Names::Color, GetColor());
-
-	const auto GS = CastChecked<ASaucewichGameState>(World->GetGameState());
-	GS->AddDilatablePSC(PSC);
+	if (const auto PSC = UGameplayStatics::SpawnEmitterAtLocation(World, Data->DeathFX.LoadSynchronous(),
+	                                                              FTransform{Location}, true,
+	                                                              EPSCPoolMethod::AutoRelease)) {
+		PSC->SetColorParameter(Names::Color, GetColor());
+		if (const auto GS = Cast<ASaucewichGameState>(World->GetGameState())) {
+			GS->AddDilatablePSC(PSC);
+		}
+	}
 
 	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	ASauceMarker::Add(this, GetTeam(), Location, Data->DeathSauceMarkScale);

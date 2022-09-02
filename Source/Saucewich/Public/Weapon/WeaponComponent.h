@@ -65,6 +65,7 @@ protected:
 private:
 	void StartFire();
 	void StopFire();
+	
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireP();
 	UFUNCTION(Server, Reliable, WithValidation) void ServerFireR();
 	UFUNCTION(NetMulticast, Reliable) void MulticastFireP();
@@ -82,18 +83,32 @@ private:
 
 	FOnEquipWeapon OnEquipWeapon;
 	
-	UPROPERTY(ReplicatedUsing=OnRep_Weapons, VisibleInstanceOnly, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	TArray<AWeapon*> Weapons;
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	TArray<TObjectPtr<AWeapon>> Weapons;
+
+	// BUG: UE5.0.3에서 배열이 리플리케이트되지 않는 버그가 있음. 이를 위한 임시 방편
+	UPROPERTY(ReplicatedUsing=OnRep_Weapons)
+	TObjectPtr<AWeapon> Weapon0;
+	
+	// BUG: UE5.0.3에서 배열이 리플리케이트되지 않는 버그가 있음. 이를 위한 임시 방편
+	UPROPERTY(ReplicatedUsing=OnRep_Weapons)
+	TObjectPtr<AWeapon> Weapon1;
+	
 	TArray<FOnWepAvailabilityChanged> OnWepAvailabilityChanged;
 
-	UPROPERTY(EditDefaultsOnly, meta=(UIMax=9, ClampMax=9), BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-	uint8 WeaponSlots;
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	uint8 WeaponSlots = 2;
 
-	UPROPERTY(VisibleInstanceOnly, Replicated, Transient, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
+	UPROPERTY(VisibleInstanceOnly, Replicated, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	uint8 Active;
 
+	UPROPERTY(EditInstanceOnly)
 	uint8 bFirePressed : 1;
+	
+	UPROPERTY(VisibleInstanceOnly)
 	uint8 bShouldAutoFire : 1;
+	
+	UPROPERTY(VisibleInstanceOnly)
 	uint8 bFiring : 1;
 };
 

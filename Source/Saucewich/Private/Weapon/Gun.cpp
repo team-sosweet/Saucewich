@@ -156,7 +156,7 @@ void AGun::Shoot()
 		if (UUserSettings::Get(this)->bVibration)
 			PC->PlayDynamicForceFeedback(Data.FFBIntensity, Data.FFBDuration, true, false, true, false);
 
-		PC->ClientPlayCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);
+		PC->ClientStartCameraShake(Data.FireShake.LoadSynchronous(), Data.Recoil);
 	}
 
 	FirePSC->Activate();

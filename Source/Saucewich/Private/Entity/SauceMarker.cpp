@@ -20,6 +20,9 @@ UInstancedStaticMeshComponent* FSauceMarkers::PickRand() const
 void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hit, const AActor* const Ignore)
 {
 #if !UE_SERVER
+	if (IsRunningDedicatedServer()) {
+		return;
+	}
 	const auto World = Ignore->GetWorld();
 
 	auto Rot = Hit.ImpactNormal.ToOrientationQuat();
@@ -70,13 +73,16 @@ void ASauceMarker::Add(const uint8 Team, const float Scale, const FHitResult& Hi
 	}
 
 	const auto Comp = Marker->TeamMarkers[Team].PickRand();
-	Comp->AddInstance({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (Offset + .01f), Scale3D}, true);
+	Comp->AddInstance({Rot, Hit.ImpactPoint + Hit.ImpactNormal * (Offset + .05f), Scale3D}, true);
 #endif
 }
 
 void ASauceMarker::Add(const AActor* const Owner, const uint8 Team, const FVector& Location, const float Scale)
 {
 #if !UE_SERVER
+	if (IsRunningDedicatedServer()) {
+		return;
+	}
 	const auto World = Owner->GetWorld();
 	const auto MaxDist = 100.f * Scale;
 

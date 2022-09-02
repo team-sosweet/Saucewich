@@ -82,10 +82,6 @@ void USaucewichInstance::Init()
 	UserSettings = NewObject<UUserSettings>(this);
 	Matchmaker = NewObject<UMatchmaker>(this);
 
-#if !UE_SERVER
-	UserSettings->CommitMaxFPS();
-#endif
-
 	GEngine->NetworkFailureEvent.AddUObject(this, &USaucewichInstance::OnNetworkError);
 
 	UE_LOG(LogSaucewich, Log, TEXT("BUILD TIME: " __DATE__ " " __TIME__));
